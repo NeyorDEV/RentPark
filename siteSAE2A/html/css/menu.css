@@ -1,0 +1,200 @@
+nav {
+    position: fixed; 
+    top: 0;
+    left: 0;
+    width: 20%;      
+    height: 100%;   
+    background-color:white;
+    border: 1px solid;
+    padding-top: 20px;
+
+}
+
+
+.menu {
+
+    margin: 0;
+    padding: 0;
+}
+
+.menu li {
+    margin: 10px 0;
+}
+
+.menu a {
+    display: flex;               
+    align-items: center;
+    padding: 12px 20px;
+    text-decoration: none;
+    color: rgb(80, 80, 80);      
+    font-size: 18px;
+    border-radius: 10px;        
+    margin: 5px 10px;         
+  }
+  .menu a img {
+    width: 15%;
+    height: 15%;
+    margin-right: 10px;
+
+  }
+  
+  .menu a:hover img {
+    filter: grayscale(70%) brightness(0.9); 
+
+  }
+  
+  .menu a:hover {
+    background-color: rgb(230, 230, 230);
+    color: black;                 
+  }
+
+  .voiture {
+    display: flex;                
+    flex-wrap: wrap;              
+    justify-content: flex-start;  
+    align-items: flex-start;      
+    gap: 50px;                    
+    margin-left: 22%;             
+    padding: 20px;
+  }
+  
+
+.rectangle {
+    width: 300px;
+    height: 400px;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    padding-top: 5px;
+    transition: transform 0.3s ease;
+  }
+  
+
+.rectangle:hover {
+    transform: scale(1.1);
+}
+
+.rectangle p {
+    font-size: 18px;
+    font-weight: bold;
+}
+  
+.top {
+    display: flex;
+    justify-content: space-between; /* espace entre titre et bouton */
+    align-items: center;
+    padding: 10px 20px;
+}
+.top h1 {
+    margin-left:48% ;
+}
+
+.add-btn {
+    background: #28a745;
+    color: white;
+    padding: 8px 15px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: bold;
+}
+.add-btn:hover {
+    background: #218838;
+}
+
+.modal {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px); /* compatibilité Safari */
+    display: none;
+    align-items: center;
+    justify-content: center;
+}
+.modal:target {
+    display: flex;
+}
+.modal-content {
+    background: white;
+    padding: 20px;
+    border-radius: 40px;
+    width: 40%;
+    height: 60%;
+    box-shadow: 0 0 15px rgba(0,0,0,0.3);
+    text-align: center;
+}
+.close {
+    float: right;
+    text-decoration: none;
+    font-weight: bold;
+    color: red;
+}
+.close:hover {
+    color: darkred;
+}
+
+/* Style moderne pour les champs de formulaire */
+.modal-content input[type="text"],
+.modal-content input[type="number"],
+.modal-content input[type="email"],
+.modal-content input[type="password"],
+.modal-content select,
+.modal-content textarea {
+    width: 90%;
+    padding: 12px 15px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+}
+
+/* Effet focus */
+.modal-content input:focus,
+.modal-content select:focus,
+.modal-content textarea:focus {
+    border-color: #28a745;
+    box-shadow: 0 0 8px rgba(40, 167, 69, 0.4);
+    outline: none;
+}
+
+/* Bouton moderne */
+.modal-content button {
+    background: #28a745;
+    color: white;
+    padding: 12px 20px;
+    margin-top: 15px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.modal-content button:hover {
+    background: #218838;
+    transform: translateY(-2px);
+}
+
+.delete-btn {
+    background: #dc3545;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    margin-top: 10px;
+}
+.delete-btn:hover {
+    background: #c82333;
+}
+
+
+  
