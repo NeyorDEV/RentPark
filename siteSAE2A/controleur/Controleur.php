@@ -36,13 +36,13 @@ class Controleur
 
                 default:
                     $dVueEreur[] = "Action inconnue";
-                    $this->afficherVue('flotte', $dVueEreur);
+                    $this->afficherVue('flotte', $dVueEreur,$results=null,'admin');
                     break;
             }
 
         } catch (PDOException $e) {
             $dVueEreur[] = "Erreur BDD : " . $e->getMessage();
-            $this->afficherVue('erreur', $dVueEreur);
+            $this->afficherVue('erreur', $dVueEreur, $results = null,'admin');
         }
 
         exit(0);
@@ -89,7 +89,7 @@ class Controleur
      * @param array $dVueEreur tableau d'erreurs
      * @param array|null $results tableau de résultats optionnel
      */
-    private function afficherVue(string $vueKey, array $dVueEreur, array $results = null,string $role )
+    private function afficherVue(string $vueKey, array $dVueEreur, array $results=null,string $role )
     {
         global $rep, $vues;
 
