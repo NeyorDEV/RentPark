@@ -9,11 +9,9 @@ import requests
 
 load_dotenv()  # charge le contenu du .env
 GITLAB_TOKEN = os.getenv("GITLAB_TOKEN")
+DISCORD_TOKEN = os.getenv("DISCORD_TOKEN")
 
 print("Token chargé :", bool(GITLAB_TOKEN))  # test : doit afficher True
-
-# --- Remplace par ton token personnel (à garder secret !) ---
-TOKEN = "MTQyNzU0Mzk3NDcwNDQ0NzQ5OA.GyOEHP.NGMy0sODYyFvsTMIEb0MJTqI28TIzO7Vj2zeMc"
 
 # --- Configuration du bot ---
 intents = discord.Intents.default()
@@ -25,9 +23,8 @@ bot = commands.Bot(command_prefix="!", intents=intents)
 async def on_ready():
     print(f"Connecté en tant que {bot.user}")
 
-# --- Commande !graph ---
+# --- Commande !graph --------------------------------------------------------------------------------------------
 @bot.command()
-
 async def graph(ctx):
     # Exemple : générer un graphique simple
     x = [1, 2, 3, 4, 5]
@@ -48,7 +45,7 @@ async def graph(ctx):
     # Envoyer l'image sur Discord
     await ctx.send(file=discord.File(buffer, filename="graph.png"))
 
-# --- Commande !commit (test) ---
+# --- Commande !commit (test) ------------------------------------------------------------------------------
 @bot.command()
 async def commits(ctx):
     await ctx.send("🔍 Récupération des commits...")
@@ -69,6 +66,6 @@ async def commits(ctx):
     else:
         await ctx.send(f"Erreur {response.status_code} lors de la récupération des commits.")
 
-# --- Lancer le bot ---
+# --- Lancer le bot -----------------------------------------------------------------------------------
 print("Commandes chargées :", bot.all_commands.keys())
-bot.run(TOKEN)
+bot.run(DISCORD_TOKEN)
