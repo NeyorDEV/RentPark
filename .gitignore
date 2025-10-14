@@ -1,0 +1,21 @@
+# --- Fichiers sensibles ---
+.env
+
+# --- Dossiers temporaires Python ---
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# --- Dossiers et fichiers de configuration d’IDE ---
+.vscode/
+.idea/
+
+# --- Environnement virtuel Python (si tu en utilises un) ---
+venv/
+.env/
+.venv/
+
+# --- Logs et fichiers temporaires ---
+*.log
+*.tmp
