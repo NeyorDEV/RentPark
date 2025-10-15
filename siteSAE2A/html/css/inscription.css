@@ -1,0 +1,91 @@
+body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #4a90e2, #9013fe);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+  }
+  
+  .login-container {
+    background-color: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    width: 320px;
+    text-align: center;
+  }
+  
+  h2 {
+    margin-bottom: 1.5rem;
+    color: #333;
+  }
+  
+  .input-group {
+    margin-bottom: 1rem;
+    text-align: left;
+  }
+  
+  label {
+    display: block;
+    margin-bottom: 0.3rem;
+    color: #555;
+  }
+  
+  input {
+    width: 100%;
+    padding: 0.6rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    outline: none;
+    transition: border-color 0.3s;
+  }
+  
+  input:focus {
+    border-color: #4a90e2;
+  }
+  
+  button {
+    width: 100%;
+    padding: 0.7rem;
+    background-color: #4a90e2;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+  
+  button:hover {
+    background-color: #357abd;
+  }
+  
+  .error {
+    color: red;
+    font-size: 0.9rem;
+    margin-top: 1rem;
+  }
+  
+  .success {
+    color: green;
+    font-size: 0.9rem;
+    margin-top: 1rem;
+  }
+  .role-options {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 0.5rem;
+  }
+  
+  .role-options label {
+    font-size: 0.95rem;
+    color: #444;
+    cursor: pointer;
+  }
+  
+  .role-options input[type="radio"] {
+    margin-right: 0.3rem;
+  }
+  
+  

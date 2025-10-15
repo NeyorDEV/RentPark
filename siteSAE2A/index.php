@@ -12,6 +12,16 @@ require_once(__DIR__ . '/config/config.php');
 require_once(__DIR__ . '/config/Autoload.php');
 Autoload::charger();
 
+
+$action = $_POST['action'] ?? $_GET['action'] ?? null;
+
+if ($action === 'inscription') {
+    $controller = new Controleur();
+    $controller->inscription($dVueErreur); // ici tu traites le POST
+    
+    exit;
+}
+
 $role = $_SESSION['role'] ?? 'admin'; // 'admin', 'user', 'guest'
 
 // Selon le rôle, on instancie le bon contrôleur
@@ -32,5 +42,6 @@ switch ($role) {
         break;
 }
 
-
+// instancie un front controller et le controller gère le reste 
+// alto routeur 
 ?> 

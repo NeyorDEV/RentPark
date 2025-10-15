@@ -4,6 +4,8 @@ class Controleur
     private Connection $connection;
     private VehicleGateway $gateway;
 
+    private UserGateway $userGateway;
+
     public function __construct()
     {
         global $rep, $vues, $user, $pass, $dsn;
@@ -17,6 +19,7 @@ class Controleur
 
             // ⚡ Instanciation de la Gateway
             $this->gateway = new VehicleGateway($this->connection);
+            $this->userGateway = new UserGateway($this->connection);
 
             // Action
             $action = $_REQUEST['action'] ?? null;
@@ -32,6 +35,10 @@ class Controleur
 
                 case "supprimerVoiture":
                     $this->supprimerVoiture($dVueEreur);
+                    break;
+
+                case "inscription":
+                    $this->inscription( $dVueEreur);
                     break;
 
                 default:
@@ -83,13 +90,36 @@ class Controleur
         exit;
     }
 
-    /**
-     * Affiche une vue de manière sécurisée
-     * @param string $vueKey clé du tableau $vues
-     * @param array $dVueEreur tableau d'erreurs
-     * @param array|null $results tableau de résultats optionnel
-     */
-    private function afficherVue(string $vueKey, array $dVueEreur, array $results=null,string $role )
+    public function inscription(array $dVueErreur)
+    {
+        $username = $_POST['username'] ?? '';
+        $password = $_POST['password'] ?? '';
+        $confirm  = $_POST['confirm'] ?? '';
+        $role     = $_POST['role'] ?? '';
+
+        
+        Validation::val_user($username, $password, $confirm, $role, $dVueErreur);
+
+        if (!empty($dVueErreur)) {
+            require '../view/viewErreur.php';
+            exit;
+        }
+
+        $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+
+        
+        $user = new User(null, $username, $hashedPassword, $role);
+        $this->userGateway->addUser($user);
+
+        
+        $results = $this->gateway->getAll();
+        require __DIR__ . '/../view/viewVoiture.php';
+
+        
+    }
+
+  
+    private function afficherVue(string $vueKey, array $dVueEreur, array  $results=null,string $role ='admin' )
     {
         global $rep, $vues;
 
