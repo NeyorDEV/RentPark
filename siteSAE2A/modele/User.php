@@ -1,6 +1,8 @@
 <?php
 // classes/User.php
 
+namespace modele;
+
 class User
 {
     private ?int $id;

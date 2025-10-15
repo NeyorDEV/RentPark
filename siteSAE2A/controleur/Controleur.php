@@ -1,4 +1,10 @@
 <?php
+namespace controleur;
+use modele\Connection;
+use modele\UserGateway;
+use modele\VehicleGateway;
+use modele\User;
+use config\Validation;
 class Controleur
 {
     private Connection $connection;
@@ -47,7 +53,7 @@ class Controleur
                     break;
             }
 
-        } catch (PDOException $e) {
+        } catch (\PDOException $e) {
             $dVueEreur[] = "Erreur BDD : " . $e->getMessage();
             $this->afficherVue('erreur', $dVueEreur, $results = null,'admin');
         }

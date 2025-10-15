@@ -1,0 +1,12 @@
+{
+    "require": {
+        "twig/twig": "^3.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "controleur\\": "controleur/",
+             "config\\": "config/",
+             "modele\\": "modele/"
+        }
+    }
+}

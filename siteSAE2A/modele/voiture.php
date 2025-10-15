@@ -1,4 +1,5 @@
 <?php
+namespace modele;
 class Voiture {
     private int $voiture;     // ex : id ou nombre
     private string $modele;   // ex : "BMW"

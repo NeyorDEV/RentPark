@@ -1,4 +1,8 @@
 <?php
+namespace controleur;
+use modele\Connection;
+use modele\VehicleGateway;
+
 class UserController
 {
     private Connection $connection;
@@ -18,7 +22,7 @@ class UserController
             // Les utilisateurs n'ont que la liste
             $this->listeVoitures($dVueErreur);
 
-        } catch (PDOException $e) {
+        } catch (\PDOException $e) {
             $dVueErreur[] = "Erreur BDD : " . $e->getMessage();
             $this->afficherVue('erreur', $dVueErreur);
         }

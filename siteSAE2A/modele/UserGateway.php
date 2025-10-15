@@ -1,4 +1,5 @@
 <?php
+namespace modele;
 class UserGateway {
     private Connection $connection;
 
@@ -10,9 +11,9 @@ class UserGateway {
     {
         $query = "INSERT INTO users (username, password, role) VALUES (:username, :password, :role)";
         $params = [
-            ':username' => [$user->getUsername(), PDO::PARAM_STR],
-            ':password' => [$user->getPassword(), PDO::PARAM_STR], // déjà hashé
-            ':role'     => [$user->getRole(), PDO::PARAM_STR],
+            ':username' => [$user->getUsername(), \PDO::PARAM_STR],
+            ':password' => [$user->getPassword(), \PDO::PARAM_STR], // déjà hashé
+            ':role'     => [$user->getRole(), \PDO::PARAM_STR],
         ];
 
         $this->connection->executeQuery($query, $params);

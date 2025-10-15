@@ -1,4 +1,5 @@
 <?php
+namespace modele;
 class VehicleGateway {
     private Connection $connection;
 
@@ -14,10 +15,10 @@ class VehicleGateway {
     public function add(int $voiture, string $modele, string $couleur , string $puissance): void {
         $query = "INSERT INTO testphp VALUES (:voiture, :modele,:couleur,:puissance)";
         $params = [
-            ':voiture' => [$voiture, PDO::PARAM_INT],
-            ':modele' => [$modele, PDO::PARAM_STR],
-            ':couleur' => [$couleur, PDO::PARAM_STR],
-            ':puissance' => [$puissance, PDO::PARAM_STR],
+            ':voiture' => [$voiture, \PDO::PARAM_INT],
+            ':modele' => [$modele, \PDO::PARAM_STR],
+            ':couleur' => [$couleur, \PDO::PARAM_STR],
+            ':puissance' => [$puissance, \PDO::PARAM_STR],
         ];
         $this->connection->executeQuery($query, $params);
     }
@@ -25,7 +26,7 @@ class VehicleGateway {
     public function delete(int $id): void {
         $query = "DELETE FROM testphp WHERE voiture = :id";
         $params = [
-            ':id' => [$id, PDO::PARAM_INT]
+            ':id' => [$id, \PDO::PARAM_INT]
         ];
         $this->connection->executeQuery($query, $params);
     }
