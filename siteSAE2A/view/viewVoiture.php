@@ -1,6 +1,8 @@
 <?php
 // $results est fourni par le contrôleur
 // $dVueErreur contient les messages d'erreur si besoin
+// action à modifier dans la top bar 
+
  
  $isAdmin = ($role === 'admin');
 ?>
@@ -12,7 +14,8 @@
     <title>RentPark - Flotte Automobile</title>
     <link rel="stylesheet" href="html/css/menu.css">
 </head>
-<body>    
+<body>   
+
 <nav>
     <ul class="menu">
         <li><a href=""><img src="html/icons/acceuil.jpg" alt="Accueil"> Accueil</a></li>
@@ -28,6 +31,26 @@
         <a href="#addModal" class="add-btn">+ Ajouter</a>
         <?php endif; ?>
 </div>
+
+
+<header class="topbar">
+  <form action="index.php" method="get" role="search" class="topbar-form">
+    <input type="hidden" name="action" value="rechercherVoitures">
+
+    <input
+      id="q3"
+      name="q"
+      type="search"
+      placeholder="Rechercher..."
+      aria-label="Recherche"
+      value="<?php echo htmlspecialchars($_GET['q'] ?? '', ENT_QUOTES); ?>"
+    >
+
+    <button type="submit">🔍</button>
+  </form>
+</header>
+
+
 
 <?php if (!empty($dVueErreur)) : ?>
     <div class="erreurs">

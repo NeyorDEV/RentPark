@@ -47,6 +47,11 @@ class Controleur
                     $this->inscription( $dVueEreur);
                     break;
 
+                case "rechercherVoitures":
+                        $this->rechercherVoitures($dVueEreur);
+                        break;
+                    
+
                 default:
                     $dVueEreur[] = "Action inconnue";
                     $this->afficherVue('flotte', $dVueEreur,$results=null,'admin');
@@ -66,6 +71,8 @@ class Controleur
         $results = $this->gateway->getAll();
         $this->afficherVue('flotte', $dVueEreur, $results,'admin');
     }
+// ajouter les vue erreur et les vérif 
+    
 
     private function ajouterVoiture(array $dVueEreur)
     {
@@ -95,6 +102,24 @@ class Controleur
         header("Location: index.php");
         exit;
     }
+
+    private function rechercherVoitures(array $dVueErreur = []): void
+{
+    $motCle = trim($_GET['q'] ?? '');
+
+    if ($motCle === '') {
+        $results = $this->gateway->getAll();
+    } else {
+        $results = $this->gateway->rechercherVoitures($motCle);
+
+        if (empty($results)) {
+            $dVueErreur[] = "Aucune voiture trouvée pour \"$motCle\".";
+        }
+    }
+
+    $this->afficherVue('flotte', $dVueErreur, $results, 'admin');
+}
+
 
     public function inscription(array $dVueErreur)
     {

@@ -20,6 +20,7 @@ class VehicleGateway {
             ':couleur' => [$couleur, \PDO::PARAM_STR],
             ':puissance' => [$puissance, \PDO::PARAM_STR],
         ];
+
         $this->connection->executeQuery($query, $params);
     }
 
@@ -30,6 +31,19 @@ class VehicleGateway {
         ];
         $this->connection->executeQuery($query, $params);
     }
+
+    public function rechercherVoitures(string $motCle): array {
+        $query = "SELECT * FROM testphp WHERE modele LIKE :q";
+        $params = [
+            ':q' => ["%$motCle%", \PDO::PARAM_STR]
+        ];
+    
+        $this->connection->executeQuery($query, $params);
+    
+       
+        return $this->connection->getResults();
+    }
+    
     
 }
 ?>
