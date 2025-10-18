@@ -48,8 +48,24 @@ class Controleur
                     break;
 
                 case "rechercherVoitures":
-                        $this->rechercherVoitures($dVueEreur);
-                        break;
+                    $this->rechercherVoitures($dVueEreur);
+                    break;
+
+                case "ajouterUtilisateur":
+                    $this->ajouterUtilisateur( $dVueEreur);
+                    break;
+
+                case "supprimerUtilisateur":
+                    $this->supprimerUtilisateur( $dVueEreur);
+                    break;
+
+                case "rechercherUtilisateur":
+                    $this->rechercherUtilisateur($dVueEreur);
+                    break;
+
+                case "listeUtilisateur":
+                    $this->listeUtilisateur($dVueEreur);
+                    break;
                     
 
                 default:
@@ -168,5 +184,58 @@ class Controleur
             exit;
         }
     }
+    private function rechercherUtilisateur(array $dVueErreur = []): void
+    {
+        $motCle = trim($_GET['q'] ?? '');
+
+        if ($motCle === '') {
+            $results = $this->userGateway->getAllUser();
+        } else {
+            $results = $this->userGateway->rechercherUtilisateur($motCle);
+
+            if (empty($results)) {
+                $dVueErreur[] = "Aucun utilisateur trouvée pour \"$motCle\".";
+            }
+        }
+
+        $this->afficherVue('user', $dVueErreur, $results, 'admin');
+    }
+
+    private function supprimerUtilisateur(array $dVueEreur)
+    {
+        $id = (int)($_POST['id'] ?? -1);
+        if ($id >= 0) {
+            $this->userGateway->deleteUser($id);
+        }
+
+        header("Location: index.php");
+        exit;
+    }
+
+    private function ajouterUtilisateur(array $dVueEreur)
+    {
+        $username   = $_POST['username'] ?? '';
+        $password   = $_POST['password'] ?? '';
+        $confirm    = $_POST['confirm'] ?? '';
+        $role = $_POST['role'] ?? '';
+
+        Validation::val_user($username, $password, $confirm, $role, $dVueEreur);
+
+        if (empty($dVueEreur)) {
+            $this->userGateway->addUser( $username, $password, $role);
+            header("Location: index.php");
+            exit;
+        }
+
+        $results = $this->userGateway->getAllUser();
+        $this->afficherVue('user', $dVueEreur, $results);
+    }
+
+    private function listeUtilisateur(array $dVueEreur)
+    {
+        $results = $this->userGateway->getAllUser();
+        $this->afficherVue('user', $dVueEreur, $results,'admin');
+    }
 }
+
 ?>

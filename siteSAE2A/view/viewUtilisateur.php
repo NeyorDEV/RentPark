@@ -1,0 +1,112 @@
+<?php
+// $results est fourni par le contrôleur
+// $dVueErreur contient les messages d'erreur si besoin
+// action à modifier dans la top bar
+
+
+$isAdmin = ($role === 'admin');
+?>
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <title>RentPark - Utilisateurs</title>
+    <link rel="stylesheet" href="html/css/menu.css">
+</head>
+<body>
+
+<nav>
+    <ul class="menu">
+        <li><a href=""><img src="html/icons/acceuil.jpg" alt="Accueil"> Accueil</a></li>
+        <li><a href=""><img src="html/icons/voiture.png" alt="Flotte"> Flotte Automobile</a></li>
+        <li><a href=""><img src="html/icons/contrat.png" alt="Contrats"> Contrats</a></li>
+        <li><a href=""><img src="html/icons/settings.png" alt="Paramètres"> Paramètres</a></li>
+    </ul>
+</nav>
+
+<div class="top">
+    <h1>Utilisateurs</h1>
+    <?php if ($isAdmin): ?>
+        <a href="#addModal" class="add-btn">+ Ajouter</a>
+    <?php endif; ?>
+</div>
+
+
+<header class="topbar">
+    <form action="index.php" method="get" role="search" class="topbar-form">
+        <input type="hidden" name="action" value="rechercherUtilisateur">
+
+        <input
+                id="q3"
+                name="q"
+                type="search"
+                placeholder="Rechercher..."
+                aria-label="Recherche"
+                value="<?php echo htmlspecialchars($_GET['q'] ?? '', ENT_QUOTES); ?>"
+        >
+
+        <button type="submit">🔍</button>
+    </form>
+</header>
+
+
+
+<?php if (!empty($dVueErreur)) : ?>
+    <div class="erreurs">
+        <ul>
+            <?php foreach ($dVueErreur as $erreur) : ?>
+                <li><?= htmlspecialchars($erreur) ?></li>
+            <?php endforeach; ?>
+        </ul>
+    </div>
+<?php endif; ?>
+
+<div class="voiture">
+    <?php if (!empty($results)) : ?>
+        <?php foreach ($results as $row) : ?>
+            <div class="rectangle">
+                <p>
+                    <?= htmlspecialchars($row['id']) ?><br>
+                    <?= htmlspecialchars($row['username']) ?><br>
+                    <?= htmlspecialchars($row['role']) ?><br>
+                    <img src="html/icons/user.png" alt="User" width="100px">
+                </p>
+
+                <!-- Formulaire pour supprimer -->
+                <form method="POST" action ="index.php" onsubmit="return confirm('Supprimer cet utilisateur ?');">
+                    <input type="hidden" name="id" value="<?= htmlspecialchars($row['id']) ?>">
+                    <input type="hidden" name="action" value="supprimerUtilisateur">
+                    <button type="submit"  class="delete-btn">Supprimer</button>
+                </form>
+            </div>
+        <?php endforeach; ?>
+    <?php else : ?>
+        <div class="rectangle">
+            <p>Aucun Utilisateur trouvé</p>
+        </div>
+    <?php endif; ?>
+</div>
+
+<!-- Modal pour ajouter -->
+
+<div id="addModal" class="modal">
+    <div class="modal-content">
+        <a href="#" class="close">&times;</a>
+        <h2>Ajouter un Utilisateur</h2>
+        <form method="POST" action="index.php">
+            <input type="hidden" name="action" value="ajouterUtilisateur">
+            <input type="text" name="username" placeholder="username" required><br><br>
+            <input type="password" name="password" placeholder="password" required><br><br>
+            <input type="password" name="confirm" placeholder="confirm" required><br><br>
+            <input type="text" name="role" placeholder="role" required><br><br>
+            <button type="submit" name="ajouterUtilisateur">Ajouter</button>
+
+        </form>
+    </div>
+</div>
+
+
+</body>
+</html>
+
