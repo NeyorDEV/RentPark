@@ -3,14 +3,15 @@ namespace controleur;
 use modele\Connection;
 use modele\UserGateway;
 use modele\VehicleGateway;
+use modele\ReservationGateway;
 use modele\User;
 use config\Validation;
 class Controleur
 {
     private Connection $connection;
     private VehicleGateway $gateway;
-
     private UserGateway $userGateway;
+    private ReservationGateway $reservationGateway;
 
     public function __construct()
     {
@@ -65,6 +66,10 @@ class Controleur
 
                 case "listeUtilisateur":
                     $this->listeUtilisateur($dVueEreur);
+                    break;
+
+                case "listeReservation":
+                    $this->listeReservation($dVueEreur);
                     break;
                     
 
@@ -235,6 +240,11 @@ class Controleur
     {
         $results = $this->userGateway->getAllUser();
         $this->afficherVue('user', $dVueEreur, $results,'admin');
+    }
+    private function listeReservation(array $dVueEreur)
+    {
+        $results = $this->reservationGateway->getCurrentReservation();
+        $this->afficherVue('reservation', $dVueEreur, $results,'admin');
     }
 }
 
