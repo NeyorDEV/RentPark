@@ -79,6 +79,9 @@ class Controleur
                 case 'ajouterReservation':
                     $this->ajouterReservation($_POST);
                     break;
+                case 'supprimerReservation':
+                    $this->supprimerReservation($_POST);
+                    break;
 
                 default:
                     $dVueEreur[] = "Action inconnue";
@@ -199,7 +202,8 @@ class Controleur
 
         if ($motCle === '') {
             $results = $this->userGateway->getAllUser();
-        } else {
+        } 
+        else {
             $results = $this->userGateway->rechercherUtilisateur($motCle);
 
             if (empty($results)) {
@@ -294,6 +298,20 @@ class Controleur
 
         // Réaffiche la page (liste + form) avec éventuellement les erreurs
         $this->rechercherReservation(); 
+    }
+
+    private function supprimerReservation(array $dVueEreur)
+    {
+        $id = (int)($_POST['id'] ?? -1);
+        if ($id >= 0) {
+            $this->reservationGateway->delete($id);
+        }
+        else{
+            $dVueErreur[] = "Cette réservation n'existe pas, impossible de la supprimer .";
+        }
+        
+        $this->rechercherReservation();
+        exit;
     }
 
 }

@@ -49,4 +49,11 @@ class ReservationGateway {
             ':etat' => ['neuf',     \PDO::PARAM_STR], // adapte à ton schéma (NOT NULL ? valeur par défaut ?)
         ]);
     }
+    public function delete(int $id): void {
+        $query = "DELETE FROM Contrat WHERE idcontrat = :id";
+        $params = [
+            ':id' => [$id, \PDO::PARAM_INT]
+        ];
+        $this->connection->executeQuery($query, $params);
+    }
 }

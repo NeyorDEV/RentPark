@@ -95,6 +95,11 @@ $isAdmin = ($role === 'admin');
                 </p>
 
                 <!-- Formulaire pour supprimer -->
+                <form method="POST" action ="index.php" onsubmit="return confirm('Supprimer ce contrat ?');">
+                  <input type="hidden" name="action" value="supprimerReservation">
+                  <input type="hidden" name="id" value="<?= htmlspecialchars($row['idContrat']) ?>">
+                  <button type="submit"  class="delete-btn">Supprimer</button>
+                </form>
             </div>
         <?php endforeach; ?>
     <?php else : ?>
@@ -127,6 +132,7 @@ $isAdmin = ($role === 'admin');
 
       <button type="submit">Créer la réservation</button>
     </form>
+    
   </div>
 </div>
 
