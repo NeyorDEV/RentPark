@@ -42,9 +42,7 @@ class VehicleGateway {
     
        
         return $this->connection->getResults();
-    }
-    
-    
+    }   
 }
 ?>
 

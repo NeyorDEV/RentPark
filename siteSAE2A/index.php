@@ -24,10 +24,15 @@ if ($action === 'inscription') {
     
     exit;
 }
+if ($action === 'ajouterReservation') {
+    require_once __DIR__ . '/controleur/Controleur.php';
+    new Controleur(); 
+    exit;                 
+}
 // ACCÈS à la liste des réservations
 // (autorise tout le monde pas encore géré le role)
-if ($action === 'listeReservation') {
-    $_GET['action'] = $_REQUEST['action'] = 'listeReservation';
+if ($action === 'rechercherReservation') {
+    $_GET['action'] = $_REQUEST['action'] = 'rechercherReservation';
     require_once __DIR__ . '/controleur/Controleur.php';
     new Controleur();
     exit;

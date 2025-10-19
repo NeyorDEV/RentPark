@@ -12,11 +12,14 @@ class Controleur
     private VehicleGateway $gateway;
     private UserGateway $userGateway;
     private ReservationGateway $reservationGateway;
-
+    
     public function __construct()
     {
         global $rep, $vues, $user, $pass, $dsn;
-        session_start();
+
+        if (session_status() !== PHP_SESSION_ACTIVE) { session_start(); }
+  
+        
 
         $dVueEreur = [];
 
@@ -70,13 +73,12 @@ class Controleur
                     $this->listeUtilisateur($dVueEreur);
                     break;
 
-                case "listeReservation":
-                    $this->listeReservation($dVueEreur);
-                    break;
                 case 'rechercherReservation':
                     $this->rechercherReservation();
                     break;
-
+                case 'ajouterReservation':
+                    $this->ajouterReservation($_POST);
+                    break;
 
                 default:
                     $dVueEreur[] = "Action inconnue";
@@ -98,7 +100,6 @@ class Controleur
         $this->afficherVue('flotte', $dVueEreur, $results,'admin');
     }
 // ajouter les vue erreur et les vérif 
-    
 
     private function ajouterVoiture(array $dVueEreur)
     {
@@ -171,12 +172,9 @@ class Controleur
         
         $results = $this->gateway->getAll();
         require __DIR__ . '/../view/viewVoiture.php';
-
-        
     }
 
-  
-    private function afficherVue(string $vueKey, array $dVueEreur, ?array $results = null, string $role = 'admin')
+    private function afficherVue(string $vueKey, array $dVueErreur, ?array $results = null, string $role = 'guest'): void
 
     {
         global $rep, $vues;
@@ -247,25 +245,56 @@ class Controleur
         $results = $this->userGateway->getAllUser();
         $this->afficherVue('user', $dVueEreur, $results,'admin');
     }
-    private function listeReservation(array $dVueEreur)
-    {
-        $results = $this->reservationGateway->getCurrentReservation();
-        $this->afficherVue('reservation', $dVueEreur, $results,'admin');
-    }
+
     private function rechercherReservation(): void
-{
-    $champ  = $_GET['champ']  ?? 'idContrat';
-    $q      = trim($_GET['q'] ?? '');
-    $filtre = $_GET['filtre'] ?? 'en-cours';
+    {
+        $champ  = $_GET['champ']  ?? 'idContrat';
+        $q      = trim($_GET['q'] ?? '');
+        $filtre = $_GET['filtre'] ?? 'en-cours';
 
-    // whitelist des champs autorisés
-    $allowed = ['idContrat' => 'idContrat', 'Vehicule' => 'Vehicule', 'Client' => 'Client'];
-    if (!isset($allowed[$champ])) { $champ = 'idContrat'; }
+        // whitelist des champs autorisés
+        $allowed = ['idContrat' => 'idContrat', 'Vehicule' => 'Vehicule', 'Client' => 'Client'];
+        if (!isset($allowed[$champ])) { $champ = 'idContrat'; }
 
-    $results = $this->reservationGateway->searchReservations($champ, $q, $filtre);
+        $results = $this->reservationGateway->searchReservations($champ, $q, $filtre);
 
-    $this->afficherVue('reservation', [], $results, $this->role);
-}
+        $this->afficherVue('reservation', [], $results, 'admin');
+    }
+    private function ajouterReservation(array $post): void {
+        $vehicule  = trim($post['Vehicule']  ?? '');
+        $client    = (int)($post['Client']   ?? 0);
+        $dateDebut = trim($post['DateDebut'] ?? '');
+        $dateFin   = trim($post['DateFin']   ?? '');
+
+        $err = [];
+
+        if ($vehicule === '') $err[] = "Le véhicule (VIN) est obligatoire.";
+        if ($client <= 0)     $err[] = "Le client (ID) doit être un entier positif.";
+        if ($dateDebut === '') $err[] = "La date de début est obligatoire.";
+        if ($dateFin   === '') $err[] = "La date de fin est obligatoire.";
+
+        $d1 = \DateTime::createFromFormat('Y-m-d', $dateDebut) ?: null;
+        $d2 = \DateTime::createFromFormat('Y-m-d', $dateFin)   ?: null;
+        if (!$d1 || !$d2) {
+            $err[] = "Format de date invalide (attendu : AAAA-MM-JJ).";
+        } elseif ($d1 > $d2) {
+            $err[] = "La date de début doit être antérieure ou égale à la date de fin.";
+        }
+
+        // 👉 INSERT SI OK
+        if (empty($err)) {
+            try {
+                $this->reservationGateway->insertReservation($vehicule, $client, $dateDebut, $dateFin);
+                // (optionnel) message de succès via la vue
+                // $msg = "Réservation créée avec succès.";
+            } catch (\PDOException $e) {
+                $err[] = "Erreur base de données : " . $e->getMessage();
+            }
+        }
+
+        // Réaffiche la page (liste + form) avec éventuellement les erreurs
+        $this->rechercherReservation(); 
+    }
 
 }
 

@@ -7,56 +7,46 @@ class ReservationGateway {
     public function __construct(Connection $connection) {
         $this->connection = $connection;
     }
+    public function searchReservations(string $champ, string $q, string $filtre): array {
+        $where  = [];
+        $params = [];
 
-    // Liste complète (ex: pour debug / page admin)
-    public function getAll(): array {
-        $sql = "SELECT idContrat, DateDebut, DateFin, Vehicule, Client, EtatDesLieu
-                FROM Contrat
-                ORDER BY DateDebut DESC";
-        $this->connection->executeQuery($sql);
-        return $this->connection->getResults();
-    }
-
-    // Réservations en cours aujourd'hui (inclusives)
-    public function getCurrentReservation(): array {
-        $sql = "SELECT idContrat, DateDebut, DateFin, Vehicule, Client, EtatDesLieu
-                FROM Contrat
-                WHERE CURDATE() BETWEEN DateDebut AND DateFin";
-        $this->connection->executeQuery($sql);
-        return $this->connection->getResults();
-    }
-    public function searchReservations(string $champ, string $q, string $filtre): array
-{
-    $where  = [];
-    $params = [];
-
-    // filtre de date
-    switch ($filtre) {
-        case 'a-venir':  $where[] = "DateDebut > CURDATE()"; break;
-        case 'passees':  $where[] = "DateFin   < CURDATE()"; break;
-        case 'toutes':   $where[] = "1";                    break;
-        case 'en-cours':
-        default:         $where[] = "CURDATE() BETWEEN DateDebut AND DateFin"; break;
-    }
-
-    // recherche texte
-    if ($q !== '') {
-        if ($champ === 'idContrat' || $champ === 'Client') {
-            $where[] = "$champ = :qnum";
-            $params[':qnum'] = (int)$q;
-        } else { // Vehicule (VIN)
-            $where[] = "$champ LIKE :q";
-            $params[':q'] = "%{$q}%";
+        // filtre date
+        switch ($filtre) {
+            case 'a-venir': $where[] = "DateDebut > CURDATE()"; break;
+            case 'passees': $where[] = "DateFin   < CURDATE()"; break;
+            case 'toutes':  $where[] = "1";                     break;
+            default:        $where[] = "CURDATE() BETWEEN DateDebut AND DateFin";
         }
+
+        // recherche
+        if ($q !== '') {
+            if ($champ === 'idContrat' || $champ === 'Client') {
+                $where[] = "$champ = :qnum";
+                $params[':qnum'] = [ (int)$q, \PDO::PARAM_INT ];
+            } else { // Vehicule (VIN)
+                $where[] = "$champ LIKE :q";
+                $params[':q'] = [ "%{$q}%", \PDO::PARAM_STR ];
+            }
+        }
+
+        $sql = "SELECT idContrat, Vehicule, DateDebut, DateFin, Client, EtatDesLieu
+                FROM Contrat
+                WHERE ".implode(' AND ', $where)."
+                ORDER BY DateDebut DESC";
+
+        $this->connection->executeQuery($sql, $params);
+        return $this->connection->getResults();
     }
-
-    $sql = "SELECT idContrat, Vehicule, DateDebut, DateFin, Client, EtatDesLieu
-            FROM Contrat
-            WHERE " . implode(' AND ', $where) . "
-            ORDER BY DateDebut DESC";
-
-    $this->connection->executeQuery($sql, $params);
-    return $this->connection->getResults();
-}
-
+    public function insertReservation(string $vehicule, int $client, string $dateDebut, string $dateFin): void {
+        $sql = "INSERT INTO Contrat (DateDebut, DateFin, Vehicule, Client, EtatDesLieu)
+                VALUES (:d1, :d2, :veh, :cli, :etat)";
+        $this->connection->executeQuery($sql, [
+            ':d1'   => [$dateDebut, \PDO::PARAM_STR],
+            ':d2'   => [$dateFin,   \PDO::PARAM_STR],
+            ':veh'  => [$vehicule,  \PDO::PARAM_STR],
+            ':cli'  => [$client,    \PDO::PARAM_INT],
+            ':etat' => ['neuf',     \PDO::PARAM_STR], // adapte à ton schéma (NOT NULL ? valeur par défaut ?)
+        ]);
+    }
 }

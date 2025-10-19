@@ -1,7 +1,10 @@
 <?php
- $isAdmin = ($role === 'admin');
+if (!isset($role)) {
+    if (session_status() !== PHP_SESSION_ACTIVE) { session_start(); }
+    $role = $_SESSION['role'] ?? 'guest';
+}
+$isAdmin = ($role === 'admin');
 ?>
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -16,7 +19,7 @@
         <li><a href=""><img src="html/icons/acceuil.jpg" alt="Accueil"> Accueil</a></li>
         <li><a href="index.php"><img src="html/icons/voiture.png" alt="Flotte"> Flotte Automobile</a></li>
         <li><a href=""><img src="html/icons/contrat.png" alt="Contrats"> Contrats</a></li>
-        <li><a href="index.php?action=listeReservation"><img src="html/icons/reservation.png" alt="Réservations"> Réservations</a></li>
+        <li><a href="index.php?action=rechercherReservation"><img src="html/icons/reservation.png" alt="Réservations"> Réservations</a></li>
         <li><a href=""><img src="html/icons/settings.png" alt="Paramètres"> Paramètres</a></li>
         
     </ul>       
@@ -37,8 +40,6 @@
         <option value="idContrat"   <?= $champ==='idContrat'?'selected':''; ?>>ID</option>
         <option value="Vehicule"    <?= $champ==='Vehicule'?'selected':''; ?>>Véhicule (VIN)</option>
         <option value="Client"      <?= $champ==='Client'?'selected':''; ?>>Client (ID)</option>
-        <option value="DateDebut"   <?= $champ==='DateDebut'?'selected':''; ?>>Date Debut</option>
-        <option value="DateFin"     <?= $champ==='DateFin'?'selected':''; ?>>Date Fin</option>
       </select>
 
       <input
@@ -63,7 +64,7 @@
     </form>
 
     <?php if ($isAdmin): ?>
-      <a href="#addContratModal" class="add-btn">+ Ajouter</a>
+      <a href="#addReservationModal" class="add-btn">+ Ajouter</a>
     <?php endif; ?>
   </div>
 </header>
@@ -103,13 +104,13 @@
 </div>
 
 
-<div id="addContratModal" class="modal">
+<div id="addReservationModal" class="modal">
   <div class="modal-content">
     <a href="#" class="close">&times;</a>
-    <h2>Ajouter un contrat</h2>
+    <h2>Ajouter une réservation</h2>
 
     <form method="POST" action="index.php">
-      <input type="hidden" name="action" value="ajouterContrat">
+      <input type="hidden" name="action" value="ajouterReservation">
 
       <label for="vehicule">Véhicule (VIN)</label><br>
       <input type="text" id="vehicule" name="Vehicule" placeholder="Ex: 12345678910111213" required><br><br>
