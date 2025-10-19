@@ -88,6 +88,7 @@ $isAdmin = ($role === 'admin');
             <div class="rectangle">
                 <p>
                     Reservation n°<?= htmlspecialchars($row['idContrat']) ?><br>
+                    Client : <?= htmlspecialchars($row['Client']) ?><br>
                     Vehicule : <?= htmlspecialchars($row['Vehicule']) ?><br>
                     Debut : <?= htmlspecialchars($row['DateDebut']) ?><br>
                     Fin : <?= htmlspecialchars($row['DateFin']) ?><br>
