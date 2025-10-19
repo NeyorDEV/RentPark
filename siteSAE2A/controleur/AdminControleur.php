@@ -41,6 +41,10 @@ class AdminControleur
                 case "supprimerVoiture":
                     $this->supprimerVoiture($dVueEreur);
                     break;
+                
+                case "modifierVoiture":
+                    $this->modifierVoiture($dVueEreur);
+                    break;
 
                 case "inscription":
                     $this->inscription( $dVueEreur);
@@ -115,6 +119,25 @@ class AdminControleur
 
         header("Location: index.php");
         exit;
+    }
+
+    private function modifierVoiture(array $dVueEreur)
+    {
+        $id        = (int)($_POST['id'] ?? 0);
+        $modele    = $_POST['modele'] ?? '';
+        $couleur   = $_POST['couleur'] ?? '';
+        $puissance = $_POST['puissance'] ?? '';
+
+        \config\Validation::val_voiture($modele, $couleur, $puissance, $dVueEreur);
+
+       if (empty($dVueEreur) && $id > 0) {
+
+            $this->gateway->update($id, $modele, $couleur, $puissance);
+            header("Location: index.php");
+            exit;
+        }
+        $results = $this->gateway->getAll();
+        $this->afficherVue('flotte', $dVueEreur, $results, 'admin');
     }
 
     private function rechercherVoitures(array $dVueErreur = []): void

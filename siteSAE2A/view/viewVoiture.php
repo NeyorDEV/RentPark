@@ -80,6 +80,35 @@
                     <input type="hidden" name="id" value="<?= htmlspecialchars($row['voiture']) ?>">
                     <button type="submit"  class="delete-btn">Supprimer</button>
                 </form>
+                
+            <button type="button" class="delete-btn" onclick="location.hash='editModal-<?= htmlspecialchars($row['voiture']) ?>'">Modifier</button>
+            </div>
+            <div id="editModal-<?= htmlspecialchars($row['voiture']) ?>" class="modal">
+                <div class="modal-content">
+                    <a href="#" class="close">×</a>
+                    <h2>Modifier le véhicule</h2>
+                    <form method="POST" action="index.php">
+                        <input type="hidden" name="action" value="modifierVoiture">
+                        <input type="hidden" name="id" value="<?= htmlspecialchars($row['voiture']) ?>">
+
+                        <label>Modèle<br>
+                            <input type="text" name="modele" required value="<?= htmlspecialchars($row['modele']) ?>">
+                        </label>
+                        <br><br>
+
+                        <label>Puissance (cv)<br>
+                            <input type="number" name="puissance" required value="<?= htmlspecialchars($row['puissance']) ?>">
+                        </label>
+                        <br><br>
+
+                        <label>Couleur<br>
+                            <input type="text" name="couleur" required value="<?= htmlspecialchars($row['couleur']) ?>">
+                        </label>
+                        <br><br>
+
+                        <button type="submit">Enregistrer</button>
+                    </form>
+                </div>
             </div>
         <?php endforeach; ?>
     <?php else : ?>

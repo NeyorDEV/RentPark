@@ -31,6 +31,17 @@ class VehicleGateway {
         $this->connection->executeQuery($query, $params);
     }
 
+    public function update(int $id, string $modele, string $couleur, string $puissance): void {
+        $query = "UPDATE cars SET modele = :modele, couleur = :couleur, puissance = :puissance WHERE voiture = :id";
+        $params = [
+            ':modele'   => [$modele, \PDO::PARAM_STR],
+            ':couleur'  => [$couleur, \PDO::PARAM_STR],
+            ':puissance'=> [$puissance, \PDO::PARAM_STR],
+            ':id'       => [$id, \PDO::PARAM_INT],
+        ];
+        $this->connection->executeQuery($query, $params);
+    }
+
     public function rechercherVoitures(string $motCle): array {
         $query = "SELECT * FROM cars WHERE modele LIKE :q";
         $params = [
