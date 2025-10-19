@@ -23,6 +23,7 @@ class FrontControleur
 
         // Route voitures (liste)
         $router->map('GET|POST', '/voitures', 'listeVoitures');
+        $router->map('GET|POST', '/index.php', 'listeVoitures');
 
         // Route utilisateurs (liste) - admin uniquement
         $router->map('GET|POST', '/utilisateurs', 'listeUtilisateur');
