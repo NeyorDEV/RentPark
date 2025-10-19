@@ -31,7 +31,7 @@ class AdminControleur
 
             switch ($action) {
                 case null:
-                    $this->listeVoitures($dVueEreur);
+                    $this->listeUtilisateur($dVueEreur);
                     break;
 
                 case "ajouterVoiture":
@@ -187,25 +187,39 @@ class AdminControleur
     }
 
   
-    private function afficherVue(string $vueKey, array $dVueErreur, array $results = null, string $role = 'admin')
-{
-    global $twig;
-
-    $templateMap = [
-        'flotte' => 'flotte.twig',
-    ];
-
-    if (!isset($templateMap[$vueKey])) {
-        echo "Vue '$vueKey' non définie.";
-        exit;
+    private function afficherVue(string $vueKey, array $dVueEreur, ?array $results = null, string $role = 'admin')
+    {
+        global $rep, $vues, $twig;
+    
+        // Récupère le chemin depuis ton tableau $vues
+        if (!isset($vues[$vueKey])) {
+            echo "Vue '$vueKey' non définie.";
+            exit;
+        }
+    
+        $vuePath = $vues[$vueKey];
+    
+        // Si c’est un template Twig (.twig)
+        if (str_ends_with($vuePath, '.twig')) {
+            echo $twig->render($vuePath, [
+                'erreurs' => $dVueEreur,
+                'results' => $results,
+                'role'    => $role
+            ]);
+            return;
+        }
+    
+        // Sinon c’est une vue PHP classique
+        $cheminVue = realpath($rep . $vuePath);
+        if ($cheminVue && file_exists($cheminVue)) {
+            $resultsTwig = $results; // compatibilité variable
+            require($cheminVue);
+        } else {
+            echo "Fichier de vue introuvable : " . ($rep . $vuePath);
+            exit;
+        }
     }
-
-    echo $twig->render($templateMap[$vueKey], [
-        'results'     => $results,
-        'dVueErreur'  => $dVueErreur,
-        'role'        => $role
-    ]);
-}
+    
 
     private function rechercherUtilisateur(array $dVueErreur = []): void
     {
