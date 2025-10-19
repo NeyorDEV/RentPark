@@ -14,7 +14,7 @@ use controleur\UserController;
 
 // Récup action + rôle
 $action = $_POST['action'] ?? $_GET['action'] ?? null;
-$role   = $_SESSION['role'] ?? 'guest'; // 'admin', 'user', 'guest'
+$role   = $_SESSION['role'] ?? 'admin'; // 'admin', 'user', 'guest'
 
 
 // --- ROUTES SPÉCIFIQUES AVANT DISPATCH PAR RÔLE ---

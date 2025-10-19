@@ -73,7 +73,10 @@ class Controleur
                 case "listeReservation":
                     $this->listeReservation($dVueEreur);
                     break;
-                    
+                case 'rechercherReservation':
+                    $this->rechercherReservation();
+                    break;
+
 
                 default:
                     $dVueEreur[] = "Action inconnue";
@@ -249,6 +252,21 @@ class Controleur
         $results = $this->reservationGateway->getCurrentReservation();
         $this->afficherVue('reservation', $dVueEreur, $results,'admin');
     }
+    private function rechercherReservation(): void
+{
+    $champ  = $_GET['champ']  ?? 'idContrat';
+    $q      = trim($_GET['q'] ?? '');
+    $filtre = $_GET['filtre'] ?? 'en-cours';
+
+    // whitelist des champs autorisés
+    $allowed = ['idContrat' => 'idContrat', 'Vehicule' => 'Vehicule', 'Client' => 'Client'];
+    if (!isset($allowed[$champ])) { $champ = 'idContrat'; }
+
+    $results = $this->reservationGateway->searchReservations($champ, $q, $filtre);
+
+    $this->afficherVue('reservation', [], $results, $this->role);
+}
+
 }
 
 ?>
