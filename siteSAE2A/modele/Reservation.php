@@ -5,8 +5,8 @@ namespace modele;
 class Reservation
 {
     private int $idContrat;
-    private DateTime $dateDebut;
-    private DateTime $dateFin;
+    private \DateTime $dateDebut;
+    private \DateTime $dateFin;
 
     private string $vehiculeVin;     // Véhicule.numSérie (VIN) — alphanumérique
     private int $clientId;           // Client.idClient
@@ -14,8 +14,8 @@ class Reservation
 
     public function __construct(
         int $idContrat,
-        DateTime $dateDebut,
-        DateTime $dateFin,
+        \DateTime $dateDebut,
+        \DateTime $dateFin,
         string $vehiculeVin,
         int $clientId,
         int $etatDesLieuxId
@@ -29,8 +29,8 @@ class Reservation
     }
 
     public function getIdContrat(): ?int { return $this->idContrat; }
-    public function getDateDebut(): DateTime { return $this->dateDebut; }
-    public function getDateFin(): DateTime { return $this->dateFin; }
+    public function getDateDebut(): \DateTime { return $this->dateDebut; }
+    public function getDateFin(): \DateTime { return $this->dateFin; }
 
     public function getVehiculeVin(): string { return $this->vehiculeVin; }
     public function getClientId(): int { return $this->clientId; }
