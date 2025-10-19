@@ -94,12 +94,45 @@ $isAdmin = ($role === 'admin');
                     Fin : <?= htmlspecialchars($row['DateFin']) ?><br>
                 </p>
 
-                <!-- Formulaire pour supprimer -->
-                <form method="POST" action ="index.php" onsubmit="return confirm('Supprimer ce contrat ?');">
-                  <input type="hidden" name="action" value="supprimerReservation">
-                  <input type="hidden" name="id" value="<?= htmlspecialchars($row['idContrat']) ?>">
-                  <button type="submit"  class="delete-btn">Supprimer</button>
-                </form>
+        <div class="actions">
+          <button type="button" class="edit-btn" onclick="location.hash='editModal-<?= htmlspecialchars($row['idContrat']) ?>'">Modifier</button>
+
+          <form method="POST" action ="index.php" onsubmit="return confirm('Supprimer ce contrat ?');" style="display:inline-block;">
+            <input type="hidden" name="action" value="supprimerReservation">
+            <input type="hidden" name="id" value="<?= htmlspecialchars($row['idContrat']) ?>">
+            <button type="submit"  class="delete-btn">Supprimer</button>
+          </form>
+        </div>
+
+    
+        <div id="editModal-<?= htmlspecialchars($row['idContrat']) ?>" class="modal">
+          <div class="modal-content">
+            <a href="#" class="close">×</a>
+            <h2>Modifier la réservation</h2>
+            <form method="POST" action="index.php">
+              <input type="hidden" name="action" value="modifierReservation">
+              <input type="hidden" name="id" value="<?= htmlspecialchars($row['idContrat']) ?>">
+
+              <label>Véhicule (VIN)<br>
+                <input type="text" name="Vehicule" required value="<?= htmlspecialchars($row['Vehicule']) ?>">
+              </label><br><br>
+
+              <label>Client (ID)<br>
+                <input type="number" name="Client" required value="<?= htmlspecialchars($row['Client']) ?>">
+              </label><br><br>
+
+              <label>Début<br>
+                <input type="date" name="DateDebut" required value="<?= htmlspecialchars($row['DateDebut']) ?>">
+              </label><br><br>
+
+              <label>Fin<br>
+                <input type="date" name="DateFin" required value="<?= htmlspecialchars($row['DateFin']) ?>">
+              </label><br><br>
+
+              <button type="submit">Enregistrer</button>
+            </form>
+          </div>
+        </div>
             </div>
         <?php endforeach; ?>
     <?php else : ?>

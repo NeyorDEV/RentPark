@@ -79,6 +79,9 @@ class Controleur
                 case 'ajouterReservation':
                     $this->ajouterReservation($_POST);
                     break;
+                case 'modifierReservation':
+                    $this->modifierReservation($_POST);
+                    break;
                 case 'supprimerReservation':
                     $this->supprimerReservation($_POST);
                     break;
@@ -298,6 +301,45 @@ class Controleur
 
         // Réaffiche la page (liste + form) avec éventuellement les erreurs
         $this->rechercherReservation(); 
+    }
+
+    private function modifierReservation(array $post): void
+    {
+        $id        = (int)($post['id'] ?? 0);
+        $vehicule  = trim($post['Vehicule']  ?? '');
+        $client    = (int)($post['Client']   ?? 0);
+        $dateDebut = trim($post['DateDebut'] ?? '');
+        $dateFin   = trim($post['DateFin'] ?? '');
+
+        $err = [];
+
+        if ($id <= 0) $err[] = "Identifiant de contrat invalide.";
+        if ($vehicule === '') $err[] = "Le véhicule (VIN) est obligatoire.";
+        if ($client <= 0)     $err[] = "Le client (ID) doit être un entier positif.";
+        if ($dateDebut === '') $err[] = "La date de début est obligatoire.";
+        if ($dateFin   === '') $err[] = "La date de fin est obligatoire.";
+
+        $d1 = \DateTime::createFromFormat('Y-m-d', $dateDebut) ?: null;
+        $d2 = \DateTime::createFromFormat('Y-m-d', $dateFin)   ?: null;
+        if (!$d1 || !$d2) {
+            $err[] = "Format de date invalide (attendu : AAAA-MM-JJ).";
+        } elseif ($d1 > $d2) {
+            $err[] = "La date de début doit être antérieure ou égale à la date de fin.";
+        }
+
+        if (empty($err)) {
+            try {
+                $this->reservationGateway->update($id, $vehicule, $client, $dateDebut, $dateFin);
+                // redirige vers la liste des réservations
+                header('Location: index.php?action=rechercherReservation');
+                exit;
+            } catch (\PDOException $e) {
+                $err[] = "Erreur base de données : " . $e->getMessage();
+            }
+        }
+
+        $results = $this->reservationGateway->searchReservations('idContrat', '', 'toutes');
+        $this->afficherVue('reservation', $err, $results, 'admin');
     }
 
     private function supprimerReservation(array $dVueEreur)

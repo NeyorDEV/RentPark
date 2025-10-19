@@ -49,6 +49,20 @@ class ReservationGateway {
             ':etat' => ['neuf',     \PDO::PARAM_STR], // adapte à ton schéma (NOT NULL ? valeur par défaut ?)
         ]);
     }
+    public function update(int $id, string $vehicule, int $client, string $dateDebut, string $dateFin): void {
+        $sql = "UPDATE Contrat
+                SET DateDebut = :d1, DateFin = :d2, Vehicule = :veh, Client = :cli
+                WHERE idContrat = :id";
+        $params = [
+            ':d1'  => [$dateDebut, \PDO::PARAM_STR],
+            ':d2'  => [$dateFin,   \PDO::PARAM_STR],
+            ':veh' => [$vehicule,  \PDO::PARAM_STR],
+            ':cli' => [$client,    \PDO::PARAM_INT],
+            ':id'  => [$id,        \PDO::PARAM_INT],
+        ];
+        $this->connection->executeQuery($sql, $params);
+    }
+
     public function delete(int $id): void {
         $query = "DELETE FROM Contrat WHERE idcontrat = :id";
         $params = [
