@@ -98,7 +98,7 @@ class AdminControleur
         Validation::val_voiture($modele, $couleur, $puissance, $dVueEreur);
 
         if (empty($dVueEreur)) {
-            $this->gateway->add(0, $modele, $couleur, $puissance);
+            $this->gateway->add( $modele, $couleur, $puissance);
             header("Location: index.php");
             exit;
         }
@@ -109,10 +109,9 @@ class AdminControleur
 
     private function supprimerVoiture(array $dVueEreur)
     {
-        $id = (int)($_POST['id'] ?? 0);
-        if ($id >= 0) {             // à revoir plus tard 
-            $this->gateway->delete($id);
-        }
+        $id = (int)($_POST['id'] ?? 0);       
+        $this->gateway->delete($id);
+        
 
         header("Location: index.php");
         exit;
