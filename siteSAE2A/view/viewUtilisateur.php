@@ -19,7 +19,7 @@
 <nav>
     <ul class="menu">
         <li><a href=""><img src="html/icons/acceuil.jpg" alt="Accueil"> Accueil</a></li>
-        <li><a href=""><img src="html/icons/voiture.png" alt="Flotte"> Flotte Automobile</a></li>
+        <li><a href="/sitesae2A/voitures"><img src="html/icons/voiture.png" alt="Flotte"> Flotte Automobile</a></li>
         <li><a href=""><img src="html/icons/contrat.png" alt="Contrats"> Contrats</a></li>
         <li><a href=""><img src="html/icons/settings.png" alt="Paramètres"> Paramètres</a></li>
     </ul>
@@ -34,7 +34,7 @@
 
 
 <header class="topbar">
-    <form action="index.php" method="get" role="search" class="topbar-form">
+    <form action="/sitesae2A/utilisateurs" method="get" role="search" class="topbar-form">
         <input type="hidden" name="action" value="rechercherUtilisateur">
 
         <input
@@ -74,7 +74,7 @@
                 </p>
 
                 <!-- Formulaire pour supprimer -->
-                <form method="POST" action ="index.php" onsubmit="return confirm('Supprimer cet utilisateur ?');">
+                <form method="POST" action ="/sitesae2A/utilisateurs" onsubmit="return confirm('Supprimer cet utilisateur ?');">
                     <input type="hidden" name="id" value="<?= htmlspecialchars($row['id']) ?>">
                     <input type="hidden" name="action" value="supprimerUtilisateur">
                     <button type="submit"  class="delete-btn">Supprimer</button>
@@ -92,9 +92,9 @@
 
 <div id="addModal" class="modal">
     <div class="modal-content">
-        <a href="#" class="close">&times;</a>
+        <a href="" class="close">&times;</a>
         <h2>Ajouter un Utilisateur</h2>
-        <form method="POST" action="index.php">
+        <form method="POST" action="/siteSAE2A/utilisateurs">
             <input type="hidden" name="action" value="ajouterUtilisateur">
             <input type="text" name="username" placeholder="username" required><br><br>
             <input type="password" name="password" placeholder="password" required><br><br>

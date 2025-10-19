@@ -19,3 +19,5 @@ $vues['flotte']  = 'flotte.twig';
 $vues['user']  = 'view/viewUtilisateur.php';
 $vues['erreur'] = 'view/viewErreur.php';
 
+$action = "RAS";
+

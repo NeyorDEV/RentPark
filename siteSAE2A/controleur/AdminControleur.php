@@ -14,7 +14,7 @@ class AdminControleur
 
     public function __construct()
     {
-        global $rep, $vues, $user, $pass, $dsn;
+        global $rep, $vues, $user, $pass, $dsn,$action;
 
         $dVueEreur = [];
 
@@ -26,14 +26,12 @@ class AdminControleur
             $this->gateway = new VehicleGateway($this->connection);
             $this->userGateway = new UserGateway($this->connection);
 
-            // Action
-            $action = $_REQUEST['action'] ?? null;
+            
 
             switch ($action) {
-                case null:
-                    $this->listeUtilisateur($dVueEreur);
+                case "listeVoitures":
+                    $this->listeVoitures($dVueEreur);
                     break;
-
                 case "ajouterVoiture":
                     $this->ajouterVoiture($dVueEreur);
                     break;
@@ -70,11 +68,6 @@ class AdminControleur
                     $this->listeUtilisateur($dVueEreur);
                     break;
                     
-
-                default:
-                    $dVueEreur[] = "Action inconnue";
-                    $this->afficherVue('flotte', $dVueEreur,$results=null,'admin');
-                    break;
             }
 
         } catch (\PDOException $e) {
@@ -85,8 +78,37 @@ class AdminControleur
         exit(0);
     }
 
-    private function listeVoitures(array $dVueEreur)
+    public function listeVoitures(array $dVueEreur)
     {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $sousAction = $_POST['action'] ?? '';
+
+            switch ($sousAction) {
+                case 'ajouterVoiture':
+                    $this->ajouterVoiture($dVueEreur);
+                    break;
+
+                case 'supprimerVoiture':
+                    $this->supprimerVoiture($dVueEreur);
+                    break;
+
+                case 'modifierVoiture':
+                    $this->modifierVoiture($dVueEreur);
+                    break;
+            }
+
+            // Redirige vers la même page pour éviter le repost du formulaire
+            header("Location: /siteSAE2A/voitures");
+            exit;
+        }
+
+         // Cas GET → recherche ou liste complète
+        $sousAction = $_GET['action'] ?? '';
+         if ($sousAction === 'rechercherVoitures') {
+              $this->rechercherVoitures($dVueEreur);
+              return;
+          }
+        
         $results = $this->gateway->getAll();
         $this->afficherVue('flotte', $dVueEreur, $results,'admin');
     }
@@ -103,7 +125,7 @@ class AdminControleur
 
         if (empty($dVueEreur)) {
             $this->gateway->add( $modele, $couleur, $puissance);
-            header("Location: index.php");
+            header("Location: /sitesae2A/voitures");
             exit;
         }
 
@@ -115,9 +137,7 @@ class AdminControleur
     {
         $id = (int)($_POST['id'] ?? 0);       
         $this->gateway->delete($id);
-        
-
-        header("Location: index.php");
+        header("Location: /sitesae2A/voitures");
         exit;
     }
 
@@ -133,7 +153,7 @@ class AdminControleur
        if (empty($dVueEreur) && $id > 0) {
 
             $this->gateway->update($id, $modele, $couleur, $puissance);
-            header("Location: index.php");
+            header("Location: /sitesae2A/voitures");
             exit;
         }
         $results = $this->gateway->getAll();
@@ -146,6 +166,7 @@ class AdminControleur
 
     if ($motCle === '') {
         $results = $this->gateway->getAll();
+        
     } else {
         $results = $this->gateway->rechercherVoitures($motCle);
 
@@ -153,7 +174,7 @@ class AdminControleur
             $dVueErreur[] = "Aucune voiture trouvée pour \"$motCle\".";
         }
     }
-
+    
     $this->afficherVue('flotte', $dVueErreur, $results, 'admin');
 }
 
@@ -187,7 +208,7 @@ class AdminControleur
     }
 
   
-    private function afficherVue(string $vueKey, array $dVueEreur, ?array $results = null, string $role = 'admin')
+    private function afficherVue(string $vueKey, array $dVueEreur, ?array $results, string $role = 'admin')
     {
         global $rep, $vues, $twig;
     
@@ -245,7 +266,7 @@ class AdminControleur
             $this->userGateway->deleteUser($id);
         }
 
-        header("Location: index.php");
+        header("Location: /siteSAE2A/utilisateurs");
         exit;
     }
 
@@ -260,16 +281,43 @@ class AdminControleur
 
         if (empty($dVueEreur)) {
             $this->userGateway->addUser( $username, $password, $role);
-            header("Location: index.php");
+            header("Location: /siteSAE2A/utilisateurs");
             exit;
+
         }
 
         $results = $this->userGateway->getAllUser();
         $this->afficherVue('user', $dVueEreur, $results);
     }
 
-    private function listeUtilisateur(array $dVueEreur)
+    public function listeUtilisateur(array $dVueEreur)
     {
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $sousAction = $_POST['action'] ?? '';
+
+            switch ($sousAction) {
+                case 'ajouterUtilisateur':
+                    $this->ajouterUtilisateur($dVueEreur);
+                    break;
+
+                case 'supprimerUtilisateur':
+                    $this->supprimerUtilisateur($dVueEreur);
+                    break;
+
+            }
+
+            // Redirige vers la même page pour éviter le repost du formulaire
+            header("Location: /siteSAE2A/utilisateurs");
+            exit;
+        }
+
+         // Cas GET → recherche ou liste complète
+        $sousAction = $_GET['action'] ?? '';
+         if ($sousAction === 'rechercherUtilisateur') {
+              $this->rechercherUtilisateur($dVueEreur);
+              return;
+          }
         $results = $this->userGateway->getAllUser();
         $this->afficherVue('user', $dVueEreur, $results,'admin');
     }

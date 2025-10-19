@@ -11,6 +11,7 @@ require_once __DIR__ . '/vendor/autoload.php';
 
 use controleur\FrontControleur;
 
+
 $loader = new \Twig\Loader\FilesystemLoader(__DIR__ . '/templates');
 $twig   = new \Twig\Environment($loader, [
     'cache' => false,
@@ -18,6 +19,7 @@ $twig   = new \Twig\Environment($loader, [
 ]);
 
 $controller = new FrontControleur();
+$controller->run();
 
 // alto routeur 
 ?> 

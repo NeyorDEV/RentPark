@@ -11,7 +11,7 @@
 </div>
 
 <header class="topbar">
-  <form action="index.php" method="get" role="search" class="topbar-form">
+  <form action="/sitesae2A/voitures" method="get" role="search" class="topbar-form">
     <input type="hidden" name="action" value="rechercherVoitures">
     <input
       id="q3"
@@ -46,7 +46,7 @@
                     <img src="html/icons/voiture.png" alt="Voiture" width="100px">
                 </p>
 
-                <form method="POST" action="index.php" onsubmit="return confirm('Supprimer ce véhicule ?');">
+                <form method="POST" action="/siteSAE2A/voitures" onsubmit="return confirm('Supprimer ce véhicule ?');">
                     <input type="hidden" name="action" value="supprimerVoiture">
                     <input type="hidden" name="id" value="{{ row.voiture|e }}">
                     <button type="submit" class="delete-btn">Supprimer</button>
@@ -59,7 +59,7 @@
                 <div class="modal-content">
                     <a href="#" class="close">×</a>
                     <h2>Modifier le véhicule</h2>
-                    <form method="POST" action="index.php">
+                    <form method="POST" action="/siteSAE2A/voitures">
                         <input type="hidden" name="action" value="modifierVoiture">
                         <input type="hidden" name="id" value="{{ row.voiture|e }}">
                         <label>Modèle<br>
@@ -87,7 +87,7 @@
     <div class="modal-content">
         <a href="#" class="close">&times;</a>
         <h2>Ajouter un véhicule</h2>
-        <form method="POST" action="index.php">
+        <form method="POST" action="/siteSAE2A/voitures">
              <input type="hidden" name="action" value="ajouterVoiture">
             <input type="text" name="modele" placeholder="Modèle" required><br><br>
             <input type="number" name="puissance" placeholder="Puissance" required><br><br>

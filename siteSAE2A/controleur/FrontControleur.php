@@ -1,60 +1,43 @@
 <?php
 namespace controleur;
 
-//si controller pas objet
-//  header('Location: controller/controller.php');
-
-//si controller objet
-
-
-use controleur\AdminControleur; 
-use controleur\UserController;
+use AltoRouter;
 
 class FrontControleur
 {
     public function __construct()
     {
-        global $rep, $vues, $user, $pass, $dsn;
         session_start();
-
-        $dVueErreur = [];
-
-        $role = $_SESSION['role'] ?? 'admin'; // 'admin', 'user', 'guest'
-
-        // Selon le rôle, on instancie le bon contrôleur
-        switch ($role) {
-            case 'admin':
-                require_once(__DIR__ . '/AdminControleur.php');
-                $controller = new AdminControleur();
-                break;
-        
-            case 'user':
-                require_once(__DIR__ . '/UserController.php');
-                $controller = new UserController();
-                break;
-        
-            default: // guest ou non connecté
-                require_once(__DIR__ . '/UserController.php');
-                $controller = new UserController();
-                break;
-        }
-
-        $action = $_POST['action'] ?? $_GET['action'] ?? null;
-
-        if ($action === 'inscription') {
-             $controller = new AdminControleur();
-             $controller->inscription($dVueErreur); // ici traimenet  du  POST à améliorer après pour savoir ou le mettre ect 
-    
-             exit;
-            }
-
-        exit(0);
     }
-}
-?>
 
+    public function run()
+    {
+        global $rep, $vues,$action; // tes globals
 
+        $role = $_SESSION['role'] ?? 'admin';
 
+       
 
+        $router = new AltoRouter();
+        $router->setBasePath('/siteSAE2A'); // ton dossier projet
 
+        // Route voitures (liste)
+        $router->map('GET|POST', '/voitures', 'listeVoitures');
 
+        // Route utilisateurs (liste) - admin uniquement
+        $router->map('GET|POST', '/utilisateurs', 'listeUtilisateur');
+
+        // Match
+        $match = $router->match();
+        if (!$match) { echo "404"; die; }
+        if ($match) {
+            $action=$match['target'];
+            
+            $controleur = new AdminControleur();
+        }  
+
+         
+    }  
+}  
+ 
+?>    
