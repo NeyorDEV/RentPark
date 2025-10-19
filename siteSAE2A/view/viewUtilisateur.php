@@ -4,7 +4,7 @@
 // action à modifier dans la top bar
 
 
-$isAdmin = ($role === 'admin');
+ $isAdmin = ($role === 'admin');
 ?>
 
 <!DOCTYPE html>

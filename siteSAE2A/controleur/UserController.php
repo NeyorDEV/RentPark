@@ -11,7 +11,6 @@ class UserController
     public function __construct()
     {
         global $rep, $vues, $user, $pass, $dsn;
-        session_start();
 
         $dVueErreur = [];
 

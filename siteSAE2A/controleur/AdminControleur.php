@@ -5,7 +5,7 @@ use modele\UserGateway;
 use modele\VehicleGateway;
 use modele\User;
 use config\Validation;
-class Controleur
+class AdminControleur
 {
     private Connection $connection;
     private VehicleGateway $gateway;
@@ -15,7 +15,6 @@ class Controleur
     public function __construct()
     {
         global $rep, $vues, $user, $pass, $dsn;
-        session_start();
 
         $dVueEreur = [];
 
@@ -156,7 +155,7 @@ class Controleur
 
         
         $user = new User(null, $username, $hashedPassword, $role);
-        $this->userGateway->addUser($user);
+        $this->userGateway->login($user);
 
         
         $results = $this->gateway->getAll();
