@@ -12,17 +12,29 @@ use controleur\Controleur;
 use controleur\UserController;
 
 
+// Récup action + rôle
 $action = $_POST['action'] ?? $_GET['action'] ?? null;
+$role   = $_SESSION['role'] ?? 'guest'; // 'admin', 'user', 'guest'
 
+
+// --- ROUTES SPÉCIFIQUES AVANT DISPATCH PAR RÔLE ---
 if ($action === 'inscription') {
     $controller = new Controleur();
     $controller->inscription($dVueErreur); // ici tu traites le POST à améliorer après pour savoir ou le mettre ect 
     
     exit;
 }
+// ACCÈS à la liste des réservations
+// (autorise tout le monde pas encore géré le role)
+if ($action === 'listeReservation') {
+    $_GET['action'] = $_REQUEST['action'] = 'listeReservation';
+    require_once __DIR__ . '/controleur/Controleur.php';
+    new Controleur();
+    exit;
+}
 
-$role = $_SESSION['role'] ?? 'admin'; // 'admin', 'user', 'guest'
 
+// --- DISPATCH PAR RÔLE PAR DÉFAUT ---
 // Selon le rôle, on instancie le bon contrôleur
 switch ($role) {
     case 'admin':

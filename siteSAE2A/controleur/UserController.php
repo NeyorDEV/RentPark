@@ -36,7 +36,7 @@ class UserController
         $this->afficherVue('flotte', $dVueErreur, $results, 'user');
     }
 
-    private function afficherVue(string $vueKey, array $dVueErreur, array $results = null, string $role = 'user')
+    private function afficherVue(string $vueKey, array $dVueEreur, ?array $results = null, string $role = 'admin')
     {
         global $rep, $vues;
         if (!isset($vues[$vueKey])) {

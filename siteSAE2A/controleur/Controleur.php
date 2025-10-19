@@ -27,6 +27,8 @@ class Controleur
             // ⚡ Instanciation de la Gateway
             $this->gateway = new VehicleGateway($this->connection);
             $this->userGateway = new UserGateway($this->connection);
+            $this->reservationGateway = new ReservationGateway($this->connection);
+
 
             // Action
             $action = $_REQUEST['action'] ?? null;
@@ -171,7 +173,8 @@ class Controleur
     }
 
   
-    private function afficherVue(string $vueKey, array $dVueEreur, array  $results=null,string $role ='admin' )
+    private function afficherVue(string $vueKey, array $dVueEreur, ?array $results = null, string $role = 'admin')
+
     {
         global $rep, $vues;
 

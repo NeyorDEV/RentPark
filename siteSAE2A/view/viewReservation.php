@@ -1,9 +1,4 @@
 <?php
-// $results est fourni par le contrôleur
-// $dVueErreur contient les messages d'erreur si besoin
-// action à modifier dans la top bar 
-
- 
  $isAdmin = ($role === 'admin');
 ?>
 
@@ -11,8 +6,8 @@
 <html lang="fr">
 <head>
     <meta charset="utf-8">
-    <title>RentPark - Flotte Automobile</title>
-    <link rel="stylesheet" href="html/css/menu.css">
+    <title>RentPark - Reservation</title>
+    <link rel="stylesheet" href="html/css/reservation.css">
 </head>
 <body>   
 
@@ -28,10 +23,10 @@
 </nav>
 
 <div class="top"> 
-    <h1>Flotte Automobile</h1>
+    <h1>Reservation</h1>
     <?php if ($isAdmin): ?>
         <a href="#addModal" class="add-btn">+ Ajouter</a>
-        <?php endif; ?>
+    <?php endif; ?>
 </div>
 
 
@@ -64,50 +59,26 @@
     </div>
 <?php endif; ?>
 
-<div class="voiture">
+<div class="reservation">
     <?php if (!empty($results)) : ?>
         <?php foreach ($results as $row) : ?>
             <div class="rectangle">
                 <p>
-                    <?= htmlspecialchars($row['modele']) ?><br>
-                    <?= htmlspecialchars($row['puissance']) ?> cv<br>
-                    <?= htmlspecialchars($row['couleur']) ?><br>
-                    <img src="html/icons/voiture.png" alt="Voiture" width="100px">
+                    <?= htmlspecialchars($row['idContrat']) ?><br>
+                    <?= htmlspecialchars($row['vehiculeVin']) ?> cv<br>
+                    <?= htmlspecialchars($row['dateDebut']) ?><br>
+                    <?= htmlspecialchars($row['dateFin']) ?><br>
                 </p>
 
                 <!-- Formulaire pour supprimer -->
-                <form method="POST" action ="index.php" onsubmit="return confirm('Supprimer ce véhicule ?');">
-                    <input type="hidden" name="action" value="supprimerVoiture">
-                    <input type="hidden" name="id" value="<?= htmlspecialchars($row['voiture']) ?>">
-                    <button type="submit"  class="delete-btn">Supprimer</button>
-                </form>
             </div>
         <?php endforeach; ?>
     <?php else : ?>
         <div class="rectangle">
-            <p>Aucun véhicule trouvé</p>
+            <p>Aucune réservation trouvée</p>
         </div>
     <?php endif; ?>
 </div>
 
-<!-- Modal pour ajouter -->
-
-<div id="addModal" class="modal">
-    <div class="modal-content">
-        <a href="#" class="close">&times;</a>
-        <h2>Ajouter un véhicule</h2>
-        <form method="POST" action="index.php">
-             <input type="hidden" name="action" value="ajouterVoiture">
-            <input type="text" name="modele" placeholder="Modèle" required><br><br>
-            <input type="number" name="puissance" placeholder="Puissance" required><br><br>
-            <input type="text" name="couleur" placeholder="Couleur" required><br><br>
-                <button type="submit" name="ajouterVoiture">Ajouter</button>
-
-        </form>
-    </div>
-</div>
-
-
 </body>
 </html>
-
