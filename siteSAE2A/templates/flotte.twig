@@ -1,0 +1,99 @@
+{% extends "base.twig" %}
+
+{% block title %}Flotte Automobile{% endblock %}
+
+{% block content %}
+<div class="top"> 
+    <h1>Flotte Automobile</h1>
+    {% if role == 'admin' %}
+        <a href="#addModal" class="add-btn">+ Ajouter</a>
+    {% endif %}
+</div>
+
+<header class="topbar">
+  <form action="index.php" method="get" role="search" class="topbar-form">
+    <input type="hidden" name="action" value="rechercherVoitures">
+    <input
+      id="q3"
+      name="q"
+      type="search"
+      placeholder="Rechercher..."
+      aria-label="Recherche"
+      value="{{ app.request.get('q')|default('') }}"
+    >
+    <button type="submit">🔍</button>
+  </form>
+</header>
+
+{% if dVueErreur is not empty %}
+<div class="erreurs">
+    <ul>
+        {% for erreur in dVueErreur %}
+            <li>{{ erreur|e }}</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}
+
+<div class="voiture">
+    {% if results is not empty %}
+        {% for row in results %}
+            <div class="rectangle">
+                <p>
+                    {{ row.modele|e }}<br>
+                    {{ row.puissance|e }} cv<br>
+                    {{ row.couleur|e }}<br>
+                    <img src="html/icons/voiture.png" alt="Voiture" width="100px">
+                </p>
+
+                <form method="POST" action="index.php" onsubmit="return confirm('Supprimer ce véhicule ?');">
+                    <input type="hidden" name="action" value="supprimerVoiture">
+                    <input type="hidden" name="id" value="{{ row.voiture|e }}">
+                    <button type="submit" class="delete-btn">Supprimer</button>
+                </form>
+
+                <button type="button" class="delete-btn" onclick="location.hash='editModal-{{ row.voiture|e }}'">Modifier</button>
+            </div>
+
+            <div id="editModal-{{ row.voiture|e }}" class="modal">
+                <div class="modal-content">
+                    <a href="#" class="close">×</a>
+                    <h2>Modifier le véhicule</h2>
+                    <form method="POST" action="index.php">
+                        <input type="hidden" name="action" value="modifierVoiture">
+                        <input type="hidden" name="id" value="{{ row.voiture|e }}">
+                        <label>Modèle<br>
+                            <input type="text" name="modele" required value="{{ row.modele|e }}">
+                        </label><br><br>
+                        <label>Puissance (cv)<br>
+                            <input type="number" name="puissance" required value="{{ row.puissance|e }}">
+                        </label><br><br>
+                        <label>Couleur<br>
+                            <input type="text" name="couleur" required value="{{ row.couleur|e }}">
+                        </label><br><br>
+                        <button type="submit">Enregistrer</button>
+                    </form>
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <div class="rectangle">
+            <p>Aucun véhicule trouvé</p>
+        </div>
+    {% endif %}
+</div>
+
+<div id="addModal" class="modal">
+    <div class="modal-content">
+        <a href="#" class="close">&times;</a>
+        <h2>Ajouter un véhicule</h2>
+        <form method="POST" action="index.php">
+             <input type="hidden" name="action" value="ajouterVoiture">
+            <input type="text" name="modele" placeholder="Modèle" required><br><br>
+            <input type="number" name="puissance" placeholder="Puissance" required><br><br>
+            <input type="text" name="couleur" placeholder="Couleur" required><br><br>
+            <button type="submit" name="ajouterVoiture">Ajouter</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

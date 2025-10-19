@@ -128,7 +128,7 @@ class AdminControleur
         $couleur   = $_POST['couleur'] ?? '';
         $puissance = $_POST['puissance'] ?? '';
 
-        \config\Validation::val_voiture($modele, $couleur, $puissance, $dVueEreur);
+        Validation::val_voiture($modele, $couleur, $puissance, $dVueEreur);
 
        if (empty($dVueEreur) && $id > 0) {
 
@@ -187,24 +187,26 @@ class AdminControleur
     }
 
   
-    private function afficherVue(string $vueKey, array $dVueEreur, array  $results=null,string $role ='admin' )
-    {
-        global $rep, $vues;
+    private function afficherVue(string $vueKey, array $dVueErreur, array $results = null, string $role = 'admin')
+{
+    global $twig;
 
-        if (!isset($vues[$vueKey])) {
-            echo "Vue '$vueKey' non définie.";
-            exit;
-        }
+    $templateMap = [
+        'flotte' => 'flotte.twig',
+    ];
 
-        $cheminVue = realpath($rep . $vues[$vueKey]);
-
-        if ($cheminVue && file_exists($cheminVue)) {
-            require($cheminVue);
-        } else {
-            echo "Fichier de vue introuvable : " . ($rep . $vues[$vueKey]);
-            exit;
-        }
+    if (!isset($templateMap[$vueKey])) {
+        echo "Vue '$vueKey' non définie.";
+        exit;
     }
+
+    echo $twig->render($templateMap[$vueKey], [
+        'results'     => $results,
+        'dVueErreur'  => $dVueErreur,
+        'role'        => $role
+    ]);
+}
+
     private function rechercherUtilisateur(array $dVueErreur = []): void
     {
         $motCle = trim($_GET['q'] ?? '');
