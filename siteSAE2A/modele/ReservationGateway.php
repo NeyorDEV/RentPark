@@ -20,7 +20,7 @@ class ReservationGateway {
         }
 
         // recherche
-        if ($q !== '') {
+        if ($q !== '') { // id de contrat ou de client
             if ($champ === 'idContrat' || $champ === 'Client') {
                 $where[] = "$champ = :qnum";
                 $params[':qnum'] = [ (int)$q, \PDO::PARAM_INT ];
@@ -46,7 +46,7 @@ class ReservationGateway {
             ':d2'   => [$dateFin,   \PDO::PARAM_STR],
             ':veh'  => [$vehicule,  \PDO::PARAM_STR],
             ':cli'  => [$client,    \PDO::PARAM_INT],
-            ':etat' => ['neuf',     \PDO::PARAM_STR], // adapte à ton schéma (NOT NULL ? valeur par défaut ?)
+            ':etat' => ['neuf',     \PDO::PARAM_STR], 
         ]);
     }
     public function update(int $id, string $vehicule, int $client, string $dateDebut, string $dateFin): void {

@@ -24,16 +24,11 @@ class Controleur
         $dVueEreur = [];
 
         try {
-            // ⚡ Instanciation de la connexion
             $this->connection = new Connection($dsn, $user, $pass);
-
-            // ⚡ Instanciation de la Gateway
             $this->gateway = new VehicleGateway($this->connection);
             $this->userGateway = new UserGateway($this->connection);
             $this->reservationGateway = new ReservationGateway($this->connection);
 
-
-            // Action
             $action = $_REQUEST['action'] ?? null;
 
             switch ($action) {
@@ -259,7 +254,7 @@ class Controleur
         $q      = trim($_GET['q'] ?? '');
         $filtre = $_GET['filtre'] ?? 'en-cours';
 
-        // whitelist des champs autorisés
+        // whitelist des champs autorisé
         $allowed = ['idContrat' => 'idContrat', 'Vehicule' => 'Vehicule', 'Client' => 'Client'];
         if (!isset($allowed[$champ])) { $champ = 'idContrat'; }
 
@@ -288,18 +283,13 @@ class Controleur
             $err[] = "La date de début doit être antérieure ou égale à la date de fin.";
         }
 
-        // 👉 INSERT SI OK
         if (empty($err)) {
             try {
                 $this->reservationGateway->insertReservation($vehicule, $client, $dateDebut, $dateFin);
-                // (optionnel) message de succès via la vue
-                // $msg = "Réservation créée avec succès.";
             } catch (\PDOException $e) {
                 $err[] = "Erreur base de données : " . $e->getMessage();
             }
         }
-
-        // Réaffiche la page (liste + form) avec éventuellement les erreurs
         $this->rechercherReservation(); 
     }
 
@@ -330,7 +320,6 @@ class Controleur
         if (empty($err)) {
             try {
                 $this->reservationGateway->update($id, $vehicule, $client, $dateDebut, $dateFin);
-                // redirige vers la liste des réservations
                 header('Location: index.php?action=rechercherReservation');
                 exit;
             } catch (\PDOException $e) {
