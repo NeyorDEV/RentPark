@@ -28,7 +28,7 @@
         <input type="password" id="confirm" name="confirm" required>
       </div>
 
-      <!-- Groupe de boutons radio pour le rôle -->
+      
       <div class="input-group">
         <label>Rôle</label>
         <div class="role-options">

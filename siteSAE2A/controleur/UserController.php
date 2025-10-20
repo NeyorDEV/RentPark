@@ -18,7 +18,7 @@ class UserController
             $this->connection = new Connection($dsn, $user, $pass);
             $this->gateway = new VehicleGateway($this->connection);
 
-            // Les utilisateurs n'ont que la liste
+            
             $this->listeVoitures($dVueErreur);
 
         } catch (\PDOException $e) {

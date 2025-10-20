@@ -21,5 +21,4 @@ $twig   = new \Twig\Environment($loader, [
 $controller = new FrontControleur();
 $controller->run();
 
-// alto routeur 
 ?> 

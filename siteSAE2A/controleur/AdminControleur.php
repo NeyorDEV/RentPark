@@ -19,10 +19,10 @@ class AdminControleur
         $dVueEreur = [];
 
         try {
-            // ⚡ Instanciation de la connexion
+            
             $this->connection = new Connection($dsn, $user, $pass);
 
-            // ⚡ Instanciation de la Gateway
+            
             $this->gateway = new VehicleGateway($this->connection);
             $this->userGateway = new UserGateway($this->connection);
 
@@ -97,12 +97,12 @@ class AdminControleur
                     break;
             }
 
-            // Redirige vers la même page pour éviter le repost du formulaire
+           
             header("Location: /siteSAE2A/voitures");
             exit;
         }
 
-         // Cas GET → recherche ou liste complète
+         
         $sousAction = $_GET['action'] ?? '';
          if ($sousAction === 'rechercherVoitures') {
               $this->rechercherVoitures($dVueEreur);
@@ -212,7 +212,7 @@ class AdminControleur
     {
         global $rep, $vues, $twig;
     
-        // Récupère le chemin depuis ton tableau $vues
+        
         if (!isset($vues[$vueKey])) {
             echo "Vue '$vueKey' non définie.";
             exit;
@@ -220,7 +220,7 @@ class AdminControleur
     
         $vuePath = $vues[$vueKey];
     
-        // Si c’est un template Twig (.twig)
+        // twig 
         if (str_ends_with($vuePath, '.twig')) {
             echo $twig->render($vuePath, [
                 'erreurs' => $dVueEreur,
@@ -230,10 +230,10 @@ class AdminControleur
             return;
         }
     
-        // Sinon c’est une vue PHP classique
+        // php
         $cheminVue = realpath($rep . $vuePath);
         if ($cheminVue && file_exists($cheminVue)) {
-            $resultsTwig = $results; // compatibilité variable
+            $resultsTwig = $results; 
             require($cheminVue);
         } else {
             echo "Fichier de vue introuvable : " . ($rep . $vuePath);
@@ -305,14 +305,18 @@ class AdminControleur
                     $this->supprimerUtilisateur($dVueEreur);
                     break;
 
+                case 'modifierUtilisateur':
+                    $this->modifierUtilisateur($dVueEreur);
+                    break;
+
             }
 
-            // Redirige vers la même page pour éviter le repost du formulaire
+            
             header("Location: /siteSAE2A/utilisateurs");
             exit;
         }
 
-         // Cas GET → recherche ou liste complète
+         
         $sousAction = $_GET['action'] ?? '';
          if ($sousAction === 'rechercherUtilisateur') {
               $this->rechercherUtilisateur($dVueEreur);
@@ -320,6 +324,23 @@ class AdminControleur
           }
         $results = $this->userGateway->getAllUser();
         $this->afficherVue('user', $dVueEreur, $results,'admin');
+    }
+
+    private function modifierUtilisateur(array $dVueEreur)
+    {
+        $username   = $_POST['username'] ?? '';
+        $id = (int)($_POST['id'] ?? -1);
+
+        
+
+       if (empty($dVueEreur)) {
+
+            $this->userGateway->update($username,$id);
+            header("Location: /sitesae2A/utilisateurs");
+            exit;
+        }
+        $results = $this->gateway->getAll();
+        $this->afficherVue('user', $dVueEreur, $results, 'admin');
     }
 }
 

@@ -12,23 +12,22 @@ class FrontControleur
 
     public function run()
     {
-        global $rep, $vues,$action; // tes globals
+        global $rep, $vues,$action; 
 
         $role = $_SESSION['role'] ?? 'admin';
 
        
-
         $router = new AltoRouter();
-        $router->setBasePath('/siteSAE2A'); // ton dossier projet
+        $router->setBasePath('/siteSAE2A'); 
 
-        // Route voitures (liste)
+        
         $router->map('GET|POST', '/voitures', 'listeVoitures');
         $router->map('GET|POST', '/index.php', 'listeVoitures');
 
-        // Route utilisateurs (liste) - admin uniquement
+       
         $router->map('GET|POST', '/utilisateurs', 'listeUtilisateur');
 
-        // Match
+        
         $match = $router->match();
         if (!$match) { echo "404"; die; }
         if ($match) {

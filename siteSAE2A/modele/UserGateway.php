@@ -55,6 +55,18 @@ class UserGateway {
 
         return $this->connection->getResults();
     }
+
+    public function update(string $username,int $id): void {
+        $query = "UPDATE users SET username = :username WHERE id = :id";
+        $params = [
+            ':username'   => [$username, \PDO::PARAM_STR],
+            ':id' => [$id, \PDO::PARAM_INT],
+            
+      
+          
+        ];
+        $this->connection->executeQuery($query, $params);
+    }
 }
 ?>
 
