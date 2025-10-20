@@ -59,7 +59,7 @@
     </form>
 
     <p style="margin-top: 1rem;">
-      Déjà inscrit ? <a href="login.html">Se connecter</a>
+      Déjà inscrit ? <a href="viewConnection.php">Se connecter</a>
     </p>
   </div>
 </body>

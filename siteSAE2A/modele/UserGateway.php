@@ -31,6 +31,34 @@ class UserGateway {
         $this->connection->executeQuery($query, $params);
     }
 
+    public function getHashPass(string $user,string $pass): string
+    {
+        $query = "SELECT password FROM users WHERE username=:user";
+        $params = [
+            ':user' => [$user, \PDO::PARAM_STR],
+        ];
+        
+        $this->connection->executeQuery($query, $params);
+
+        $bdd_pass = $this->connection->getResults();
+        
+        return $bdd_pass[0]['password'] ?? '';
+    }
+
+    public function getRole(string $user): string
+    {
+        $query = "SELECT role FROM users WHERE username=:user";
+        $params = [
+            ':user' => [$user, \PDO::PARAM_STR],
+        ];
+        
+        $this->connection->executeQuery($query, $params);
+
+        $role = $this->connection->getResults();
+        
+        return $role[0]['role'] ?? '';
+    }
+
     public function deleteUser(int $id): void {
         $query = "DELETE FROM users WHERE id = :id";
         $params = [

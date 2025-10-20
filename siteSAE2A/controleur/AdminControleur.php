@@ -47,7 +47,9 @@ class AdminControleur
                 case "inscription":
                     $this->inscription( $dVueEreur);
                     break;
-
+                case "connection":
+                    $this->connection( $dVueEreur);
+                    break;
                 case "rechercherVoitures":
                     $this->rechercherVoitures($dVueEreur);
                     break;
@@ -202,13 +204,36 @@ class AdminControleur
 
         
         $results = $this->gateway->getAll();
-        require __DIR__ . '/../view/viewVoiture.php';
+        $this->listeVoitures($dVueErreur);
 
         
     }
 
   
-    private function afficherVue(string $vueKey, array $dVueEreur, ?array $results, string $role = 'admin')
+    public function connection(array $dVueErreur)
+    {
+        global $role;
+        $username = $_POST['username'] ?? '';
+        $password = $_POST['password'] ?? '';
+        $savepass = $this->userGateway->getHashPass($username, $password);
+        $role = $this->userGateway->getRole($username);
+        Validation::val_connection($username, $password, $savepass, $dVueErreur);
+
+        $role = $_POST['role'] ??'';
+        //$dVueErreur='';
+        if (!empty($dVueErreur)) {
+            require '../view/viewErreur.php';
+            exit;
+        }        
+        $results = $this->gateway->getAll();
+        //$dVueErreur =array('');
+        $this->listeVoitures($dVueErreur);
+
+
+        
+    }
+
+    private function afficherVue(string $vueKey, array $dVueEreur, ?array $results = null, string $role = 'admin')
     {
         global $rep, $vues, $twig;
     

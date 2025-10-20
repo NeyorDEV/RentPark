@@ -21,3 +21,4 @@ $vues['erreur'] = 'view/viewErreur.php';
 
 $action = "RAS";
 
+$role = 'invite';

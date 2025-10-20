@@ -73,7 +73,23 @@ class Validation
         $username = filter_var($username, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
     }
 
+    public static function val_connection(string &$username, string &$password, string &$savepass, array &$errors)
+    {
+        $username = trim($username ?? '');
+        $password = trim($password ?? '');
 
+        $password=password_hash($password, PASSWORD_DEFAULT);
+
+        if ($username === '' || $password === '' ) {
+            $errors[] = "Tous les champs sont requis.";
+        }
+
+        if (!password_verify($password , $savepass) ){ //il faut réimplémenter le check du mdp
+            //$errors[] = "Mot de passe ou Nom d'utilisateur invalide";
+        }
+        
+        $username = filter_var($username, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+    }
 
 }
 
