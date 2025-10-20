@@ -8,14 +8,13 @@ class VehicleGateway {
     }
 
     public function getAll(): array {
-        $this->connection->executeQuery("SELECT * FROM testphp");
+        $this->connection->executeQuery("SELECT * FROM cars");
         return $this->connection->getResults();
     }
 
-    public function add(int $voiture, string $modele, string $couleur , string $puissance): void {
-        $query = "INSERT INTO testphp VALUES (:voiture, :modele,:couleur,:puissance)";
+    public function add( string $modele, string $couleur , string $puissance): void {
+        $query = "INSERT INTO cars (modele,couleur,puissance) VALUES ( :modele,:couleur,:puissance)";
         $params = [
-            ':voiture' => [$voiture, \PDO::PARAM_INT],
             ':modele' => [$modele, \PDO::PARAM_STR],
             ':couleur' => [$couleur, \PDO::PARAM_STR],
             ':puissance' => [$puissance, \PDO::PARAM_STR],
@@ -25,15 +24,26 @@ class VehicleGateway {
     }
 
     public function delete(int $id): void {
-        $query = "DELETE FROM testphp WHERE voiture = :id";
+        $query = "DELETE FROM cars WHERE voiture = :id";
         $params = [
             ':id' => [$id, \PDO::PARAM_INT]
         ];
         $this->connection->executeQuery($query, $params);
     }
 
+    public function update(int $id, string $modele, string $couleur, string $puissance): void {
+        $query = "UPDATE cars SET modele = :modele, couleur = :couleur, puissance = :puissance WHERE voiture = :id";
+        $params = [
+            ':modele'   => [$modele, \PDO::PARAM_STR],
+            ':couleur'  => [$couleur, \PDO::PARAM_STR],
+            ':puissance'=> [$puissance, \PDO::PARAM_STR],
+            ':id'       => [$id, \PDO::PARAM_INT],
+        ];
+        $this->connection->executeQuery($query, $params);
+    }
+
     public function rechercherVoitures(string $motCle): array {
-        $query = "SELECT * FROM testphp WHERE modele LIKE :q";
+        $query = "SELECT * FROM cars WHERE modele LIKE :q";
         $params = [
             ':q' => ["%$motCle%", \PDO::PARAM_STR]
         ];

@@ -1,10 +1,8 @@
 <?php
-// $results est fourni par le contrôleur
-// $dVueErreur contient les messages d'erreur si besoin
-// action à modifier dans la top bar
 
 
-$isAdmin = ($role === 'admin');
+
+ $isAdmin = ($role === 'admin');
 ?>
 
 <!DOCTYPE html>
@@ -19,7 +17,7 @@ $isAdmin = ($role === 'admin');
 <nav>
     <ul class="menu">
         <li><a href=""><img src="html/icons/acceuil.jpg" alt="Accueil"> Accueil</a></li>
-        <li><a href=""><img src="html/icons/voiture.png" alt="Flotte"> Flotte Automobile</a></li>
+        <li><a href="/sitesae2A/voitures"><img src="html/icons/voiture.png" alt="Flotte"> Flotte Automobile</a></li>
         <li><a href=""><img src="html/icons/contrat.png" alt="Contrats"> Contrats</a></li>
         <li><a href=""><img src="html/icons/reservation.png" alt="Réservation"> Réservation</a></li>
         <li><a href=""><img src="html/icons/settings.png" alt="Paramètres"> Paramètres</a></li>
@@ -35,7 +33,7 @@ $isAdmin = ($role === 'admin');
 
 
 <header class="topbar">
-    <form action="index.php" method="get" role="search" class="topbar-form">
+    <form action="/sitesae2A/utilisateurs" method="get" role="search" class="topbar-form">
         <input type="hidden" name="action" value="rechercherUtilisateur">
 
         <input
@@ -74,12 +72,34 @@ $isAdmin = ($role === 'admin');
                     <img src="html/icons/user.png" alt="User" width="100px">
                 </p>
 
-                <!-- Formulaire pour supprimer -->
-                <form method="POST" action ="index.php" onsubmit="return confirm('Supprimer cet utilisateur ?');">
+                <form method="POST" action ="/sitesae2A/utilisateurs" onsubmit="return confirm('Supprimer cet utilisateur ?');">
                     <input type="hidden" name="id" value="<?= htmlspecialchars($row['id']) ?>">
                     <input type="hidden" name="action" value="supprimerUtilisateur">
                     <button type="submit"  class="delete-btn">Supprimer</button>
+
+                    
                 </form>
+                <button type="button" class="delete-btn" onclick="location.hash='editModal-<?= htmlspecialchars($row['id']) ?>'">Modifier</button>
+            </div>
+            <div id="editModal-<?= htmlspecialchars($row['id']) ?>" class="modal">
+                <div class="modal-content">
+                    <a href="#" class="close">×</a>
+                    <h2>Modifier l'utilisateur</h2>
+                    <form method="POST" action="/siteSAE2A/utilisateurs">
+                        <input type="hidden" name="action" value="modifierUtilisateur">
+                        <input type="hidden" name="id" value="<?= htmlspecialchars($row['id']) ?>">
+                        
+                        <label>Nom d'utilisateur<br>
+                            <input type="text" name="username" required value="<?= htmlspecialchars($row['username']) ?>">
+                        </label><br><br>
+
+                        <label>Rôle<br>
+                            <input type="text" name="role" required value="<?= htmlspecialchars($row['role']) ?>">
+                        </label><br><br>
+
+                        <button type="submit">Enregistrer</button>
+                    </form>
+                </div>
             </div>
         <?php endforeach; ?>
     <?php else : ?>
@@ -89,13 +109,13 @@ $isAdmin = ($role === 'admin');
     <?php endif; ?>
 </div>
 
-<!-- Modal pour ajouter -->
+
 
 <div id="addModal" class="modal">
     <div class="modal-content">
-        <a href="#" class="close">&times;</a>
+        <a href="" class="close">&times;</a>
         <h2>Ajouter un Utilisateur</h2>
-        <form method="POST" action="index.php">
+        <form method="POST" action="/siteSAE2A/utilisateurs">
             <input type="hidden" name="action" value="ajouterUtilisateur">
             <input type="text" name="username" placeholder="username" required><br><br>
             <input type="password" name="password" placeholder="password" required><br><br>

@@ -33,7 +33,7 @@ class Voiture {
     }  
    
 
-    // Pour pouvoir afficher directement l'objet avec echo
+    
     public function __toString(): string {
         return "Voiture: {$this->voiture}, Modèle: {$this->modele}, Couleur: {$this->couleur}, Puissance:{$this->puissance} ";
     }

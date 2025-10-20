@@ -28,7 +28,7 @@
         <input type="password" id="confirm" name="confirm" required>
       </div>
 
-      <!-- Groupe de boutons radio pour le rôle -->
+      
       <div class="input-group">
         <label>Rôle</label>
         <div class="role-options">
@@ -59,7 +59,7 @@
     </form>
 
     <p style="margin-top: 1rem;">
-      Déjà inscrit ? <a href="login.html">Se connecter</a>
+      Déjà inscrit ? <a href="viewConnection.php">Se connecter</a>
     </p>
   </div>
 </body>

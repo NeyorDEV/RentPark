@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <title>{% block title %}RentPark{% endblock %}</title>
+    <link rel="stylesheet" href="html/css/menu.css">
+</head>
+<body>
+
+<nav>
+    <ul class="menu">
+        <li><a href=""><img src="html/icons/acceuil.jpg" alt="Accueil"> Accueil</a></li>
+        <li><a href=""><img src="html/icons/voiture.png" alt="Flotte"> Flotte Automobile</a></li>
+        <li><a href=""><img src="html/icons/contrat.png" alt="Contrats"> Contrats</a></li>
+        <li><a href="siteSAE2A/../utilisateurs"><img src="html/icons/user.png" alt="Utilisateurs"> Utilisateur</a></li>
+        <li><a href=""><img src="html/icons/settings.png" alt="Paramètres"> Paramètres</a></li>
+    </ul>
+</nav>
+
+<header class="topbar">
+    {% block topbar %}{% endblock %}
+</header>
+
+<main>
+    {% block content %}{% endblock %}
+</main>
+
+</body>
+</html>

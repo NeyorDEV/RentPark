@@ -82,6 +82,11 @@ nav {
     font-size: 18px;
     font-weight: bold;
 }
+
+a.delete-btn {
+    text-decoration: none;
+    cursor: pointer;
+}
   
 .top {
     display: flex;
