@@ -44,18 +44,10 @@ class AdminControleur
                 case "listeUtilisateur":
                     $this->listeUtilisateur($dVueEreur);
                     break;
-                case 'rechercherReservation':
-                    $this->rechercherReservation();
+                case 'listeReservation':
+                    $this->listeReservation($dVueEreur);
                     break;
-                case 'ajouterReservation':
-                    $this->ajouterReservation($_POST);
-                    break;
-                case 'modifierReservation':
-                    $this->modifierReservation($_POST);
-                    break;
-                case 'supprimerReservation':
-                    $this->supprimerReservation($_POST);
-                    break;
+
 
                 default:
                     $dVueEreur[] = "Action inconnue";
@@ -331,7 +323,6 @@ class AdminControleur
             header("Location: /siteSAE2A/utilisateurs");
             exit;
         }
-
          
         $sousAction = $_GET['action'] ?? '';
          if ($sousAction === 'rechercherUtilisateur') {
@@ -378,7 +369,6 @@ class AdminControleur
         } elseif ($d1 > $d2) {
             $err[] = "La date de début doit être antérieure ou égale à la date de fin.";
         }
-
         if (empty($err)) {
             try {
                 $this->reservationGateway->insertReservation($vehicule, $client, $dateDebut, $dateFin);
@@ -388,7 +378,6 @@ class AdminControleur
         }
         $this->rechercherReservation(); 
     }
-
     private function modifierReservation(array $post): void
     {
         $id        = (int)($post['id'] ?? 0);
@@ -412,21 +401,17 @@ class AdminControleur
         } elseif ($d1 > $d2) {
             $err[] = "La date de début doit être antérieure ou égale à la date de fin.";
         }
-
         if (empty($err)) {
             try {
                 $this->reservationGateway->update($id, $vehicule, $client, $dateDebut, $dateFin);
-                header('Location: index.php?action=rechercherReservation');
+                header('Location: /siteSAE2A/reservation');
                 exit;
             } catch (\PDOException $e) {
                 $err[] = "Erreur base de données : " . $e->getMessage();
             }
         }
-
-        $results = $this->reservationGateway->searchReservations('idContrat', '', 'toutes');
-        $this->afficherVue('reservation', $err, $results, 'admin');
+        $this->rechercherReservation(); 
     }
-
     private function supprimerReservation(array $dVueEreur)
     {
         $id = (int)($_POST['id'] ?? -1);
@@ -439,6 +424,33 @@ class AdminControleur
         
         $this->rechercherReservation();
         exit;
+    }
+    public function listeReservation(array $dVueEreur)
+    {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $sousAction = $_POST['action'] ?? '';
+
+            switch ($sousAction) {
+                case 'ajouterReservation':
+                    $this->ajouterReservation($_POST);
+                    break;
+                case 'modifierReservation':
+                    $this->modifierReservation($_POST);
+                    break;
+                case 'supprimerReservation':
+                    $this->supprimerReservation($dVueEreur);
+                    break;
+            }            
+            exit;
+        }
+        $sousAction = $_GET['action'] ?? '';
+        if ($sousAction === 'rechercherReservation') {
+            $this->rechercherReservation();
+            return;
+        }
+
+        $results = $this->reservationGateway->searchReservations('idContrat', '', 'en-cours');
+        $this->afficherVue('reservation', [], $results, 'admin');
     }
 // ------------------------------------------------------------------------------------------------------
     private function modifierUtilisateur(array $dVueEreur)

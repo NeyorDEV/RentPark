@@ -32,7 +32,7 @@ $isAdmin = ($role === 'admin');
 
 <header class="topbar">
   <div class="toolbar">
-    <form action="/siteSAE2A" method="get" role="search" class="topbar-form">
+    <form action="/siteSAE2A/reservation" method="get" role="search" class="topbar-form">
       <input type="hidden" name="action" value="rechercherReservation">
 
       <label for="champ" class="lbl">Rechercher<br>par :</label>
@@ -69,9 +69,6 @@ $isAdmin = ($role === 'admin');
     <?php endif; ?>
   </div>
 </header>
-
-
-
 
 <?php if (!empty($dVueErreur)) : ?>
     <div class="erreurs">
@@ -110,7 +107,7 @@ $isAdmin = ($role === 'admin');
           <div class="modal-content">
             <a href="#" class="close">×</a>
             <h2>Modifier la réservation</h2>
-            <form method="POST" action="index.php">
+            <form method="POST" action="/siteSAE2A/reservation">
               <input type="hidden" name="action" value="modifierReservation">
               <input type="hidden" name="id" value="<?= htmlspecialchars($row['idContrat']) ?>">
 
