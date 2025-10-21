@@ -31,18 +31,6 @@ class AdminControleur
                 case "listeVoitures":
                     $this->listeVoitures($dVueEreur);
                     break;
-                case "ajouterVoiture":
-                    $this->ajouterVoiture($dVueEreur);
-                    break;
-
-                case "supprimerVoiture":
-                    $this->supprimerVoiture($dVueEreur);
-                    break;
-                
-                case "modifierVoiture":
-                    $this->modifierVoiture($dVueEreur);
-                    break;
-
                 case "inscription":
                     $this->inscription( $dVueEreur);
                     break;
@@ -51,18 +39,6 @@ class AdminControleur
                     break;
                 case "rechercherVoitures":
                     $this->rechercherVoitures($dVueEreur);
-                    break;
-
-                case "ajouterUtilisateur":
-                    $this->ajouterUtilisateur( $dVueEreur);
-                    break;
-
-                case "supprimerUtilisateur":
-                    $this->supprimerUtilisateur( $dVueEreur);
-                    break;
-
-                case "rechercherUtilisateur":
-                    $this->rechercherUtilisateur($dVueEreur);
                     break;
 
                 case "listeUtilisateur":
