@@ -11,6 +11,7 @@
     <meta charset="utf-8">
     <title>RentPark - Utilisateurs</title>
     <link rel="stylesheet" href="html/css/menu.css">
+    <link rel="icon" type="image/png" href="html/icons/voitures.png?v=1">
 </head>
 <body>
 

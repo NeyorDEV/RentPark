@@ -67,7 +67,7 @@ class AdminControleur
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $sousAction = $_POST['action'] ?? '';
-
+            
             switch ($sousAction) {
                 case 'ajouterVoiture':
                     $this->ajouterVoiture($dVueEreur);

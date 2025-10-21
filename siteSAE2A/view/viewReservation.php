@@ -11,6 +11,7 @@ $isAdmin = ($role === 'admin');
     <meta charset="utf-8">
     <title>RentPark - Reservation</title>
     <link rel="stylesheet" href="html/css/reservation.css">
+    <link rel="icon" type="image/png" href="html/icons/voitures.png?v=1">
 </head>
 <body>   
 
@@ -20,7 +21,7 @@ $isAdmin = ($role === 'admin');
         <li><a href="/siteSAE2A/voitures"><img src="html/icons/voiture.png" alt="Flotte"> Flotte Automobile</a></li>
         <li><a href=""><img src="html/icons/contrat.png" alt="Contrats"> Contrats</a></li>
         <li><a href="/siteSAE2A/reservation"><img src="html/icons/reservation.png" alt="Réservations"> Réservations</a></li>
-        <li><a href="siteSAE2A/utilisateurs"><img src="html/icons/user.png" alt="Utilisateurs"> Utilisateur</a></li>
+        <li><a href="siteSAE2A/../utilisateurs"><img src="html/icons/user.png" alt="Utilisateurs"> Utilisateur</a></li>
         <li><a href=""><img src="html/icons/settings.png" alt="Paramètres"> Paramètres</a></li>
         
     </ul>       
