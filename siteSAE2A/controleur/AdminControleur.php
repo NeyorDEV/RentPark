@@ -366,6 +366,8 @@ class AdminControleur
         $this->afficherVue('user', $dVueEreur, $results,'admin');
     }
 
+
+// ---------------------------| Reservations |-----------------------------------------------------------
     private function rechercherReservation(): void
     {
         $champ  = $_GET['champ']  ?? 'idContrat';
@@ -462,7 +464,7 @@ class AdminControleur
         $this->rechercherReservation();
         exit;
     }
-
+// ------------------------------------------------------------------------------------------------------
     private function modifierUtilisateur(array $dVueEreur)
     {
         $username   = $_POST['username'] ?? '';
