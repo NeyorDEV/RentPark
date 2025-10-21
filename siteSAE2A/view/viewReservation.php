@@ -98,7 +98,7 @@ $isAdmin = ($role === 'admin');
         <div class="actions">
           <button type="button" class="edit-btn" onclick="location.hash='editModal-<?= htmlspecialchars($row['idContrat']) ?>'">Modifier</button>
 
-          <form method="POST" action ="index.php" onsubmit="return confirm('Supprimer ce contrat ?');" style="display:inline-block;">
+          <form method="POST" action ="/siteSAE2A/reservation" onsubmit="return confirm('Supprimer ce contrat ?');" style="display:inline-block;">
             <input type="hidden" name="action" value="supprimerReservation">
             <input type="hidden" name="id" value="<?= htmlspecialchars($row['idContrat']) ?>">
             <button type="submit"  class="delete-btn">Supprimer</button>
