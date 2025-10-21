@@ -19,7 +19,8 @@
         <li><a href=""><img src="html/icons/acceuil.jpg" alt="Accueil"> Accueil</a></li>
         <li><a href="/sitesae2A/voitures"><img src="html/icons/voiture.png" alt="Flotte"> Flotte Automobile</a></li>
         <li><a href=""><img src="html/icons/contrat.png" alt="Contrats"> Contrats</a></li>
-        <li><a href=""><img src="html/icons/reservation.png" alt="Réservation"> Réservation</a></li>
+        <li><a href="/siteSAE2A/reservation"><img src="html/icons/reservation.png" alt="Réservation"> Réservation</a></li>
+        <li><a href="siteSAE2A/../utilisateurs"><img src="html/icons/user.png" alt="Utilisateurs"> Utilisateur</a></li>
         <li><a href=""><img src="html/icons/settings.png" alt="Paramètres"> Paramètres</a></li>
     </ul>
 </nav>

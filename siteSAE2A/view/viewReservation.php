@@ -17,9 +17,10 @@ $isAdmin = ($role === 'admin');
 <nav>
     <ul class="menu">
         <li><a href=""><img src="html/icons/acceuil.jpg" alt="Accueil"> Accueil</a></li>
-        <li><a href="index.php"><img src="html/icons/voiture.png" alt="Flotte"> Flotte Automobile</a></li>
+        <li><a href="/siteSAE2A/voitures"><img src="html/icons/voiture.png" alt="Flotte"> Flotte Automobile</a></li>
         <li><a href=""><img src="html/icons/contrat.png" alt="Contrats"> Contrats</a></li>
-        <li><a href="index.php?action=rechercherReservation"><img src="html/icons/reservation.png" alt="Réservations"> Réservations</a></li>
+        <li><a href="/siteSAE2A/reservation"><img src="html/icons/reservation.png" alt="Réservations"> Réservations</a></li>
+        <li><a href="siteSAE2A/utilisateurs"><img src="html/icons/user.png" alt="Utilisateurs"> Utilisateur</a></li>
         <li><a href=""><img src="html/icons/settings.png" alt="Paramètres"> Paramètres</a></li>
         
     </ul>       
@@ -31,7 +32,7 @@ $isAdmin = ($role === 'admin');
 
 <header class="topbar">
   <div class="toolbar">
-    <form action="index.php" method="get" role="search" class="topbar-form">
+    <form action="/siteSAE2A" method="get" role="search" class="topbar-form">
       <input type="hidden" name="action" value="rechercherReservation">
 
       <label for="champ" class="lbl">Rechercher<br>par :</label>
@@ -148,7 +149,7 @@ $isAdmin = ($role === 'admin');
     <a href="#" class="close">&times;</a>
     <h2>Ajouter une réservation</h2>
 
-    <form method="POST" action="index.php">
+    <form method="POST" action="/siteSAE2A/reservation">
       <input type="hidden" name="action" value="ajouterReservation">
 
       <label for="vehicule">Véhicule (VIN)</label><br>
