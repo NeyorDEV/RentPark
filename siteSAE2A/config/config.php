@@ -19,6 +19,8 @@ $vues['flotte']  = 'flotte.twig';
 $vues['user']  = 'view/viewUtilisateur.php';
 $vues['erreur'] = 'view/viewErreur.php';
 $vues['reservation'] = 'view/viewReservation.php';
+$vues['inscription'] = 'view/viewInscription.php';
+$vues['connection'] = 'view/viewConnection.php';
 
 $action = "RAS";
 

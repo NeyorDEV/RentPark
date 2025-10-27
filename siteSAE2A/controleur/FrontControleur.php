@@ -29,6 +29,9 @@ class FrontControleur
        
         $router->map('GET|POST', '/utilisateurs', 'listeUtilisateur');
 
+        $router->map('GET|POST', '/inscription', 'afficheInscription');
+        $router->map('GET|POST', '/connection', 'afficheConnection');
+
         
         $match = $router->match();
         if (!$match) { echo "404"; die; }

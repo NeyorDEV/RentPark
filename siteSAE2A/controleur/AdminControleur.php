@@ -31,8 +31,8 @@ class AdminControleur
                 case "listeVoitures":
                     $this->listeVoitures($dVueEreur);
                     break;
-                case "inscription":
-                    $this->inscription( $dVueEreur);
+                case "afficheInscription":
+                    $this->afficheInscription( $dVueEreur);
                     break;
                 case "connection":
                     $this->connection( $dVueEreur);
@@ -101,14 +101,27 @@ class AdminControleur
 
     private function ajouterVoiture(array $dVueEreur)
     {
+
+        $imagePath = ''; 
+        if (isset($_FILES['image']) && $_FILES['image']['error'] === 0) {
+            $nomTemp = $_FILES['image']['tmp_name'];
+            $nomFichier = uniqid() . '_' . basename($_FILES['image']['name']); // nom unique
+            $dossier = __DIR__ . '/../html/icons/' . $nomFichier; // dossier réel sur le serveur
+
+        if (move_uploaded_file($nomTemp, $dossier)) {
+                $imagePath = 'html/icons/' . $nomFichier; // chemin relatif pour Twig
+    }
+}
+
         $modele    = $_POST['modele'] ?? '';
         $couleur   = $_POST['couleur'] ?? '';
         $puissance = $_POST['puissance'] ?? '';
 
+
         Validation::val_voiture($modele, $couleur, $puissance, $dVueEreur);
 
         if (empty($dVueEreur)) {
-            $this->gateway->add( $modele, $couleur, $puissance);
+            $this->gateway->add( $modele, $couleur, $puissance,$imagePath);
             header("Location: /sitesae2A/voitures");
             exit;
         }
@@ -174,8 +187,8 @@ class AdminControleur
         Validation::val_user($username, $password, $confirm, $role, $dVueErreur);
 
         if (!empty($dVueErreur)) {
-            require '../view/viewErreur.php';
-            exit;
+            $dVueErreur[] = "erreur dans l'inscription";
+            $this->afficherVue('erreur', $dVueErreur, $results=null, 'admin');
         }
 
         $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
@@ -183,10 +196,6 @@ class AdminControleur
         
         $user = new User(null, $username, $hashedPassword, $role);
         $this->userGateway->login($user);
-
-        
-        $results = $this->gateway->getAll();
-        $this->listeVoitures($dVueErreur);
 
         
     }
@@ -207,11 +216,6 @@ class AdminControleur
             require '../view/viewErreur.php';
             exit;
         }        
-        $results = $this->gateway->getAll();
-        //$dVueErreur =array('');
-        $this->listeVoitures($dVueErreur);
-
-
         
     }
 
@@ -469,6 +473,46 @@ class AdminControleur
         $results = $this->gateway->getAll();
         $this->afficherVue('user', $dVueEreur, $results, 'admin');
     }
+
+
+    public function afficheInscription(array $dVueEreur)
+    {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $sousAction = $_POST['action'] ?? '';
+            
+            switch ($sousAction) {
+                case 'inscription':
+                    $this->inscription($dVueEreur);
+                    break;
+            }
+
+           
+            header("Location: /siteSAE2A/voitures");
+            exit;
+        }
+      $this->afficherVue('inscription',$dVueEreur,$results=null,'admin');
+
+    }
+
+    public function afficheConnection(array $dVueEreur)
+    {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $sousAction = $_POST['action'] ?? '';
+            
+            switch ($sousAction) {
+                case 'connection':
+                    $this->connection($dVueEreur);
+                    break;
+            }
+
+           
+            header("Location: /siteSAE2A/voitures");
+            exit;
+        }
+      $this->afficherVue('connection',$dVueEreur,$results=null,'admin');
+
+    }
 }
+
 
 ?>

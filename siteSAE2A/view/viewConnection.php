@@ -2,8 +2,8 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Inscription</title>
-  <link rel="stylesheet" href="../html/css/inscription.css">
+  <title>Connection</title>
+  <link rel="stylesheet" href="html/css/inscription.css">
   <link rel="icon" type="image/png" href="html/icons/voiture.png">
  <link rel="shortcut icon" href="html/icons/favicon.ico" type="image/x-icon">
 </head>
@@ -11,7 +11,7 @@
   <div class="login-container">
     <h2>Se connecter</h2>
 
-    <form action="../index.php" method="POST">
+    <form action="/siteSAE2A/connection" method="POST">
 
       <input type="hidden" name="action" value="connection">
 
@@ -25,7 +25,7 @@
         <input type="password" id="password" name="password" required>
       </div>
 
-      <button type="submit" name="inscritpion">Se Connecter</button>
+      <button type="submit" name="connection">Se Connecter</button>
 
       <?php if (isset($_GET['error'])): ?>
         <p class="error"><?php echo htmlspecialchars($_GET['error']); ?></p>

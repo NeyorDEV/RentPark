@@ -12,16 +12,18 @@ class VehicleGateway {
         return $this->connection->getResults();
     }
 
-    public function add( string $modele, string $couleur , string $puissance): void {
-        $query = "INSERT INTO cars (modele,couleur,puissance) VALUES ( :modele,:couleur,:puissance)";
+    public function add(string $modele, string $couleur, string $puissance, string $imagePath = ''): void {
+        $query = "INSERT INTO cars (modele, couleur, puissance, image_path) 
+                  VALUES (:modele, :couleur, :puissance, :image_path)";
         $params = [
-            ':modele' => [$modele, \PDO::PARAM_STR],
-            ':couleur' => [$couleur, \PDO::PARAM_STR],
-            ':puissance' => [$puissance, \PDO::PARAM_STR],
+            ':modele'     => [$modele, \PDO::PARAM_STR],
+            ':couleur'    => [$couleur, \PDO::PARAM_STR],
+            ':puissance'  => [$puissance, \PDO::PARAM_STR],
+            ':image_path' => [$imagePath, \PDO::PARAM_STR],
         ];
-
         $this->connection->executeQuery($query, $params);
     }
+    
 
     public function delete(int $id): void {
         $query = "DELETE FROM cars WHERE voiture = :id";
@@ -53,6 +55,9 @@ class VehicleGateway {
        
         return $this->connection->getResults();
     }   
+
+
+
 }
 ?>
 
