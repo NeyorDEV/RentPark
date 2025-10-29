@@ -24,4 +24,4 @@ $vues['connection'] = 'view/viewConnection.php';
 
 $action = "RAS";
 
-$role = 'invite';
+$role = '';

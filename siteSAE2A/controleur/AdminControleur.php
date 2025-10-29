@@ -34,9 +34,9 @@ class AdminControleur
                 case "afficheInscription":
                     $this->afficheInscription( $dVueEreur);
                     break;
-                case "connection":
-                    $this->connection( $dVueEreur);
-                    break;
+                 case "afficheConnection":
+                        $this->afficheConnection( $dVueEreur);
+                        break;
                 case "rechercherVoitures":
                     $this->rechercherVoitures($dVueEreur);
                     break;
@@ -105,11 +105,11 @@ class AdminControleur
         $imagePath = ''; 
         if (isset($_FILES['image']) && $_FILES['image']['error'] === 0) {
             $nomTemp = $_FILES['image']['tmp_name'];
-            $nomFichier = uniqid() . '_' . basename($_FILES['image']['name']); // nom unique
-            $dossier = __DIR__ . '/../html/icons/' . $nomFichier; // dossier réel sur le serveur
+            $nomFichier = uniqid() . '_' . basename($_FILES['image']['name']); 
+            $dossier = __DIR__ . '/../html/icons/' . $nomFichier; 
 
         if (move_uploaded_file($nomTemp, $dossier)) {
-                $imagePath = 'html/icons/' . $nomFichier; // chemin relatif pour Twig
+                $imagePath = 'html/icons/' . $nomFichier; 
     }
 }
 
@@ -210,18 +210,23 @@ class AdminControleur
         $role = $this->userGateway->getRole($username);
         Validation::val_connection($username, $password, $savepass, $dVueErreur);
 
-        $role = $_POST['role'] ??'';
-        //$dVueErreur='';
+        $_SESSION['username'] = $username;
+        $_SESSION['role'] = $role;
+
+
         if (!empty($dVueErreur)) {
-            require '../view/viewErreur.php';
+            $this->afficherVue('erreur', $dVueErreur, $results=null, 'admin');
             exit;
         }        
         
     }
 
-    private function afficherVue(string $vueKey, array $dVueEreur, ?array $results = null, string $role = 'admin')
+    private function afficherVue(string $vueKey, array $dVueEreur, ?array $results = null, string $role)
     {
         global $rep, $vues, $twig;
+
+        $role = $_SESSION['role'] ?? 'visiteur';
+
     
         
         if (!isset($vues[$vueKey])) {
@@ -487,7 +492,7 @@ class AdminControleur
             }
 
            
-            header("Location: /siteSAE2A/voitures");
+            header("Location: /siteSAE2A/connection");
             exit;
         }
       $this->afficherVue('inscription',$dVueEreur,$results=null,'admin');
@@ -512,6 +517,7 @@ class AdminControleur
       $this->afficherVue('connection',$dVueEreur,$results=null,'admin');
 
     }
+
 }
 
 

@@ -4,14 +4,14 @@
   <meta charset="UTF-8">
   <title>Inscription</title>
   <link rel="stylesheet" href="html/css/inscription.css">
-  <link rel="icon" type="image/png" href="html/icons/voiture.png">
-  <link rel="shortcut icon" href="html/icons/favicon.ico" type="image/x-icon">
+   <link rel="icon" type="image/png" href="html/icons/voiture.png">
+    <link rel="shortcut icon" href="html/icons/favicon.ico" type="image/x-icon">
 </head>
 <body>
   <div class="login-container">
     <h2>Créer un compte</h2>
 
-    <form action="/siteSAE2A/c" method="POST">
+    <form action="/siteSAE2A/inscription" method="POST">
 
       <input type="hidden" name="action" value="inscription">
 
@@ -61,7 +61,7 @@
     </form>
 
     <p style="margin-top: 1rem;">
-      Déjà inscrit ? <a href="viewConnection.php">Se connecter</a>
+      Déjà inscrit ? <a href="/siteSAE2A/connection">Se connecter</a>
     </p>
   </div>
 </body>

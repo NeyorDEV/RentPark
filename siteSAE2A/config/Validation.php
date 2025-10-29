@@ -73,23 +73,32 @@ class Validation
         $username = filter_var($username, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
     }
 
-    public static function val_connection(string &$username, string &$password, string &$savepass, array &$errors)
+    public static function val_connection(string &$username, string &$password, ?string $savepass, array &$errors)
     {
+        // Nettoyage et vérification de base
         $username = trim($username ?? '');
         $password = trim($password ?? '');
-
-        $password=password_hash($password, PASSWORD_DEFAULT);
-
-        if ($username === '' || $password === '' ) {
+    
+        if ($username === '' || $password === '') {
             $errors[] = "Tous les champs sont requis.";
+            return;
         }
-
-        if (!password_verify($password , $savepass) ){ //il faut réimplémenter le check du mdp
-            //$errors[] = "Mot de passe ou Nom d'utilisateur invalide";
+    
+        // Vérifie que le hash est bien fourni
+        if ($savepass === null) {
+            $errors[] = "Utilisateur introuvable.";
+            return;
         }
-        
+    
+        // Vérifie la correspondance entre mot de passe saisi et hash stocké
+        if (!password_verify($password, $savepass)) {
+            $errors[] = "Mot de passe ou nom d'utilisateur invalide.";
+        }
+    
+        // Nettoyage du nom d’utilisateur
         $username = filter_var($username, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
     }
+    
 
 }
 

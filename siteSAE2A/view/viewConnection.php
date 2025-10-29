@@ -37,7 +37,7 @@
     </form>
 
     <p style="margin-top: 1rem;">
-      Pas de compte ? <a href="viewInscription.php">S'inscrire</a>
+      Pas de compte ? <a href="/siteSAE2A/inscription">S'inscrire</a>
     </p>
   </div>
 </body>
