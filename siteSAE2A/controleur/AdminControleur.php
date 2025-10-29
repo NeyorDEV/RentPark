@@ -47,8 +47,9 @@ class AdminControleur
                 case 'listeReservation':
                     $this->listeReservation($dVueEreur);
                     break;
-
-
+                case 'deconnecter':
+                        $this->deconnecter();
+                        break;
                 default:
                     $dVueEreur[] = "Action inconnue";
                     $this->afficherVue('flotte', $dVueEreur,$results=null,'admin');
@@ -517,6 +518,14 @@ class AdminControleur
       $this->afficherVue('connection',$dVueEreur,$results=null,'admin');
 
     }
+
+    public function deconnecter(): void
+{
+    session_unset();
+    session_destroy();
+    header("Location: /siteSAE2A/connection");
+    exit;
+}
 
 }
 
