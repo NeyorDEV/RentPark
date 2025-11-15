@@ -15,10 +15,10 @@ $dsn = 'mysql:host=127.0.0.1;port=3307;dbname=dbaltixier1;charset=utf8';
 
 //Vues
 
-$vues['flotte']  = 'flotte.twig';
-$vues['user']  = 'view/viewUtilisateur.php';
+$vues['flotte']  = 'viewFlotte.twig';
+$vues['user']  = 'viewUtilisateur.twig';
 $vues['erreur'] = 'view/viewErreur.php';
-$vues['reservation'] = 'view/viewReservation.php';
+$vues['reservation'] = 'viewReservation.twig';
 $vues['inscription'] = 'view/viewInscription.php';
 $vues['connection'] = 'view/viewConnection.php';
 
