@@ -1,0 +1,59 @@
+@startuml
+
+Class Connection{
+
+}
+
+Class Reservation{
+
+}
+
+Class ReservationGateway{
+
+}
+
+Class User{
+
+}
+
+Class UserGateway{
+
+}
+
+Class VehiculeGateway{
+
+}
+
+Class voiture{
+
+}
+
+Class AdminController{
+
+}
+
+Class FrontController{
+
+}
+
+Class UserController{
+
+}
+
+Class Validation{
+
+}
+
+Class AltoRouter{
+
+}
+
+Class Autoload{
+
+}
+
+' Ajouter un fichier nécessaire, y compris l'index.php
+package "Fichiers nécessaires" {
+    class "index"
+    class "config"
+}
