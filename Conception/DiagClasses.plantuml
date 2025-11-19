@@ -4,51 +4,177 @@ Class Connection{
 
 }
 
-Class Reservation{
+class Connection{
+        -stmt: PDOStatement
+
+        +__construct(dsn: string, username: string, password: string)
+        +executeQuery(query: string, parameters: array): bool
+        +getResults(): array
+}
+
+class Reservation {
+
+        -idContrat: int
+        -dateDebut: DateTime
+        -dateFin: DateTime
+        -vehiculeVin: string
+        -clientId: int
+        -etatDesLieuxId: int
+
+        +__construct(idContrat: int, dateDebut: DateTime, dateFin: DateTime, vehiculeVin: string, clientId: int, etatDesLieuxId: int)
+        +getIdContrat(): int
+        +getDateDebut(): DateTime
+        +getDateFin(): DateTime
+        +getVehiculeVin(): string
+        +getClientId(): int
+        +getEtatDesLieuxId(): int
+}
+
+class ReservationGateway {
+
+        -connection: Connection
+
+        +__construct(connection: Connection)
+        +searchReservations(champ: string, q: string, filtre: string): array
+        +insertReservation(vehicule: string, client: int, dateDebut: string, dateFin: string): void
+        +update(id: int, vehicule: string, client: int, dateDebut: string, dateFin: string): void
+        +delete(id: int): void
 
 }
 
-Class ReservationGateway{
+class User {
+
+        -id: int
+        -username: string
+        -password: string
+        -role: string
+
+        +__construct(id: int, username: string, password: string, role: string)
+        +getId(): int
+        +getUsername(): string
+        +getPassword(): string
+        +getRole(): string
 
 }
 
-Class User{
+class UserGateway {
+
+        -connection: Connection
+
+        +__construct(connection: Connection)
+        +login(user: User): void
+        +addUser(user: string, pass: string, role: string): void
+        +getHashPass(user: string, pass: string): string
+        +getRole(user: string): string
+        +deleteUser(id: int): void
+        +getAllUser(): array
+        +rechercherUtilisateur(motCle: string): array
+        +update(username: string, id: int): void
+
+    }
+
+
+class VehicleGateway {
+
+        -connection: Connection
+
+        +__construct(connection: Connection)
+        +getAll(): array
+        +add(modele: string, couleur: string, puissance: string, imagePath: string): void
+        +delete(id: int): void
+        +update(id: int, modele: string, couleur: string, puissance: string): void
+        +rechercherVoitures(motCle: string): array
 
 }
 
-Class UserGateway{
+class Voiture {
+
+        -voiture: int
+        -modele: string
+        -couleur: string
+        -puissance: string
+
+        +__construct(voiture: int, modele: string, couleur: string, puissance: string)
+        +getVoiture(): int
+        +getModele(): string
+        +getCouleur(): string
+        +getPuissance(): string
+        +__toString(): string
 
 }
 
-Class VehiculeGateway{
-
+class AdminControleur {
+        
+        -Connection connection
+        -VehicleGateway gateway
+        -UserGateway userGateway
+        -ReservationGateway reservationGateway
+        
+        +__construct()
+        +listeVoitures(dVueEreur: array): void
+        +ajouterVoiture(dVueEreur: array): void
+        +supprimerVoiture(dVueEreur: array): void
+        +modifierVoiture(dVueEreur: array): void
+        +rechercherVoitures(dVueErreur: array): void
+        +inscription(dVueErreur: array): void
+        +connection(dVueErreur: array): void
+        +afficherVue(vueKey: string, dVueEreur: array, results: array, role: string): void
+        +rechercherUtilisateur(dVueErreur: array): void
+        +supprimerUtilisateur(dVueEreur: array): void
+        +ajouterUtilisateur(dVueEreur: array): void
+        +listeUtilisateur(dVueEreur: array): void
+        +rechercherReservation(): void
+        +ajouterReservation(post: array): void
+        +modifierReservation(post: array): void
+        +supprimerReservation(dVueEreur: array): void
+        +listeReservation(dVueEreur: array): void
+        +modifierUtilisateur(dVueEreur: array): void
+        +afficheInscription(dVueEreur: array): void
+        +afficheConnection(dVueEreur: array): void
+        +deconnecter(): void
+        
 }
 
-Class voiture{
+class FrontControleur {
 
+        +__construct()
+        +run(): void
+    }
+
+class UserController {
+
+        -Connection connection
+        -VehicleGateway gateway
+
+        +__construct()
+        +listeVoitures(dVueErreur: array): void
+        +afficherVue(vueKey: string, dVueErreur: array, results: array, role: string): void
+
+    }
+
+class Validation {
+    +static val_action(action: string): void
+    +static val_voiture(modele: string, couleur: string, puissance: int, dVueErreur: array): void
+    +static val_user(username: string, password: string, confirm: string, role: string, errors: array): void
+    +static val_connection(username: string, password: string, savepass: string, errors: array): void
 }
 
-Class AdminController{
+class AltoRouter {
 
-}
+    -routes: array
+    -namedRoutes: array
+    -basePath: string
+    -matchTypes: array
 
-Class FrontController{
-
-}
-
-Class UserController{
-
-}
-
-Class Validation{
-
-}
-
-Class AltoRouter{
-
-}
-
-Class Autoload{
+    +__construct(routes: array, basePath: string, matchTypes: array)
+    +getRoutes(): array
+    +addRoutes(routes: array): void
+    +setBasePath(basePath: string): void
+    +addMatchTypes(matchTypes: array): void
+    +map(method: string, route: string, target: mixed, name: string): void
+    +generate(routeName: string, params: array): string
+    +match(requestUrl: string, requestMethod: string): array | boolean
+    +compileRoute(route: string): string
 
 }
 
@@ -56,4 +182,30 @@ Class Autoload{
 package "Fichiers nécessaires" {
     class "index"
     class "config"
+    class "autoload"
 }
+
+' Liens entre les classes principales
+AdminControleur --> VehicleGateway : "utilise"
+AdminControleur --> UserGateway : "utilise"
+AdminControleur --> ReservationGateway : "utilise"
+AdminControleur --> Validation : "utilise"
+
+' Liens entre les classes d'objets
+UserGateway --> Connection : "utilise"
+VehicleGateway --> Connection : "utilise"
+ReservationGateway --> Connection : "utilise"
+UserGateway --> User : "manipule"
+ReservationGateway --> Reservation : "manipule"
+VehicleGateway --> Voiture : "manipule"
+
+' Liens avec le contrôleur front-end
+FrontControleur --> AltoRouter : "utilise"
+FrontControleur --> AdminControleur : "appelle"
+FrontControleur --> UserController : "appelle"
+UserController --> UserGateway : "utilise"
+UserController --> VehicleGateway : "utilise"
+
+' Autres relations
+Voiture --> Reservation : "associée à"
+Reservation --> Voiture : "associée à"
