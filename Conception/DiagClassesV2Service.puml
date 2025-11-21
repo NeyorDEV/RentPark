@@ -78,24 +78,29 @@ class User {
         +getRole(): string
 
 }
-
-class Voiture {
-
-        -id: int
-        -modele: string
-        -couleur: string
-        -puissance: string
-
-        +__construct(id: int, modele: string, couleur: string, puissance: string)
+abstract class Vehicule{
+    -id: int
+    -modele: string
+    -couleur: string
+    -puissance: string
+    
+    +__construct(id: int, modele: string, couleur: string, puissance: string)
         +getId(): int
         +getModele(): string
         +getCouleur(): string
         +getPuissance(): string
         +__toString(): string
+}
+
+class Voiture extends Vehicule{
+    
+    -nbPortes : int   
+    
+    +getnbPortes(): int
 
 }
 
-Voiture "1" <-- "0..*" Reservation : "concerne"
+Vehicule "1" <-- "0..*" Reservation : "concerne"
 User "1" <-- "0..*" Reservation : "concerne"
 
 ' ===== GATEWAYS =====
@@ -133,16 +138,16 @@ class VehicleGateway {
         -connection: Connection
 
         +__construct(connection: Connection)
-        +getAll(): Voiture[]
-        +add(voiture: Voiture): void
+        +getAll(): Vehicule[]
+        +add(voiture: Vehicule): void
         +delete(id: int): void
-        +update(voiture: Voiture): void
-        +rechercherVoitures(motCle: string): Voiture[]
+        +update(voiture: Vehicule): void
+        +rechercherVVehicules(motCle: string): Vehicule[]
 
 }
 
 UserGateway ..> User : "créer/envoie/modif/supp"
-VehicleGateway ..> Voiture : "créer/envoie/modif/supp"
+VehicleGateway ..> Vehicule : "créer/envoie/modif/supp"
 ReservationGateway ..> Reservation : "créer/envoie/modif/supp"
 
 UserGateway --> Connection : "utilise"
@@ -152,9 +157,9 @@ ReservationGateway --> Connection : "utilise"
 ' ===== CONTROLEURS =====
 
 class AdminControleur extends UserController{
-        +ajouterVoiture(dVueEreur: array): void
-        +supprimerVoiture(dVueEreur: array): void
-        +modifierVoiture(dVueEreur: array): void
+        +ajouterVehicule(dVueEreur: array): void
+        +supprimerVehicule(dVueEreur: array): void
+        +modifierVehicule(dVueEreur: array): void
         +rechercherUtilisateur(dVueErreur: array): void
         +supprimerUtilisateur(dVueEreur: array): void
         +ajouterUtilisateur(dVueEreur: array): void
@@ -175,8 +180,8 @@ class UserController {
         -reservationService: ReservationService
 
         +__construct(vehicleService: IVehicleService, userService: IUserService, reservationService: IReservationService)
-        +listeVoitures(dVueEreur: array): void
-        +rechercherVoitures(dVueErreur: array): void
+        +listeVehicule(dVueEreur: array): void
+        +rechercherVehicule(dVueErreur: array): void
         +inscription(dVueErreur: array): void
         +connection(dVueErreur: array): void
         +afficherVue(vueKey: string, dVueEreur: array, results: array, role: string): void
@@ -193,9 +198,9 @@ UserController --> IReservationService : "utilise"
     ' ======= SERVICES  =======
 
     interface IVehicleService {
-    +getAll(): Voiture[]
-    +getById(id: int): Voiture
-    +create(modele: string, couleur: string, puissance: string): Voiture
+    +getAll(): Vehicule[]
+    +getById(id: int): Vehicule
+    +create(modele: string, couleur: string, puissance: string): Vehicule
     +update(id: int, modele: string, couleur: string, puissance: string): Voiture
     +delete(id: int): void
 }
@@ -243,7 +248,7 @@ ReservationService --> VehicleGateway
 ReservationService --> UserGateway
 
 ReservationService --> Reservation : "manipule"
-VehicleService --> Voiture : "manipule"
+VehicleService --> Vehicule : "manipule"
 UserService --> User : "manipule"
 
 ' ======= Validation  =======
