@@ -177,30 +177,15 @@ class AdminControleur extends CollabController {
 class CollabController extends UserController {
 
     -DashboardService: IDashboardService
-
-    +ajouterVehicule(dVueEreur: array): void
-    +supprimerVehicule(dVueEreur: array): void
-    +modifierVehicule(dVueEreur: array): void
-    +rechercherUtilisateur(dVueErreur: array): void
-    +supprimerUtilisateur(dVueEreur: array): void
-    +ajouterUtilisateur(dVueEreur: array): void
-    +listeUtilisateur(dVueEreur: array): void
-    +ajouterReservation(post: array): void
-    +modifierReservation(post: array): void
-    +supprimerReservation(dVueEreur: array): void
-    +modifierUtilisateur(dVueEreur: array): void
-    +afficheInscription(dVueEreur: array): void
-    +afficheConnection(dVueEreur: array): void
-    +deconnecter(): void 
+    +ConstructionServiceDashboard(dVueEreur: array): void
 }
 
 class UserController extends GuestController {
 
-    +deconnecter(): void
 }
 
 class GuestController {
-
+    -ConnectionService : IConnectionService
     -vehicleService: IVehicleService
     -userService: IUserService
     -reservationService: IReservationService
@@ -208,13 +193,10 @@ class GuestController {
     +__construct(vehicleService: IVehicleService,
                  userService: IUserService,
                  reservationService: IReservationService)
-    +listeVehicule(dVueEreur: array): void
-    +rechercherVehicule(dVueErreur: array): void
-    +inscription(dVueErreur: array): void
-    +connection(dVueErreur: array): void
-    +afficherVue(vueKey: string, dVueEreur: array, results: array, role: string): void
-    +rechercherReservation(): void
-    +listeReservation(dVueEreur: array): void        
+    +ConstructionServiceVehicule(dVueEreur: array): void
+    +ConstructionServiceReservation(dVueEreur: array): void  
+    +ConstructionServiceConnection(dVueEreur: array): void  
+    +afficherVue(vueKey: string, dVueEreur: array, results: array, role: string): void       
 }
 
 GuestController --> IVehicleService     : "utilise"
@@ -228,45 +210,54 @@ CollabController --> IDashboardService  : "utilise"
 ' ============================
 
 interface IVehicleService {
-
-    +getAll(): Vehicule[]
-    +getById(id: int): Vehicule
-    +create(modele: string, couleur: string, puissance: string): Vehicule
-    +update(id: int, modele: string, couleur: string, puissance: string): Vehicule
+    +getAll(): array<JSON>
+    +getById(id: int): array<JSON>
+    +create(modele: string, couleur: string, puissance: string): array<JSON>
+    +update(id: int, modele: string, couleur: string, puissance: string): array<JSON>
     +delete(id: int): void
 }
 
 class VehicleService implements IVehicleService {
-
     -vehicleGateway: VehicleGateway
     -validator: IVehicleValidator
-
     +__construct(vehicleGateway: VehicleGateway, validator: IVehicleValidator)
 }
 
-interface IUserService {
+interface IConnectionService {
 
-    +getAll(): User[]
-    +getById(id: int): User
-    +register(username: string, password: string, role: string): User
+    +login(username: string, password: string): array<JSON>
+    +logout(): void
+    +register(username: string, password: string, role: string): array<JSON>
+    +isLoggedIn(): bool
+    +getCurrentUser(): array<JSON>
+}
+
+class ConnectionService implements IConnectionService {
+    -userService: IUserService
+    -validator: IUserValidator
+    +__construct(userService: IUserService, validator: IUserValidator)
+}
+
+
+interface IUserService {
+    +getAll(): array<JSON>
+    +getById(id: int): array<JSON>
+    +add(username: string, password: string, role: string): array<JSON>
     +delete(id: int): void
-    +updateRole(id: int, role: string): User
+    +update(id:int, username: string, password: string, role: string):void
 }
 
 class UserService implements IUserService {
-
     -userGateway: UserGateway
     -validator: IUserValidator
-
     +__construct(userGateway: UserGateway, validator: IUserValidator)
 }
 
 interface IReservationService {
-
-    +getAll(): Reservation[]
-    +getById(idContrat: int): Reservation
-    +create(vehiculeId: int, clientId: int, dateDebut: DateTime, dateFin: DateTime): Reservation
-    +update(idContrat: int, vehiculeId: int, clientId: int, dateDebut: DateTime, dateFin: DateTime): Reservation
+    +getAll(): array<JSON>
+    +getById(idContrat: int): array<JSON>
+    +create(vehiculeId: int, clientId: int, dateDebut: DateTime, dateFin: DateTime): array<JSON>
+    +update(idContrat: int, vehiculeId: int, clientId: int, dateDebut: DateTime, dateFin: DateTime): array<JSON>
     +cancel(idContrat: int): void
 }
 
@@ -284,7 +275,6 @@ class ReservationService implements IReservationService {
 }
 
 interface IDashboardService {
-
     +getStats(): array
 }
 
@@ -308,38 +298,45 @@ UserService        --> User        : "manipule"
 
 interface IUserValidator {
 
-    +validateRegistration(username: string, password: string, confirm: string, role: string): array
-    +validateLogin(username: string, password: string): array
+    +validateRegistration(username: string, password: string, confirm: string, role: string, dVueEreur: array): void
+    +validateLogin(username: string, password: string, dVueEreur: array): bool
 }
 
 interface IVehicleValidator {
 
-    +validateVehicle(modele: string, couleur: string, puissance: int): array
+    +validateVehicle(modele: string, couleur: string, puissance: int): void
 }
 
 interface IReservationValidator {
 
-    +validateReservation(vehiculeId: int, clientId: int, dateDebut: DateTime, dateFin: DateTime): array
+    +validateReservation(vehiculeId: int, clientId: int, dateDebut: DateTime, dateFin: DateTime, dVueEreur: array): void
 }
 
 class UserValidator implements IUserValidator {
 
-    +validateRegistration(...): array
-    +validateLogin(...): array
 }
 
 class VehicleValidator implements IVehicleValidator {
 
-    +validateVehicle(...): array
 }
 
 class ReservationValidator implements IReservationValidator {
 
-    +validateReservation(...): array
 }
+
+'pas propre ...
 
 VehicleService     --> IVehicleValidator     : "valide données véhicule"
 UserService        --> IUserValidator        : "valide données utilisateur"
 ReservationService --> IReservationValidator : "valide données réservation"
+
+
+GuestController --> IConnectionService : "authentifie"
+UserController  --> IConnectionService : "gère session"
+CollabController --> IConnectionService
+AdminControleur --> IConnectionService
+
+ConnectionService --> IUserService     : "utilise pour accès BDD"
+ConnectionService --> IUserValidator   : "valide données login/register"
 
 @enduml
