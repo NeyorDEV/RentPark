@@ -208,11 +208,11 @@ UserController --> IReservationService : "utilise"
 
     class VehicleService implements IVehicleService{
         -vehicleGateway: VehicleGateway
-        -validator: IRVehicleValidator
+        -validator: IVehicleValidator
+        +__construct(VehicleGateway: VehicleGateway)
     }
 
     interface IUserService{
-        +__construct(userGateway: UserGateway)
         +getAll(): User[]
         +getById(id: int): User
         +register(username: string, password: string, role: string): User
@@ -223,10 +223,10 @@ UserController --> IReservationService : "utilise"
     class UserService implements IUserService{
         -userGateway: UserGateway
         -validator: IUserValidator
+        +__construct(userGateway: UserGateway)
     }
 
     interface IReservationService{
-        +__construct(reservationGateway: ReservationGateway, vehicleGateway: VehicleGateway, userGateway: UserGateway)
         +getAll(): Reservation[]
         +getById(idContrat: int): Reservation
         +create(vehiculeId: int, clientId: int, dateDebut: DateTime, dateFin: DateTime): Reservation
@@ -239,6 +239,7 @@ UserController --> IReservationService : "utilise"
         -vehicleGateway: VehicleGateway
         -userGateway: UserGateway
         -validator: IReservationValidator
+        +__construct(reservationGateway: ReservationGateway, vehicleGateway: VehicleGateway, userGateway: UserGateway)
     }
     
 VehicleService --> VehicleGateway
