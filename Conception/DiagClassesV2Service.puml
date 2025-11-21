@@ -14,7 +14,9 @@ class FrontControleur {
 
 FrontControleur --> AltoRouter : "utilise"
 FrontControleur --> AdminControleur : "appelle"
+FrontControleur --> CollabController : "appelle"
 FrontControleur --> UserController : "appelle"
+FrontControleur --> GuestController : "appelle"
 
 ' ===== TECHNIQUE =====
 
@@ -142,7 +144,7 @@ class VehicleGateway {
         +add(voiture: Vehicule): void
         +delete(id: int): void
         +update(voiture: Vehicule): void
-        +rechercherVVehicules(motCle: string): Vehicule[]
+        +rechercherVehicules(motCle: string): Vehicule[]
 
 }
 
@@ -156,7 +158,13 @@ ReservationGateway --> Connection : "utilise"
 
 ' ===== CONTROLEURS =====
 
-class AdminControleur extends UserController{
+class AdminControleur extends CollabController{
+        
+}
+
+class CollabController extends UserController{
+    -DashboardService: IDashboardService
+
         +ajouterVehicule(dVueEreur: array): void
         +supprimerVehicule(dVueEreur: array): void
         +modifierVehicule(dVueEreur: array): void
@@ -173,11 +181,14 @@ class AdminControleur extends UserController{
         +deconnecter(): void 
 }
 
-class UserController {
+class UserController extends GuestController{
+    +deconnecter(): void
+}
 
-        -vehicleService: VehicleService
-        -userService: UserService
-        -reservationService: ReservationService
+class GuestController{
+    -vehicleService: IVehicleService
+        -userService: IUserService
+        -reservationService: IReservationService
 
         +__construct(vehicleService: IVehicleService, userService: IUserService, reservationService: IReservationService)
         +listeVehicule(dVueEreur: array): void
@@ -187,13 +198,13 @@ class UserController {
         +afficherVue(vueKey: string, dVueEreur: array, results: array, role: string): void
         +rechercherReservation(): void
         +listeReservation(dVueEreur: array): void
-        +deconnecter(): void
-
+        
 }
 
-UserController --> IVehicleService : "utilise"
-UserController --> IUserService : "utilise"
-UserController --> IReservationService : "utilise"
+GuestController --> IVehicleService : "utilise"
+GuestController --> IUserService : "utilise"
+GuestController --> IReservationService : "utilise"
+CollabController --> IDashboardService : "utilise"
 
     ' ======= SERVICES  =======
 
@@ -201,15 +212,16 @@ UserController --> IReservationService : "utilise"
     +getAll(): Vehicule[]
     +getById(id: int): Vehicule
     +create(modele: string, couleur: string, puissance: string): Vehicule
-    +update(id: int, modele: string, couleur: string, puissance: string): Voiture
+    +update(id: int, modele: string, couleur: string, puissance: string): Vehicule
     +delete(id: int): void
-}
+    }
 
 
     class VehicleService implements IVehicleService{
         -vehicleGateway: VehicleGateway
         -validator: IVehicleValidator
-        +__construct(VehicleGateway: VehicleGateway)
+        +__construct(vehicleGateway: VehicleGateway, validator: IVehicleValidator)
+
     }
 
     interface IUserService{
@@ -223,7 +235,7 @@ UserController --> IReservationService : "utilise"
     class UserService implements IUserService{
         -userGateway: UserGateway
         -validator: IUserValidator
-        +__construct(userGateway: UserGateway)
+        +__construct(userGateway: UserGateway, validator: IUserValidator)
     }
 
     interface IReservationService{
@@ -239,9 +251,18 @@ UserController --> IReservationService : "utilise"
         -vehicleGateway: VehicleGateway
         -userGateway: UserGateway
         -validator: IReservationValidator
-        +__construct(reservationGateway: ReservationGateway, vehicleGateway: VehicleGateway, userGateway: UserGateway)
+        +__construct(reservationGateway: ReservationGateway, vehicleGateway: VehicleGateway, userGateway: UserGateway, validator: IReservationValidator)
+
+    }
+
+    interface IDashboardService {
+        +getStats(): array
+    }
+
+    class DashboardService implements IDashboardService{
     }
     
+
 VehicleService --> VehicleGateway
 UserService --> UserGateway
 ReservationService --> ReservationGateway
