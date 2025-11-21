@@ -178,13 +178,6 @@ class AltoRouter {
 
 }
 
-' Ajouter un fichier nécessaire, y compris l'index.php
-package "Fichiers nécessaires" {
-    class "index"
-    class "config"
-    class "autoload"
-}
-
 ' Liens entre les classes principales
 AdminControleur --> VehicleGateway : "utilise"
 AdminControleur --> UserGateway : "utilise"
