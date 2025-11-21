@@ -64,7 +64,7 @@ class Reservation {
     -dateFin: DateTime
     -vehiculeId: int
     -clientId: int
-    -etatDesLieuxId: int
+    -etatDesLieuxId: string
 
     +__construct(idContrat: int, dateDebut: DateTime, dateFin: DateTime,
                  vehiculeId: int, clientId: int, etatDesLieuxId: int)
@@ -73,7 +73,7 @@ class Reservation {
     +getDateFin(): DateTime
     +getVehiculeId(): int
     +getClientId(): int
-    +getEtatDesLieuxId(): int
+    +getEtatDesLieuxId(): string
 }
 
 class User {
@@ -92,23 +92,43 @@ class User {
 
 abstract class Vehicule {
 
-    -id: int
+    -vin: int
     -modele: string
+    -annee: int
     -couleur: string
     -puissance: string
-    
-    +__construct(id: int, modele: string, couleur: string, puissance: string)
-    +getId(): int
+    -prix: float
+    -energie: string
+    -nbPlaces: int
+    -transmission: string
+    -boite: string
+    -etat: string
+    -dateAchat: Date
+    -dateDernierControleTech: Date
+    -assureur: string
+    -fournisseur: string
+
+    +getVin(): int
     +getModele(): string
+    +getAnnee(): int
     +getCouleur(): string
     +getPuissance(): string
+    +getPrix(): float
+    +getEnergie(): string
+    +getNbPlaces(): int
+    +getTransmission(): string
+    +getBoite(): string
+    +getEtat(): string
+    +getDateAchat(): Date
+    +getDateDernierControleTech(): Date
+    +getAssureur(): string
+    +getFournisseur(): string
     +__toString(): string
 }
 
+
 class Voiture extends Vehicule {
-    
     -nbPortes: int   
-    
     +getnbPortes(): int
 }
 
