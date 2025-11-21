@@ -1,0 +1,246 @@
+@startuml
+
+' ===== TECHNIQUE =====
+
+interface DBConnection {
+    +executeQuery(query: string, parameters: array): bool
+    +getResults(): array
+}
+
+class Connection {
+        -stmt: PDOStatement
+
+        +__construct(dsn: string, username: string, password: string)
+        +executeQuery(query: string, parameters: array): bool
+        +getResults(): array
+}
+
+DBConnection <|.. Connection
+
+class AltoRouter {
+
+    -routes: array
+    -namedRoutes: array
+    -basePath: string
+    -matchTypes: array
+
+    +__construct(routes: array, basePath: string, matchTypes: array)
+    +getRoutes(): array
+    +addRoutes(routes: array): void
+    +setBasePath(basePath: string): void
+    +addMatchTypes(matchTypes: array): void
+    +map(method: string, route: string, target: mixed, name: string): void
+    +generate(routeName: string, params: array): string
+    +match(requestUrl: string, requestMethod: string): array | boolean
+    +compileRoute(route: string): string
+}
+
+' ===== ENTITES =====
+
+class Reservation {
+
+        -idContrat: int
+        -dateDebut: DateTime
+        -dateFin: DateTime
+        -vehiculeId: int
+        -clientId: int
+        -etatDesLieuxId: int
+
+        +__construct(idContrat: int, dateDebut: DateTime, dateFin: DateTime, vehiculeId: int, clientId: int, etatDesLieuxId: int)
+        +getIdContrat(): int
+        +getDateDebut(): DateTime
+        +getDateFin(): DateTime
+        +getVehiculeId(): int
+        +getClientId(): int
+        +getEtatDesLieuxId(): int
+}
+
+class User {
+
+        -id: int
+        -username: string
+        -passwordHash: string
+        -role: string
+
+        +__construct(id: int, username: string, passwordHash: string, role: string)
+        +getId(): int
+        +getUsername(): string
+        +getPasswordHash(): string
+        +getRole(): string
+
+}
+
+class Voiture {
+
+        -id: int
+        -modele: string
+        -couleur: string
+        -puissance: string
+
+        +__construct(id: int, modele: string, couleur: string, puissance: string)
+        +getId(): int
+        +getModele(): string
+        +getCouleur(): string
+        +getPuissance(): string
+        +__toString(): string
+
+}
+
+Voiture "1" <-- "0..*" Reservation : "concerne"
+
+' ===== GATEWAYS =====
+
+class ReservationGateway {
+
+        -connection: DBConnection
+
+        +__construct(connection: DBConnection)
+        +searchReservations(champ: string, q: string, filtre: string): Reservation[]
+        +insertReservation(reservation: Reservation): void
+        +update(reservation: Reservation): void
+        +delete(id: int): void
+
+}
+
+class UserGateway {
+
+        -connection: DBConnection
+
+        +__construct(connection: DBConnection)
+        +login(user: User): void
+        +addUser(user: User): void
+        +getHashPass(username: string): string
+        +getRole(username: string): string
+        +deleteUser(id: int): void
+        +getAllUser(): User[]
+        +rechercherUtilisateur(motCle: string): User[]
+        +update(user: User): void
+
+}
+
+class VehicleGateway {
+
+        -connection: DBConnection
+
+        +__construct(connection: DBConnection)
+        +getAll(): Voiture[]
+        +add(voiture: Voiture): void
+        +delete(id: int): void
+        +update(voiture: Voiture): void
+        +rechercherVoitures(motCle: string): Voiture[]
+
+}
+
+UserGateway --> DBConnection : "utilise"
+VehicleGateway --> DBConnection : "utilise"
+ReservationGateway --> DBConnection : "utilise"
+
+UserGateway --> User : "manipule"
+ReservationGateway --> Reservation : "manipule"
+VehicleGateway --> Voiture : "manipule"
+
+' ===== VALIDATION =====
+
+interface VehicleValidator {
+    +val_voiture(modele: string, couleur: string, puissance: int): array
+}
+
+interface UserValidator {
+    +val_user(username: string, password: string, confirm: string, role: string): array
+    +val_connection(username: string, password: string, savepass: string): array
+}
+
+class Validation implements VehicleValidator, UserValidator {
+    +val_voiture(modele: string, couleur: string, puissance: int): array
+    +val_user(username: string, password: string, confirm: string, role: string): array
+    +val_connection(username: string, password: string, savepass: string): array
+}
+
+' ===== CONTROLEURS =====
+
+interface Controller {
+    +handle(action: string, request: array): void
+}
+
+class AdminControleur {
+        
+        -connection: DBConnection
+        -gateway: VehicleGateway
+        -userGateway: UserGateway
+        -reservationGateway: ReservationGateway
+        -validator: Validation
+        
+        +__construct(connection: DBConnection, gateway: VehicleGateway,
+                     userGateway: UserGateway, reservationGateway: ReservationGateway,
+                     validator: Validation)
+        +handle(action: string, request: array): void
+        +listeVoitures(dVueEreur: array): void
+        +ajouterVoiture(dVueEreur: array): void
+        +supprimerVoiture(dVueEreur: array): void
+        +modifierVoiture(dVueEreur: array): void
+        +rechercherVoitures(dVueErreur: array): void
+        +inscription(dVueErreur: array): void
+        +connection(dVueErreur: array): void
+        +afficherVue(vueKey: string, dVueEreur: array, results: array, role: string): void
+        +rechercherUtilisateur(dVueErreur: array): void
+        +supprimerUtilisateur(dVueEreur: array): void
+        +ajouterUtilisateur(dVueEreur: array): void
+        +listeUtilisateur(dVueEreur: array): void
+        +rechercherReservation(): void
+        +ajouterReservation(post: array): void
+        +modifierReservation(post: array): void
+        +supprimerReservation(dVueEreur: array): void
+        +listeReservation(dVueEreur: array): void
+        +modifierUtilisateur(dVueEreur: array): void
+        +afficheInscription(dVueEreur: array): void
+        +afficheConnection(dVueEreur: array): void
+        +deconnecter(): void
+        
+}
+
+class UserController {
+
+        -connection: DBConnection
+        -gateway: VehicleGateway
+
+        +__construct(connection: DBConnection, gateway: VehicleGateway)
+        +handle(action: string, request: array): void
+        +listeVoitures(dVueErreur: array): void
+        +afficherVue(vueKey: string, dVueErreur: array, results: array, role: string): void
+
+}
+
+Controller <|.. AdminControleur
+Controller <|.. UserController
+
+AdminControleur --> VehicleGateway : "utilise"
+AdminControleur --> UserGateway : "utilise"
+AdminControleur --> ReservationGateway : "utilise"
+AdminControleur --> VehicleValidator : "utilise"
+AdminControleur --> UserValidator : "utilise"
+UserController --> VehicleGateway : "utilise"
+
+' ===== FRONT CONTROLLER =====
+
+class FrontControleur {
+
+        -router: AltoRouter
+        -adminController: Controller
+        -userController: Controller
+
+        +__construct(router: AltoRouter, adminController: Controller, userController: Controller)
+        +run(): void
+    }
+
+FrontControleur --> AltoRouter : "utilise"
+FrontControleur --> Controller : "appelle"
+
+' ===== FICHIERS =====
+
+package "Fichiers nécessaires" {
+    class "index"
+    class "config"
+    class "autoload"
+}
+
+@enduml
