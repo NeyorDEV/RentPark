@@ -1,31 +1,37 @@
 @startuml
 
-' ===== FRONT CONTROLLER =====
+' ============================
+'        FRONT CONTROLLER
+' ============================
 
 class FrontControleur {
 
-        -router: AltoRouter
-        -adminController: Controller
-        -userController: Controller
+    -router: AltoRouter
+    -adminController: Controller
+    -userController: Controller
 
-        +__construct(router: AltoRouter, adminController: Controller, userController: Controller)
-        +run(): void
-    }
+    +__construct(router: AltoRouter, adminController: Controller, userController: Controller)
+    +run(): void
+}
 
-FrontControleur --> AltoRouter : "utilise"
+FrontControleur --> AltoRouter      : "utilise"
 FrontControleur --> AdminControleur : "appelle"
-FrontControleur --> CollabController : "appelle"
-FrontControleur --> UserController : "appelle"
+FrontControleur --> CollabController: "appelle"
+FrontControleur --> UserController  : "appelle"
 FrontControleur --> GuestController : "appelle"
 
-' ===== TECHNIQUE =====
+
+' ============================
+'           TECHNIQUE
+' ============================
 
 class Connection {
-        -stmt: PDOStatement
 
-        +__construct(dsn: string, username: string, password: string)
-        +executeQuery(query: string, parameters: array): bool
-        +getResults(): array
+    -stmt: PDOStatement
+
+    +__construct(dsn: string, username: string, password: string)
+    +executeQuery(query: string, parameters: array): bool
+    +getResults(): array
 }
 
 class AltoRouter {
@@ -46,263 +52,294 @@ class AltoRouter {
     +compileRoute(route: string): string
 }
 
-' ===== MODELES =====
+
+' ============================
+'            MODELES
+' ============================
 
 class Reservation {
 
-        -idContrat: int
-        -dateDebut: DateTime
-        -dateFin: DateTime
-        -vehiculeId: int
-        -clientId: int
-        -etatDesLieuxId: int
+    -idContrat: int
+    -dateDebut: DateTime
+    -dateFin: DateTime
+    -vehiculeId: int
+    -clientId: int
+    -etatDesLieuxId: int
 
-        +__construct(idContrat: int, dateDebut: DateTime, dateFin: DateTime, vehiculeId: int, clientId: int, etatDesLieuxId: int)
-        +getIdContrat(): int
-        +getDateDebut(): DateTime
-        +getDateFin(): DateTime
-        +getVehiculeId(): int
-        +getClientId(): int
-        +getEtatDesLieuxId(): int
+    +__construct(idContrat: int, dateDebut: DateTime, dateFin: DateTime,
+                 vehiculeId: int, clientId: int, etatDesLieuxId: int)
+    +getIdContrat(): int
+    +getDateDebut(): DateTime
+    +getDateFin(): DateTime
+    +getVehiculeId(): int
+    +getClientId(): int
+    +getEtatDesLieuxId(): int
 }
 
 class User {
 
-        -id: int
-        -username: string
-        -passwordHash: string
-        -role: string
+    -id: int
+    -username: string
+    -passwordHash: string
+    -role: string
 
-        +__construct(id: int, username: string, passwordHash: string, role: string)
-        +getId(): int
-        +getUsername(): string
-        +getPasswordHash(): string
-        +getRole(): string
-
+    +__construct(id: int, username: string, passwordHash: string, role: string)
+    +getId(): int
+    +getUsername(): string
+    +getPasswordHash(): string
+    +getRole(): string
 }
-abstract class Vehicule{
+
+abstract class Vehicule {
+
     -id: int
     -modele: string
     -couleur: string
     -puissance: string
     
     +__construct(id: int, modele: string, couleur: string, puissance: string)
-        +getId(): int
-        +getModele(): string
-        +getCouleur(): string
-        +getPuissance(): string
-        +__toString(): string
+    +getId(): int
+    +getModele(): string
+    +getCouleur(): string
+    +getPuissance(): string
+    +__toString(): string
 }
 
-class Voiture extends Vehicule{
+class Voiture extends Vehicule {
     
-    -nbPortes : int   
+    -nbPortes: int   
     
     +getnbPortes(): int
-
 }
 
 Vehicule "1" <-- "0..*" Reservation : "concerne"
-User "1" <-- "0..*" Reservation : "concerne"
+User     "1" <-- "0..*" Reservation : "concerne"
 
-' ===== GATEWAYS =====
+
+' ============================
+'           GATEWAYS
+' ============================
 
 class ReservationGateway {
 
-        -connection: Connection
+    -connection: Connection
 
-        +__construct(connection: Connection)
-        +searchReservations(champ: string, q: string, filtre: string): Reservation[]
-        +insertReservation(reservation: Reservation): void
-        +update(reservation: Reservation): void
-        +delete(id: int): void
-
+    +__construct(connection: Connection)
+    +searchReservations(champ: string, q: string, filtre: string): Reservation[]
+    +insertReservation(reservation: Reservation): void
+    +update(reservation: Reservation): void
+    +delete(id: int): void
 }
 
 class UserGateway {
 
-        -connection: Connection
+    -connection: Connection
 
-        +__construct(connection: Connection)
-        +login(user: User): void
-        +addUser(user: User): void
-        +getHashPass(username: string): string
-        +getRole(username: string): string
-        +deleteUser(id: int): void
-        +getAllUser(): User[]
-        +rechercherUtilisateur(motCle: string): User[]
-        +update(user: User): void
-
+    +__construct(connection: Connection)
+    +login(user: User): void
+    +addUser(user: User): void
+    +getHashPass(username: string): string
+    +getRole(username: string): string
+    +deleteUser(id: int): void
+    +getAllUser(): User[]
+    +rechercherUtilisateur(motCle: string): User[]
+    +update(user: User): void
 }
 
 class VehicleGateway {
 
-        -connection: Connection
+    -connection: Connection
 
-        +__construct(connection: Connection)
-        +getAll(): Vehicule[]
-        +add(voiture: Vehicule): void
-        +delete(id: int): void
-        +update(voiture: Vehicule): void
-        +rechercherVehicules(motCle: string): Vehicule[]
-
+    +__construct(connection: Connection)
+    +getAll(): Vehicule[]
+    +add(voiture: Vehicule): void
+    +delete(id: int): void
+    +update(voiture: Vehicule): void
+    +rechercherVehicules(motCle: string): Vehicule[]
 }
 
-UserGateway ..> User : "créer/envoie/modif/supp"
-VehicleGateway ..> Vehicule : "créer/envoie/modif/supp"
-ReservationGateway ..> Reservation : "créer/envoie/modif/supp"
+UserGateway       ..> User       : "créer/envoie/modif/supp"
+VehicleGateway    ..> Vehicule   : "créer/envoie/modif/supp"
+ReservationGateway..> Reservation: "créer/envoie/modif/supp"
 
-UserGateway --> Connection : "utilise"
-VehicleGateway --> Connection : "utilise"
-ReservationGateway --> Connection : "utilise"
+UserGateway        --> Connection: "utilise"
+VehicleGateway     --> Connection: "utilise"
+ReservationGateway --> Connection: "utilise"
 
-' ===== CONTROLEURS =====
 
-class AdminControleur extends CollabController{
-        
+' ============================
+'          CONTROLEURS
+' ============================
+
+class AdminControleur extends CollabController {
 }
 
-class CollabController extends UserController{
+class CollabController extends UserController {
+
     -DashboardService: IDashboardService
 
-        +ajouterVehicule(dVueEreur: array): void
-        +supprimerVehicule(dVueEreur: array): void
-        +modifierVehicule(dVueEreur: array): void
-        +rechercherUtilisateur(dVueErreur: array): void
-        +supprimerUtilisateur(dVueEreur: array): void
-        +ajouterUtilisateur(dVueEreur: array): void
-        +listeUtilisateur(dVueEreur: array): void
-        +ajouterReservation(post: array): void
-        +modifierReservation(post: array): void
-        +supprimerReservation(dVueEreur: array): void
-        +modifierUtilisateur(dVueEreur: array): void
-        +afficheInscription(dVueEreur: array): void
-        +afficheConnection(dVueEreur: array): void
-        +deconnecter(): void 
+    +ajouterVehicule(dVueEreur: array): void
+    +supprimerVehicule(dVueEreur: array): void
+    +modifierVehicule(dVueEreur: array): void
+    +rechercherUtilisateur(dVueErreur: array): void
+    +supprimerUtilisateur(dVueEreur: array): void
+    +ajouterUtilisateur(dVueEreur: array): void
+    +listeUtilisateur(dVueEreur: array): void
+    +ajouterReservation(post: array): void
+    +modifierReservation(post: array): void
+    +supprimerReservation(dVueEreur: array): void
+    +modifierUtilisateur(dVueEreur: array): void
+    +afficheInscription(dVueEreur: array): void
+    +afficheConnection(dVueEreur: array): void
+    +deconnecter(): void 
 }
 
-class UserController extends GuestController{
+class UserController extends GuestController {
+
     +deconnecter(): void
 }
 
-class GuestController{
-    -vehicleService: IVehicleService
-        -userService: IUserService
-        -reservationService: IReservationService
+class GuestController {
 
-        +__construct(vehicleService: IVehicleService, userService: IUserService, reservationService: IReservationService)
-        +listeVehicule(dVueEreur: array): void
-        +rechercherVehicule(dVueErreur: array): void
-        +inscription(dVueErreur: array): void
-        +connection(dVueErreur: array): void
-        +afficherVue(vueKey: string, dVueEreur: array, results: array, role: string): void
-        +rechercherReservation(): void
-        +listeReservation(dVueEreur: array): void
-        
+    -vehicleService: IVehicleService
+    -userService: IUserService
+    -reservationService: IReservationService
+
+    +__construct(vehicleService: IVehicleService,
+                 userService: IUserService,
+                 reservationService: IReservationService)
+    +listeVehicule(dVueEreur: array): void
+    +rechercherVehicule(dVueErreur: array): void
+    +inscription(dVueErreur: array): void
+    +connection(dVueErreur: array): void
+    +afficherVue(vueKey: string, dVueEreur: array, results: array, role: string): void
+    +rechercherReservation(): void
+    +listeReservation(dVueEreur: array): void        
 }
 
-GuestController --> IVehicleService : "utilise"
-GuestController --> IUserService : "utilise"
+GuestController --> IVehicleService     : "utilise"
+GuestController --> IUserService        : "utilise"
 GuestController --> IReservationService : "utilise"
-CollabController --> IDashboardService : "utilise"
+CollabController --> IDashboardService  : "utilise"
 
-    ' ======= SERVICES  =======
 
-    interface IVehicleService {
+' ============================
+'            SERVICES
+' ============================
+
+interface IVehicleService {
+
     +getAll(): Vehicule[]
     +getById(id: int): Vehicule
     +create(modele: string, couleur: string, puissance: string): Vehicule
     +update(id: int, modele: string, couleur: string, puissance: string): Vehicule
     +delete(id: int): void
-    }
+}
 
+class VehicleService implements IVehicleService {
 
-    class VehicleService implements IVehicleService{
-        -vehicleGateway: VehicleGateway
-        -validator: IVehicleValidator
-        +__construct(vehicleGateway: VehicleGateway, validator: IVehicleValidator)
+    -vehicleGateway: VehicleGateway
+    -validator: IVehicleValidator
 
-    }
+    +__construct(vehicleGateway: VehicleGateway, validator: IVehicleValidator)
+}
 
-    interface IUserService{
-        +getAll(): User[]
-        +getById(id: int): User
-        +register(username: string, password: string, role: string): User
-        +delete(id: int): void
-        +updateRole(id: int, role: string): User
-    }
+interface IUserService {
 
-    class UserService implements IUserService{
-        -userGateway: UserGateway
-        -validator: IUserValidator
-        +__construct(userGateway: UserGateway, validator: IUserValidator)
-    }
+    +getAll(): User[]
+    +getById(id: int): User
+    +register(username: string, password: string, role: string): User
+    +delete(id: int): void
+    +updateRole(id: int, role: string): User
+}
 
-    interface IReservationService{
-        +getAll(): Reservation[]
-        +getById(idContrat: int): Reservation
-        +create(vehiculeId: int, clientId: int, dateDebut: DateTime, dateFin: DateTime): Reservation
-        +update(idContrat: int, vehiculeId: int, clientId: int, dateDebut: DateTime, dateFin: DateTime): Reservation
-        +cancel(idContrat: int): void
-    }
+class UserService implements IUserService {
 
-    class ReservationService implements IReservationService {
-        -reservationGateway: ReservationGateway
-        -vehicleGateway: VehicleGateway
-        -userGateway: UserGateway
-        -validator: IReservationValidator
-        +__construct(reservationGateway: ReservationGateway, vehicleGateway: VehicleGateway, userGateway: UserGateway, validator: IReservationValidator)
+    -userGateway: UserGateway
+    -validator: IUserValidator
 
-    }
+    +__construct(userGateway: UserGateway, validator: IUserValidator)
+}
 
-    interface IDashboardService {
-        +getStats(): array
-    }
+interface IReservationService {
 
-    class DashboardService implements IDashboardService{
-    }
-    
+    +getAll(): Reservation[]
+    +getById(idContrat: int): Reservation
+    +create(vehiculeId: int, clientId: int, dateDebut: DateTime, dateFin: DateTime): Reservation
+    +update(idContrat: int, vehiculeId: int, clientId: int, dateDebut: DateTime, dateFin: DateTime): Reservation
+    +cancel(idContrat: int): void
+}
 
-VehicleService --> VehicleGateway
-UserService --> UserGateway
+class ReservationService implements IReservationService {
+
+    -reservationGateway: ReservationGateway
+    -vehicleGateway: VehicleGateway
+    -userGateway: UserGateway
+    -validator: IReservationValidator
+
+    +__construct(reservationGateway: ReservationGateway,
+                 vehicleGateway: VehicleGateway,
+                 userGateway: UserGateway,
+                 validator: IReservationValidator)
+}
+
+interface IDashboardService {
+
+    +getStats(): array
+}
+
+class DashboardService implements IDashboardService {
+}
+
+VehicleService     --> VehicleGateway
+UserService        --> UserGateway
 ReservationService --> ReservationGateway
 ReservationService --> VehicleGateway
 ReservationService --> UserGateway
 
 ReservationService --> Reservation : "manipule"
-VehicleService --> Vehicule : "manipule"
-UserService --> User : "manipule"
+VehicleService     --> Vehicule    : "manipule"
+UserService        --> User        : "manipule"
 
-' ======= Validation  =======
+
+' ============================
+'           VALIDATION
+' ============================
 
 interface IUserValidator {
+
     +validateRegistration(username: string, password: string, confirm: string, role: string): array
     +validateLogin(username: string, password: string): array
 }
 
 interface IVehicleValidator {
+
     +validateVehicle(modele: string, couleur: string, puissance: int): array
 }
 
 interface IReservationValidator {
+
     +validateReservation(vehiculeId: int, clientId: int, dateDebut: DateTime, dateFin: DateTime): array
 }
 
 class UserValidator implements IUserValidator {
+
     +validateRegistration(...): array
     +validateLogin(...): array
 }
 
 class VehicleValidator implements IVehicleValidator {
+
     +validateVehicle(...): array
 }
 
 class ReservationValidator implements IReservationValidator {
+
     +validateReservation(...): array
 }
 
-VehicleService --> IVehicleValidator : "valide données véhicule"
-UserService --> IUserValidator : "valide données utilisateur"
+VehicleService     --> IVehicleValidator     : "valide données véhicule"
+UserService        --> IUserValidator        : "valide données utilisateur"
 ReservationService --> IReservationValidator : "valide données réservation"
 
 @enduml
