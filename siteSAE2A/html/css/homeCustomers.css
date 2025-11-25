@@ -160,7 +160,7 @@ h1 {
 
 .row {
     display: grid;
-    grid-template-columns: 1fr 0.7fr 0.7fr auto;
+    grid-template-columns: 1fr 1fr auto;
     gap: 20px;
     align-items: end;
 }
@@ -196,13 +196,29 @@ h1 {
     gap: 12px;
 }
 
-.dual input[type="time"] {
+.dual .input-icon {
     background: #f6f6f6;
     border-radius: 10px;
-    border: none;
-    padding: 10px;
+    padding: 10px 12px;
+    display: flex;
+    align-items: center;
     width: 100%;
 }
+
+.dual .input-icon i {
+    margin-right: 10px;
+    color: #999;
+}
+
+.dual .input-icon input {
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 15px;
+    width: 100%;
+}
+
+
 
 .sub-link {
     display: block;
