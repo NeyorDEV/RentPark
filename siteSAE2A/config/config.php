@@ -21,6 +21,7 @@ $vues['erreur'] = 'view/viewErreur.php';
 $vues['reservation'] = 'view/viewReservation.php';
 $vues['inscription'] = 'view/viewInscription.php';
 $vues['connection'] = 'view/viewConnection.php';
+$vues['dashboard'] = 'view/viewDashboard.php';
 
 $action = "RAS";
 

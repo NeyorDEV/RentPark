@@ -1,0 +1,234 @@
+nav {
+    position: fixed; 
+    top: 0;
+    left: 0;
+    width: 20%;      
+    height: 100%;   
+    background-color:white;
+    border: 1px solid;
+    padding-top: 20px;
+
+}
+
+
+.menu {
+
+    margin: 0;
+    padding: 0;
+}
+
+.menu li {
+    margin: 10px 0;
+}
+
+.menu a {
+    display: flex;               
+    align-items: center;
+    padding: 12px 20px;
+    text-decoration: none;
+    color: rgb(80, 80, 80);      
+    font-size: 18px;
+    border-radius: 10px;        
+    margin: 5px 10px;         
+  }
+  .menu a img {
+    width: 15%;
+    height: 15%;
+    margin-right: 10px;
+
+  }
+  
+  .menu a:hover img {
+    filter: grayscale(70%) brightness(0.9); 
+
+  }
+  
+  .menu a:hover {
+    background-color: rgb(230, 230, 230);
+    color: black;                 
+  }
+/* ZONE PRINCIPALE */
+.main-content {
+    margin-left: 22%;
+    padding: 20px;
+    font-family: sans-serif;
+}
+
+.dashboard-cards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
+}
+
+/* CARTE STATISTIQUE */
+.card {
+    background-color: #fff;
+    width: 300px;
+    height: 200px;
+    border-radius: 12px;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start; 
+    transition: transform 0.3s ease;
+}
+
+.card:hover {
+    transform: scale(1.05);
+}
+
+.card h2 {
+    font-size: 20px;
+    margin: 0 0 10px 0;
+}
+
+.card .circle-chart {
+    margin-top: auto;
+    margin-bottom: auto;
+}
+
+
+/* CERCLE STATISTIQUE */
+/* Déclare la variable animable */
+/* Déclare la variable animable */
+@property --value {
+    syntax: '<number>';
+    inherits: false;
+    initial-value: 0;
+}
+
+/* Cercle générique */
+.circle-chart {
+    --value: 0;
+    --final-value: 0; /* valeur finale du cercle (pourcentage) */
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    background:
+        radial-gradient(circle, white 55%, transparent 56%),
+        conic-gradient(#d67608 calc(var(--value) * 1%), #eee 0);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 16px;
+    color: #333;
+    animation: fill-circle 1.7s ease-out forwards;
+}
+
+/* Animation générique qui utilise la variable --final-value */
+@keyframes fill-circle {
+    from { --value: 0; }
+    to { --value: var(--final-value); }
+}
+
+
+
+
+
+
+/* CARTE rappel */
+.alert {
+    background-color: #fff;
+    width: 440px;
+    height: 380px;
+
+    border-radius: 12px;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+
+    padding: 0vh 3vw 3vh 3vw;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+
+    transition: transform 0.3s ease;
+}
+
+/* CARTE planning */
+.planning {
+    background-color: #fff;
+    width: 440px;
+    height: 380px;
+
+    border-radius: 12px;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+
+    padding: 0vh 3vw 3vh 3vw;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+
+    transition: transform 0.3s ease;
+
+}
+
+.rectangle {
+    display: flex;               
+    align-items: center;
+    padding: 15px 70px;
+    text-decoration: none;
+    color: rgb(0, 0, 0);      
+    font-size: 18px;
+    border-radius: 10px;        
+    margin: 5px 10px;   
+    background-color: rgb(236, 232, 232);     
+  }
+
+
+
+
+
+/* Titre */
+.alert h2 {
+    font-size: 19px;
+    margin: 0px 0px 10px 0px;
+    padding: 5% 53%;
+    border-radius: 12px 12px 0px 0px;
+    background-color: rgb(255, 254, 254);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+}
+/* Titre */
+.planning h2 {
+    font-size: 19px;
+    margin: 0px 0px 10px 0px;
+    padding: 5% 51%;
+    border-radius: 12px 12px 0px 0px;
+    background-color: rgb(255, 254, 254);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+}
+
+/* Zone scrollable */
+.alert-content {
+    overflow-y: auto;
+    padding-right: 5px; /* petit espace pour scrollbar */
+}
+
+/* Zone scrollable */
+.planning-content {
+    overflow-y: auto;
+    padding-right: 5px; /* petit espace pour scrollbar */
+}
+
+.main-content h1 {
+    margin-left:40% ;
+    font-family:cursive;
+}
+
+.bottom-cards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px; /* espace seulement entre Rappel et Planning */
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+
+
+

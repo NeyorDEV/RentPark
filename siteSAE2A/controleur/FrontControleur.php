@@ -32,6 +32,7 @@ class FrontControleur
         $router->map('GET|POST', '/inscription', 'afficheInscription');
         $router->map('GET|POST', '/connection', 'afficheConnection');
         $router->map('GET|POST', '/deconnection', 'deconnecter');
+        $router->map('GET|POST', '/dashboard', 'afficheDashboard');
 
         
         $match = $router->match();

@@ -34,6 +34,9 @@ class AdminControleur
                 case "afficheInscription":
                     $this->afficheInscription( $dVueEreur);
                     break;
+                case "afficheDashboard":
+                        $this->afficheDashboard( $dVueEreur);
+                        break;
                  case "afficheConnection":
                         $this->afficheConnection( $dVueEreur);
                         break;
@@ -99,6 +102,13 @@ class AdminControleur
         $this->afficherVue('flotte', $dVueEreur, $results,'admin');
     }
 // ajouter les vue erreur et les vérif 
+
+    public function afficheDashboard(array $dVueEreur)
+    {
+        
+    $this->afficherVue('dashboard',$dVueEreur,$results=null,'admin');
+
+}
 
     private function ajouterVoiture(array $dVueEreur)
     {

@@ -1,7 +1,8 @@
 {
     "require": {
         "twig/twig": "^3.0",
-        "altorouter/altorouter": "^2.0"
+        "altorouter/altorouter": "^2.0",
+        "phpmailer/phpmailer": "^7.0"
     },
     "autoload": {
         "psr-4": {

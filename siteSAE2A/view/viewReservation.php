@@ -19,11 +19,14 @@ $isAdmin = ($role === 'admin');
 <nav>
     <ul class="menu">
         <li><a href=""><img src="html/icons/acceuil.jpg" alt="Accueil"> Accueil</a></li>
+        <li><a href="/siteSAE2A/dashboard"><img src="html/icons/dashboard.png" alt="Tableau de bord"> Tableau de bord</a></li>
         <li><a href="/siteSAE2A/voitures"><img src="html/icons/voiture.png" alt="Flotte"> Flotte Automobile</a></li>
         <li><a href=""><img src="html/icons/contrat.png" alt="Contrats"> Contrats</a></li>
         <li><a href="/siteSAE2A/reservation"><img src="html/icons/reservation.png" alt="Réservations"> Réservations</a></li>
         <li><a href="siteSAE2A/../utilisateurs"><img src="html/icons/user.png" alt="Utilisateurs"> Utilisateur</a></li>
         <li><a href=""><img src="html/icons/settings.png" alt="Paramètres"> Paramètres</a></li>
+        <li><a href="/siteSAE2A/deconnection"><img src="html/icons/logout.png" alt="se déconnecter"> déconnexion</a></li>
+
         
     </ul>       
 </nav>
