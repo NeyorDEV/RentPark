@@ -22,6 +22,7 @@ $vues['reservation'] = 'view/viewReservation.php';
 $vues['inscription'] = 'view/viewInscription.php';
 $vues['connection'] = 'view/viewConnection.php';
 $vues['dashboard'] = 'view/viewDashboard.php';
+$vues['homeCustomers'] = 'view/viewHomeCustomers.php';
 
 $action = "RAS";
 

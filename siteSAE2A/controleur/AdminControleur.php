@@ -53,6 +53,9 @@ class AdminControleur
                 case 'deconnecter':
                         $this->deconnecter();
                         break;
+                case 'homeCustomers' :
+                    $this->homeCustomers($dVueEreur);
+                    break;
                 default:
                     $dVueEreur[] = "Action inconnue";
                     $this->afficherVue('flotte', $dVueEreur,$results=null,'admin');
@@ -108,7 +111,14 @@ class AdminControleur
         
     $this->afficherVue('dashboard',$dVueEreur,$results=null,'admin');
 
-}
+    }
+
+    public function homeCustomers(array $dVueEreur)
+    {
+        
+    $this->afficherVue('homeCustomers',$dVueEreur,$results=null,'admin');
+
+    }
 
     private function ajouterVoiture(array $dVueEreur)
     {

@@ -33,7 +33,7 @@ class FrontControleur
         $router->map('GET|POST', '/connection', 'afficheConnection');
         $router->map('GET|POST', '/deconnection', 'deconnecter');
         $router->map('GET|POST', '/dashboard', 'afficheDashboard');
-
+        $router->map('GET|POST', '/homeCustomers', 'homeCustomers');
         
         $match = $router->match();
         if (!$match) { echo "404"; die; }
