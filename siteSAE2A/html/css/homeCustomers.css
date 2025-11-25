@@ -1,3 +1,13 @@
+@font-face {
+    font-family: 'frt';
+    src: url('../fonts/frt.woff2') format('woff2'),
+        url('../fonts/frt.woff') format('woff');
+    font-weight: 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+
 body {
     margin: 0;
     font-family: "Roboto", sans-serif;
@@ -93,6 +103,15 @@ header {
     padding-bottom: 30px;
 }
 
+
+header h1 {
+    font-family: 'frt', sans-serif;
+    font-size: 100px;
+    font-weight: 700;
+    margin-bottom: 40px;
+}
+
+
 .top-right-btn {
     position: absolute;
     top: 25px;
@@ -113,11 +132,7 @@ header {
     border-radius: 50%;
 }
 
-h1 {
-    font-size: 60px;
-    font-weight: 700;
-    margin-bottom: 40px;
-}
+
 
 /* ====== SEARCH BAR CONTAINER ====== */
 .search-box {

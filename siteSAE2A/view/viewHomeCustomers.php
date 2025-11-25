@@ -37,7 +37,7 @@
         <span>Connection/Inscription</span>
     </div>
 
-    <h1>Rentpark</h1>
+    <h1>RENTPARK</h1>
 
     <div class="search-box">
 
