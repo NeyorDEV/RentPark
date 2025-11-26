@@ -56,6 +56,9 @@ class AdminControleur
                 case 'homeCustomers' :
                     $this->homeCustomers($dVueEreur);
                     break;
+                case 'cars' :
+                    $this->cars($dVueEreur);
+                    break;
                 default:
                     $dVueEreur[] = "Action inconnue";
                     $this->afficherVue('flotte', $dVueEreur,$results=null,'admin');
@@ -89,7 +92,6 @@ class AdminControleur
                     break;
             }
 
-           
             header("Location: /siteSAE2A/voitures");
             exit;
         }
@@ -118,6 +120,11 @@ class AdminControleur
         
     $this->afficherVue('homeCustomers',$dVueEreur,$results=null,'admin');
 
+    }
+
+    public function cars(array $dVueEreur)
+    {
+    $this->afficherVue('cars',$dVueEreur,$results=null,'admin');
     }
 
     private function ajouterVoiture(array $dVueEreur)

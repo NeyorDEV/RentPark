@@ -12,19 +12,116 @@
 <!-- Header -->
 <header>
     <div class="top-bar">
-        <span>Paris CDG Aéroport Terminal 2</span>
-        <span>27 nov. | 12:30 - 01 déc. | 08:30</span>
+        <span>Paramètres :</span>
+        <span>date debut et date fin</span>
     </div>
     <h1>Quelle voiture voulez-vous conduire ?</h1>
-</header>
 
-<!-- Filter options -->
-<div class="filter-options">
-    <button class="active">Par Prix le plus bas</button>
-    <button>Filtres</button>
-    <button><i class="fa-solid fa-car"></i> Automatique</button>
-    <button><i class="fa-solid fa-bolt"></i> Électrique</button>
-</div>
+    <div class="filtre" onclick="toggleMenu()">
+        <span>Filtre</span>
+    </div>
+
+    <script>
+    function toggleMenu() {
+        document.getElementById("sidebar").classList.toggle("open");
+    }
+</script>
+</header>
+<body>
+<aside id="sidebar">
+    <div class="sidebar-header">
+        <button class="close-btn" onclick="toggleSidebar()">✖</button>
+        <h2>Filtres</h2>
+    </div>
+    
+    <!-- Trié par prix -->
+    <div class="filter-option">
+        <div class="fliter-label">
+        <label>Trié par prix</label>
+        </div>
+        <div class="filter-btn-group">
+            <button>Par prix le plus bas</button>
+            <div class="price-max">
+                <label for="max-price">Max :</label>
+                <input type="number" id="max-price" placeholder="Nombre">
+            </div>
+        </div>
+    </div>
+    
+    <!-- Boîte -->
+    <div class="filter-option">
+        <div class="fliter-label">
+        <label>Boîte</label>
+        </div>
+        <div class="filter-btn-group">
+            <button>Automatique</button>
+            <button>Manuelle</button>
+        </div>
+    </div>
+    
+    <!-- Energie -->
+    <div class="filter-option">
+        <div class="fliter-label">
+        <label>Energie</label>
+        </div>
+        <div class="filter-btn-group">
+            <button>Diesel</button>
+            <button>Essence</button>
+            <button>Hybride</button>
+            <button>Electrique</button>
+        </div>
+    </div>
+    
+    <!-- Type de véhicule -->
+    <div class="filter-option">
+        <div class="fliter-label">
+        <label>Type de Véhicule</label>
+        </div>
+        <div class="filter-btn-group">
+            <button>SUV</button>
+            <button>Sportive</button>
+            <button>Citadine</button>
+            <button>Coupé</button>
+        </div>
+    </div>
+    
+    <!-- Transmission -->
+    <div class="filter-option">
+        <div class="fliter-label">
+        <label>Transmission</label>
+        </div>
+        <div class="filter-btn-group">
+            <button>Traction</button>
+            <button>Propulsion</button>
+            <button>Intégrale</button>
+        </div>
+    </div>
+    
+    <!-- Nombre de places -->
+    <div class="filter-option">
+        <div class="fliter-label">
+        <label>Nombre de places</label>
+        </div>
+        <div class="filter-btn-group">
+            <input type="number" placeholder="Nombre de places">
+        </div>
+    </div>
+    
+    <!-- Puissance -->
+    <div class="filter-option">
+        <div class="fliter-label">
+        <label>Puissance</label>
+        </div>
+        <div class="filter-btn-group">
+            <input type="number" placeholder="Puissance en CV">
+        </div>
+    </div>
+    
+    <!-- Apply Filters Button -->
+    <button class="btn-orange">Afficher les offres</button>
+</aside>
+
+
 
 <!-- Cars Section -->
 <div class="cars-section">
