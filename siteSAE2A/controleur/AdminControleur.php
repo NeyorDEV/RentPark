@@ -56,6 +56,9 @@ class AdminControleur
                 case 'homeCustomers' :
                     $this->homeCustomers($dVueEreur);
                     break;
+                case 'afficheRecapitulatif':
+                    $this->afficheRecapitulatif($dVueEreur);
+                    break;
                 default:
                     $dVueEreur[] = "Action inconnue";
                     $this->afficherVue('flotte', $dVueEreur,$results=null,'admin');
@@ -117,6 +120,13 @@ class AdminControleur
     {
         
     $this->afficherVue('homeCustomers',$dVueEreur,$results=null,'admin');
+
+    }
+
+    public function afficheRecapitulatif(array $dVueEreur)
+    {
+        
+    $this->afficherVue('recapitulatif',$dVueEreur,$results=null,'admin');
 
     }
 
