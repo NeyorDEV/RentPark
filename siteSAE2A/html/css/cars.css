@@ -1,0 +1,161 @@
+/* General reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    background: #121212;
+    color: white;
+}
+
+/* Header */
+header {
+    text-align: center;
+    padding: 40px 0;
+    background: linear-gradient(to bottom, #1e1e1e, #212121);
+}
+
+.top-bar {
+    font-size: 14px;
+    color: #bbb;
+}
+
+h1 {
+    font-size: 36px;
+    font-weight: 600;
+    margin-top: 20px;
+}
+
+/* Filter Options */
+.filter-options {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin: 30px 0;
+}
+
+.filter-options button {
+    background: transparent;
+    border: 1px solid white;
+    padding: 10px 20px;
+    border-radius: 50px;
+    cursor: pointer;
+    color: white;
+}
+
+.filter-options button.active {
+    background: white;
+    color: #121212;
+}
+
+.filter-options button i {
+    margin-right: 8px;
+}
+
+/* Cars Section */
+.cars-section {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-bottom: 40px;
+}
+
+/* Car Card */
+.car-card {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    width: 300px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.car-card img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+
+.car-info {
+    padding: 20px;
+}
+
+.car-info h3 {
+    font-size: 22px;
+    font-weight: 600;
+}
+
+.car-info p {
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+.car-info .price {
+    font-size: 18px;
+    font-weight: 600;
+    color: #ff5a19;
+}
+
+.btn-orange {
+    background: #ff5a19;
+    border: none;
+    padding: 10px 20px;
+    color: white;
+    font-size: 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 15px;
+}
+
+.btn-orange:hover {
+    background: #e34a00;
+}
+
+/* Car Details Modal */
+.car-details {
+    display: none; /* Modal hidden by default */
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+}
+
+.details-content {
+    display: flex;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    width: 80%;
+    max-width: 1000px;
+}
+
+.details-info {
+    padding-left: 20px;
+    color: black;
+}
+
+.details-info h3 {
+    font-size: 28px;
+    font-weight: 600;
+}
+
+.details-info p {
+    font-size: 16px;
+    margin-bottom: 10px;
+}
+
+.details-info .btn-orange {
+    background: #121212;
+    color: white;
+    font-size: 18px;
+    margin-top: 20px;
+}

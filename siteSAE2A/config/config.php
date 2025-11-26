@@ -23,6 +23,7 @@ $vues['inscription'] = 'view/viewInscription.php';
 $vues['connection'] = 'view/viewConnection.php';
 $vues['dashboard'] = 'view/viewDashboard.php';
 $vues['homeCustomers'] = 'view/viewHomeCustomers.php';
+$vues['cars'] = 'view/viewCars.php';
 
 $action = "RAS";
 
