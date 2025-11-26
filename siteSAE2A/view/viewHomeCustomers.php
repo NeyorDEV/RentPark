@@ -37,7 +37,7 @@
         <span>Connection/Inscription</span>
     </div>
 
-    <h1>Rentpark</h1>
+    <h1>RENTPARK</h1>
 
     <div class="search-box">
 
@@ -50,18 +50,26 @@
                         <i class="fa-solid fa-calendar"></i>
                         <input type="date">
                     </div>
-                    <input type="time" value="12:30">
+
+                    <div class="input-icon">
+                        <i class="fa-solid fa-clock"></i>
+                        <input type="time" value="12:30">
+                    </div>
                 </div>
             </div>
 
             <div class="input-block">
                 <label>Date de retour</label>
                 <div class="dual">
-                    <div class="input-icon">
+                   <div class="input-icon">
                         <i class="fa-solid fa-calendar"></i>
                         <input type="date">
                     </div>
-                    <input type="time" value="08:30">
+
+                    <div class="input-icon">
+                        <i class="fa-solid fa-clock"></i>
+                        <input type="time" value="12:30">
+                    </div>
                 </div>
             </div>
 

@@ -1,3 +1,13 @@
+@font-face {
+    font-family: 'frt';
+    src: url('../fonts/frt.woff2') format('woff2'),
+        url('../fonts/frt.woff') format('woff');
+    font-weight: 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+
 body {
     margin: 0;
     font-family: "Roboto", sans-serif;
@@ -93,6 +103,15 @@ header {
     padding-bottom: 30px;
 }
 
+
+header h1 {
+    font-family: 'frt', sans-serif;
+    font-size: 100px;
+    font-weight: 700;
+    margin-bottom: 40px;
+}
+
+
 .top-right-btn {
     position: absolute;
     top: 25px;
@@ -113,11 +132,7 @@ header {
     border-radius: 50%;
 }
 
-h1 {
-    font-size: 60px;
-    font-weight: 700;
-    margin-bottom: 40px;
-}
+
 
 /* ====== SEARCH BAR CONTAINER ====== */
 .search-box {
@@ -160,7 +175,7 @@ h1 {
 
 .row {
     display: grid;
-    grid-template-columns: 1fr 0.7fr 0.7fr auto;
+    grid-template-columns: 1fr 1fr auto;
     gap: 20px;
     align-items: end;
 }
@@ -196,13 +211,29 @@ h1 {
     gap: 12px;
 }
 
-.dual input[type="time"] {
+.dual .input-icon {
     background: #f6f6f6;
     border-radius: 10px;
-    border: none;
-    padding: 10px;
+    padding: 10px 12px;
+    display: flex;
+    align-items: center;
     width: 100%;
 }
+
+.dual .input-icon i {
+    margin-right: 10px;
+    color: #999;
+}
+
+.dual .input-icon input {
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 15px;
+    width: 100%;
+}
+
+
 
 .sub-link {
     display: block;
