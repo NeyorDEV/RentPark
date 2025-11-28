@@ -22,7 +22,7 @@ class FrontControleur
 
         
         $router->map('GET|POST', '/voitures', 'listeVoitures');
-        $router->map('GET|POST', '/index.php', 'listeVoitures');
+        $router->map('GET|POST', '/index.php', 'homeCustomers');    
 
         $router->map('GET|POST', '/reservation', 'listeReservation');
         

@@ -11,7 +11,7 @@
 
 <nav>
     <ul class="menu">
-        <li><a href=""><img src="html/icons/acceuil.jpg" alt="Accueil"> Accueil</a></li>
+        <li><a href="/siteSAE2A/index.php"><img src="html/icons/acceuil.jpg" alt="Accueil"> Accueil</a></li>
         <li><a href=""><img src="html/icons/dashboard.png" alt="Tableau de bord"> Tableau de bord</a></li>
         <li><a href="/sitesae2A/voitures"><img src="html/icons/voiture.png" alt="Flotte"> Flotte Automobile</a></li>
         <li><a href=""><img src="html/icons/contrat.png" alt="Contrats"> Contrats</a></li>

@@ -12,13 +12,13 @@ require_once __DIR__ . '/vendor/autoload.php';
 use controleur\FrontControleur;
 
 
-$loader = new \Twig\Loader\FilesystemLoader(__DIR__ . '/templates');
-$twig   = new \Twig\Environment($loader, [
-    'cache' => false,
-    'auto_reload' => true,
-]);
+    $loader = new \Twig\Loader\FilesystemLoader(__DIR__ . '/templates');
+    $twig   = new \Twig\Environment($loader, [
+        'cache' => false,
+        'auto_reload' => true,
+    ]);
 
-$controller = new FrontControleur();
-$controller->run();
+    $controller = new FrontControleur();
+    $controller->run();
 
-?> 
+    ?> 
