@@ -58,6 +58,7 @@ class AdminControleur
                     break;
                 case 'cars' :
                     $this->cars($dVueEreur);
+                    break;
                 case 'afficheRecapitulatif':
                     $this->afficheRecapitulatif($dVueEreur);
                     break;
@@ -127,11 +128,10 @@ class AdminControleur
     public function cars(array $dVueEreur)
     {
     $this->afficherVue('cars',$dVueEreur,$results=null,'admin');
-    public function afficheRecapitulatif(array $dVueEreur)
-    {
-        
-    $this->afficherVue('recapitulatif',$dVueEreur,$results=null,'admin');
+    }
 
+    public function afficheRecapitulatif(array $dVueEreur){
+    $this->afficherVue('recapitulatif',$dVueEreur,$results=null,'admin');
     }
 
     private function ajouterVoiture(array $dVueEreur)
@@ -162,7 +162,7 @@ class AdminControleur
         }
 
         $results = $this->gateway->getAll();
-        $this->afficherVue('flotte', $dVueEreur, $results);
+        $this->afficherVue('flotte', $dVueEreur, $results, 'admin');
     }
 
     private function supprimerVoiture(array $dVueEreur)

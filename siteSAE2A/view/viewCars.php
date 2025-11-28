@@ -25,12 +25,14 @@
     function toggleMenu() {
         document.getElementById("sidebar").classList.toggle("open");
     }
-</script>
+    </script>
+    
 </header>
+
 <body>
 <aside id="sidebar">
     <div class="sidebar-header">
-        <button class="close-btn" onclick="toggleSidebar()">✖</button>
+        <button class="close-btn" onclick="toggleMenu()">✖</button>
         <h2>Filtres</h2>
     </div>
     
@@ -43,7 +45,7 @@
             <button>Par prix le plus bas</button>
             <div class="price-max">
                 <label for="max-price">Max :</label>
-                <input type="number" id="max-price" placeholder="Nombre">
+                <input type="number" id="max-price" placeholder="Prix Max">
             </div>
         </div>
     </div>

@@ -16,6 +16,7 @@ header {
     text-align: center;
     padding: 40px 0;
     background: linear-gradient(to bottom, #1e1e1e, #212121);
+    margin: 0px 0px 50px 0px;
 }
 
 .top-bar {
@@ -49,7 +50,7 @@ h1 {
     left: -601px;  /* Hide by default */
     width: 600px;
     height: 100vh;
-    background: rgba(255, 255, 255, 0.8);
+    background: rgba(212, 211, 211, 0.8);
     backdrop-filter: blur(10px);
     box-shadow: 2px 0 20px rgba(0, 0, 0, 0.2);
     padding: 20px;
@@ -112,6 +113,12 @@ h1 {
     padding: 10px 20px;
     cursor: pointer;
     transition: 0.3s;
+    margin: 10px 2px;
+}
+
+.price-max {
+    margin: 0px 0px 10px 20px;
+
 }
 
 .filter-btn-group button:hover {
@@ -250,3 +257,4 @@ h1 {
     font-size: 18px;
     margin-top: 20px;
 }
+
