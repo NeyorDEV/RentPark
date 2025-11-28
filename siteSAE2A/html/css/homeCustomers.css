@@ -95,6 +95,17 @@ body::before {
     border-radius: 6px;
 }
 
+#sidebar li a {
+    text-decoration: none;
+    color: inherit;
+}
+#sidebar li a:focus,
+#sidebar li a:visited {
+    text-decoration: none; 
+    color: inherit;
+}
+
+
 /* ---- HEADER ---- */
 header {
     padding-top: 50px;
@@ -111,27 +122,50 @@ header h1 {
     margin-bottom: 40px;
 }
 
-
 .top-right-btn {
     position: absolute;
     top: 25px;
     right: 25px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    border: 2px solid white;
-    padding: 8px 16px;
-    border-radius: 8px;
+    display: inline-flex; /* Utilisation de inline-flex pour que les éléments soient sur la même ligne */
+    align-items: center;  /* Aligne le cercle et le texte verticalement */
+    gap: 12px; /* Espace entre le cercle et le texte */
+    padding: 12px 20px;
+    border-radius: 50px; /* Arrondi du bouton */
+    background-color: rgba(0, 0, 0, 0.6); /* Fond semi-transparent */
     cursor: pointer;
+    transition: all 0.3s ease-in-out; /* Animation douce */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); /* Ombre légère */
+}
+
+.top-right-btn:hover {
+    transform: translateY(-5px); /* Légère élévation lors du survol */
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3); /* Ombre plus marquée */
 }
 
 .top-right-btn .circle {
-    width: 20px;
-    height: 20px;
-    border: 2px solid white;
+    width: 24px;
+    height: 24px;
+    border: 2px solid white; /* Bordure blanche pour le cercle */
     border-radius: 50%;
+    background-color: #fff; /* Cercle blanc */
+    transition: background-color 0.3s ease;
 }
 
+.top-right-btn:hover .circle {
+    background-color: #ddd; /* Change la couleur du cercle au survol */
+}
+
+.top-right-btn span {
+    color: white;
+    font-size: 18px;
+    font-weight: 500; /* Poids du texte pour plus de lisibilité */
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.top-right-btn:hover span {
+    color: #ddd; /* Texte plus clair lors du survol */
+}
 
 
 /* ====== SEARCH BAR CONTAINER ====== */

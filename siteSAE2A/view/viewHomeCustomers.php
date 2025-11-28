@@ -19,24 +19,24 @@
 <!-- ========== SIDEBAR ========== -->
 <aside id="sidebar">
     <ul>
-        <li><i class="fa-solid fa-house"></i> Accueil</li>
-        <li><i class="fa-solid fa-chart-line"></i> Tableau de bord</li>
-        <li><i class="fa-solid fa-car"></i> Flotte Automobile</li>
+        <li><a href="/siteSAE2A/index.php"><i class="fa-solid fa-house"></i> Accueil</a></li>
+        <li><a href="/siteSAE2A/voitures"><i class="fa-solid fa-car"></i> Flotte Automobile</a></li>
+        <li><a href="/siteSAE2A/dashboard"><i class="fa-solid fa-dashboard"></i>Tableau de bord</a></li>
         <li><i class="fa-solid fa-file-signature"></i> Contrats</li>
-        <li><i class="fa-solid fa-calendar-days"></i> Réservation</li>
-        <li><i class="fa-solid fa-user"></i> Utilisateur</li>
-        <li><i class="fa-solid fa-gear"></i> Paramètres</li>
-        <li><i class="fa-solid fa-right-from-bracket"></i> Déconnexion</li>
+        <li><a href="/siteSAE2A/reservation"><i class="fa-solid fa-calendar-days"></i> Réservations</a></li>
+        <li><i class="fa-solid fa-user"></i> Utilisateurs</li>
+        <li><a href="/siteSAE2A/deconnection"><i class="fa-solid fa-gear"></i> Paramètres</a></li>
     </ul>
 </aside>
 
 <!-- ========== HEADER + FORMULAIRE ========== -->
 <header>
-    <div class="top-right-btn">
-        <div class="circle"></div>
-        <span>Connection/Inscription</span>
-    </div>
-
+     <a href="/siteSAE2A/connection">
+        <div class="top-right-btn">
+            <div class="circle"></div>
+            <span>Connection/Inscription</span>
+        </div>
+    </a>
     <h1>RENTPARK</h1>
 
     <div class="search-box">
@@ -50,11 +50,6 @@
                         <i class="fa-solid fa-calendar"></i>
                         <input type="date">
                     </div>
-
-                    <div class="input-icon">
-                        <i class="fa-solid fa-clock"></i>
-                        <input type="time" value="12:30">
-                    </div>
                 </div>
             </div>
 
@@ -64,11 +59,6 @@
                    <div class="input-icon">
                         <i class="fa-solid fa-calendar"></i>
                         <input type="date">
-                    </div>
-
-                    <div class="input-icon">
-                        <i class="fa-solid fa-clock"></i>
-                        <input type="time" value="12:30">
                     </div>
                 </div>
             </div>
