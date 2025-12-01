@@ -1,3 +1,12 @@
+/* Import Montserrat depuis Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&display=swap');
+
+body, .voiture, .rectangle, .top, h1, p, button {
+  font-family: 'Montserrat', sans-serif;
+  color: #333;
+}
+
+
 nav {
     position: fixed; 
     top: 0;
@@ -47,86 +56,102 @@ nav {
     background-color: rgb(230, 230, 230);
     color: black;                 
   }
-
   .voiture {
-    display: flex;                
-    flex-wrap: wrap;              
-    justify-content: flex-start;  
-    align-items: flex-start;      
-    gap: 50px;                    
-    margin-left: 22%;             
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 30px;
+    margin-left: 22%;
     padding: 20px;
-  }
-  
+}
 
-  .rectangle {
-    width: 300px;
-    height: 420px;
-    background-color: white;
-    border-radius: 12px;
-    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+.rectangle {
+    position: relative;
+    height: 400px;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    padding: 15px;
-    transition: transform 0.3s ease;
-    text-align: center;
-  }
-  
-  .rectangle:hover {
-    transform: scale(1.05);
-  }
-  
-  .rectangle img {
-    width:75%;
-    height: 180px;
-    object-fit: cover;
-    border-radius: 8px;
-    margin: 10px 0 15px 0;
-  }
-  
-  .rectangle p {
-    font-size: 16px;
-    line-height: 1.6;
-    color: #333;
-    margin: 0;
-    
-  }
-
-  .rectangle form,
-  .rectangle button.delete-btn {
-    width: 60%;
-  }
-
-  
-  
-  .rectangle > form,
-  .rectangle > button.delete-btn {
-    margin-top: auto;
-  }
-  
-  .rectangle .delete-btn {
-    background: #dc3545;
-    color: white;
-    padding: 8px 12px;
-    border-radius: 6px;
-    border: none;
-    cursor: pointer;
-    font-weight: bold;
-    transition: background 0.3s ease, transform 0.2s ease;
-  }
-  
-  .rectangle .delete-btn:hover {
-    background: #c82333;
-    transform: translateY(-2px);
-  }
-  
-
-
-.rectangle p {
-    font-size: 18px;
-    font-weight: bold;
+    justify-content: flex-end;
+    background-color: #f7f7f7;
 }
+
+.rectangle:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 25px rgba(0,0,0,0.15);
+}
+
+.rectangle img.bg-img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: brightness(0.65);
+    z-index: 1;
+    transition: transform 0.3s ease;
+}
+
+.rectangle:hover img.bg-img {
+    transform: scale(1.03);
+}
+
+.rectangle .info {
+    position: relative;
+    z-index: 2;
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(6px);
+    padding: 15px;
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    text-align: center;
+}
+
+.rectangle .info p {
+    margin: 6px 0;
+    font-size: 16px;
+    font-weight: 500;
+    color: #333;
+}
+
+.rectangle .info .badge {
+    display: inline-block;
+    background: rgba(0,0,0,0.1);
+    color: #333;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 13px;
+    margin-top: 5px;
+}
+
+.rectangle .actions {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.rectangle .actions button {
+    padding: 5px 12px;
+    border-radius: 12px;
+    border: 1px solid rgba(0,0,0,0.2);
+    background: rgba(255,255,255,0.7);
+    font-weight: 500;
+    cursor: pointer;
+    color: #333;
+    font-size: 14px;
+    transition: all 0.2s ease;
+}
+
+.rectangle .actions button:hover {
+    background: rgba(255,255,255,0.9);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+
+
 
 a.delete-btn {
     text-decoration: none;
@@ -141,115 +166,134 @@ a.delete-btn {
 }
 .top h1 {
     margin-left:48% ;
-    font-family:cursive;
 }
 
 .add-btn {
-    background: #28a745;
-    color: white;
-    padding: 8px 15px;
-    border-radius: 5px;
-    text-decoration: none;
-    font-weight: bold;
+  background: linear-gradient(135deg, #434a44, #5a6059);
+  color: #fff;
+  padding: 14px 25px;
+  margin-top: 20px;
+  border: none;
+  border-radius: 20px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  text-decoration: none;
 }
 .add-btn:hover {
-    background: #218838;
+  background: linear-gradient(135deg, #5a6059, #434a44);
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
 }
 
+/* MODAL AVEC EFFET D’APPARITION TYPE APPLE */
 .modal {
     position: fixed;
-    top: 0; left: 0;
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0,0,0,0.6);
-    backdrop-filter: blur(6px);
-    display: none;
+    background: rgba(0,0,0,0.4);
+    display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 1000;           
+    z-index: 1000;
+    backdrop-filter: blur(6px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
 }
 
 .modal:target {
-    display: flex;
-    pointer-events: all;     
+    opacity: 1;
+    pointer-events: all;
 }
 
+/* Animation d’apparition du contenu */
 .modal-content {
-    background: white;
-    padding: 20px;
-    border-radius: 40px;
-    width: 40%;
-    height: 60%;
-    box-shadow: 0 0 15px rgba(0,0,0,0.3);
+    position: relative;
+    background: rgba(255,255,255,0.95);
+    border-radius: 25px;
+    width: 95%;
+    max-width: 550px;
+    padding: 40px 40px;
+    box-shadow: 0 25px 50px rgba(0,0,0,0.15);
     text-align: center;
+
+    transform: scale(0.8);
+    opacity: 0;
+    transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.4s ease;
 }
+
+.modal:target .modal-content {
+    transform: scale(1);
+    opacity: 1;
+}
+
+/* Croix pour fermer */
 .close {
-    float: right;
+    position: absolute;
+    top: 20px;
+    right: 25px;
+    font-size: 28px;
+    font-weight: 700;
     text-decoration: none;
-    font-weight: bold;
-    color: red;
+    color: #555;
+    transition: color 0.2s ease, transform 0.2s ease;
 }
+
 .close:hover {
-    color: darkred;
+    color: #111;
+    transform: scale(1.2);
 }
 
-/* Style moderne pour les champs de formulaire */
-.modal-content input[type="text"],
-.modal-content input[type="number"],
-.modal-content input[type="email"],
-.modal-content input[type="password"],
+/* Champs de formulaire */
+.modal-content input,
 .modal-content select,
-.modal-content textarea {
-    width: 90%;
-    padding: 12px 15px;
-    margin: 10px 0;
-    border: 1px solid #ccc;
-    border-radius: 8px;
+.modal-content textarea,
+.modal-content input[type="file"] {
+    width: 100%;
+    padding: 14px 18px;
+    margin: 12px 0;
+    border: none;
+    border-radius: 15px;
     font-size: 16px;
+    background: rgba(255,255,255,0.8);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
     transition: all 0.3s ease;
-    box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
 }
 
-/* Effet focus */
 .modal-content input:focus,
 .modal-content select:focus,
 .modal-content textarea:focus {
-    border-color: #28a745;
-    box-shadow: 0 0 8px rgba(40, 167, 69, 0.4);
     outline: none;
+    box-shadow: 0 6px 15px rgba(67,74,68,0.3);
+    background: rgba(255,255,255,0.95);
 }
 
-/* Bouton moderne */
+/* Boutons */
 .modal-content button {
-    background: #28a745;
-    color: white;
-    padding: 12px 20px;
-    margin-top: 15px;
+    background: linear-gradient(135deg, #434a44, #5a6059);
+    color: #fff;
+    padding: 14px 25px;
+    margin-top: 20px;
     border: none;
-    border-radius: 8px;
+    border-radius: 20px;
     font-size: 16px;
-    font-weight: bold;
+    font-weight: 600;
     cursor: pointer;
-    transition: background 0.3s ease, transform 0.2s ease;
+    transition: all 0.25s ease;
 }
 
 .modal-content button:hover {
-    background: #218838;
-    transform: translateY(-2px);
+    background: linear-gradient(135deg, #5a6059, #434a44);
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
 }
 
-.delete-btn {
-    background: #dc3545;
-    color: white;
-    padding: 6px 12px;
-    border-radius: 5px;
-    border: none;
-    cursor: pointer;
-    margin-top: 10px;
-}
-.delete-btn:hover {
-    background: #c82333;
-}
+
+
 
 
 .topbar{
