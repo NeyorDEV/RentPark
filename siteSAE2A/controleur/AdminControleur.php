@@ -62,6 +62,9 @@ class AdminControleur
                 case 'afficheRecapitulatif':
                     $this->afficheRecapitulatif($dVueEreur);
                     break;
+                case 'afficheParametres':
+                    $this->afficheParametres($dVueEreur);
+                    break;
                 default:
                     $dVueEreur[] = "Action inconnue";
                     $this->afficherVue('flotte', $dVueEreur,$results=null,'admin');
@@ -132,6 +135,10 @@ class AdminControleur
 
     public function afficheRecapitulatif(array $dVueEreur){
     $this->afficherVue('recapitulatif',$dVueEreur,$results=null,'admin');
+    }
+
+    public function afficheParametres(array $dVueEreur){
+    $this->afficherVue('parametres',$dVueEreur,$results=null,'admin');
     }
 
     private function ajouterVoiture(array $dVueEreur)

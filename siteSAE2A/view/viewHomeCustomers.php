@@ -25,7 +25,7 @@
         <li><i class="fa-solid fa-file-signature"></i> Contrats</li>
         <li><a href="/siteSAE2A/reservation"><i class="fa-solid fa-calendar-days"></i> Réservations</a></li>
         <li><i class="fa-solid fa-user"></i> Utilisateurs</li>
-        <li><a href="/siteSAE2A/deconnection"><i class="fa-solid fa-gear"></i> Paramètres</a></li>
+        <li><a href="/siteSAE2A/parametres"><i class="fa-solid fa-gear"></i> Paramètres</a></li>
     </ul>
 </aside>
 
