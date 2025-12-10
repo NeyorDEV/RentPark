@@ -113,14 +113,14 @@ class AdminControleur
 
 public function afficheDashboard(array $dVueEreur)
 {
-
-
     $results = [
-        "revenusMensuels" => $this->reservationGateway->getMonthlyIncome()
+        "revenusMensuels"   => $this->reservationGateway->getMonthlyIncome(),
+        "voiturePlusLouee"  => $this->gateway->getMostRentedCar()
     ];
 
     $this->afficherVue('dashboard', $dVueEreur, $results, 'admin');
 }
+
 
 
     public function homeCustomers(array $dVueEreur)

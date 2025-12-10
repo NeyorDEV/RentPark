@@ -54,7 +54,36 @@ class VehicleGateway {
     
        
         return $this->connection->getResults();
-    }   
+    }  
+    
+    
+    public function getMostRentedCar(): ?array
+    {
+        $query = "
+            SELECT 
+                v.Marque,
+                v.Nom AS Modele,
+                v.ImagePath,
+                COUNT(*) AS nb_locations
+            FROM Contrat c
+            JOIN Vehicule v ON c.IdVehicule = v.NumSerie
+            WHERE c.Statut = 'Terminé'
+            GROUP BY v.Marque, v.Nom
+            ORDER BY nb_locations DESC
+        ";
+    
+        $this->connection->executeQuery($query);
+        $rows = $this->connection->getResults();
+    
+        if (empty($rows)) {
+            return null;
+        }
+    
+        return $rows[0]; // On renvoie seulement la voiture la plus louée
+    }
+    
+    
+
 
 
 

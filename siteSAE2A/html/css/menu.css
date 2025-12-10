@@ -1,4 +1,4 @@
-/* Import Montserrat depuis Google Fonts */
+
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&display=swap');
 
 body, .voiture, .rectangle, .top, h1, p, button {
@@ -187,7 +187,6 @@ a.delete-btn {
   box-shadow: 0 8px 20px rgba(0,0,0,0.15);
 }
 
-/* MODAL AVEC EFFET D’APPARITION TYPE APPLE */
 .modal {
     position: fixed;
     top: 0;
@@ -210,14 +209,14 @@ a.delete-btn {
     pointer-events: all;
 }
 
-/* Animation d’apparition du contenu */
+
 .modal-content {
     position: relative;
     background: rgba(255,255,255,0.95);
     border-radius: 25px;
     width: 95%;
     max-width: 550px;
-    padding: 40px 40px;
+    padding: 40px 50px;
     box-shadow: 0 25px 50px rgba(0,0,0,0.15);
     text-align: center;
 

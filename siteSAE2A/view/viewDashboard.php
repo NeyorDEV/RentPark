@@ -36,9 +36,31 @@
         </div>
 
         <div class="card">
-            <h2>Voiture la plus louée</h2>
-            <div class="circle-chart" style="--final-value: 50;">50%</div>
+    <h2>Voiture la plus louée</h2>
+    <?php if (!empty($results["voiturePlusLouee"])) : 
+    $bestCar = $results["voiturePlusLouee"];
+?>
+    <div class="best-car-card">
+        <div class="info">
+            <p>
+                <strong><?= htmlspecialchars($bestCar["Marque"]) ?></strong>
+                <?= htmlspecialchars($bestCar["Modele"]) ?><br>
+                <span class="small">Louée <?= (int)$bestCar["nb_locations"] ?> fois</span>
+            </p>
         </div>
+        <div class="image-container">
+            <?php if (!empty($bestCar["ImagePath"])) : ?>
+                <img src="<?= htmlspecialchars($bestCar["ImagePath"]) ?>" alt="Image de <?= htmlspecialchars($bestCar["Modele"]) ?>">
+            <?php else : ?>
+                <img src="html/icons/voiture.png" alt="Voiture par défaut">
+            <?php endif; ?>
+        </div>
+    </div>
+<?php endif; ?>
+
+</div>
+
+
 
         <div class="card">
     <h2>Revenus mensuels</h2>
