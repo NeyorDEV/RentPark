@@ -5,40 +5,38 @@
 {% block content %}
 <div class="top">
     <h1>Utilisateurs</h1>
-    <?php if ($isAdmin): ?>
+     {% if role == 'admin' %} 
         <a href="#addModal" class="add-btn">+ Ajouter</a>
-    <?php endif; ?>
+    {% endif %}
 </div>
 
 
 <header class="topbar">
     <form action="/sitesae2A/utilisateurs" method="get" role="search" class="topbar-form">
         <input type="hidden" name="action" value="rechercherUtilisateur">
-
         <input
                 id="q3"
                 name="q"
                 type="search"
                 placeholder="Rechercher..."
                 aria-label="Recherche"
-                value="<?php echo htmlspecialchars($_GET['q'] ?? '', ENT_QUOTES); ?>"
+                value={{" echo htmlspecialchars($_GET['q'] ?? '', ENT_QUOTES); }}"
         >
-
         <button type="submit">🔍</button>
     </form>
 </header>
 
 
 
-<?php if (!empty($dVueErreur)) : ?>
+{% if !empty($dVueErreur)  %}
     <div class="erreurs">
         <ul>
-            <?php foreach ($dVueErreur as $erreur) : ?>
+            {% foreach ($dVueErreur as $erreur) : %}
                 <li><?= htmlspecialchars($erreur) ?></li>
-            <?php endforeach; ?>
+            {%  endforeach %}
         </ul>
     </div>
-<?php endif; ?>
+{% endif %}
 
 <div class="voiture">
     <?php if (!empty($results)) : ?>
