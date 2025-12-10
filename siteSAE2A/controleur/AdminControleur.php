@@ -292,7 +292,7 @@ class AdminControleur
         $cheminVue = realpath($rep . $vuePath);
         if ($cheminVue && file_exists($cheminVue)) {
             $resultsTwig = $results; 
-            require($cheminVue);
+            require_once($cheminVue);
         } else {
             echo "Fichier de vue introuvable : " . ($rep . $vuePath);
             exit;

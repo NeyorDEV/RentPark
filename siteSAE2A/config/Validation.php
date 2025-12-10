@@ -5,7 +5,7 @@ namespace config;
 class Validation
 {
 
-    static function val_action($action)
+    public static function val_action($action)
     {
 
         if (!isset($action)) {
