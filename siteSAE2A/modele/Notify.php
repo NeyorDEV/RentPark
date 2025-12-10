@@ -1,8 +1,13 @@
 <?php
+namespace modele;
 
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
+
+
+
+require_once __DIR__ . '../config/config.php';
 
 
 /**
@@ -12,7 +17,10 @@ use PHPMailer\PHPMailer\Exception;
  * @param string $body    Contenu HTML du mail
  */
 function sendAlertEmail($to, $subject, $body) {
+    global $smtp_pass;
     $mail = new PHPMailer(true);
+
+    
 
     try {
         // Configuration du serveur SMTP Gmail
@@ -21,7 +29,7 @@ function sendAlertEmail($to, $subject, $body) {
         $mail->Host       = 'smtp.gmail.com';
         $mail->SMTPAuth   = true;
         $mail->Username   = 'rentpark88@gmail.com';           // Ton adresse Gmail
-        $mail->Password   = 'crpw mjdp rawc nkwq'; // Mot de passe d'application Gmail
+        $mail->Password   = $smtp_pass; // Mot de passe d'application Gmail
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
         $mail->Port       = 587;
 

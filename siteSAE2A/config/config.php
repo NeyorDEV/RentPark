@@ -31,3 +31,5 @@ $vues['parametres'] = 'view/viewParametres.php';
 $action = "RAS";
 
 $role = '';
+
+$smtp_pass = 'crpw mjdp rawc nkwq';
