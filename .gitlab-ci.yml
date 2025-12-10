@@ -50,19 +50,16 @@ deploy-job:      # This job runs in the deploy stage.
 
 
 sonarqube-check:
-  image: 
-    name: sonarsource/sonar-scanner-cli:latest
-    entrypoint: [""]
+  image: sonarsource/sonar-scanner-cli:latest
   variables:
-    SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"  # Defines the location of the analysis task cache
-    GIT_DEPTH: "0"  # Tells git to fetch all the branches of the project, required by the analysis task
-  cache:
-    key: "${CI_JOB_NAME}"
-    paths:
-      - .sonar/cache
+    SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"
+    GIT_DEPTH: "0"
+    # Forcer l'encodage UTF-8
+    JAVA_TOOL_OPTIONS: "-Dfile.encoding=UTF-8"
   script: 
     - sonar-scanner -X
   allow_failure: true
   only:
     - main
+
 
