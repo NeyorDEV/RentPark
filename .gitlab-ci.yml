@@ -62,7 +62,7 @@ sonarqube-check:
       - .sonar/cache
   script: 
     - sonar-scanner
-     - sonar-scanner -X
+    - sonar-scanner -X
   allow_failure: true
   only:
     - main
