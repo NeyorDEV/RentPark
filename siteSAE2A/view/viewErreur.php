@@ -1,5 +1,9 @@
+<!DOCTYPE html>
+
 <html>
-<head><title>Erreur</title>
+<head>
+    <meta charset="UTF-8">
+    <title>Erreur</title>
 </head>
 
 <body>
