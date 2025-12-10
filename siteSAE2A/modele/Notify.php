@@ -7,9 +7,6 @@ use PHPMailer\PHPMailer\Exception;
 
 
 
-require_once __DIR__ . '../config/config.php';
-
-
 /**
  * Fonction pour envoyer un mail d'alerte
  * @param string $to      Adresse du destinataire

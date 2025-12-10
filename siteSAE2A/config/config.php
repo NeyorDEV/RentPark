@@ -1,5 +1,7 @@
 <?php
 
+namespace SiteSAE2A\Config;
+
 //gen
 $rep = __DIR__ . '/../';
 
