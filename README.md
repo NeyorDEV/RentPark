@@ -17,3 +17,4 @@
 - 📐 [Conception](https://codefirst.iut.uca.fr/gitlab/qumiotto/sae_2a_rentpark/-/wikis/diagramme_de_classe)
 
 nous avons mis une conception initiale de là où nous en sommes dans le projet avec une conception moyenne qui ne respecte pas les principes SOLID mais qui était celle demandée par les professeurs de PHP, la 2e conception est une version améliorée avec un maximum de respect des principes SOLID et l'intégration des webservices qui permettent de mieux respecter ces principes
+
