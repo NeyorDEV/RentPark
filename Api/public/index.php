@@ -4,14 +4,14 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\Factory\AppFactory;
 use modeleApi\Connection;
 
-require __DIR__ . '/../vendor/autoload.php';
+
 
 // Autoload PSR-4
-$loader = require __DIR__ . '/../vendor/autoload.php';
+$loader = require_once __DIR__ . '/../vendor/autoload.php';
 $loader->addPsr4('BL\\', __DIR__);
 
 // Récupération de la connexion via database.php
-$databaseFactory = require __DIR__ . '/../config/database.php';
+$databaseFactory = require_once __DIR__ . '/../config/database.php';
 $conn = $databaseFactory(); // $conn est maintenant une instance de Connection
 
 $app = AppFactory::create();
