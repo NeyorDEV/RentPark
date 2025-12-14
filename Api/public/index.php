@@ -16,7 +16,7 @@ $conn = $databaseFactory(); // $conn est maintenant une instance de Connection
 
 $app = AppFactory::create();
 
-// Route exemple pour récupérer tous les véhicules
+
 $app->get('/vehicules', function (Request $request, Response $response, $args) use ($conn) {
     $conn->executeQuery("SELECT * FROM Vehicule");
     $vehicules = $conn->getResults();
@@ -25,6 +25,14 @@ $app->get('/vehicules', function (Request $request, Response $response, $args) u
     return $response->withHeader('Content-Type', 'application/json');
 });
 
+
+$app->get('/client', function (Request $request, Response $response, $args) use ($conn) {
+    $conn->executeQuery("SELECT * FROM Client");
+    $client = $conn->getResults();
+
+    $response->getBody()->write(json_encode($client));
+    return $response->withHeader('Content-Type', 'application/json');
+});
 $app->addRoutingMiddleware();
 
 $errorMiddleware = $app->addErrorMiddleware(true, true, true);

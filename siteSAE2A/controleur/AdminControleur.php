@@ -6,12 +6,17 @@ use modele\VehicleGateway;
 use modele\ReservationGateway;
 use modele\User;
 use config\Validation;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\RequestException;
 class AdminControleur
 {
     private Connection $connection;
     private VehicleGateway $gateway;
     private UserGateway $userGateway;
     private ReservationGateway $reservationGateway;
+
+    // test pour l'API
+    private Client $apiClient;
     
     public function __construct()
     {
@@ -26,6 +31,13 @@ class AdminControleur
             $this->gateway = new VehicleGateway($this->connection);
             $this->userGateway = new UserGateway($this->connection);
             $this->reservationGateway = new ReservationGateway($this->connection);
+
+            // test pour l'API
+            $this->apiClient = new Client([
+                'base_uri' => 'http://localhost:8880/',
+                'timeout'  => 2.0
+            ]);
+            
 
             switch ($action) {
                 case "listeVoitures":
@@ -108,9 +120,23 @@ class AdminControleur
               $this->rechercherVoitures($dVueEreur);
               return;
           }
+
         
-        $results = $this->gateway->getAll();
-        $this->afficherVue('flotte', $dVueEreur, $results,'admin');
+        try {
+            $response = $this->apiClient->get('vehicules');
+        
+            $results = json_decode(
+                $response->getBody()->getContents(),
+                true
+            );
+        
+        } catch (RequestException $e) {
+            $dVueEreur[] = "Impossible de récupérer les véhicules depuis l’API.";
+            $results = [];
+        }
+        
+        $this->afficherVue('flotte', $dVueEreur, $results, 'admin');
+        
     }
 // ajouter les vue erreur et les vérif 
 

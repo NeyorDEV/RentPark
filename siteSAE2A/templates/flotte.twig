@@ -39,11 +39,10 @@
         {% for row in results %}
             <div class="rectangle">
                 <p>
-                    {{ row.modele|e }}<br>
-                    {{ row.puissance|e }} cv<br>
-                    {{ row.couleur|e }}<br>
-                    {% if row.image_path is not empty %}
-                         <img src="{{ row.image_path|e }}" alt="Image du véhicule" width="100px">
+                    {{ row.Nom|e }}<br>
+                    {{ row.Puissance|e }} cv<br>
+                    {% if row.ImagePath is not empty %}
+                         <img src="{{ row.ImagePath|e }}" alt="Image du véhicule" width="100px">
                     {% else %}
                          <img src="html/icons/voiture.png" alt="Voiture par défaut" width="100px">
                     {% endif %}
