@@ -39,34 +39,39 @@
         </a>
         <h1>RENTPARK</h1>
 
-    <form id="searchForm" action="viewCars.php" method="get">
-        <div class="search-box">
-            <div class="row">
+    <form action="viewCars.php" method="get">
+    <div class="search-box">
+        <div class="row">
 
-                <div class="input-block">
-                    <label>Date de départ</label>
-                    <div class="dual">
-                        <div class="input-icon">
-                            <i class="fa-solid fa-calendar"></i>
-                            <input type="date" id="dateDepart" name="dateDepart">
-                        </div>
+            <div class="input-block">
+                <label>Date de départ</label>
+                <div class="dual">
+                    <div class="input-icon">
+                        <i class="fa-solid fa-calendar"></i>
+                        <!-- IMPORTANT : name="dateDepart" -->
+                        <input type="date" name="dateDepart" required>
                     </div>
                 </div>
-
-                <div class="input-block">
-                    <label>Date de retour</label>
-                    <div class="dual">
-                        <div class="input-icon">
-                            <i class="fa-solid fa-calendar"></i>
-                            <input type="date" id="dateRetour" name="dateRetour">
-                        </div>
-                    </div>
-                </div>
-
-                <button class="btn-orange" type="submit">Voir les véhicules</button>
             </div>
+
+            <div class="input-block">
+                <label>Date de retour</label>
+                <div class="dual">
+                    <div class="input-icon">
+                        <i class="fa-solid fa-calendar"></i>
+                        <!-- IMPORTANT : name="dateRetour" -->
+                        <input type="date" name="dateRetour" required>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bouton d’envoi -->
+            <button class="btn-orange" type="submit">Voir les véhicules</button>
         </div>
-    </form>
+    </div>
+</form>
+
+
 
     </header>
 

@@ -1,3 +1,8 @@
+<?php
+$dateDepart = $_GET['dateDepart'] ?? null;
+$dateRetour = $_GET['dateRetour'] ?? null;
+?>
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -13,7 +18,15 @@
 <header>
     <div class="top-bar">
         <span>Paramètres :</span>
-        <span>date debut et date fin</span>
+        <span>
+            <?php if ($dateDepart && $dateRetour): ?>
+                Du <?= htmlspecialchars($dateDepart) ?> au <?= htmlspecialchars($dateRetour) ?>
+            <?php elseif ($dateDepart): ?>
+                À partir du <?= htmlspecialchars($dateDepart) ?>
+            <?php else: ?>
+                Aucune date sélectionnée
+            <?php endif; ?>
+        </span>
     </div>
     <h1>Quelle voiture voulez-vous conduire ?</h1>
 
