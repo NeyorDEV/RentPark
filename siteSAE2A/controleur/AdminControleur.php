@@ -346,14 +346,27 @@ class AdminControleur
 
     private function supprimerUtilisateur(array $dVueEreur)
     {
-        $id = (int)($_POST['id'] ?? -1);
-        if ($id >= 0) {
-            $this->userGateway->deleteUser($id);
+        $id = (int) ($_POST['id'] ?? -1);
+
+        if ($id <= 0) {
+            header("Location: /siteSAE2A/utilisateurs");
+            exit;
+        }
+
+        try {
+            // Appel API DELETE
+            $this->apiClient->delete("users/$id");
+
+        } catch (RequestException $e) {
+            $dVueEreur[] = "Erreur lors de la suppression via l’API.";
+            // Optionnel : log
+            // error_log($e->getMessage());
         }
 
         header("Location: /siteSAE2A/utilisateurs");
         exit;
     }
+
 
     private function ajouterUtilisateur(array $dVueEreur)
     {

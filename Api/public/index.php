@@ -33,6 +33,55 @@ $app->get('/client', function (Request $request, Response $response, $args) use 
     $response->getBody()->write(json_encode($client));
     return $response->withHeader('Content-Type', 'application/json');
 });
+
+
+$app->delete('/users/{id}', function (Request $request, Response $response, array $args) use ($conn) {
+
+    // 1️⃣ Récupération et validation de l'ID
+    $id = (int) $args['id'];
+
+    if ($id <= 0) {
+        $response->getBody()->write(json_encode([
+            'error' => 'ID invalide'
+        ]));
+        return $response->withHeader('Content-Type', 'application/json')
+                        ->withStatus(400);
+    }
+
+    // 2️⃣ Vérifier si l'utilisateur existe
+    $conn->executeQuery(
+        "SELECT id FROM users WHERE id = :id",
+        [':id' => [$id, \PDO::PARAM_INT]]
+    );
+
+    $user = $conn->getResults();
+
+    if (empty($user)) {
+        $response->getBody()->write(json_encode([
+            'error' => 'Utilisateur non trouvé'
+        ]));
+        return $response->withHeader('Content-Type', 'application/json')
+                        ->withStatus(404);
+    }
+
+    // 3️⃣ Suppression
+    $conn->executeQuery(
+        "DELETE FROM users WHERE id = :id",
+        [':id' => [$id, \PDO::PARAM_INT]]
+    );
+
+    // 4️⃣ Réponse OK
+    $response->getBody()->write(json_encode([
+        'message' => 'Utilisateur supprimé avec succès'
+    ]));
+
+    return $response->withHeader('Content-Type', 'application/json')
+                    ->withStatus(200);
+});
+
+
+
+
 $app->addRoutingMiddleware();
 
 $errorMiddleware = $app->addErrorMiddleware(true, true, true);
