@@ -1,6 +1,6 @@
 ﻿namespace BlazorAdminRentPark.Services
 {
-    public class IClientService
+    public interface IClientService : IDataService
     {
     }
 }

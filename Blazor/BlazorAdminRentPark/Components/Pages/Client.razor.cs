@@ -1,4 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using BlazorAdminRentPark.Services;
+using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.QuickGrid;
+using System.ComponentModel.DataAnnotations;
 
 namespace BlazorAdminRentPark.Components.Pages
 {
@@ -7,6 +10,14 @@ namespace BlazorAdminRentPark.Components.Pages
         public int Id { get; set; }
 
         public string Username { get; set; }
+
+        [Inject]
+        private IDataService DataService { get; init; }
+
+        protected async override Task OnAfterRenderAsync(bool firstRender)
+        {
+            var result = await DataService.GetItems(GridItemsProviderRequest<Client> request);
+        }
 
         /* [Required]
         [StringLength(50, ErrorMessage = "Le prénom affiché ne doit pas dépasser 50 caractères.")]

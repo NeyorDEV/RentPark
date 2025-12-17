@@ -25,7 +25,7 @@ namespace BlazorAdminRentPark.Services
         */
 
         /// <inheritdoc />
-        public async ValueTask<GridItemsProviderResult<Client>> GetItems(GridItemsProviderRequest<Client> request)
+        public async Task<GridItemsProviderResult<Client>> GetItems(GridItemsProviderRequest<Client> request)
         {
             var items = await _http.GetFromJsonAsync<List<Client>>($"https://localhost:8880/client");
 
