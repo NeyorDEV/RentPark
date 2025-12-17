@@ -1,7 +1,80 @@
 ﻿@page "/"
+@using MudBlazor
 
-<PageTitle>Home</PageTitle>
+<MudContainer MaxWidth="MaxWidth.Large" Class="mt-8">
+    @* Section de Bienvenue *@
+    <MudPaper Elevation="0" Class="pa-8 rounded-lg mud-theme-primary mb-8">
+        <MudStack Spacing="2">
+            <MudText Typo="Typo.h3" Style="font-weight: 800;">RentPark</MudText>
+            <MudText Typo="Typo.h5" Class="mud-text-secondary" Style="opacity: 0.8;">
+                Bienvenue dans votre interface d'administration.
+            </MudText>
+            <MudText Typo="Typo.body1">
+                Gérez votre flotte, vos contrats et vos utilisateurs en quelques clics.
+            </MudText>
+        </MudStack>
+    </MudPaper>
 
-<h1>Rentpark</h1>
+    @* Section Statistiques Rapides *@
+    <MudText Typo="Typo.h5" Class="mb-4" Style="font-weight: bold;">Aperçu de l'activité</MudText>
 
-Bienvenue dans l'application admin de Rentpark !
+    <MudGrid>
+        @* Carte Utilisateurs *@
+        <MudItem xs="12" sm="6" md="4">
+            <MudCard Elevation="2" Class="pa-4" Style="border-left: 6px solid var(--mud-palette-info);">
+                <MudCardContent>
+                    <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="4">
+                        <MudIcon Icon="@Icons.Material.Filled.People" Size="Size.Large" Color="Color.Info" />
+                        <MudStack Spacing="0">
+                            <MudText Typo="Typo.h4" Style="font-weight: bold;">43</MudText>
+                            <MudText Typo="Typo.body2" Class="mud-text-secondary">Utilisateurs actifs</MudText>
+                        </MudStack>
+                    </MudStack>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+
+        @* Carte Flotte (Exemple) *@
+        <MudItem xs="12" sm="6" md="4">
+            <MudCard Elevation="2" Class="pa-4" Style="border-left: 6px solid var(--mud-palette-success);">
+                <MudCardContent>
+                    <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="4">
+                        <MudIcon Icon="@Icons.Material.Filled.DirectionsCar" Size="Size.Large" Color="Color.Success" />
+                        <MudStack Spacing="0">
+                            <MudText Typo="Typo.h4" Style="font-weight: bold;">12</MudText>
+                            <MudText Typo="Typo.body2" Class="mud-text-secondary">Véhicules en service</MudText>
+                        </MudStack>
+                    </MudStack>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+
+        @* Carte Réservations (Exemple) *@
+        <MudItem xs="12" sm="6" md="4">
+            <MudCard Elevation="2" Class="pa-4" Style="border-left: 6px solid var(--mud-palette-warning);">
+                <MudCardContent>
+                    <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="4">
+                        <MudIcon Icon="@Icons.Material.Filled.EventAvailable" Size="Size.Large" Color="Color.Warning" />
+                        <MudStack Spacing="0">
+                            <MudText Typo="Typo.h4" Style="font-weight: bold;">8</MudText>
+                            <MudText Typo="Typo.body2" Class="mud-text-secondary">Réservations ce jour</MudText>
+                        </MudStack>
+                    </MudStack>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+    </MudGrid>
+
+    @* Section Actions Rapides *@
+    <MudPaper Class="pa-6 mt-8 rounded-lg" Elevation="1">
+        <MudText Typo="Typo.h6" Class="mb-4">Actions rapides</MudText>
+        <MudStack Row="true" Wrap="Wrap.Wrap" Spacing="2">
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" href="account">
+                Nouvel Utilisateur
+            </MudButton>
+            <MudButton Variant="Variant.Outlined" Color="Color.Primary" StartIcon="@Icons.Material.Filled.ListAlt">
+                Voir les Contrats
+            </MudButton>
+        </MudStack>
+    </MudPaper>
+</MudContainer>
