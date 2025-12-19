@@ -16,6 +16,8 @@ $conn = $databaseFactory(); // $conn est maintenant une instance de Connection
 
 $app = AppFactory::create();
 
+$app->addBodyParsingMiddleware();
+
 
 $app->get('/vehicules', function (Request $request, Response $response, $args) use ($conn) {
     $conn->executeQuery("SELECT * FROM Vehicule");
@@ -129,6 +131,50 @@ $app->delete('/contrat/{idContrat}', function (Request $request, Response $respo
 
     return $response->withHeader('Content-Type', 'application/json')
                     ->withStatus(200);
+});
+
+$app->post('/contrat', function (Request $request, Response $response, $args) use ($conn) {
+    
+    $data = $request->getParsedBody();
+
+    if (empty($data['DateDebut']) || empty($data['DateFin'])) {
+        $response->getBody()->write(json_encode([
+            'error' => 'Les champs DateDebut et DateFin sont obligatoires.'
+        ]));
+        return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
+    }
+
+    $sql = "INSERT INTO Contrat (DateDebut, DateFin, Statut, IdClient, EtatAvant, EtatApres, IdVehicule, Marque, NomModele, AnneeModele) 
+            VALUES (:dateDebut, :dateFin, :statut, :idClient, :etatAvant, :etatApres, :idVehicule, :marque, :nomModele, :anneeModele)";
+
+    $params = [
+        ':dateDebut' => [$data['DateDebut'], \PDO::PARAM_STR],
+        ':dateFin' => [$data['DateFin'], \PDO::PARAM_STR],
+        ':statut' => [$data['Statut'] ?? 'EnCoursValidation', \PDO::PARAM_STR],
+        ':idClient' => [$data['IdClient'] ?? null, \PDO::PARAM_INT],
+        ':etatAvant' => [$data['EtatAvant'] ?? null, \PDO::PARAM_INT],
+        ':etatApres' => [$data['EtatApres'] ?? null, \PDO::PARAM_INT],
+        ':idVehicule' => [$data['IdVehicule'] ?? null, \PDO::PARAM_STR], 
+        ':marque' => [$data['Marque'] ?? null, \PDO::PARAM_STR],
+        ':nomModele' => [$data['NomModele'] ?? null, \PDO::PARAM_STR],
+        ':anneeModele' => [$data['AnneeModele'] ?? null, \PDO::PARAM_STR]
+    ];
+
+    try {
+        $conn->executeQuery($sql, $params);
+        
+        $response->getBody()->write(json_encode([
+            'message' => 'Contrat créé avec succès'
+        ]));
+
+        return $response->withHeader('Content-Type', 'application/json')->withStatus(201);
+
+    } catch (\Exception $e) {
+        $response->getBody()->write(json_encode([
+            'error' => 'Erreur lors de la création du contrat : ' . $e->getMessage()
+        ]));
+        return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
+    }
 });
 
 
