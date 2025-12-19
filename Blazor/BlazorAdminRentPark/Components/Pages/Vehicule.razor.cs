@@ -6,24 +6,24 @@ using System.ComponentModel.DataAnnotations;
 
 namespace BlazorAdminRentPark.Components.Pages
 {
-    public partial class Client
+    public partial class Vehicule
     {
-        private GridItemsProviderRequest<ClientModel> request;
-        private List<ClientModel> clients;
+        private GridItemsProviderRequest<VehiculeModel> request;
+        private List<VehiculeModel> vehicules;
 
         [Inject]
-        private IClientService ClientService { get; init; }
+        private IVehiculeService VehiculeService { get; init; }
 
         protected override async Task OnInitializedAsync()
         {
-            var request = new GridItemsProviderRequest<ClientModel>
+            var request = new GridItemsProviderRequest<VehiculeModel>
             {
                 StartIndex = 0,
                 Count = null
             };
 
-            var result = await ClientService.GetItems(request);
-            clients = result.Items?.ToList();
+            var result = await VehiculeService.GetItems(request);
+            vehicules = result.Items?.ToList();
             StateHasChanged();
         }
 

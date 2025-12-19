@@ -1,10 +1,11 @@
 ﻿using BlazorAdminRentPark.Components.Pages;
+using BlazorAdminRentPark.Models;
 using Microsoft.AspNetCore.Components.QuickGrid;
 
 namespace BlazorAdminRentPark.Services
 {
-    public interface IClientService : IDataService<Client>
+    public interface IClientService : IDataService<ClientModel>
     {
-        Task<GridItemsProviderResult<Client>> GetItems(GridItemsProviderRequest<Client> request);
+        Task<GridItemsProviderResult<ClientModel>> GetItems(GridItemsProviderRequest<ClientModel> request);
     }
 }

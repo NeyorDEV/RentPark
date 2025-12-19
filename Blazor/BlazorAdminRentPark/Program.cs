@@ -9,6 +9,7 @@ builder.Services.AddRazorComponents()
 
 builder.Services.AddHttpClient();
 builder.Services.AddScoped<IClientService, ClientService>(); 
+builder.Services.AddScoped<IVehiculeService, VehiculeService>();
 
 var app = builder.Build();
 
