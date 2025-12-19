@@ -98,7 +98,13 @@ $voitures = $results ?? [];
     <?php if (!empty($voitures)): ?>
         <?php foreach ($voitures as $voiture): ?>
     <div class="car-card">
-        <img src="/siteSAE2A/html/img/<?php echo htmlspecialchars($voiture['ImagePath'] ?? 'default.jpg'); ?>" alt="Image voiture">
+        <?php
+        $image_path = $voiture['image_path'] ?? $voiture['ImagePath'] ?? 'default.jpg';
+            if (empty($image_path)) {
+                $image_path ='html/icons/car.png';
+        }
+        ?>
+        <img src="/siteSAE2A/<?php echo htmlspecialchars($image_path); ?>" alt="Image voiture">
         <div class="car-info">
             <h3><?php echo htmlspecialchars($voiture['Nom']); ?></h3> <p>Marque : <?php echo htmlspecialchars($voiture['Marque']); ?></p>
             <p>Couleur : <?php echo htmlspecialchars($voiture['Couleur']); ?> | Puissance : <?php echo htmlspecialchars($voiture['Puissance']); ?></p>
