@@ -138,17 +138,18 @@ class AdminControleur
         $this->afficherVue('flotte', $dVueEreur, $results, 'admin');
         
     }
-// ajouter les vue erreur et les vérif 
 
-public function afficheDashboard(array $dVueEreur)
-{
-    $results = [
-        "revenusMensuels"   => $this->reservationGateway->getMonthlyIncome(),
-        "voiturePlusLouee"  => $this->gateway->getMostRentedCar()
-    ];
+    // ajouter les vue erreur et les vérif 
 
-    $this->afficherVue('dashboard', $dVueEreur, $results, 'admin');
-}
+    public function afficheDashboard(array $dVueEreur)
+    {
+        $results = [
+            "revenusMensuels"   => $this->reservationGateway->getMonthlyIncome(),
+            "voiturePlusLouee"  => $this->gateway->getMostRentedCar()
+        ];
+
+        $this->afficherVue('dashboard', $dVueEreur, $results, 'admin');
+    }
 
     public function homeCustomers(array $dVueEreur)
     {
@@ -159,7 +160,8 @@ public function afficheDashboard(array $dVueEreur)
 
     public function cars(array $dVueEreur)
     {
-    $this->afficherVue('cars',$dVueEreur,$results=null,'admin');
+        $results = $this->gateway->getRentableVehiculesBetweenDates();
+        $this->afficherVue('cars',$dVueEreur,$results=null,'admin');
     }
 
     public function afficheRecapitulatif(array $dVueEreur){
@@ -181,8 +183,8 @@ public function afficheDashboard(array $dVueEreur)
 
         if (move_uploaded_file($nomTemp, $dossier)) {
                 $imagePath = 'html/icons/' . $nomFichier; 
-    }
-}
+            }
+        }
 
         $modele    = $_POST['modele'] ?? '';
         $couleur   = $_POST['couleur'] ?? '';
@@ -229,22 +231,22 @@ public function afficheDashboard(array $dVueEreur)
     }
 
     private function rechercherVoitures(array $dVueErreur = []): void
-{
-    $motCle = trim($_GET['q'] ?? '');
+    {
+        $motCle = trim($_GET['q'] ?? '');
 
-    if ($motCle === '') {
-        $results = $this->gateway->getAll();
-        
-    } else {
-        $results = $this->gateway->rechercherVoitures($motCle);
+        if ($motCle === '') {
+            $results = $this->gateway->getAll();
+            
+        } else {
+            $results = $this->gateway->rechercherVoitures($motCle);
 
-        if (empty($results)) {
-            $dVueErreur[] = "Aucune voiture trouvée pour \"$motCle\".";
+            if (empty($results)) {
+                $dVueErreur[] = "Aucune voiture trouvée pour \"$motCle\".";
+            }
         }
+        
+        $this->afficherVue('flotte', $dVueErreur, $results, 'admin');
     }
-    
-    $this->afficherVue('flotte', $dVueErreur, $results, 'admin');
-}
 
 
     public function inscription(array $dVueErreur)
