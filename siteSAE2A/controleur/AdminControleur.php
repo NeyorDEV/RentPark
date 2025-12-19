@@ -158,25 +158,54 @@ class AdminControleur
 
     }
 
-    // Dans AdminControleur.php
-public function cars(array $dVueEreur)
-{
-    // 1. Récupération des dates envoyées par le formulaire de recherche (via GET)
-    $date_depart = $_GET['date_depart'] ?? null;
-    $date_retour = $_GET['date_retour'] ?? null;
+    public function cars(array $dVueEreur)
+    {
+        // 1. Récupération de tous les filtres
+        $date_depart = $_GET['date_depart'] ?? null;
+        $date_retour = $_GET['date_retour'] ?? null;
+        $boite_filtre = $_GET['boite'] ?? null;
+        $prix_min = isset($_GET['prix_min']) && $_GET['prix_min'] !== '' ? (float)$_GET['prix_min'] : null;
+        $prix_max = isset($_GET['prix_max']) && $_GET['prix_max'] !== '' ? (float)$_GET['prix_max'] : null;
 
-    // 2. Logique de récupération des données
-    if ($date_depart && $date_retour) {
-        // Si les dates sont présentes, on filtre les véhicules disponibles
-        $results = $this->gateway->getRentableVehiculesBetweenDates($date_depart, $date_retour);
-    } else {
-        // Sinon, on affiche tous les véhicules par défaut (ou une erreur)
-        $results = $this->gateway->getAll();
+        // 2. Récupération initiale des véhicules
+        if ($date_depart && $date_retour) {
+            $results = $this->gateway->getRentableVehiculesBetweenDates($date_depart, $date_retour);
+        } else {
+            $results = $this->gateway->getAll();
+        }
+
+        // 3. Application des filtres combinés (Boîte + Prix)
+        if (!empty($results)) {
+            $results = array_filter($results, function($voiture) use ($boite_filtre, $prix_min, $prix_max) {
+                $match = true;
+                $prixVoiture = isset($voiture['Prix']) ? (float)$voiture['Prix'] : 0;
+
+                // Filtre Boîte
+                if ($boite_filtre && (!isset($voiture['Boite']) || $voiture['Boite'] !== $boite_filtre)) {
+                    $match = false;
+                }
+
+                // Filtre Prix Min
+                if ($match && $prix_min !== null && $prixVoiture < $prix_min) {
+                    $match = false;
+                }
+
+                // Filtre Prix Max
+                if ($match && $prix_max !== null && $prixVoiture > $prix_max) {
+                    $match = false;
+                }
+
+                return $match;
+            });
+            
+            // Ré-indexer le tableau pour l'affichage
+            $results = array_values($results);
+        }
+
+        $this->afficherVue('cars', $dVueEreur, $results, 'user');
     }
 
-    // 3. Affichage de la vue 'cars' (qui correspond à viewCars.php)
-    $this->afficherVue('cars', $dVueEreur, $results, 'user');
-}
+
     public function afficheRecapitulatif(array $dVueEreur){
     $this->afficherVue('recapitulatif',$dVueEreur,$results=null,'admin');
     }

@@ -1,7 +1,29 @@
 <?php
+// Récupération des dates et des résultats
 $date_depart = $_GET['date_depart'] ?? ($date_depart ?? null);
 $date_retour = $_GET['date_retour'] ?? ($date_retour ?? null);
 $voitures = $results ?? [];
+
+// --- LOGIQUE DE TRI ---
+if (!empty($voitures) && isset($_GET['tri'])) {
+    $ordre = $_GET['tri']; // 'asc' ou 'desc'
+    
+    usort($voitures, function($a, $b) use ($ordre) {
+        // On récupère les prix. Si la clé 'Prix' n'existe pas, on utilise 0 par défaut.
+        $prixA = $a['Prix'] ?? 0;
+        $prixB = $b['Prix'] ?? 0;
+
+        if ($prixA == $prixB) {
+            return 0;
+        }
+
+        if ($ordre === 'desc') {
+            return ($prixA > $prixB) ? -1 : 1;
+        } else {
+            return ($prixA < $prixB) ? -1 : 1;
+        }
+    });
+}
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -60,15 +82,16 @@ $voitures = $results ?? [];
         <div class="sidebar-header">
             <button type="button" class="close-btn" onclick="toggleMenu()">✖</button>
             <h2>Filtres</h2>
-            <button type="reset" class="clear-btn">Effacer</button>
+            <button type="reset" class="clear-btn" onclick="window.location.href='/siteSAE2A/cars?date_depart=<?php echo $date_depart; ?>&date_retour=<?php echo $date_retour; ?>'">Effacer</button>
         </div>
         
         <div class="filter-option">
-            <div class="fliter-label"><label>Prix</label></div>
+            <div class="fliter-label"><label>Prix (€)</label></div>
             <div class="price-inputs">
-                <input type="number" name="prix_min" placeholder="Min" value="<?php echo $_GET['prix_min'] ?? ''; ?>">
-                <input type="number" name="prix_max" placeholder="Max" value="<?php echo $_GET['prix_max'] ?? ''; ?>">
+                <input type="number" name="prix_min" placeholder="Min" value="<?php echo htmlspecialchars($_GET['prix_min'] ?? ''); ?>">
+                <input type="number" name="prix_max" placeholder="Max" value="<?php echo htmlspecialchars($_GET['prix_max'] ?? ''); ?>">
             </div>
+        </div>
             
             <div class="filter-btn-group-vertical">
                 <input type="radio" name="tri" value="asc" id="tri-asc" <?php if(($_GET['tri'] ?? '') == 'asc') echo 'checked'; ?>>
@@ -82,10 +105,10 @@ $voitures = $results ?? [];
         <div class="filter-option">
             <div class="fliter-label"><label>Boîte</label></div>
             <div class="filter-btn-group-vertical">
-                <input type="radio" name="boite" value="auto" id="b-auto" <?php if(($_GET['boite'] ?? '') == 'auto') echo 'checked'; ?>>
+                <input type="radio" name="boite" value="Automatique" id="b-auto" <?php if(($_GET['boite'] ?? '') == 'Automatique') echo 'checked'; ?>>
                 <label for="b-auto">Automatique</label>
 
-                <input type="radio" name="boite" value="manuel" id="b-manuel" <?php if(($_GET['boite'] ?? '') == 'manuel') echo 'checked'; ?>>
+                <input type="radio" name="boite" value="Manuelle" id="b-manuel" <?php if(($_GET['boite'] ?? '') == 'Manuelle') echo 'checked'; ?>>
                 <label for="b-manuel">Manuelle</label>
             </div>
         </div>
@@ -100,31 +123,30 @@ $voitures = $results ?? [];
     <div class="car-card">
         <?php
         $image_path = $voiture['image_path'] ?? $voiture['ImagePath'] ?? 'default.jpg';
-            if (empty($image_path)) {
-                $image_path ='html/icons/car.png';
+        if (empty($image_path)) {
+            $image_path ='html/icons/car.png';
         }
         ?>
         <img src="/siteSAE2A/<?php echo htmlspecialchars($image_path); ?>" alt="Image voiture">
         <div class="car-info">
-            <h3><?php echo htmlspecialchars($voiture['Nom']); ?></h3> <p>Marque : <?php echo htmlspecialchars($voiture['Marque']); ?></p>
-            <p>Couleur : <?php echo htmlspecialchars($voiture['Couleur']); ?> | Puissance : <?php echo htmlspecialchars($voiture['Puissance']); ?></p>
+            <h3><?php echo htmlspecialchars($voiture['Nom']); ?></h3>
+            <p>Marque : <?php echo htmlspecialchars($voiture['Marque']); ?></p>
             
-            <span class="price">Prix à définir € / jour</span>
+            <p>
+                Couleur : <?php echo htmlspecialchars($voiture['Couleur']); ?> | 
+                Boîte : <strong><?php echo htmlspecialchars($voiture['Boite'] ?? 'N/C'); ?></strong> | 
+                Puissance : <?php echo htmlspecialchars($voiture['Puissance']); ?>
+            </p>
+            
+            <span class="price">
+                <?php echo isset($voiture['Prix']) ? htmlspecialchars($voiture['Prix']) . " € / jour" : "Prix à définir"; ?>
+            </span>
             <button class="btn-orange">Réserver</button>
         </div>
     </div>
     <?php endforeach; ?>
     <?php else: ?>
-        <div class="car-card">
-            <img src="car_image_1.jpg" alt="Citroën E-C3">
-            <div class="car-info">
-                <h3>Citroën E-C3 ou similaire</h3>
-                <p>Citadine SUV Automatique</p>
-                <p><span>293km</span> | <span>4 Sièges</span> | <span>2 Bagages</span></p>
-                <span class="price">22,74 € / jour</span>
-                <button class="btn-orange">Réserver</button>
-            </div>
-        </div>
+        <p style="text-align: center; width: 100%;">Aucune voiture ne correspond à vos critères.</p>
     <?php endif; ?>
 </div>
 
