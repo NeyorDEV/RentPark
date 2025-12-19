@@ -83,39 +83,24 @@ class VehicleGateway {
         return $rows[0]; // On renvoie seulement la voiture la plus louée
     }
     
-    public function getRentableVehiculesBetweenDates($action): ?array
+    public function getRentableVehiculesBetweenDates(string $date_depart, string $date_retour): array
     {
-        $date_depart = $_GET['date_depart'] ?? null;
-        $date_retour = $_GET['date_retour'] ?? null;
+    // On utilise la table 'cars' comme dans vos autres méthodes
+    $query = "SELECT * FROM cars v 
+            WHERE v.voiture NOT IN (
+                SELECT c.idVehicule 
+                FROM Contrat c 
+                WHERE NOT (c.DateFin< :date_depart OR c.DateDebut > :date_retour)
+            )";
 
+    $params = [
+        ':date_depart' => [$date_depart, \PDO::PARAM_STR],
+        ':date_retour' => [$date_retour, \PDO::PARAM_STR]
+    ];
 
-        if (!$date_depart || !$date_retour) {
-            $query = "SELECT * FROM vehicule";
-            $res = $this->connection->prepare($query);
-            $res->execute();
-            return $res->fetchAll(\PDO::FETCH_ASSOC);
-        }
-
-        $query = "SELECT * FROM vehicule v 
-                WHERE v.id_vehicule NOT IN (
-                    SELECT r.id_vehicule 
-                    FROM reservation r 
-                    WHERE NOT (r.date_fin < :date_depart OR r.date_debut > :date_retour)
-                )";
-
-        try {
-            $res = $this->connection->prepare($query);
-            $res->execute([
-                ':date_depart' => $date_depart,
-                ':date_retour' => $date_retour
-            ]);
-
-            return $res->fetchAll(\PDO::FETCH_ASSOC);
-        } catch (\PDOException $e) {
-            // Gestion d'erreur
-            return null;
-        }
-    }
+    $this->connection->executeQuery($query, $params);
+    return $this->connection->getResults();
+}
 }
 ?>
 
