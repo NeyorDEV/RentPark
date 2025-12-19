@@ -50,16 +50,66 @@
         </div>
 
         <div class="card">
-            <h2>Voiture la plus louée</h2>
-            <div class="circle-chart" style="--final-value: 50;">50%</div>
-
+    <h2>Voiture la plus louée</h2>
+    <?php if (!empty($results["voiturePlusLouee"])) : 
+    $bestCar = $results["voiturePlusLouee"];
+?>
+    <div class="best-car-card">
+        <div class="info">
+            <p>
+                <strong><?= htmlspecialchars($bestCar["Marque"]) ?></strong>
+                <?= htmlspecialchars($bestCar["Modele"]) ?><br>
+                <span class="small">Louée <?= (int)$bestCar["nb_locations"] ?> fois</span>
+            </p>
         </div>
+        <div class="image-container">
+            <?php if (!empty($bestCar["ImagePath"])) : ?>
+                <img src="<?= htmlspecialchars($bestCar["ImagePath"]) ?>" alt="Image de <?= htmlspecialchars($bestCar["Modele"]) ?>">
+            <?php else : ?>
+                <img src="html/icons/voiture.png" alt="Voiture par défaut">
+            <?php endif; ?>
+        </div>
+    </div>
+<?php endif; ?>
+
+</div>
+
+
 
         <div class="card">
-            <h2>Revenus mensuels</h2>
-            <div class="circle-chart" style="--final-value: 15;">15%</div>
+    <h2>Revenus mensuels</h2>
+    <div class="circle-chart" 
+         id="revenus-circle" 
+         style="--final-value: <?= min(($results["revenusMensuels"] / 300000) * 100, 100) ?>;">
+        <span id="revenus-counter">0</span>€
+    </div>
+</div>
 
-        </div>
+<script>
+function animateCounter(id, targetValue, duration) {
+    const counter = document.getElementById(id);
+    let start = 0;
+    const fps = 60; // frames par seconde
+    const totalFrames = Math.round(duration / (1000 / fps));
+    const increment = targetValue / totalFrames;
+
+    const timer = setInterval(() => {
+        start += increment;
+        if (start >= targetValue) {
+            start = targetValue;
+            clearInterval(timer);
+        }
+        counter.textContent = Math.floor(start).toLocaleString();
+    }, 1000 / fps);
+}
+
+// Exemple : chiffre d'affaires de PHP
+const revenusMensuels = <?= $results["revenusMensuels"] ?>;
+animateCounter("revenus-counter", revenusMensuels, 800); // 0,8s pour atteindre la valeur
+</script>
+
+
+
    
  <div class="bottom-cards">   
     <div class="alert">

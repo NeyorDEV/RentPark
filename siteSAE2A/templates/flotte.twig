@@ -1,6 +1,5 @@
 {% extends "base.twig" %}
 
-
 {% block content %}
 <div class="top"> 
     <h1>Flotte Automobile</h1>
@@ -39,6 +38,10 @@
     {% if results is not empty %}
         {% for row in results %}
             <div class="rectangle">
+                {% if row.image_path is not empty %}
+                    <img src="{{ row.image_path|e }}" alt="Image du véhicule" class="bg-img">
+                {% else %}
+                    <img src="html/icons/voiture.png" alt="Voiture par défaut" class="bg-img">
                 <p>
                     {{ row.Nom|e }}<br>
                     {{ row.Puissance|e }} cv<br>
@@ -59,28 +62,46 @@
                 {% if role == 'admin' %}
                 <button type="button" class="delete-btn" onclick="location.hash='editModal-{{ row.voiture|e }}'">Modifier</button>
                 {% endif %}
+
+                <div class="info">
+                    <p>{{ row.modele|e }}</p>
+                    <p class="badge">{{ row.puissance|e }} cv</p>
+                    <p>{{ row.couleur|e }}</p>
+
+                    <div class="actions">
+                        {% if role == 'admin' %}
+                            <form method="POST" action="/siteSAE2A/voitures" onsubmit="return confirm('Supprimer ce véhicule ?');">
+                                <input type="hidden" name="action" value="supprimerVoiture">
+                                <input type="hidden" name="id" value="{{ row.voiture|e }}">
+                                <button type="submit">Supprimer</button>
+                            </form>
+                            <button type="button" onclick="location.hash='editModal-{{ row.voiture|e }}'">Modifier</button>
+                        {% endif %}
+                    </div>
+                </div>
             </div>
 
+            <!-- Modale pour modification -->
+            {% if role == 'admin' %}
             <div id="editModal-{{ row.voiture|e }}" class="modal">
                 <div class="modal-content">
-                    <a href="#" class="close">×</a>
+                    <a href="#" class="close">&times;</a>
                     <h2>Modifier le véhicule</h2>
-                    <form method="POST" action="/siteSAE2A/voitures">
+                    <form method="POST" action="/siteSAE2A/voitures" enctype="multipart/form-data">
                         <input type="hidden" name="action" value="modifierVoiture">
                         <input type="hidden" name="id" value="{{ row.voiture|e }}">
-                        <label>Modèle<br>
-                            <input type="text" name="modele" required value="{{ row.modele|e }}">
-                        </label><br><br>
-                        <label>Puissance (cv)<br>
-                            <input type="number" name="puissance" required value="{{ row.puissance|e }}">
-                        </label><br><br>
-                        <label>Couleur<br>
-                            <input type="text" name="couleur" required value="{{ row.couleur|e }}">
-                        </label><br><br>
+                        
+                        <input type="text" name="modele" required value="{{ row.modele|e }}" placeholder="Modèle">
+                        <input type="number" name="puissance" required value="{{ row.puissance|e }}" placeholder="Puissance">
+                        <input type="text" name="couleur" required value="{{ row.couleur|e }}" placeholder="Couleur">
+                        <input type="file" name="image" accept="image/*">
+
                         <button type="submit">Enregistrer</button>
                     </form>
                 </div>
             </div>
+            {% endif %}
+
         {% endfor %}
     {% else %}
         <div class="rectangle">
@@ -89,6 +110,8 @@
     {% endif %}
 </div>
 
+<!-- Modale pour ajout -->
+{% if role == 'admin' %}
 <div id="addModal" class="modal">
     <div class="modal-content">
         <a href="#" class="close">&times;</a>
@@ -101,7 +124,8 @@
             <input type="file" name="image" accept="image/*"><br><br>
             <button type="submit" name="ajouterVoiture">Ajouter</button>
         </form>
-        
     </div>
 </div>
+{% endif %}
+
 {% endblock %}
