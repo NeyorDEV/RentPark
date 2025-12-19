@@ -294,7 +294,7 @@ public function afficheDashboard(array $dVueEreur)
         
     }
 
-    private function afficherVue(string $vueKey, array $dVueEreur, ?array $results = null, string $role)
+    private function afficherVue(string $vueKey, array $dVueEreur, ?array $results = null, string $role="user")
     {
         global $rep, $vues, $twig;
 
