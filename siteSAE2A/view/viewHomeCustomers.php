@@ -51,7 +51,7 @@
             <span>Connection/Inscription</span>
         </div>
     </a>
-    <h1>RENTPARK</h1>
+    <h1 id="RentPark">RENTPARK</h1>
 
     <form action="/siteSAE2A/cars" method="GET" class="search-box">
 

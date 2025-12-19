@@ -37,22 +37,24 @@ body::before {
     }
 } 
 
-/* ---- BURGER ---- */
-.burger {
-    position: fixed;
-    top: 20px;
-    left: 20px;
-    width: 32px;
-    cursor: pointer;
-    z-index: 50;
+#Rentpark{
+    color:white;
 }
 
+/* ---- BURGER ---- */
 .burger span {
     display: block;
     height: 3px;
-    background: #333;
+    /* --- MODIFICATION --- */
+    background: #e0e0e0; /* Couleur gris clair/blanc cassé */
+    /* --------------------- */
     margin: 6px 0;
     border-radius: 3px;
+    transition: 0.3s;
+}
+
+.burger:hover span {
+    background: #ffffff; /* Devient blanc pur au survol */
 }
 
 /* ---- SIDEBAR (GLASS EFFECT) ---- */
@@ -142,20 +144,21 @@ header h1 {
     position: absolute;
     top: 25px;
     right: 25px;
-    display: inline-flex; /* Utilisation de inline-flex pour que les éléments soient sur la même ligne */
-    align-items: center;  /* Aligne le cercle et le texte verticalement */
-    gap: 12px; /* Espace entre le cercle et le texte */
-    padding: 12px 20px;
-    border-radius: 50px; /* Arrondi du bouton */
-    background-color: rgba(0, 0, 0, 0.6); /* Fond semi-transparent */
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 20px;
+    background-color: transparent; 
+    border: 2px solid white;      
+    border-radius: 12px;          
     cursor: pointer;
-    transition: all 0.3s ease-in-out; /* Animation douce */
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); /* Ombre légère */
+    transition: all 0.3s ease-in-out;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .top-right-btn:hover {
-    transform: translateY(-5px); /* Légère élévation lors du survol */
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3); /* Ombre plus marquée */
+    background-color: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
 }
 
 .top-right-btn .circle {

@@ -22,10 +22,12 @@ $voitures = $results ?? []; // Dans ton afficherVue, $results contient tes donn√
         } catch (e) { }
     })();
     </script>
+    
+    <link rel="stylesheet" href="/siteSAE2A/html/css/cars.css">
     <link rel="stylesheet" href="/siteSAE2A/html/css/menu.css">
     <link rel="stylesheet" href="/siteSAE2A/html/css/parametres.css">
-    <link rel="stylesheet" href="/siteSAE2A/html/css/cars.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
 </head>
 <body>
 
