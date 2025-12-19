@@ -2,7 +2,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Allura&family=Michroma&family=Science+Gothic:wght@100..900&display=swap');
 
 h1 {
-    font-family: "Science Gothic", sans-serif;
+    font-family: 'Montserrat', sans-serif;
     color: #333;
   }
 
@@ -41,7 +41,7 @@ nav {
     border-radius: 10px;        
     margin: 5px 10px;   
     
-    font-family: "Science Gothic", sans-serif;
+    font-family: 'Montserrat', sans-serif;
   }
   .menu a img {
     width: 15%;
@@ -96,7 +96,7 @@ nav {
     font-size: 20px;
     margin: 0 0 10px 0;
 
-    font-family: "Science Gothic", sans-serif;
+    font-family: 'Montserrat', sans-serif;
 }
 
 .card .circle-chart {
@@ -132,7 +132,7 @@ nav {
     color: #333;
     animation: fill-circle 1.7s ease-out forwards;
 
-    font-family: "Science Gothic", sans-serif;
+    font-family: 'Montserrat', sans-serif;
 }
 
 /* Animation générique qui utilise la variable --final-value */
@@ -196,7 +196,7 @@ nav {
     margin: 5px 10px;   
     background-color: rgb(236, 232, 232);     
 
-    font-family: "Science Gothic", sans-serif;
+    font-family: 'Montserrat', sans-serif;
   }
 
 
@@ -212,7 +212,7 @@ nav {
     background-color: rgb(255, 254, 254);
     box-shadow: 0 8px 16px rgba(0,0,0,0.2);
 
-    font-family: "Science Gothic", sans-serif;
+    font-family: 'Montserrat', sans-serif;
     color: #333;
 }
 /* Titre */
@@ -224,7 +224,7 @@ nav {
     background-color: rgb(255, 254, 254);
     box-shadow: 0 8px 16px rgba(0,0,0,0.2);
 
-    font-family: "Science Gothic", sans-serif;
+    font-family: 'Montserrat', sans-serif;
     color: #333;
 }
 
