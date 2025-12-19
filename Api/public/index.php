@@ -19,7 +19,7 @@ $app = AppFactory::create();
 $app->addBodyParsingMiddleware();
 
 
-$app->get('/vehicules', function (Request $request, Response $response, $args) use ($conn) {
+$app->get('/voitures', function (Request $request, Response $response, $args) use ($conn) {
     $conn->executeQuery("SELECT * FROM Vehicule");
     $vehicules = $conn->getResults();
 
@@ -55,7 +55,7 @@ $app->delete('/users/{id}', function (Request $request, Response $response, arra
             'error' => 'ID invalide'
         ]));
         return $response->withHeader('Content-Type', 'application/json')
-                        ->withStatus(400);
+            ->withStatus(400);
     }
 
     // 2️⃣ Vérifier si l'utilisateur existe
@@ -71,7 +71,7 @@ $app->delete('/users/{id}', function (Request $request, Response $response, arra
             'error' => 'Utilisateur non trouvé'
         ]));
         return $response->withHeader('Content-Type', 'application/json')
-                        ->withStatus(404);
+            ->withStatus(404);
     }
 
     // 3️⃣ Suppression
@@ -86,8 +86,55 @@ $app->delete('/users/{id}', function (Request $request, Response $response, arra
     ]));
 
     return $response->withHeader('Content-Type', 'application/json')
-                    ->withStatus(200);
+        ->withStatus(200);
 });
+
+$app->delete('/voitures/{numSerie}', function ($request, $response, $args) use ($conn) {
+    $numSerie = (string) $args['numSerie'];
+
+    // 1️⃣ Vérifier si la voiture existe
+    $conn->executeQuery(
+        "SELECT NumSerie FROM Vehicule WHERE NumSerie = :numSerie",
+        [':numSerie' => [$numSerie, \PDO::PARAM_STR]]
+    );
+    $voiture = $conn->getResults();
+
+    if (empty($voiture)) {
+        $response->getBody()->write(json_encode(['error' => 'Voiture non trouvée']));
+        return $response->withHeader('Content-Type', 'application/json')->withStatus(404);
+    }
+
+    // 2️⃣ Essayer de supprimer la voiture
+    try {
+        $conn->executeQuery(
+            "DELETE FROM Vehicule WHERE NumSerie = :numSerie",
+            [':numSerie' => [$numSerie, \PDO::PARAM_STR]]
+        );
+    } catch (\PDOException $e) {
+        // 3️⃣ Gestion propre de la clé étrangère
+        if ($e->getCode() === '23000') { // SQLSTATE pour contrainte FK
+            $response->getBody()->write(json_encode([
+                'error' => 'Impossible de supprimer la voiture',
+                'message' => 'Cette voiture est utilisée dans un ou plusieurs contrats'
+            ]));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(409);
+        }
+
+        // Autres erreurs SQL
+        $response->getBody()->write(json_encode([
+            'error' => 'Erreur SQL',
+            'message' => $e->getMessage()
+        ]));
+        return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
+    }
+
+    // 4️⃣ Suppression réussie
+    $response->getBody()->write(json_encode(['message' => 'Voiture supprimée avec succès']));
+    return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
+});
+
+
+
 
 $app->delete('/contrat/{idContrat}', function (Request $request, Response $response, array $args) use ($conn) {
 
