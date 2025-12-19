@@ -1,6 +1,32 @@
-﻿namespace BlazorAdminRentPark.Components.Pages
+﻿@page "/client"
+
+<h3>Liste des Clients</h3>
+
+@if (clients == null)
 {
-    public class Client
-    {
-    }
+    <p><em>Chargement...</em></p>
+}
+else if (!clients.Any())
+{
+    <p><em>Aucun client trouvé.</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nom</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var client in clients)
+            {
+                <tr>
+                    <td>@client.IdClient</td>
+                    <td>@client.Nom</td>
+                </tr>
+            }
+        </tbody>
+    </table>
 }

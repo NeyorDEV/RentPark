@@ -7,17 +7,11 @@ namespace BlazorAdminRentPark.Components.Pages
 {
     public partial class Client
     {
-        public int Id { get; set; }
-        public string Name { get; set; }
-        public string Surname { get; set; }
-        public DateTime BirthDate { get; set; }
-        public string Nationality { get; set; }
-        public string PhoneNumber { get; set; }
-        public string Email { get; set; }
-        public string LicenseNumber { get; set; }
-        public string Comment { get; set; }
+        public int IdClient { get; set; }
+        public string Nom { get; set; }
 
         private GridItemsProviderRequest<Client> request;
+        private List<Client> clients;
 
         [Inject]
         private IClientService ClientService { get; init; }
@@ -25,6 +19,7 @@ namespace BlazorAdminRentPark.Components.Pages
         protected async override Task OnAfterRenderAsync(bool firstRender)
         {
             var result = await ClientService.GetItems(request);
+            clients = result.Items.ToList();
         }
 
         /* [Required]

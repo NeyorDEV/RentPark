@@ -3,24 +3,28 @@
   "WorkspaceRootPath": "C:\\Users\\dadou\\Documents\\BUT\\2A\\SAE\\sae_2a_rentpark\\Blazor\\BlazorAdminRentPark\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{7A53A978-03C4-0DE4-E433-BDD6B52049B9}|BlazorAdminRentPark.csproj|c:\\users\\dadou\\documents\\but\\2a\\sae\\sae_2a_rentpark\\blazor\\blazoradminrentpark\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{7A53A978-03C4-0DE4-E433-BDD6B52049B9}|BlazorAdminRentPark.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{7A53A978-03C4-0DE4-E433-BDD6B52049B9}|BlazorAdminRentPark.csproj|c:\\users\\dadou\\documents\\but\\2a\\sae\\sae_2a_rentpark\\blazor\\blazoradminrentpark\\components\\pages\\client.razor.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{7A53A978-03C4-0DE4-E433-BDD6B52049B9}|BlazorAdminRentPark.csproj|solutionrelative:components\\pages\\client.razor.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{7A53A978-03C4-0DE4-E433-BDD6B52049B9}|BlazorAdminRentPark.csproj|c:\\users\\dadou\\documents\\but\\2a\\sae\\sae_2a_rentpark\\blazor\\blazoradminrentpark\\services\\clientservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{7A53A978-03C4-0DE4-E433-BDD6B52049B9}|BlazorAdminRentPark.csproj|solutionrelative:services\\clientservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{7A53A978-03C4-0DE4-E433-BDD6B52049B9}|BlazorAdminRentPark.csproj|c:\\users\\dadou\\documents\\but\\2a\\sae\\sae_2a_rentpark\\blazor\\blazoradminrentpark\\components\\pages\\client.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{7A53A978-03C4-0DE4-E433-BDD6B52049B9}|BlazorAdminRentPark.csproj|solutionrelative:components\\pages\\client.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{7A53A978-03C4-0DE4-E433-BDD6B52049B9}|BlazorAdminRentPark.csproj|c:\\users\\dadou\\documents\\but\\2a\\sae\\sae_2a_rentpark\\blazor\\blazoradminrentpark\\services\\idataservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7A53A978-03C4-0DE4-E433-BDD6B52049B9}|BlazorAdminRentPark.csproj|solutionrelative:services\\idataservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{7A53A978-03C4-0DE4-E433-BDD6B52049B9}|BlazorAdminRentPark.csproj|c:\\users\\dadou\\documents\\but\\2a\\sae\\sae_2a_rentpark\\blazor\\blazoradminrentpark\\services\\iclientservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{7A53A978-03C4-0DE4-E433-BDD6B52049B9}|BlazorAdminRentPark.csproj|solutionrelative:services\\iclientservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{7A53A978-03C4-0DE4-E433-BDD6B52049B9}|BlazorAdminRentPark.csproj|c:\\users\\dadou\\documents\\but\\2a\\sae\\sae_2a_rentpark\\blazor\\blazoradminrentpark\\services\\idataservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{7A53A978-03C4-0DE4-E433-BDD6B52049B9}|BlazorAdminRentPark.csproj|solutionrelative:services\\idataservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{7A53A978-03C4-0DE4-E433-BDD6B52049B9}|BlazorAdminRentPark.csproj|c:\\users\\dadou\\documents\\but\\2a\\sae\\sae_2a_rentpark\\blazor\\blazoradminrentpark\\services\\clientservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7A53A978-03C4-0DE4-E433-BDD6B52049B9}|BlazorAdminRentPark.csproj|solutionrelative:services\\clientservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{7A53A978-03C4-0DE4-E433-BDD6B52049B9}|BlazorAdminRentPark.csproj|c:\\users\\dadou\\documents\\but\\2a\\sae\\sae_2a_rentpark\\blazor\\blazoradminrentpark\\components\\pages\\error.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{7A53A978-03C4-0DE4-E433-BDD6B52049B9}|BlazorAdminRentPark.csproj|solutionrelative:components\\pages\\error.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     }
   ],
   "DocumentGroupContainers": [
@@ -30,7 +34,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 311,
-          "SelectedChildIndex": 2,
+          "SelectedChildIndex": 3,
           "Children": [
             {
               "$type": "Bookmark",
@@ -38,39 +42,52 @@
             },
             {
               "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "Error.razor",
+              "DocumentMoniker": "C:\\Users\\dadou\\Documents\\BUT\\2A\\SAE\\sae_2a_rentpark\\Blazor\\BlazorAdminRentPark\\Components\\Pages\\Error.razor",
+              "RelativeDocumentMoniker": "Components\\Pages\\Error.razor",
+              "ToolTip": "C:\\Users\\dadou\\Documents\\BUT\\2A\\SAE\\sae_2a_rentpark\\Blazor\\BlazorAdminRentPark\\Components\\Pages\\Error.razor",
+              "RelativeToolTip": "Components\\Pages\\Error.razor",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-12-19T10:42:00.182Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
               "DocumentIndex": 1,
+              "Title": "Client.razor",
+              "DocumentMoniker": "C:\\Users\\dadou\\Documents\\BUT\\2A\\SAE\\sae_2a_rentpark\\Blazor\\BlazorAdminRentPark\\Components\\Pages\\Client.razor",
+              "RelativeDocumentMoniker": "Components\\Pages\\Client.razor",
+              "ToolTip": "C:\\Users\\dadou\\Documents\\BUT\\2A\\SAE\\sae_2a_rentpark\\Blazor\\BlazorAdminRentPark\\Components\\Pages\\Client.razor",
+              "RelativeToolTip": "Components\\Pages\\Client.razor",
+              "ViewState": "AgIAAAYAAAAAAAAAAAAAAAgAAAAYAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-12-19T10:03:47.631Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
               "Title": "Client.razor.cs",
               "DocumentMoniker": "C:\\Users\\dadou\\Documents\\BUT\\2A\\SAE\\sae_2a_rentpark\\Blazor\\BlazorAdminRentPark\\Components\\Pages\\Client.razor.cs",
               "RelativeDocumentMoniker": "Components\\Pages\\Client.razor.cs",
               "ToolTip": "C:\\Users\\dadou\\Documents\\BUT\\2A\\SAE\\sae_2a_rentpark\\Blazor\\BlazorAdminRentPark\\Components\\Pages\\Client.razor.cs",
               "RelativeToolTip": "Components\\Pages\\Client.razor.cs",
-              "ViewState": "AgIAAAsAAAAAAAAAAAA3wBoAAAA/AAAAAAAAAA==",
+              "ViewState": "AgIAAAYAAAAAAAAAAAAAAA0AAAAlAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-12-19T09:45:11.855Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "Program.cs",
-              "DocumentMoniker": "C:\\Users\\dadou\\Documents\\BUT\\2A\\SAE\\sae_2a_rentpark\\Blazor\\BlazorAdminRentPark\\Program.cs",
-              "RelativeDocumentMoniker": "Program.cs",
-              "ToolTip": "C:\\Users\\dadou\\Documents\\BUT\\2A\\SAE\\sae_2a_rentpark\\Blazor\\BlazorAdminRentPark\\Program.cs",
-              "RelativeToolTip": "Program.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABUAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-19T09:42:49.11Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 4,
               "Title": "ClientService.cs",
               "DocumentMoniker": "C:\\Users\\dadou\\Documents\\BUT\\2A\\SAE\\sae_2a_rentpark\\Blazor\\BlazorAdminRentPark\\Services\\ClientService.cs",
               "RelativeDocumentMoniker": "Services\\ClientService.cs",
               "ToolTip": "C:\\Users\\dadou\\Documents\\BUT\\2A\\SAE\\sae_2a_rentpark\\Blazor\\BlazorAdminRentPark\\Services\\ClientService.cs",
               "RelativeToolTip": "Services\\ClientService.cs",
-              "ViewState": "AgIAAAMAAAAAAAAAAAAAABIAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAAgAAAAAAAAAAAAAwBIAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-12-19T09:42:44.904Z",
               "EditorCaption": ""
@@ -90,7 +107,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 2,
               "Title": "IDataService.cs",
               "DocumentMoniker": "C:\\Users\\dadou\\Documents\\BUT\\2A\\SAE\\sae_2a_rentpark\\Blazor\\BlazorAdminRentPark\\Services\\IDataService.cs",
               "RelativeDocumentMoniker": "Services\\IDataService.cs",
