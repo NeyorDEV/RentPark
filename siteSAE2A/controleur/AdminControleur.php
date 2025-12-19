@@ -160,8 +160,9 @@ class AdminControleur
 
     public function cars(array $dVueEreur)
     {
-        $results = $this->gateway->getRentableVehiculesBetweenDates();
-        $this->afficherVue('cars',$dVueEreur,$results=null,'admin');
+        $action = $_GET['action'] ?? '';
+        $results = $this->gateway->getRentableVehiculesBetweenDates($action);
+        $this->afficherVue('cars',$dVueEreur,$results,'admin');
     }
 
     public function afficheRecapitulatif(array $dVueEreur){

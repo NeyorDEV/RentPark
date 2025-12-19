@@ -82,11 +82,39 @@ class VehicleGateway {
         return $rows[0]; // On renvoie seulement la voiture la plus louée
     }
     
-    
+    public function getRentableVehiculesBetweenDates($action): ?array
+    {
+        $date_depart = $_GET['date_depart'] ?? null;
+        $date_retour = $_GET['date_retour'] ?? null;
 
 
+        if (!$date_depart || !$date_retour) {
+            $query = "SELECT * FROM vehicule";
+            $res = $this->connection->prepare($query);
+            $res->execute();
+            return $res->fetchAll(\PDO::FETCH_ASSOC);
+        }
 
+        $query = "SELECT * FROM vehicule v 
+                WHERE v.id_vehicule NOT IN (
+                    SELECT r.id_vehicule 
+                    FROM reservation r 
+                    WHERE NOT (r.date_fin < :date_depart OR r.date_debut > :date_retour)
+                )";
 
+        try {
+            $res = $this->connection->prepare($query);
+            $res->execute([
+                ':date_depart' => $date_depart,
+                ':date_retour' => $date_retour
+            ]);
+
+            return $res->fetchAll(\PDO::FETCH_ASSOC);
+        } catch (\PDOException $e) {
+            // Gestion d'erreur
+            return null;
+        }
+    }
 }
 ?>
 
