@@ -34,6 +34,14 @@ $app->get('/client', function (Request $request, Response $response, $args) use 
     return $response->withHeader('Content-Type', 'application/json');
 });
 
+$app->get('/contrat', function (Request $request, Response $response, $args) use ($conn) {
+    $conn->executeQuery("SELECT * FROM Contrat");
+    $client = $conn->getResults();
+
+    $response->getBody()->write(json_encode($client));
+    return $response->withHeader('Content-Type', 'application/json');
+});
+
 
 $app->delete('/users/{id}', function (Request $request, Response $response, array $args) use ($conn) {
 
@@ -79,7 +87,49 @@ $app->delete('/users/{id}', function (Request $request, Response $response, arra
                     ->withStatus(200);
 });
 
+$app->delete('/contrat/{idContrat}', function (Request $request, Response $response, array $args) use ($conn) {
 
+    // 1️⃣ Récupération et validation de l'ID
+    $id = (int) $args['idContrat'];
+
+    if ($id <= 0) {
+        $response->getBody()->write(json_encode([
+            'error' => 'ID invalide'
+        ]));
+        return $response->withHeader('Content-Type', 'application/json')
+                        ->withStatus(400);
+    }
+
+    // 2️⃣ Vérifier si l'utilisateur existe
+    $conn->executeQuery(
+        "SELECT idContrat FROM Contrat WHERE idContrat = :idContrat",
+        [':idContrat' => [$id, \PDO::PARAM_INT]]
+    );
+
+    $user = $conn->getResults();
+
+    if (empty($user)) {
+        $response->getBody()->write(json_encode([
+            'error' => 'Contrat non trouvé'
+        ]));
+        return $response->withHeader('Content-Type', 'application/json')
+                        ->withStatus(404);
+    }
+
+    // 3️⃣ Suppression
+    $conn->executeQuery(
+        "DELETE FROM Contrat WHERE idContrat = :idContrat",
+        [':idContrat' => [$id, \PDO::PARAM_INT]]
+    );
+
+    // 4️⃣ Réponse OK
+    $response->getBody()->write(json_encode([
+        'message' => 'Contrat supprimé avec succès'
+    ]));
+
+    return $response->withHeader('Content-Type', 'application/json')
+                    ->withStatus(200);
+});
 
 
 $app->addRoutingMiddleware();
