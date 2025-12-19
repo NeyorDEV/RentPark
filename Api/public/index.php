@@ -87,42 +87,53 @@ $app->delete('/users/{id}', function (Request $request, Response $response, arra
         ->withStatus(200);
 });
 
-$app->delete('/voitures/{id}', function (Request $request, Response $response, array $args) use ($conn) {
+$app->delete('/voitures/{numSerie}', function ($request, $response, $args) use ($conn) {
+    $numSerie = (string) $args['numSerie'];
 
-    // 1️⃣ Récupération et validation de l'ID qui est le numero de série
-    $id = (string) $args['id'];
-    
-
-     // 2️⃣ Vérifier si la voiture existe
+    // 1️⃣ Vérifier si la voiture existe
     $conn->executeQuery(
-        "SELECT NumSerie FROM Vehicule WHERE NumSerie = :id",
-        [':id' => [$id, \PDO::PARAM_STR]]
+        "SELECT NumSerie FROM Vehicule WHERE NumSerie = :numSerie",
+        [':numSerie' => [$numSerie, \PDO::PARAM_STR]]
     );
+    $voiture = $conn->getResults();
 
-    $user = $conn->getResults();
-
-    if (empty($user)) {
-        $response->getBody()->write(json_encode([
-            'error' => 'Voiture non trouvée'
-        ]));
-        return $response->withHeader('Content-Type', 'application/json')
-            ->withStatus(404);
+    if (empty($voiture)) {
+        $response->getBody()->write(json_encode(['error' => 'Voiture non trouvée']));
+        return $response->withHeader('Content-Type', 'application/json')->withStatus(404);
     }
 
-    // 3️⃣ Suppression
-    $conn->executeQuery(
-        "DELETE FROM Vehicule WHERE NumSerie = :id",
-        [':id' => [$id, \PDO::PARAM_STR]]
-    );
+    // 2️⃣ Essayer de supprimer la voiture
+    try {
+        $conn->executeQuery(
+            "DELETE FROM Vehicule WHERE NumSerie = :numSerie",
+            [':numSerie' => [$numSerie, \PDO::PARAM_STR]]
+        );
+    } catch (\PDOException $e) {
+        // 3️⃣ Gestion propre de la clé étrangère
+        if ($e->getCode() === '23000') { // SQLSTATE pour contrainte FK
+            $response->getBody()->write(json_encode([
+                'error' => 'Impossible de supprimer la voiture',
+                'message' => 'Cette voiture est utilisée dans un ou plusieurs contrats'
+            ]));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(409);
+        }
 
-    // 4️⃣ Réponse OK
-    $response->getBody()->write(json_encode([
-        'message' => 'Voiture supprimée avec succès'
-    ]));
+        // Autres erreurs SQL
+        $response->getBody()->write(json_encode([
+            'error' => 'Erreur SQL',
+            'message' => $e->getMessage()
+        ]));
+        return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
+    }
 
-    return $response->withHeader('Content-Type', 'application/json')
-        ->withStatus(200);
+    // 4️⃣ Suppression réussie
+    $response->getBody()->write(json_encode(['message' => 'Voiture supprimée avec succès']));
+    return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
 });
+
+
+
+
 $app->delete('/contrat/{idContrat}', function (Request $request, Response $response, array $args) use ($conn) {
 
     // 1️⃣ Récupération et validation de l'ID
