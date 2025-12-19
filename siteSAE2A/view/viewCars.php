@@ -89,10 +89,10 @@ $voitures = $results ?? [];
     <?php if (!empty($voitures)): ?>
         <?php foreach ($voitures as $voiture): ?>
     <div class="car-card">
-        <img src="/siteSAE2A/html/img/<?php echo htmlspecialchars($voiture['image_path'] ?? 'default.jpg'); ?>" alt="Image voiture">
+        <img src="/siteSAE2A/html/img/<?php echo htmlspecialchars($voiture['ImagePath'] ?? 'default.jpg'); ?>" alt="Image voiture">
         <div class="car-info">
-            <h3><?php echo htmlspecialchars($voiture['modele']); ?></h3>
-            <p>Couleur : <?php echo htmlspecialchars($voiture['couleur']); ?> | Puissance : <?php echo htmlspecialchars($voiture['puissance']); ?></p>
+            <h3><?php echo htmlspecialchars($voiture['Nom']); ?></h3> <p>Marque : <?php echo htmlspecialchars($voiture['Marque']); ?></p>
+            <p>Couleur : <?php echo htmlspecialchars($voiture['Couleur']); ?> | Puissance : <?php echo htmlspecialchars($voiture['Puissance']); ?></p>
             
             <span class="price">Prix à définir € / jour</span>
             <button class="btn-orange">Réserver</button>

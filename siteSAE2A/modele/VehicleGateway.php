@@ -86,8 +86,8 @@ class VehicleGateway {
     public function getRentableVehiculesBetweenDates(string $date_depart, string $date_retour): array
     {
     // On utilise la table 'cars' comme dans vos autres méthodes
-    $query = "SELECT * FROM cars v 
-            WHERE v.voiture NOT IN (
+    $query = "SELECT * FROM Vehicule v 
+            WHERE v.NumSerie NOT IN (
                 SELECT c.idVehicule 
                 FROM Contrat c 
                 WHERE NOT (c.DateFin< :date_depart OR c.DateDebut > :date_retour)
