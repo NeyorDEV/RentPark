@@ -44,10 +44,14 @@
     <div class="dashboard-cards">
         <!-- Exemple de carte statistique -->
         <div class="card">
-            <h2>Nombre d'utilisateurs</h2>
-            <div class="circle-chart" style="--final-value: 75;">75%</div>
+    <h2>Nombre d'utilisateurs</h2>
+    <div class="circle-chart" 
+         id="users-circle" 
+         style="--final-value: <?= min($results["totalUsers"], 100) ?>;">
+        <span id="users-counter">0</span>
+    </div>
+</div>
 
-        </div>
 
         <div class="card">
     <h2>Voiture la plus louée</h2>
@@ -105,8 +109,20 @@ function animateCounter(id, targetValue, duration) {
 
 // Exemple : chiffre d'affaires de PHP
 const revenusMensuels = <?= $results["revenusMensuels"] ?>;
+
 animateCounter("revenus-counter", revenusMensuels, 800); // 0,8s pour atteindre la valeur
+
+
+    // Animation pour le nombre d'utilisateurs
+const totalUsers = <?= $results["totalUsers"] ?>;
+animateCounter("users-counter", totalUsers, 800); // 0,8s pour atteindre la valeur
+
 </script>
+
+
+
+
+
 
 
 
