@@ -1,8 +1,7 @@
 <?php
-// Récupération des paramètres URL (si non fournis par le contrôleur)
 $date_depart = $_GET['date_depart'] ?? ($date_depart ?? null);
 $date_retour = $_GET['date_retour'] ?? ($date_retour ?? null);
-$voitures = $results ?? []; // Dans ton afficherVue, $results contient tes données
+$voitures = $results ?? [];
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -24,8 +23,6 @@ $voitures = $results ?? []; // Dans ton afficherVue, $results contient tes donn�
     </script>
     
     <link rel="stylesheet" href="/siteSAE2A/html/css/cars.css">
-    <link rel="stylesheet" href="/siteSAE2A/html/css/menu.css">
-    <link rel="stylesheet" href="/siteSAE2A/html/css/parametres.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 </head>
@@ -44,6 +41,7 @@ $voitures = $results ?? []; // Dans ton afficherVue, $results contient tes donn�
     </div>
     <h1>Quelle voiture voulez-vous conduire ?</h1>
 
+    
     <div class="filtre" onclick="toggleMenu()">
         <span><i class="fa-solid fa-filter"></i> Filtres</span>
     </div>
