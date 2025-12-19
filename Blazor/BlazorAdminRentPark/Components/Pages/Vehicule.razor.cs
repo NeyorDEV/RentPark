@@ -27,6 +27,16 @@ namespace BlazorAdminRentPark.Components.Pages
             StateHasChanged();
         }
 
+        private async Task DeleteVehicule(string numSerie) 
+        {
+            if (vehicules == null) 
+                return;
+
+                await VehiculeService.Delete(numSerie);
+                vehicules.RemoveAll(v => v.NumSerie == numSerie);
+                StateHasChanged();
+        }
+
         /* [Required]
         [StringLength(50, ErrorMessage = "Le prénom affiché ne doit pas dépasser 50 caractères.")]
         public string FirstName { get; set; }

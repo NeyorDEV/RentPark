@@ -22,5 +22,10 @@ namespace BlazorAdminRentPark.Services
                 TotalItemCount = items.Count
             };
         }
+
+        public async Task Delete(string NumSerie)
+        {
+            await _http.DeleteAsync($"http://localhost:8880/voitures/{NumSerie}");
+        }
     }
 }

@@ -27,6 +27,16 @@ namespace BlazorAdminRentPark.Components.Pages
             StateHasChanged();
         }
 
+        private async Task DeleteClient(int idClient)
+        {
+            if (clients == null)
+                return;
+
+            await ClientService.Delete(idClient);
+            clients.RemoveAll(c => c.IdClient == idClient);
+            StateHasChanged();
+        }
+
         /* [Required]
         [StringLength(50, ErrorMessage = "Le prénom affiché ne doit pas dépasser 50 caractères.")]
         public string FirstName { get; set; }

@@ -24,6 +24,7 @@ else
                 <th>Email</th>
                 <th>NumPermis</th>
                 <th>Commentaire</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -39,6 +40,11 @@ else
                     <td>@client.Email</td>
                     <td>@client.NumPermis</td>
                     <td>@client.Commentaire</td>
+                    <td>
+                        <button class="btn btn-danger btn-sm" @onclick="() => DeleteClient(client.IdClient)">
+                            Supprimer
+                        </button>
+                    </td>
                 </tr>
             }
         </tbody>

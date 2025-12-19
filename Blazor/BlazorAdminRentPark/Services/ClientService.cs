@@ -24,5 +24,10 @@ namespace BlazorAdminRentPark.Services
                 TotalItemCount = items.Count
             };
         }
+
+        public async Task Delete(int IdClient)
+        {
+            await _http.DeleteAsync($"http://localhost:8880/users/{IdClient}");
+        }
     }
 }

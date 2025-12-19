@@ -28,6 +28,7 @@ else
                 <th>DateDernierControleTech</th>
                 <th>Marque</th>
                 <th>Nom</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -47,6 +48,11 @@ else
                     <td>@vehicule.DateDernierControleTech.ToShortDateString()</td>
                     <td>@vehicule.Marque</td>
                     <td>@vehicule.Nom</td>
+                    <td>
+                        <button class="btn btn-danger btn-sm" @onclick="() => DeleteVehicule(vehicule.NumSerie)">
+                            Supprimer
+                        </button>
+                    </td>
                 </tr>
             }
         </tbody>
