@@ -47,3 +47,19 @@ deploy-job:      # This job runs in the deploy stage.
   script:
     - echo "Deploying application..."
     - echo "Application successfully deployed."
+
+
+sonarqube-check:
+  image: sonarsource/sonar-scanner-cli:latest
+  variables:
+    SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"
+    GIT_DEPTH: "0"
+    # Forcer l'encodage UTF-8
+    JAVA_TOOL_OPTIONS: "-Dfile.encoding=UTF-8"
+  script: 
+    - sonar-scanner -X
+  allow_failure: true
+  only:
+    - main
+
+

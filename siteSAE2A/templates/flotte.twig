@@ -41,6 +41,25 @@
                     <img src="{{ row.image_path|e }}" alt="Image du véhicule" class="bg-img">
                 {% else %}
                     <img src="html/icons/voiture.png" alt="Voiture par défaut" class="bg-img">
+                <p>
+                    {{ row.Nom|e }}<br>
+                    {{ row.Puissance|e }} cv<br>
+                    {% if row.ImagePath is not empty %}
+                         <img src="{{ row.ImagePath|e }}" alt="Image du véhicule" width="100px">
+                    {% else %}
+                         <img src="html/icons/voiture.png" alt="Voiture par défaut" width="100px">
+                    {% endif %}
+                </p>
+
+                <form method="POST" action="/siteSAE2A/voitures" onsubmit="return confirm('Supprimer ce véhicule ?');">
+                    <input type="hidden" name="action" value="supprimerVoiture">
+                    <input type="hidden" name="id" value="{{ row.voiture|e }}">
+                    {% if role == 'admin' %}
+                    <button type="submit" class="delete-btn">Supprimer</button>
+                    {% endif %}
+                </form>
+                {% if role == 'admin' %}
+                <button type="button" class="delete-btn" onclick="location.hash='editModal-{{ row.voiture|e }}'">Modifier</button>
                 {% endif %}
 
                 <div class="info">

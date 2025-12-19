@@ -6,12 +6,17 @@ use modele\VehicleGateway;
 use modele\ReservationGateway;
 use modele\User;
 use config\Validation;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\RequestException;
 class AdminControleur
 {
     private Connection $connection;
     private VehicleGateway $gateway;
     private UserGateway $userGateway;
     private ReservationGateway $reservationGateway;
+
+    // test pour l'API
+    private Client $apiClient;
     
     public function __construct()
     {
@@ -26,6 +31,13 @@ class AdminControleur
             $this->gateway = new VehicleGateway($this->connection);
             $this->userGateway = new UserGateway($this->connection);
             $this->reservationGateway = new ReservationGateway($this->connection);
+
+            // test pour l'API
+            $this->apiClient = new Client([
+                'base_uri' => 'http://localhost:8880/',
+                'timeout'  => 2.0
+            ]);
+            
 
             switch ($action) {
                 case "listeVoitures":
@@ -61,6 +73,9 @@ class AdminControleur
                     break;
                 case 'afficheRecapitulatif':
                     $this->afficheRecapitulatif($dVueEreur);
+                    break;
+                case 'afficheParametres':
+                    $this->afficheParametres($dVueEreur);
                     break;
                 default:
                     $dVueEreur[] = "Action inconnue";
@@ -105,9 +120,23 @@ class AdminControleur
               $this->rechercherVoitures($dVueEreur);
               return;
           }
+
         
-        $results = $this->gateway->getAll();
-        $this->afficherVue('flotte', $dVueEreur, $results,'admin');
+        try {
+            $response = $this->apiClient->get('vehicules');
+        
+            $results = json_decode(
+                $response->getBody()->getContents(),
+                true
+            );
+        
+        } catch (RequestException $e) {
+            $dVueEreur[] = "Impossible de récupérer les véhicules depuis l’API.";
+            $results = [];
+        }
+        
+        $this->afficherVue('flotte', $dVueEreur, $results, 'admin');
+        
     }
 // ajouter les vue erreur et les vérif 
 
@@ -137,6 +166,10 @@ public function afficheDashboard(array $dVueEreur)
 
     public function afficheRecapitulatif(array $dVueEreur){
     $this->afficherVue('recapitulatif',$dVueEreur,$results=null,'admin');
+    }
+
+    public function afficheParametres(array $dVueEreur){
+    $this->afficherVue('parametres',$dVueEreur,$results=null,'admin');
     }
 
     private function ajouterVoiture(array $dVueEreur)
@@ -290,7 +323,7 @@ public function afficheDashboard(array $dVueEreur)
         $cheminVue = realpath($rep . $vuePath);
         if ($cheminVue && file_exists($cheminVue)) {
             $resultsTwig = $results; 
-            require($cheminVue);
+            require_once($cheminVue); // NOSONAR
         } else {
             echo "Fichier de vue introuvable : " . ($rep . $vuePath);
             exit;
@@ -318,14 +351,27 @@ public function afficheDashboard(array $dVueEreur)
 
     private function supprimerUtilisateur(array $dVueEreur)
     {
-        $id = (int)($_POST['id'] ?? -1);
-        if ($id >= 0) {
-            $this->userGateway->deleteUser($id);
+        $id = (int) ($_POST['id'] ?? -1);
+
+        if ($id <= 0) {
+            header("Location: /siteSAE2A/utilisateurs");
+            exit;
+        }
+
+        try {
+            // Appel API DELETE
+            $this->apiClient->delete("users/$id");
+
+        } catch (RequestException $e) {
+            $dVueEreur[] = "Erreur lors de la suppression via l’API.";
+            // Optionnel : log
+            // error_log($e->getMessage());
         }
 
         header("Location: /siteSAE2A/utilisateurs");
         exit;
     }
+
 
     private function ajouterUtilisateur(array $dVueEreur)
     {

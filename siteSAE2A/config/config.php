@@ -1,5 +1,7 @@
 <?php
 
+namespace SiteSAE2A\Config;
+
 //gen
 $rep = __DIR__ . '/../';
 
@@ -25,7 +27,11 @@ $vues['dashboard'] = 'view/viewDashboard.php';
 $vues['homeCustomers'] = 'view/viewHomeCustomers.php';
 $vues['cars'] = 'view/viewCars.php';
 $vues['recapitulatif'] = 'view/viewRecapitulatif.php';
+$vues['parametres'] = 'view/viewParametres.php';
+
 
 $action = "RAS";
 
 $role = '';
+
+$smtp_pass = 'crpw mjdp rawc nkwq';
