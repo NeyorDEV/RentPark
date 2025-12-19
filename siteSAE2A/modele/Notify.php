@@ -14,10 +14,17 @@ use PHPMailer\PHPMailer\Exception;
  * @param string $body    Contenu HTML du mail
  */
 function sendAlertEmail($to, $subject, $body) {
+    // Vérifier si l'envoi d'emails est activé
+    $settingsFile = __DIR__ . '/../config/settings.json';
+    if (file_exists($settingsFile)) {
+        $settings = json_decode(file_get_contents($settingsFile), true);
+        if (empty($settings['email_notifications'])) {
+            return; // notifications désactivées
+        }
+    }
+
     global $smtp_pass;
     $mail = new PHPMailer(true);
-
-    
 
     try {
         // Configuration du serveur SMTP Gmail
@@ -25,7 +32,7 @@ function sendAlertEmail($to, $subject, $body) {
         $mail->CharSet = 'UTF-8';
         $mail->Host       = 'smtp.gmail.com';
         $mail->SMTPAuth   = true;
-        $mail->Username   = 'rentpark88@gmail.com';           // Ton adresse Gmail
+        $mail->Username   = 'rentpark88@gmail.com';
         $mail->Password   = $smtp_pass; // Mot de passe d'application Gmail
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
         $mail->Port       = 587;
