@@ -158,13 +158,25 @@ class AdminControleur
 
     }
 
-    public function cars(array $dVueEreur)
-    {
-        $action = $_GET['action'] ?? '';
-        $results = $this->gateway->getRentableVehiculesBetweenDates($action);
-        $this->afficherVue('cars',$dVueEreur,$results,'admin');
+    // Dans AdminControleur.php
+public function cars(array $dVueEreur)
+{
+    // 1. Récupération des dates envoyées par le formulaire de recherche (via GET)
+    $date_depart = $_GET['date_depart'] ?? null;
+    $date_retour = $_GET['date_retour'] ?? null;
+
+    // 2. Logique de récupération des données
+    if ($date_depart && $date_retour) {
+        // Si les dates sont présentes, on filtre les véhicules disponibles
+        $results = $this->gateway->getRentableVehiculesBetweenDates($date_depart, $date_retour);
+    } else {
+        // Sinon, on affiche tous les véhicules par défaut (ou une erreur)
+        $results = $this->gateway->getAll();
     }
 
+    // 3. Affichage de la vue 'cars' (qui correspond à viewCars.php)
+    $this->afficherVue('cars', $dVueEreur, $results, 'user');
+}
     public function afficheRecapitulatif(array $dVueEreur){
     $this->afficherVue('recapitulatif',$dVueEreur,$results=null,'admin');
     }

@@ -90,21 +90,17 @@ $voitures = $results ?? []; // Dans ton afficherVue, $results contient tes donn�
 <div class="cars-section">
     <?php if (!empty($voitures)): ?>
         <?php foreach ($voitures as $voiture): ?>
-            <div class="car-card">
-                <img src="/siteSAE2A/html/img/<?php echo htmlspecialchars($voiture['image']); ?>" alt="<?php echo htmlspecialchars($voiture['modele']); ?>">
-                <div class="car-info">
-                    <h3><?php echo htmlspecialchars($voiture['marque'] . ' ' . $voiture['modele']); ?></h3>
-                    <p><?php echo htmlspecialchars($voiture['categorie'] . ' ' . $voiture['boite']); ?></p>
-                    <p>
-                        <span><?php echo htmlspecialchars($voiture['autonomie']); ?>km</span> | 
-                        <span><?php echo htmlspecialchars($voiture['places']); ?> Sièges</span> | 
-                        <span><?php echo htmlspecialchars($voiture['bagages']); ?> Bagages</span>
-                    </p>
-                    <span class="price"><?php echo htmlspecialchars($voiture['prix']); ?> € / jour</span>
-                    <button class="btn-orange">Réserver</button>
-                </div>
-            </div>
-        <?php endforeach; ?>
+    <div class="car-card">
+        <img src="/siteSAE2A/html/img/<?php echo htmlspecialchars($voiture['image_path'] ?? 'default.jpg'); ?>" alt="Image voiture">
+        <div class="car-info">
+            <h3><?php echo htmlspecialchars($voiture['modele']); ?></h3>
+            <p>Couleur : <?php echo htmlspecialchars($voiture['couleur']); ?> | Puissance : <?php echo htmlspecialchars($voiture['puissance']); ?></p>
+            
+            <span class="price">Prix à définir € / jour</span>
+            <button class="btn-orange">Réserver</button>
+        </div>
+    </div>
+<?php endforeach; ?>
     <?php else: ?>
         <div class="car-card">
             <img src="car_image_1.jpg" alt="Citroën E-C3">
