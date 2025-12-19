@@ -31,10 +31,12 @@ h1 {
     color: #FFFFFF;
 }
 
+/* Positionnement du bouton filtre à gauche */
 .filtre {
     position: absolute;
     top: 25px;
-    right: 25px;
+    left: 25px; /* On le force à gauche */
+    right: auto;
     display: flex;
     align-items: center;
     gap: 10px;
@@ -42,6 +44,35 @@ h1 {
     padding: 8px 16px;
     border-radius: 8px;
     cursor: pointer;
+    color: white;
+}
+
+/* Style du bouton Connection identique à la Home */
+.top-right-btn {
+    position: absolute;
+    top: 25px;
+    right: 25px;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 20px;
+    background-color: transparent; 
+    border: 2px solid white;      
+    border-radius: 12px;          
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.top-right-btn span { 
+    color: white; 
+    font-size: 14px;
+}
+
+.circle {
+    width: 12px;
+    height: 12px;
+    background-color: white;
+    border-radius: 50%;
 }
 
 /* Sidebar */
