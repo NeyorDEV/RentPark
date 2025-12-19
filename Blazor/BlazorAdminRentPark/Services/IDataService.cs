@@ -3,10 +3,10 @@ using Microsoft.AspNetCore.Components.QuickGrid;
 
 namespace BlazorAdminRentPark.Services
 {
-    public interface IDataService
+    public interface IDataService<T>
     {
         /*Task Add(Client model);*/
 
-        Task<GridItemsProviderResult<Client>> GetItems(GridItemsProviderRequest<Client> request);
+        Task<GridItemsProviderResult<T>> GetItems(GridItemsProviderRequest<T> request);
     }
 }

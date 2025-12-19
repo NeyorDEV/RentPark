@@ -4,7 +4,7 @@ using static System.Net.WebRequestMethods;
 
 namespace BlazorAdminRentPark.Services
 {
-    public class ClientService 
+    public class ClientService : IClientService
     {
         private readonly HttpClient _http;
 
@@ -15,9 +15,7 @@ namespace BlazorAdminRentPark.Services
 
         public async Task<GridItemsProviderResult<Client>> GetItems(GridItemsProviderRequest<Client> request)
         {
-
-
-            var items = await _http.GetFromJsonAsync<List<Client>>($"https://localhost:8880/client");
+            var items = await _http.GetFromJsonAsync<List<Client>>($"http://localhost:8880/client");
 
             return new GridItemsProviderResult<Client>
             {
