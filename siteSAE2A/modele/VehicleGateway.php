@@ -57,6 +57,7 @@ class VehicleGateway {
     }  
     
     
+
     public function getMostRentedCar(): ?array
     {
         $query = "
