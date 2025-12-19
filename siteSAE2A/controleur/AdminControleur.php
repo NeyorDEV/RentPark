@@ -144,9 +144,9 @@ public function afficheDashboard(array $dVueEreur)
 {
     $results = [
         "revenusMensuels"   => $this->reservationGateway->getMonthlyIncome(),
-        "voiturePlusLouee"  => $this->gateway->getMostRentedCar()
+        "voiturePlusLouee"  => $this->gateway->getMostRentedCar(),
+        "totalUsers" => $this->userGateway->countUser()
     ];
-
     $this->afficherVue('dashboard', $dVueEreur, $results, 'admin');
 }
 

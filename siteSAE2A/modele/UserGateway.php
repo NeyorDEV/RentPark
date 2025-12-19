@@ -31,6 +31,17 @@ class UserGateway {
         $this->connection->executeQuery($query, $params);
     }
 
+
+    public function countUser(): int
+    {
+        $query = "SELECT COUNT(*) AS totalUsers FROM users";
+        $this->connection->executeQuery($query);
+        $result = $this->connection->getResults();
+    
+        // On retourne le nombre d'utilisateurs, 0 si vide
+        return isset($result[0]["totalUsers"]) ? (int)$result[0]["totalUsers"] : 0;
+    }
+    
     public function getHashPass(string $user,string $pass): string
     {
         $query = "SELECT password FROM users WHERE username=:user";
