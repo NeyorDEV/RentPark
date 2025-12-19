@@ -303,3 +303,5 @@ header h1 {
     font-size: 17px;
     cursor: pointer;
 }
+
+.dark-theme h1{ color:#ffffff}

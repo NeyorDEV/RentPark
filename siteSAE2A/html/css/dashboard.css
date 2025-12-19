@@ -312,3 +312,8 @@ nav {
         margin-top: 12px;
     }
 }
+
+.dark-theme .card h2 { color: #000000; }
+.dark-theme .alert h2 { color: #000000; }
+.dark-theme .planning h2 { color: #000000; }
+.dark-theme .main-content h1 { color: #FFFFFF; }

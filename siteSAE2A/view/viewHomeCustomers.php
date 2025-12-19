@@ -48,7 +48,7 @@
      <a href="/siteSAE2A/connection">
         <div class="top-right-btn">
             <div class="circle"></div>
-            <span>Connection/Inscription</span>
+            <span>Connexion/Inscription</span>
         </div>
     </a>
     <h1>RENTPARK</h1>

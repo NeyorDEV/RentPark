@@ -24,9 +24,16 @@
     </script>
     <link rel="stylesheet" href="/siteSAE2A/html/css/menu.css">
     <link rel="stylesheet" href="/siteSAE2A/html/css/parametres.css">
-    <link rel="stylesheet" href="html/css/menu.css">
     <link rel="icon" type="image/png" href="html/icons/voiture.png">
     <link rel="shortcut icon" href="html/icons/favicon.ico" type="image/x-icon">
+    <style>
+        .dark-theme .topbar-form input { background: #ffffff;  border: 1px solid rgba(0,0,0,0.12); }
+        .dark-theme .topbar-form input::placeholder {  opacity: 0.9; }
+        .dark-theme .topbar-form input::-webkit-input-placeholder {  opacity: 0.9; }
+        .dark-theme .topbar-form input:-ms-input-placeholder {  opacity: 0.9; }
+        .dark-theme .topbar-form input::-ms-input-placeholder { opacity: 0.9; }
+        .dark-theme .top h1{ color: #ffffff}
+    </style>
 </head>
 <body>
 
