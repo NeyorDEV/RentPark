@@ -45,7 +45,7 @@
 
 <!-- ========== HEADER + FORMULAIRE ========== -->
 <header>
-     <a href="/siteSAE2A/connection">
+    <a href="/siteSAE2A/connection">
         <div class="top-right-btn">
             <div class="circle"></div>
             <span>Connection/Inscription</span>
@@ -53,33 +53,33 @@
     </a>
     <h1>RENTPARK</h1>
 
-    <div class="search-box">
+    <form action="/siteSAE2A/cars" method="GET" class="search-box">
 
         <div class="row">
 
             <div class="input-block">
-                <label>Date de départ</label>
+                <label for="date_depart">Date de départ</label>
                 <div class="dual">
                     <div class="input-icon">
                         <i class="fa-solid fa-calendar"></i>
-                        <input type="date">
+                        <input type="date" name="date_depart" id="date_depart" required>
                     </div>
                 </div>
             </div>
 
             <div class="input-block">
-                <label>Date de retour</label>
+                <label for="date_retour">Date de retour</label>
                 <div class="dual">
                    <div class="input-icon">
                         <i class="fa-solid fa-calendar"></i>
-                        <input type="date">
+                        <input type="date" name="date_retour" id="date_retour" required>
                     </div>
                 </div>
             </div>
 
-            <button class="btn-orange">Voir les véhicules</button>
+            <button type="submit" class="btn-orange">Voir les véhicules</button>
         </div>
-    </div>
+    </form>
 </header>
 
 <script>

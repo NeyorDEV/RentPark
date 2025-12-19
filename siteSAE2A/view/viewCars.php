@@ -1,3 +1,9 @@
+<?php
+// Récupération des paramètres URL (si non fournis par le contrôleur)
+$date_depart = $_GET['date_depart'] ?? ($date_depart ?? null);
+$date_retour = $_GET['date_retour'] ?? ($date_retour ?? null);
+$voitures = $results ?? []; // Dans ton afficherVue, $results contient tes données
+?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -18,43 +24,37 @@
     </script>
     <link rel="stylesheet" href="/siteSAE2A/html/css/menu.css">
     <link rel="stylesheet" href="/siteSAE2A/html/css/parametres.css">
-    <link rel="stylesheet" href="html/css/cars.css">
+    <link rel="stylesheet" href="/siteSAE2A/html/css/cars.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
 
-<!-- Header -->
 <header>
     <div class="top-bar">
-        <span>Paramètres :</span>
-        <span>date debut et date fin</span>
+        <span><i class="fa-solid fa-calendar-alt"></i> Votre réservation :</span>
+        <span>
+            <?php if (!empty($date_depart) && !empty($date_retour)): ?>
+                Du <strong><?php echo htmlspecialchars($date_depart); ?></strong> au <strong><?php echo htmlspecialchars($date_retour); ?></strong>
+            <?php else: ?>
+                Dates non sélectionnées
+            <?php endif; ?>
+        </span>
     </div>
     <h1>Quelle voiture voulez-vous conduire ?</h1>
 
     <div class="filtre" onclick="toggleMenu()">
-        <span>Filtre</span>
+        <span><i class="fa-solid fa-filter"></i> Filtres</span>
     </div>
-
-    <script>
-    function toggleMenu() {
-        document.getElementById("sidebar").classList.toggle("open");
-    }
-    </script>
-    
 </header>
 
-<body>
 <aside id="sidebar">
     <div class="sidebar-header">
         <button class="close-btn" onclick="toggleMenu()">✖</button>
         <h2>Filtres</h2>
     </div>
     
-    <!-- Trié par prix -->
     <div class="filter-option">
-        <div class="fliter-label">
-        <label>Trié par prix</label>
-        </div>
+        <div class="fliter-label"><label>Trié par prix</label></div>
         <div class="filter-btn-group">
             <button>Par prix le plus bas</button>
             <div class="price-max">
@@ -64,22 +64,16 @@
         </div>
     </div>
     
-    <!-- Boîte -->
     <div class="filter-option">
-        <div class="fliter-label">
-        <label>Boîte</label>
-        </div>
+        <div class="fliter-label"><label>Boîte</label></div>
         <div class="filter-btn-group">
             <button>Automatique</button>
             <button>Manuelle</button>
         </div>
     </div>
-    
-    <!-- Energie -->
+
     <div class="filter-option">
-        <div class="fliter-label">
-        <label>Energie</label>
-        </div>
+        <div class="fliter-label"><label>Energie</label></div>
         <div class="filter-btn-group">
             <button>Diesel</button>
             <button>Essence</button>
@@ -87,110 +81,48 @@
             <button>Electrique</button>
         </div>
     </div>
-    
-    <!-- Type de véhicule -->
-    <div class="filter-option">
-        <div class="fliter-label">
-        <label>Type de Véhicule</label>
-        </div>
-        <div class="filter-btn-group">
-            <button>SUV</button>
-            <button>Sportive</button>
-            <button>Citadine</button>
-            <button>Coupé</button>
-        </div>
-    </div>
-    
-    <!-- Transmission -->
-    <div class="filter-option">
-        <div class="fliter-label">
-        <label>Transmission</label>
-        </div>
-        <div class="filter-btn-group">
-            <button>Traction</button>
-            <button>Propulsion</button>
-            <button>Intégrale</button>
-        </div>
-    </div>
-    
-    <!-- Nombre de places -->
-    <div class="filter-option">
-        <div class="fliter-label">
-        <label>Nombre de places</label>
-        </div>
-        <div class="filter-btn-group">
-            <input type="number" placeholder="Nombre de places">
-        </div>
-    </div>
-    
-    <!-- Puissance -->
-    <div class="filter-option">
-        <div class="fliter-label">
-        <label>Puissance</label>
-        </div>
-        <div class="filter-btn-group">
-            <input type="number" placeholder="Puissance en CV">
-        </div>
-    </div>
-    
-    <!-- Apply Filters Button -->
+
     <button class="btn-orange">Afficher les offres</button>
 </aside>
 
-
-
-<!-- Cars Section -->
 <div class="cars-section">
-    <!-- Car Card 1 -->
-    <div class="car-card">
-        <img src="car_image_1.jpg" alt="Citroën E-C3">
-        <div class="car-info">
-            <h3>Citroën E-C3 ou similaire</h3>
-            <p>Citadine SUV Automatique</p>
-            <p><span>293km</span> | <span>4 Sièges</span> | <span>2 Bagages</span></p>
-            <span class="price">22,74 € / jour</span>
-            <button class="btn-orange">Réserver</button>
+    <?php if (!empty($voitures)): ?>
+        <?php foreach ($voitures as $voiture): ?>
+            <div class="car-card">
+                <img src="/siteSAE2A/html/img/<?php echo htmlspecialchars($voiture['image']); ?>" alt="<?php echo htmlspecialchars($voiture['modele']); ?>">
+                <div class="car-info">
+                    <h3><?php echo htmlspecialchars($voiture['marque'] . ' ' . $voiture['modele']); ?></h3>
+                    <p><?php echo htmlspecialchars($voiture['categorie'] . ' ' . $voiture['boite']); ?></p>
+                    <p>
+                        <span><?php echo htmlspecialchars($voiture['autonomie']); ?>km</span> | 
+                        <span><?php echo htmlspecialchars($voiture['places']); ?> Sièges</span> | 
+                        <span><?php echo htmlspecialchars($voiture['bagages']); ?> Bagages</span>
+                    </p>
+                    <span class="price"><?php echo htmlspecialchars($voiture['prix']); ?> € / jour</span>
+                    <button class="btn-orange">Réserver</button>
+                </div>
+            </div>
+        <?php endforeach; ?>
+    <?php else: ?>
+        <div class="car-card">
+            <img src="car_image_1.jpg" alt="Citroën E-C3">
+            <div class="car-info">
+                <h3>Citroën E-C3 ou similaire</h3>
+                <p>Citadine SUV Automatique</p>
+                <p><span>293km</span> | <span>4 Sièges</span> | <span>2 Bagages</span></p>
+                <span class="price">22,74 € / jour</span>
+                <button class="btn-orange">Réserver</button>
+            </div>
         </div>
-    </div>
-
-    <!-- Car Card 2 -->
-    <div class="car-card">
-        <img src="car_image_2.jpg" alt="VW Polo">
-        <div class="car-info">
-            <h3>VW Polo ou similaire</h3>
-            <p>Citadine Berline Manuelle</p>
-            <p><span>350km</span> | <span>5 Sièges</span> | <span>3 Bagages</span></p>
-            <span class="price">27,32 € / jour</span>
-            <button class="btn-orange">Réserver</button>
-        </div>
-    </div>
-
-    <!-- Car Card 3 -->
-    <div class="car-card">
-        <img src="car_image_3.jpg" alt="Opel Mokka Electric">
-        <div class="car-info">
-            <h3>Opel Mokka Electric ou similaire</h3>
-            <p>Compact SUV Automatique</p>
-            <p><span>340km</span> | <span>5 Sièges</span> | <span>3 Bagages</span></p>
-            <span class="price">27,32 € / jour</span>
-            <button class="btn-orange">Réserver</button>
-        </div>
-    </div>
+    <?php endif; ?>
 </div>
 
-<!-- Car Details Modal -->
-<div class="car-details">
-    <div class="details-content">
-        <img src="car_image_1.jpg" alt="Citroën E-C3">
-        <div class="details-info">
-            <h3>Citroën E-C3</h3>
-            <p>Citadine SUV Automatique</p>
-            <p>Gamme : 293km | 4 Sièges | 2 Bagages</p>
-            <p>Âge minimum du conducteur : 18 ans</p>
-            <button class="btn-orange">Suivant</button>
-        </div>
-    </div>
-</div>
+<script>
+function toggleMenu() {
+    const sidebar = document.getElementById("sidebar");
+    sidebar.classList.toggle("open");
+}
+</script>
 
 </body>
 </html>

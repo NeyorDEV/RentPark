@@ -150,8 +150,6 @@ public function afficheDashboard(array $dVueEreur)
     $this->afficherVue('dashboard', $dVueEreur, $results, 'admin');
 }
 
-
-
     public function homeCustomers(array $dVueEreur)
     {
         
