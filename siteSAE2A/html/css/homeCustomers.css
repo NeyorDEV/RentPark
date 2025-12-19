@@ -127,12 +127,27 @@ header h1 {
     position: absolute;
     top: 25px;
     right: 25px;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
     padding: 10px 20px;
-    background: transparent;
-    border: 1px solid rgba(255,255,255,0.5);
-    border-radius: 8px;
-    color: white;
+    background-color: transparent; 
+    border: 2px solid white;      
+    border-radius: 12px;          
     cursor: pointer;
+    text-decoration: none;
+}
+
+.top-right-btn span { 
+    color: white; 
+    font-size: 14px;
+}
+
+.circle {
+    width: 12px;
+    height: 12px;
+    background-color: white;
+    border-radius: 50%;
 }
 
 .search-box {

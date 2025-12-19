@@ -24,11 +24,21 @@ $voitures = $results ?? [];
     
     <link rel="stylesheet" href="/siteSAE2A/html/css/cars.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
 </head>
 <body>
 
 <header>
+    <div class="filtre" onclick="toggleMenu()" style="left: 25px; right: auto;">
+        <span><i class="fa-solid fa-filter"></i> Filtres</span>
+    </div>
+
+    <a href="/siteSAE2A/connection">
+        <div class="top-right-btn">
+            <div class="circle"></div>
+            <span>Connection/Inscription</span>
+        </div>
+    </a>
+
     <div class="top-bar">
         <span><i class="fa-solid fa-calendar-alt"></i> Votre réservation :</span>
         <span>
@@ -40,11 +50,6 @@ $voitures = $results ?? [];
         </span>
     </div>
     <h1>Quelle voiture voulez-vous conduire ?</h1>
-
-    
-    <div class="filtre" onclick="toggleMenu()">
-        <span><i class="fa-solid fa-filter"></i> Filtres</span>
-    </div>
 </header>
 
 <aside id="sidebar">
@@ -98,7 +103,7 @@ $voitures = $results ?? [];
             <button class="btn-orange">Réserver</button>
         </div>
     </div>
-<?php endforeach; ?>
+    <?php endforeach; ?>
     <?php else: ?>
         <div class="car-card">
             <img src="car_image_1.jpg" alt="Citroën E-C3">
