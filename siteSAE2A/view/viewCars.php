@@ -53,41 +53,45 @@ $voitures = $results ?? [];
 </header>
 
 <aside id="sidebar">
-    <div class="sidebar-header">
-        <button class="close-btn" onclick="toggleMenu()">✖</button>
-        <h2>Filtres</h2>
-    </div>
-    
-    <div class="filter-option">
-        <div class="fliter-label"><label>Trié par prix</label></div>
-        <div class="filter-btn-group">
-            <button>Par prix le plus bas</button>
-            <div class="price-max">
-                <label for="max-price">Max :</label>
-                <input type="number" id="max-price" placeholder="Prix Max">
+    <form action="/siteSAE2A/cars" method="GET">
+        <input type="hidden" name="date_depart" value="<?php echo htmlspecialchars($date_depart); ?>">
+        <input type="hidden" name="date_retour" value="<?php echo htmlspecialchars($date_retour); ?>">
+
+        <div class="sidebar-header">
+            <button type="button" class="close-btn" onclick="toggleMenu()">✖</button>
+            <h2>Filtres</h2>
+            <button type="reset" class="clear-btn">Effacer</button>
+        </div>
+        
+        <div class="filter-option">
+            <div class="fliter-label"><label>Prix</label></div>
+            <div class="price-inputs">
+                <input type="number" name="prix_min" placeholder="Min" value="<?php echo $_GET['prix_min'] ?? ''; ?>">
+                <input type="number" name="prix_max" placeholder="Max" value="<?php echo $_GET['prix_max'] ?? ''; ?>">
+            </div>
+            
+            <div class="filter-btn-group-vertical">
+                <input type="radio" name="tri" value="asc" id="tri-asc" <?php if(($_GET['tri'] ?? '') == 'asc') echo 'checked'; ?>>
+                <label for="tri-asc">Prix croissant</label>
+
+                <input type="radio" name="tri" value="desc" id="tri-desc" <?php if(($_GET['tri'] ?? '') == 'desc') echo 'checked'; ?>>
+                <label for="tri-desc">Prix décroissant</label>
             </div>
         </div>
-    </div>
-    
-    <div class="filter-option">
-        <div class="fliter-label"><label>Boîte</label></div>
-        <div class="filter-btn-group">
-            <button>Automatique</button>
-            <button>Manuelle</button>
-        </div>
-    </div>
+        
+        <div class="filter-option">
+            <div class="fliter-label"><label>Boîte</label></div>
+            <div class="filter-btn-group-vertical">
+                <input type="radio" name="boite" value="auto" id="b-auto" <?php if(($_GET['boite'] ?? '') == 'auto') echo 'checked'; ?>>
+                <label for="b-auto">Automatique</label>
 
-    <div class="filter-option">
-        <div class="fliter-label"><label>Energie</label></div>
-        <div class="filter-btn-group">
-            <button>Diesel</button>
-            <button>Essence</button>
-            <button>Hybride</button>
-            <button>Electrique</button>
+                <input type="radio" name="boite" value="manuel" id="b-manuel" <?php if(($_GET['boite'] ?? '') == 'manuel') echo 'checked'; ?>>
+                <label for="b-manuel">Manuelle</label>
+            </div>
         </div>
-    </div>
 
-    <button class="btn-orange">Afficher les offres</button>
+        <button type="submit" class="btn-orange">Afficher les offres</button>
+    </form>
 </aside>
 
 <div class="cars-section">
