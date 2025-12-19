@@ -40,6 +40,7 @@
             <div class="rectangle">
                 <p>
                     {{ row.Nom|e }}<br>
+                    {{row.NumSerie}}<br>
                     {{ row.Puissance|e }} cv<br>
                     {% if row.ImagePath is not empty %}
                          <img src="{{ row.ImagePath|e }}" alt="Image du véhicule" width="100px">
@@ -47,12 +48,12 @@
                          <img src="html/icons/voiture.png" alt="Voiture par défaut" width="100px">
                     {% endif %}
                 </p>
-
+                {{row.NumSerie}}
                 <form method="POST" action="/siteSAE2A/voitures" onsubmit="return confirm('Supprimer ce véhicule ?');">
                     <input type="hidden" name="action" value="supprimerVoiture">
-                    <input type="hidden" name="id" value="{{ row.voiture|e }}">
+                    <input type="hidden" name="NumSerie" value="{{ row.NumSerie }}">
                     {% if role == 'admin' %}
-                    <button type="submit" class="delete-btn">Supprimer</button>
+                    <button type="submit" class="delete-btn">Supprimer </button>
                     {% endif %}
                 </form>
                 {% if role == 'admin' %}

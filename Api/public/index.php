@@ -17,7 +17,7 @@ $conn = $databaseFactory(); // $conn est maintenant une instance de Connection
 $app = AppFactory::create();
 
 
-$app->get('/vehicules', function (Request $request, Response $response, $args) use ($conn) {
+$app->get('/voitures', function (Request $request, Response $response, $args) use ($conn) {
     $conn->executeQuery("SELECT * FROM Vehicule");
     $vehicules = $conn->getResults();
 
@@ -45,7 +45,7 @@ $app->delete('/users/{id}', function (Request $request, Response $response, arra
             'error' => 'ID invalide'
         ]));
         return $response->withHeader('Content-Type', 'application/json')
-                        ->withStatus(400);
+            ->withStatus(400);
     }
 
     // 2️⃣ Vérifier si l'utilisateur existe
@@ -61,7 +61,7 @@ $app->delete('/users/{id}', function (Request $request, Response $response, arra
             'error' => 'Utilisateur non trouvé'
         ]));
         return $response->withHeader('Content-Type', 'application/json')
-                        ->withStatus(404);
+            ->withStatus(404);
     }
 
     // 3️⃣ Suppression
@@ -76,9 +76,45 @@ $app->delete('/users/{id}', function (Request $request, Response $response, arra
     ]));
 
     return $response->withHeader('Content-Type', 'application/json')
-                    ->withStatus(200);
+        ->withStatus(200);
 });
 
+$app->delete('/voitures/{id}', function (Request $request, Response $response, array $args) use ($conn) {
+
+    // 1️⃣ Récupération et validation de l'ID qui est le numero de série
+    $id = (string) $args['id'];
+    
+
+     // 2️⃣ Vérifier si la voiture existe
+    $conn->executeQuery(
+        "SELECT NumSerie FROM Vehicule WHERE NumSerie = :id",
+        [':id' => [$id, \PDO::PARAM_STR]]
+    );
+
+    $user = $conn->getResults();
+
+    if (empty($user)) {
+        $response->getBody()->write(json_encode([
+            'error' => 'Voiture non trouvée'
+        ]));
+        return $response->withHeader('Content-Type', 'application/json')
+            ->withStatus(404);
+    }
+
+    // 3️⃣ Suppression
+    $conn->executeQuery(
+        "DELETE FROM Vehicule WHERE NumSerie = :id",
+        [':id' => [$id, \PDO::PARAM_STR]]
+    );
+
+    // 4️⃣ Réponse OK
+    $response->getBody()->write(json_encode([
+        'message' => 'Voiture supprimée avec succès'
+    ]));
+
+    return $response->withHeader('Content-Type', 'application/json')
+        ->withStatus(200);
+});
 
 
 
