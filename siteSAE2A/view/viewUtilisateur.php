@@ -70,22 +70,25 @@
     <?php if (!empty($results)) : ?>
         <?php foreach ($results as $row) : ?>
             <div class="rectangle">
-                <p>
-                    <?= htmlspecialchars($row['id']) ?><br>
-                    <?= htmlspecialchars($row['username']) ?><br>
-                    <?= htmlspecialchars($row['role']) ?><br>
-                    <img src="html/icons/user.png" alt="User" width="100px">
-                </p>
+                <img src="html/icons/user.png" alt="User" class="bg-img">
+                <div class="info">
+                    <p>ID: <?= htmlspecialchars($row['id']) ?></p>
+                    <p><?= htmlspecialchars($row['username']) ?></p>
+                    <p>Rôle: <?= htmlspecialchars($row['role']) ?></p>
 
-                <form method="POST" action ="/sitesae2A/utilisateurs" onsubmit="return confirm('Supprimer cet utilisateur ?');">
-                    <input type="hidden" name="id" value="<?= htmlspecialchars($row['id']) ?>">
-                    <input type="hidden" name="action" value="supprimerUtilisateur">
-                    <button type="submit"  class="delete-btn">Supprimer</button>
-
-                    
-                </form>
-                <button type="button" class="delete-btn" onclick="location.hash='editModal-<?= htmlspecialchars($row['id']) ?>'">Modifier</button>
+                    <?php if ($isAdmin): ?>
+                        <div class="actions">
+                            <form method="POST" action="/sitesae2A/utilisateurs" onsubmit="return confirm('Supprimer cet utilisateur ?');">
+                                <input type="hidden" name="id" value="<?= htmlspecialchars($row['id']) ?>">
+                                <input type="hidden" name="action" value="supprimerUtilisateur">
+                                <button type="submit">Supprimer</button>
+                            </form>
+                            <button type="button" onclick="location.hash='editModal-<?= htmlspecialchars($row['id']) ?>'">Modifier</button>
+                        </div>
+                    <?php endif; ?>
+                </div>
             </div>
+
             <div id="editModal-<?= htmlspecialchars($row['id']) ?>" class="modal">
                 <div class="modal-content">
                     <a href="#" class="close">×</a>
@@ -109,10 +112,13 @@
         <?php endforeach; ?>
     <?php else : ?>
         <div class="rectangle">
-            <p>Aucun Utilisateur trouvé</p>
+            <div class="info">
+                <p>Aucun Utilisateur trouvé</p>
+            </div>
         </div>
     <?php endif; ?>
 </div>
+
 
 
 

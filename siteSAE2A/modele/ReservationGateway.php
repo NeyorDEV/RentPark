@@ -70,4 +70,30 @@ class ReservationGateway {
         ];
         $this->connection->executeQuery($query, $params);
     }
+
+    public function getMonthlyIncome(): float {
+
+        $query = "
+            SELECT SUM(m.Prix) AS total
+            FROM Contrat c
+            JOIN Vehicule v ON c.idVehicule = v.numSerie
+            JOIN Modele m 
+                ON m.Marque = v.Marque
+               AND m.Nom = v.Nom
+               AND m.Annee = v.Annee
+            WHERE MONTH(c.DateDebut) = MONTH(CURRENT_DATE())
+              AND YEAR(c.DateDebut) = YEAR(CURRENT_DATE());
+        ";
+    
+        $this->connection->executeQuery($query);
+        $results = $this->connection->getResults();
+    
+        if (empty($results) || $results[0]["total"] === null) {
+            return 0.0;
+        }
+    
+        return (float)$results[0]["total"];
+    }
+    
+    
 }
