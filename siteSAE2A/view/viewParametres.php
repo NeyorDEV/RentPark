@@ -61,10 +61,37 @@ $isAdmin = ($role === 'admin');
                 </label>
             </div>
         </div>
-
     </div>
 </div>
 </main>
+<script>
+(function () {
+    const root = document.documentElement;
+    const lightBtn = document.querySelector('.light-theme-btn');
+    const darkBtn = document.querySelector('.dark-theme-btn');
 
+    function applyTheme(theme) {
+        if (theme === 'dark') {
+            root.classList.add('dark-theme');
+            if (darkBtn) darkBtn.setAttribute('aria-pressed', 'true');
+            if (lightBtn) lightBtn.setAttribute('aria-pressed', 'false');
+        } else {
+            root.classList.remove('dark-theme');
+            if (darkBtn) darkBtn.setAttribute('aria-pressed', 'false');
+            if (lightBtn) lightBtn.setAttribute('aria-pressed', 'true');
+        }
+        localStorage.setItem('theme', theme);
+    }
+
+    function initTheme() {
+        const saved = localStorage.getItem('theme') || 'light';
+        applyTheme(saved);
+    }
+    if (lightBtn) lightBtn.addEventListener('click', () => applyTheme('light'));
+    if (darkBtn) darkBtn.addEventListener('click', () => applyTheme('dark'));
+
+    initTheme();
+})();
+</script>
 </body>
 </html>
