@@ -160,45 +160,41 @@ class AdminControleur
 
     public function cars(array $dVueEreur)
     {
-        // 1. Récupération de tous les filtres
+        // 1. Récupération des filtres depuis l'URL (GET)
         $date_depart = $_GET['date_depart'] ?? null;
         $date_retour = $_GET['date_retour'] ?? null;
         $boite_filtre = $_GET['boite'] ?? null;
         $prix_min = isset($_GET['prix_min']) && $_GET['prix_min'] !== '' ? (float)$_GET['prix_min'] : null;
         $prix_max = isset($_GET['prix_max']) && $_GET['prix_max'] !== '' ? (float)$_GET['prix_max'] : null;
 
-        // 2. Récupération initiale des véhicules
-        if ($date_depart && $date_retour) {
-            $results = $this->gateway->getRentableVehiculesBetweenDates($date_depart, $date_retour);
-        } else {
-            $results = $this->gateway->getAll();
+        // 2. Appel de l'API au lieu du Gateway direct
+        try {
+            $response = $this->apiClient->get('vehicules');
+            $results = json_decode($response->getBody()->getContents(), true);
+        } catch (RequestException $e) {
+            $dVueEreur[] = "Impossible de récupérer les véhicules depuis l’API.";
+            $results = [];
         }
 
-        // 3. Application des filtres combinés (Boîte + Prix)
+        // 3. Application des filtres PHP (car l'API /vehicules renvoie tout)
         if (!empty($results)) {
             $results = array_filter($results, function($voiture) use ($boite_filtre, $prix_min, $prix_max) {
                 $match = true;
+                // Attention : Vérifiez si l'API renvoie 'Prix' ou 'prix' (la casse est importante)
                 $prixVoiture = isset($voiture['Prix']) ? (float)$voiture['Prix'] : 0;
 
-                // Filtre Boîte
                 if ($boite_filtre && (!isset($voiture['Boite']) || $voiture['Boite'] !== $boite_filtre)) {
                     $match = false;
                 }
-
-                // Filtre Prix Min
                 if ($match && $prix_min !== null && $prixVoiture < $prix_min) {
                     $match = false;
                 }
-
-                // Filtre Prix Max
                 if ($match && $prix_max !== null && $prixVoiture > $prix_max) {
                     $match = false;
                 }
-
                 return $match;
             });
             
-            // Ré-indexer le tableau pour l'affichage
             $results = array_values($results);
         }
 
