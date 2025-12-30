@@ -158,48 +158,58 @@ class AdminControleur
 
     }
 
-    public function cars(array $dVueEreur)
-    {
-        // 1. Récupération des filtres depuis l'URL (GET)
-        $date_depart = $_GET['date_depart'] ?? null;
-        $date_retour = $_GET['date_retour'] ?? null;
-        $boite_filtre = $_GET['boite'] ?? null;
-        $prix_min = isset($_GET['prix_min']) && $_GET['prix_min'] !== '' ? (float)$_GET['prix_min'] : null;
-        $prix_max = isset($_GET['prix_max']) && $_GET['prix_max'] !== '' ? (float)$_GET['prix_max'] : null;
+    // --- Dans AdminControleur.php, méthode cars() ---
 
-        // 2. Appel de l'API au lieu du Gateway direct
-        try {
-            $response = $this->apiClient->get('vehicules');
-            $results = json_decode($response->getBody()->getContents(), true);
-        } catch (RequestException $e) {
-            $dVueEreur[] = "Impossible de récupérer les véhicules depuis l’API.";
-            $results = [];
-        }
+public function cars(array $dVueEreur)
+{
+    // 1. Récupération des filtres depuis l'URL (GET)
+    $date_depart = $_GET['date_depart'] ?? null;
+    $date_retour = $_GET['date_retour'] ?? null;
+    $boite_filtre = $_GET['boite'] ?? null;
+    // AJOUT : Récupération du filtre énergie
+    $energie_filtre = $_GET['energie'] ?? null; 
+    
+    $prix_min = isset($_GET['prix_min']) && $_GET['prix_min'] !== '' ? (float)$_GET['prix_min'] : null;
+    $prix_max = isset($_GET['prix_max']) && $_GET['prix_max'] !== '' ? (float)$_GET['prix_max'] : null;
 
-        // 3. Application des filtres PHP (car l'API /vehicules renvoie tout)
-        if (!empty($results)) {
-            $results = array_filter($results, function($voiture) use ($boite_filtre, $prix_min, $prix_max) {
-                $match = true;
-                // Attention : Vérifiez si l'API renvoie 'Prix' ou 'prix' (la casse est importante)
-                $prixVoiture = isset($voiture['Prix']) ? (float)$voiture['Prix'] : 0;
-
-                if ($boite_filtre && (!isset($voiture['Boite']) || $voiture['Boite'] !== $boite_filtre)) {
-                    $match = false;
-                }
-                if ($match && $prix_min !== null && $prixVoiture < $prix_min) {
-                    $match = false;
-                }
-                if ($match && $prix_max !== null && $prixVoiture > $prix_max) {
-                    $match = false;
-                }
-                return $match;
-            });
-            
-            $results = array_values($results);
-        }
-
-        $this->afficherVue('cars', $dVueEreur, $results, 'user');
+    // 2. Appel de l'API
+    try {
+        $response = $this->apiClient->get('vehicules');
+        $results = json_decode($response->getBody()->getContents(), true);
+    } catch (RequestException $e) {
+        $dVueEreur[] = "Impossible de récupérer les véhicules depuis l’API.";
+        $results = [];
     }
+
+    // 3. Application des filtres PHP
+    if (!empty($results)) {
+        $results = array_filter($results, function($voiture) use ($boite_filtre, $energie_filtre, $prix_min, $prix_max) {
+            $match = true;
+            $prixVoiture = isset($voiture['Prix']) ? (float)$voiture['Prix'] : 0;
+
+            if ($boite_filtre && (!isset($voiture['Boite']) || $voiture['Boite'] !== $boite_filtre)) {
+                $match = false;
+            }
+            
+            // AJOUT : Logique de filtrage pour l'énergie
+            if ($match && $energie_filtre && (!isset($voiture['Energie']) || $voiture['Energie'] !== $energie_filtre)) {
+                $match = false;
+            }
+
+            if ($match && $prix_min !== null && $prixVoiture < $prix_min) {
+                $match = false;
+            }
+            if ($match && $prix_max !== null && $prixVoiture > $prix_max) {
+                $match = false;
+            }
+            return $match;
+        });
+        
+        $results = array_values($results);
+    }
+
+    $this->afficherVue('cars', $dVueEreur, $results, 'user');
+}
 
 
     public function afficheRecapitulatif(array $dVueEreur){

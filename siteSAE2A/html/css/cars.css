@@ -89,6 +89,10 @@ h1 {
     transition: 0.3s;
     z-index: 100;
     color: black;
+    max-height: 100vh; /* S'assure que la sidebar ne dépasse pas l'écran */
+    overflow-y: auto;  /* Active le scroll vertical si besoin */
+    display: flex;
+    flex-direction: column;
 }
 
 #sidebar.open {
@@ -150,6 +154,7 @@ h1 {
 }
 
 .filter-option {
+    margin-top: 30px;
     margin-bottom: 30px;
 }
 
@@ -158,7 +163,7 @@ h1 {
     text-transform: uppercase;
     letter-spacing: 1px;
     color: #888; /* Gris pour les titres comme sur l'image */
-    margin-bottom: 15px;
+    margin-bottom: 20px;
     display: block;
 }
 

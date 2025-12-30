@@ -113,6 +113,23 @@ if (!empty($voitures) && isset($_GET['tri'])) {
             </div>
         </div>
 
+        <div class="filter-option">
+            <div class="fliter-label"><label>Énergie</label></div>
+            <div class="filter-btn-group-vertical">
+                <input type="radio" name="energie" value="Essence" id="e-essence" <?php if(($_GET['energie'] ?? '') == 'Essence') echo 'checked'; ?>>
+                <label for="e-essence">Essence</label>
+
+                <input type="radio" name="energie" value="Diesel" id="e-diesel" <?php if(($_GET['energie'] ?? '') == 'Diesel') echo 'checked'; ?>>
+                <label for="e-diesel">Diesel</label>
+
+                <input type="radio" name="energie" value="Électrique" id="e-elec" <?php if(($_GET['energie'] ?? '') == 'Électrique') echo 'checked'; ?>>
+                <label for="e-elec">Électrique</label>
+
+                <input type="radio" name="energie" value="Hybride" id="e-hybride" <?php if(($_GET['energie'] ?? '') == 'Hybride') echo 'checked'; ?>>
+                <label for="e-hybride">Hybride</label>
+            </div>
+        </div>
+
         <button type="submit" class="btn-orange">Afficher les offres</button>
     </form>
 </aside>
@@ -135,9 +152,9 @@ if (!empty($voitures) && isset($_GET['tri'])) {
             <p>
                 Couleur : <?php echo htmlspecialchars($voiture['Couleur']); ?> | 
                 Boîte : <strong><?php echo htmlspecialchars($voiture['Boite'] ?? 'N/C'); ?></strong> | 
+                Énergie : <strong><?php echo htmlspecialchars($voiture['Energie'] ?? 'N/C'); ?></strong> |
                 Puissance : <?php echo htmlspecialchars($voiture['Puissance']); ?>
             </p>
-            
             <span class="price">
                 <?php echo isset($voiture['Prix']) ? htmlspecialchars($voiture['Prix']) . " € / jour" : "Prix à définir"; ?>
             </span>
