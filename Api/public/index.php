@@ -4,8 +4,6 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\Factory\AppFactory;
 use modeleApi\Connection;
 
-
-
 // Autoload PSR-4
 $loader = require_once __DIR__ . '/../vendor/autoload.php';
 $loader->addPsr4('BL\\', __DIR__);
@@ -18,7 +16,11 @@ $app = AppFactory::create();
 
 $app->addBodyParsingMiddleware();
 
+// -----------------------------------------------------------------------
+//  /voitures - GET et DELETE
+// -----------------------------------------------------------------------
 
+// GET
 $app->get('/voitures', function (Request $request, Response $response, $args) use ($conn) {
     $conn->executeQuery("SELECT * FROM Vehicule");
     $vehicules = $conn->getResults();
@@ -27,68 +29,7 @@ $app->get('/voitures', function (Request $request, Response $response, $args) us
     return $response->withHeader('Content-Type', 'application/json');
 });
 
-
-$app->get('/client', function (Request $request, Response $response, $args) use ($conn) {
-    $conn->executeQuery("SELECT * FROM Client");
-    $client = $conn->getResults();
-
-    $response->getBody()->write(json_encode($client));
-    return $response->withHeader('Content-Type', 'application/json');
-});
-
-$app->get('/contrat', function (Request $request, Response $response, $args) use ($conn) {
-    $conn->executeQuery("SELECT * FROM Contrat");
-    $client = $conn->getResults();
-
-    $response->getBody()->write(json_encode($client));
-    return $response->withHeader('Content-Type', 'application/json');
-});
-
-
-$app->delete('/users/{id}', function (Request $request, Response $response, array $args) use ($conn) {
-
-    // 1️⃣ Récupération et validation de l'ID
-    $id = (int) $args['id'];
-
-    if ($id <= 0) {
-        $response->getBody()->write(json_encode([
-            'error' => 'ID invalide'
-        ]));
-        return $response->withHeader('Content-Type', 'application/json')
-            ->withStatus(400);
-    }
-
-    // 2️⃣ Vérifier si l'utilisateur existe
-    $conn->executeQuery(
-        "SELECT id FROM users WHERE id = :id",
-        [':id' => [$id, \PDO::PARAM_INT]]
-    );
-
-    $user = $conn->getResults();
-
-    if (empty($user)) {
-        $response->getBody()->write(json_encode([
-            'error' => 'Utilisateur non trouvé'
-        ]));
-        return $response->withHeader('Content-Type', 'application/json')
-            ->withStatus(404);
-    }
-
-    // 3️⃣ Suppression
-    $conn->executeQuery(
-        "DELETE FROM users WHERE id = :id",
-        [':id' => [$id, \PDO::PARAM_INT]]
-    );
-
-    // 4️⃣ Réponse OK
-    $response->getBody()->write(json_encode([
-        'message' => 'Utilisateur supprimé avec succès'
-    ]));
-
-    return $response->withHeader('Content-Type', 'application/json')
-        ->withStatus(200);
-});
-
+// DELETE (numSerie)
 $app->delete('/voitures/{numSerie}', function ($request, $response, $args) use ($conn) {
     $numSerie = (string) $args['numSerie'];
 
@@ -133,53 +74,32 @@ $app->delete('/voitures/{numSerie}', function ($request, $response, $args) use (
     return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
 });
 
+// -----------------------------------------------------------------------
+//  /client - GET
+// -----------------------------------------------------------------------
 
+$app->get('/client', function (Request $request, Response $response, $args) use ($conn) {
+    $conn->executeQuery("SELECT * FROM Client");
+    $client = $conn->getResults();
 
-
-$app->delete('/contrat/{idContrat}', function (Request $request, Response $response, array $args) use ($conn) {
-
-    // 1️⃣ Récupération et validation de l'ID
-    $id = (int) $args['idContrat'];
-
-    if ($id <= 0) {
-        $response->getBody()->write(json_encode([
-            'error' => 'ID invalide'
-        ]));
-        return $response->withHeader('Content-Type', 'application/json')
-                        ->withStatus(400);
-    }
-
-    // 2️⃣ Vérifier si l'utilisateur existe
-    $conn->executeQuery(
-        "SELECT idContrat FROM Contrat WHERE idContrat = :idContrat",
-        [':idContrat' => [$id, \PDO::PARAM_INT]]
-    );
-
-    $user = $conn->getResults();
-
-    if (empty($user)) {
-        $response->getBody()->write(json_encode([
-            'error' => 'Contrat non trouvé'
-        ]));
-        return $response->withHeader('Content-Type', 'application/json')
-                        ->withStatus(404);
-    }
-
-    // 3️⃣ Suppression
-    $conn->executeQuery(
-        "DELETE FROM Contrat WHERE idContrat = :idContrat",
-        [':idContrat' => [$id, \PDO::PARAM_INT]]
-    );
-
-    // 4️⃣ Réponse OK
-    $response->getBody()->write(json_encode([
-        'message' => 'Contrat supprimé avec succès'
-    ]));
-
-    return $response->withHeader('Content-Type', 'application/json')
-                    ->withStatus(200);
+    $response->getBody()->write(json_encode($client));
+    return $response->withHeader('Content-Type', 'application/json');
 });
 
+// -----------------------------------------------------------------------
+//  /contrat - GET, POST et DELETE
+// -----------------------------------------------------------------------
+
+// GET
+$app->get('/contrat', function (Request $request, Response $response, $args) use ($conn) {
+    $conn->executeQuery("SELECT * FROM Contrat");
+    $client = $conn->getResults();
+
+    $response->getBody()->write(json_encode($client));
+    return $response->withHeader('Content-Type', 'application/json');
+});
+
+// POST 
 $app->post('/contrat', function (Request $request, Response $response, $args) use ($conn) {
     
     $data = $request->getParsedBody();
@@ -224,6 +144,155 @@ $app->post('/contrat', function (Request $request, Response $response, $args) us
     }
 });
 
+// DELETE 
+$app->delete('/contrat/{idContrat}', function (Request $request, Response $response, array $args) use ($conn) {
+
+    // 1️⃣ Récupération et validation de l'ID
+    $id = (int) $args['idContrat'];
+
+    if ($id <= 0) {
+        $response->getBody()->write(json_encode([
+            'error' => 'ID invalide'
+        ]));
+        return $response->withHeader('Content-Type', 'application/json')
+                        ->withStatus(400);
+    }
+
+    // 2️⃣ Vérifier si l'utilisateur existe
+    $conn->executeQuery(
+        "SELECT idContrat FROM Contrat WHERE idContrat = :idContrat",
+        [':idContrat' => [$id, \PDO::PARAM_INT]]
+    );
+
+    $user = $conn->getResults();
+
+    if (empty($user)) {
+        $response->getBody()->write(json_encode([
+            'error' => 'Contrat non trouvé'
+        ]));
+        return $response->withHeader('Content-Type', 'application/json')
+                        ->withStatus(404);
+    }
+
+    // 3️⃣ Suppression
+    $conn->executeQuery(
+        "DELETE FROM Contrat WHERE idContrat = :idContrat",
+        [':idContrat' => [$id, \PDO::PARAM_INT]]
+    );
+
+    // 4️⃣ Réponse OK
+    $response->getBody()->write(json_encode([
+        'message' => 'Contrat supprimé avec succès'
+    ]));
+
+    return $response->withHeader('Content-Type', 'application/json')
+                    ->withStatus(200);
+});
+
+// -----------------------------------------------------------------------
+//  /users - GET, DELETE et POST
+// -----------------------------------------------------------------------
+
+$app->get('/users', function (Request $request, Response $response, $args) use ($conn) {
+    $conn->executeQuery("SELECT * FROM Compte");
+    $users = $conn->getResults();
+
+    $response->getBody()->write(json_encode($users));
+    return $response->withHeader('Content-Type', 'application/json');
+});
+
+// DELETE
+$app->delete('/users/{id}', function (Request $request, Response $response, array $args) use ($conn) {
+
+    // 1️⃣ Récupération et validation de l'ID
+    $id = (int) $args['id'];
+
+    if ($id <= 0) {
+        $response->getBody()->write(json_encode([
+            'error' => 'ID invalide'
+        ]));
+        return $response->withHeader('Content-Type', 'application/json')
+            ->withStatus(400);
+    }
+
+    // 2️⃣ Vérifier si l'utilisateur existe
+    $conn->executeQuery(
+        "SELECT id FROM Compte WHERE id = :id",
+        [':id' => [$id, \PDO::PARAM_INT]]
+    );
+
+    $user = $conn->getResults();
+
+    if (empty($user)) {
+        $response->getBody()->write(json_encode([
+            'error' => 'Utilisateur non trouvé'
+        ]));
+        return $response->withHeader('Content-Type', 'application/json')
+            ->withStatus(404);
+    }
+
+    // 3️⃣ Suppression
+    $conn->executeQuery(
+        "DELETE FROM Compte WHERE id = :id",
+        [':id' => [$id, \PDO::PARAM_INT]]
+    );
+
+    // 4️⃣ Réponse OK
+    $response->getBody()->write(json_encode([
+        'message' => 'Utilisateur supprimé avec succès'
+    ]));
+
+    return $response->withHeader('Content-Type', 'application/json')
+        ->withStatus(200);
+});
+
+// POST
+$app->post('/users', function (Request $request, Response $response, array $args) use ($conn) {
+
+    // 1️⃣ Récupérer les données envoyées en JSON dans le corps de la requête
+    $data = $request->getParsedBody();
+
+    $nom  = $data['nom']  ?? null;
+    $mdp  = $data['mdp']  ?? null;
+    $confirm = $data['confirm'] ?? null;
+    $role = $data['role'] ?? null;
+
+    // 2️⃣ Validation simple
+    if (!$nom || !$mdp || !$role || !$confirm) {
+        if ($confirm != $mdp) {
+                $response->getBody()->write(json_encode([
+                'error' => 'Mot de passe et confirmation non similaire']));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
+        }
+
+        $response->getBody()->write(json_encode([
+            'error' => 'Données manquantes (nom, mdp, role requis)'
+        ]));
+        return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
+    }
+
+    // 3️⃣ Insertion en base de données
+    // Note : On ne stocke JAMAIS un mot de passe en clair, on utilise password_hash
+    $hashedPassword = password_hash($mdp, PASSWORD_DEFAULT);
+
+    $conn->executeQuery(
+        "INSERT INTO Compte (UserName, MdpHash, Role) VALUES (:nom, :mdp, :role)",
+        [
+            ':nom'  => [$nom, \PDO::PARAM_STR],
+            ':mdp'  => [$hashedPassword, \PDO::PARAM_STR],
+            ':role' => [$role, \PDO::PARAM_STR]
+        ]
+    );
+
+    // 4️⃣ Réponse
+    $response->getBody()->write(json_encode([
+        'message' => 'Utilisateur créé avec succès'
+    ]));
+
+    return $response->withHeader('Content-Type', 'application/json')->withStatus(201); // 201 = Created
+});
+
+// -------------------------------------------------------------------------------------------------
 
 $app->addRoutingMiddleware();
 
