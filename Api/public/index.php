@@ -29,6 +29,14 @@ $app->get('/voitures', function (Request $request, Response $response, $args) us
     return $response->withHeader('Content-Type', 'application/json');
 });
 
+$app->get('/vehicules', function (Request $request, Response $response, $args) use ($conn) {
+    $conn->executeQuery("SELECT * FROM Vehicule");
+    $vehicules = $conn->getResults();
+
+    $response->getBody()->write(json_encode($vehicules));
+    return $response->withHeader('Content-Type', 'application/json');
+});
+
 // DELETE (numSerie)
 $app->delete('/voitures/{numSerie}', function ($request, $response, $args) use ($conn) {
     $numSerie = (string) $args['numSerie'];
