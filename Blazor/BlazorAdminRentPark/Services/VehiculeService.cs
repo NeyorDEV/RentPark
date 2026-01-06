@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Components.QuickGrid;
 
 namespace BlazorAdminRentPark.Services
 {
-    public class VehiculeService : IVehiculeService
+    public class VehiculeService : IVehiculeService 
     {
         private readonly HttpClient _http;
 

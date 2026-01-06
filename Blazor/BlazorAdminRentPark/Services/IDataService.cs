@@ -8,5 +8,6 @@ namespace BlazorAdminRentPark.Services
         /*Task Add(Client model);*/
 
         Task<GridItemsProviderResult<T>> GetItems(GridItemsProviderRequest<T> request);
+
     }
 }
