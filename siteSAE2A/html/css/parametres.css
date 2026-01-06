@@ -212,3 +212,8 @@ input:checked + .slider:before {
     background-color: #2a2a2a;
     color: #e8e8e8;
 }
+
+.dark-theme .menu a:hover {
+    background-color: rgba(255, 255, 255, 0.12);
+    color: #000 !important;
+}

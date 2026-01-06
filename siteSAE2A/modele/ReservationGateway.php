@@ -30,7 +30,7 @@ class ReservationGateway {
             }
         }
 
-        $sql = "SELECT idContrat, Vehicule, DateDebut, DateFin, Client, EtatDesLieu
+        $sql = "SELECT idContrat, idVehicule, DateDebut, DateFin, idClient, EtatAvant
                 FROM Contrat
                 WHERE ".implode(' AND ', $where)."
                 ORDER BY DateDebut DESC";
