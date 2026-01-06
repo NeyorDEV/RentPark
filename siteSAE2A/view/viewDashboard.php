@@ -126,46 +126,46 @@ animateCounter("users-counter", totalUsers, 800); // 0,8s pour atteindre la vale
 
 
    
- <div class="bottom-cards">   
+<div class="bottom-cards">
     <div class="alert">
         <h2>Rappel</h2>
-        
 
-     <div class="alert-content">
-        <div class="rectangle">Contrôle Technique – BMW Série 4</div>
-        <div class="rectangle">Vidange – Clio 3</div>
-        <div class="rectangle">Assurance – Tesla Model 3</div>
-        <div class="rectangle">Contrôle Pollution – Peugeot 208</div>
-        <div class="rectangle">Révision – Audi A3</div>
-        <div class="rectangle">Révision – Audi A3</div>
-        <div class="rectangle">Révision – Audi A3</div>
-        <div class="rectangle">Révision – Audi A3</div>
-        <div class="rectangle">Révision – Audi A3</div>
-        <div class="rectangle">Révision – Audi A3</div>
-        <div class="rectangle">Révision – Audi A3</div>
-        <div class="rectangle">Révision – Audi A3</div>
+    <div class="alert-content">
+            <?php if (!empty($results['alerts'])): ?>
+                <?php foreach ($results['alerts'] as $alert): ?>
+                    <div class="rectangle">
+                        <?= htmlspecialchars($alert['label']) ?> –
+                        <?= htmlspecialchars($alert['vehicule']) ?>
+                    </div>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <div class="rectangle">
+                    ✅ Aucun rappel
+                </div>
+            <?php endif; ?>
         </div>
     </div>
+</div>
+
+
 
 <div class="planning">
     <h2>Planning</h2>
     <div class="planning-content">
-        <div class="rectangle">09:00 – Location Peugeot 208</div>
-        <div class="rectangle">10:30 – Retour Tesla Model 3</div>
-        <div class="rectangle">13:00 – Location BMW Série 4</div>
-        <div class="rectangle">16:00 – Nettoyage Renault Twingo</div>
-        <div class="rectangle">18:00 – Clôture caisse</div>
-        <div class="rectangle">18:00 – Clôture caisse</div>
-        <div class="rectangle">18:00 – Clôture caisse</div>
-        <div class="rectangle">18:00 – Clôture caisse</div>
-        <div class="rectangle">18:00 – Clôture caisse</div>
-        <div class="rectangle">18:00 – Clôture caisse</div>
-        <div class="rectangle">18:00 – Clôture caisse</div>
-        <div class="rectangle">18:00 – Clôture caisse</div>
-        <div class="rectangle">18:00 – Clôture caisse</div>
-        <div class="rectangle">18:00 – Clôture caisse</div>
+        <?php if (!empty($results['planning'])): ?>
+            <?php foreach ($results['planning'] as $event): ?>
+                <div class="rectangle">
+                    <?= htmlspecialchars(date('d/m/Y', strtotime($event['time']))) ?> – 
+                    <?= htmlspecialchars($event['action']) ?> <?= htmlspecialchars($event['vehicule']) ?>
+                </div>
+            <?php endforeach; ?>
+        <?php else: ?>
+            <div class="rectangle">Aucun événement prévu</div>
+        <?php endif; ?>
     </div>
 </div>
+
+
 
 </div>
 </div>

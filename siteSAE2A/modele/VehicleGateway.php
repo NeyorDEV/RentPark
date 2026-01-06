@@ -101,6 +101,23 @@ class VehicleGateway {
     $this->connection->executeQuery($query, $params);
     return $this->connection->getResults();
 }
+
+public function getVehiculesControleTechniqueBientotExpire(): array
+{
+    $query = "
+        SELECT 
+            v.Marque,
+            v.Nom AS Modele,
+            v.DateExpirationControleTech
+        FROM Vehicule v
+        WHERE v.DateExpirationControleTech <= DATE_ADD(CURDATE(), INTERVAL 2 MONTH)
+        ORDER BY v.DateExpirationControleTech ASC
+    ";
+
+    $this->connection->executeQuery($query);
+    return $this->connection->getResults();
+}
+
 }
 ?>
 

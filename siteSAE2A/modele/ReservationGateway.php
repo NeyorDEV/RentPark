@@ -30,7 +30,7 @@ class ReservationGateway {
             }
         }
 
-        $sql = "SELECT idContrat, idVehicule, DateDebut, DateFin, idClient, EtatAvant
+        $sql = "SELECT idContrat, idVehicule, DateDebut, DateFin, IdClient, EtatAvant
                 FROM Contrat
                 WHERE ".implode(' AND ', $where)."
                 ORDER BY DateDebut DESC";
@@ -94,6 +94,33 @@ class ReservationGateway {
     
         return (float)$results[0]["total"];
     }
+
+    public function getContractsForNextMonth(): array
+{
+    $query = "
+        SELECT 
+            c.DateDebut,
+            c.DateFin,
+            v.Marque,
+            v.Nom AS Modele
+        FROM Contrat c
+        JOIN Vehicule v ON c.IdVehicule = v.NumSerie
+        WHERE (c.DateDebut BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 1 MONTH))
+           OR (c.DateFin   BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 1 MONTH))
+        ORDER BY c.DateDebut ASC
+    ";
+
+    $this->connection->executeQuery($query);
+    $results = $this->connection->getResults();
+
+    // Renvoie un tableau vide si rien trouvé
+    if (empty($results)) {
+        return [];
+    }
+
+    return $results;
+}
+
     
     
 }

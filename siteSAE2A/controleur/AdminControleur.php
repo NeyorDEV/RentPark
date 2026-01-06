@@ -149,6 +149,56 @@ class AdminControleur
             "totalUsers"      => $this->userGateway->countUser()
         ];
 
+        $alerts = [];
+
+    // Contrôle technique < 2 mois
+    $vehiculesCT = $this->gateway->getVehiculesControleTechniqueBientotExpire();
+
+    foreach ($vehiculesCT as $v) {
+        $alerts[] = [
+            "label"    => "Contrôle technique",
+            "vehicule" => $v["Marque"] . " " . $v["Modele"]
+        ];
+    }
+
+    // On injecte les alertes dans les résultats
+    $results["alerts"] = $alerts;
+
+    $contrats = $this->reservationGateway->getContractsForNextMonth();
+    $planning = [];
+    $today = date('Y-m-d'); // date du jour
+
+    foreach ($contrats as $c) {
+        // Départ (date de début) uniquement si futur ou aujourd'hui
+        if ($c['DateDebut'] >= $today) {
+            $planning[] = [
+                'time' => $c['DateDebut'],
+                'action' => 'Location',
+                'vehicule' => $c['Marque'] . ' ' . $c['Modele']
+            ];
+        }
+
+        // Arrivée (date de fin) uniquement si futur ou aujourd'hui
+        if ($c['DateFin'] >= $today) {
+            $planning[] = [
+                'time' => $c['DateFin'],
+                'action' => 'Retour',
+                'vehicule' => $c['Marque'] . ' ' . $c['Modele']
+            ];
+        }
+    }
+
+    // Trier par date
+    usort($planning, fn($a,$b) => strcmp($a['time'], $b['time']));
+
+    $results['planning'] = $planning;
+
+
+
+
+    // Tri chronologique
+    usort($planning, fn($a,$b) => strcmp($a['time'], $b['time']));       
+
         $this->afficherVue('dashboard', $dVueEreur, $results, 'admin');
     }
 
