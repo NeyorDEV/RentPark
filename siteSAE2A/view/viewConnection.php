@@ -19,10 +19,14 @@
   <link rel="stylesheet" href="/siteSAE2A/html/css/parametres.css">
   <link rel="stylesheet" href="html/css/inscription.css">
   <link rel="icon" type="image/png" href="html/icons/voiture.png">
- <link rel="shortcut icon" href="html/icons/favicon.ico" type="image/x-icon">
+  <link rel="shortcut icon" href="html/icons/favicon.ico" type="image/x-icon">
 </head>
 <body>
   <div class="login-container">
+  <a href="/siteSAE2A/cars" class="back-btn">
+  ← Retour
+</a>
+
     <h2>Se connecter</h2>
 
     <form action="/siteSAE2A/connection" method="POST">

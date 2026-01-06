@@ -18,6 +18,7 @@
     })();
     </script>
     <link rel="stylesheet" href="html/css/homeCustomers.css">
+    <link rel="shortcut icon" href="html/icons/favicon.ico" type="image/x-icon">
 </head>
 <body>
 

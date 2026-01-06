@@ -384,3 +384,14 @@ h1 {
     border-color: #ff5a19;
     font-weight: bold;
 }
+
+.reservation-click,
+.reservation-click:visited,
+.reservation-click:hover,
+.reservation-click:active,
+.reservation-click:focus {
+    color: inherit;          /* pas bleu */
+    text-decoration: none;   /* pas souligné */
+    outline: none;
+    background: none;
+}

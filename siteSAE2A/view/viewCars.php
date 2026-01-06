@@ -46,6 +46,7 @@ if (!empty($voitures) && isset($_GET['tri'])) {
     
     <link rel="stylesheet" href="/siteSAE2A/html/css/cars.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="shortcut icon" href="html/icons/favicon.ico" type="image/x-icon">
 </head>
 <body>
 
@@ -65,7 +66,14 @@ if (!empty($voitures) && isset($_GET['tri'])) {
         <span><i class="fa-solid fa-calendar-alt"></i> Votre réservation :</span>
         <span>
             <?php if (!empty($date_depart) && !empty($date_retour)): ?>
-                Du <strong><?php echo htmlspecialchars($date_depart); ?></strong> au <strong><?php echo htmlspecialchars($date_retour); ?></strong>
+                <a href="/siteSAE2A/index.php"
+           class="reservation-click"
+           title="Modifier la réservation">
+            Du <strong><?php echo htmlspecialchars($date_depart); ?></strong>
+            au <strong><?php echo htmlspecialchars($date_retour); ?></strong>
+        </a>
+            
+            </div>
             <?php else: ?>
                 Dates non sélectionnées
             <?php endif; ?>
