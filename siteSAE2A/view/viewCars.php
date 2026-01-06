@@ -1,182 +1,178 @@
+<?php
+// Récupération des dates et des résultats
+$date_depart = $_GET['date_depart'] ?? ($date_depart ?? null);
+$date_retour = $_GET['date_retour'] ?? ($date_retour ?? null);
+$voitures = $results ?? [];
+
+// --- LOGIQUE DE TRI ---
+if (!empty($voitures) && isset($_GET['tri'])) {
+    $ordre = $_GET['tri']; // 'asc' ou 'desc'
+    
+    usort($voitures, function($a, $b) use ($ordre) {
+        // On récupère les prix. Si la clé 'Prix' n'existe pas, on utilise 0 par défaut.
+        $prixA = $a['Prix'] ?? 0;
+        $prixB = $b['Prix'] ?? 0;
+
+        if ($prixA == $prixB) {
+            return 0;
+        }
+
+        if ($ordre === 'desc') {
+            return ($prixA > $prixB) ? -1 : 1;
+        } else {
+            return ($prixA < $prixB) ? -1 : 1;
+        }
+    });
+}
+?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rentpark - Choisir une voiture</title>
-    <link rel="stylesheet" href="html/css/cars.css">
+    <script>
+    (function () {
+        try {
+            const theme = localStorage.getItem('theme') || 'light';
+            if (theme === 'dark') {
+                document.documentElement.classList.add('dark-theme');
+            } else {
+                document.documentElement.classList.remove('dark-theme');
+            }
+        } catch (e) { }
+    })();
+    </script>
+    
+    <link rel="stylesheet" href="/siteSAE2A/html/css/cars.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
 
-<!-- Header -->
 <header>
+    <div class="filtre" onclick="toggleMenu()" style="left: 25px; right: auto;">
+        <span><i class="fa-solid fa-filter"></i> Filtres</span>
+    </div>
+
+    <a href="/siteSAE2A/connection">
+        <div class="top-right-btn">
+            <div class="circle"></div>
+            <span>Connection/Inscription</span>
+        </div>
+    </a>
+
     <div class="top-bar">
-        <span>Paramètres :</span>
-        <span>date debut et date fin</span>
+        <span><i class="fa-solid fa-calendar-alt"></i> Votre réservation :</span>
+        <span>
+            <?php if (!empty($date_depart) && !empty($date_retour)): ?>
+                Du <strong><?php echo htmlspecialchars($date_depart); ?></strong> au <strong><?php echo htmlspecialchars($date_retour); ?></strong>
+            <?php else: ?>
+                Dates non sélectionnées
+            <?php endif; ?>
+        </span>
     </div>
     <h1>Quelle voiture voulez-vous conduire ?</h1>
-
-    <div class="filtre" onclick="toggleMenu()">
-        <span>Filtre</span>
-    </div>
-
-    <script>
-    function toggleMenu() {
-        document.getElementById("sidebar").classList.toggle("open");
-    }
-    </script>
-    
 </header>
 
-<body>
 <aside id="sidebar">
-    <div class="sidebar-header">
-        <button class="close-btn" onclick="toggleMenu()">✖</button>
-        <h2>Filtres</h2>
-    </div>
-    
-    <!-- Trié par prix -->
-    <div class="filter-option">
-        <div class="fliter-label">
-        <label>Trié par prix</label>
+    <form action="/siteSAE2A/cars" method="GET">
+        <input type="hidden" name="date_depart" value="<?php echo htmlspecialchars($date_depart); ?>">
+        <input type="hidden" name="date_retour" value="<?php echo htmlspecialchars($date_retour); ?>">
+
+        <div class="sidebar-header">
+            <button type="button" class="close-btn" onclick="toggleMenu()">✖</button>
+            <h2>Filtres</h2>
+            <button type="reset" class="clear-btn" onclick="window.location.href='/siteSAE2A/cars?date_depart=<?php echo $date_depart; ?>&date_retour=<?php echo $date_retour; ?>'">Effacer</button>
         </div>
-        <div class="filter-btn-group">
-            <button>Par prix le plus bas</button>
-            <div class="price-max">
-                <label for="max-price">Max :</label>
-                <input type="number" id="max-price" placeholder="Prix Max">
+        
+        <div class="filter-option">
+            <div class="fliter-label"><label>Prix (€)</label></div>
+            <div class="price-inputs">
+                <input type="number" name="prix_min" placeholder="Min" value="<?php echo htmlspecialchars($_GET['prix_min'] ?? ''); ?>">
+                <input type="number" name="prix_max" placeholder="Max" value="<?php echo htmlspecialchars($_GET['prix_max'] ?? ''); ?>">
             </div>
         </div>
-    </div>
-    
-    <!-- Boîte -->
-    <div class="filter-option">
-        <div class="fliter-label">
-        <label>Boîte</label>
+            
+            <div class="filter-btn-group-vertical">
+                <input type="radio" name="tri" value="asc" id="tri-asc" <?php if(($_GET['tri'] ?? '') == 'asc') echo 'checked'; ?>>
+                <label for="tri-asc">Prix croissant</label>
+
+                <input type="radio" name="tri" value="desc" id="tri-desc" <?php if(($_GET['tri'] ?? '') == 'desc') echo 'checked'; ?>>
+                <label for="tri-desc">Prix décroissant</label>
+            </div>
         </div>
-        <div class="filter-btn-group">
-            <button>Automatique</button>
-            <button>Manuelle</button>
+        
+        <div class="filter-option">
+            <div class="fliter-label"><label>Boîte</label></div>
+            <div class="filter-btn-group-vertical">
+                <input type="radio" name="boite" value="Automatique" id="b-auto" <?php if(($_GET['boite'] ?? '') == 'Automatique') echo 'checked'; ?>>
+                <label for="b-auto">Automatique</label>
+
+                <input type="radio" name="boite" value="Manuelle" id="b-manuel" <?php if(($_GET['boite'] ?? '') == 'Manuelle') echo 'checked'; ?>>
+                <label for="b-manuel">Manuelle</label>
+            </div>
         </div>
-    </div>
-    
-    <!-- Energie -->
-    <div class="filter-option">
-        <div class="fliter-label">
-        <label>Energie</label>
+
+        <div class="filter-option">
+            <div class="fliter-label"><label>Énergie</label></div>
+            <div class="filter-btn-group-vertical">
+                <input type="radio" name="energie" value="Essence" id="e-essence" <?php if(($_GET['energie'] ?? '') == 'Essence') echo 'checked'; ?>>
+                <label for="e-essence">Essence</label>
+
+                <input type="radio" name="energie" value="Diesel" id="e-diesel" <?php if(($_GET['energie'] ?? '') == 'Diesel') echo 'checked'; ?>>
+                <label for="e-diesel">Diesel</label>
+
+                <input type="radio" name="energie" value="Électrique" id="e-elec" <?php if(($_GET['energie'] ?? '') == 'Électrique') echo 'checked'; ?>>
+                <label for="e-elec">Électrique</label>
+
+                <input type="radio" name="energie" value="Hybride" id="e-hybride" <?php if(($_GET['energie'] ?? '') == 'Hybride') echo 'checked'; ?>>
+                <label for="e-hybride">Hybride</label>
+            </div>
         </div>
-        <div class="filter-btn-group">
-            <button>Diesel</button>
-            <button>Essence</button>
-            <button>Hybride</button>
-            <button>Electrique</button>
-        </div>
-    </div>
-    
-    <!-- Type de véhicule -->
-    <div class="filter-option">
-        <div class="fliter-label">
-        <label>Type de Véhicule</label>
-        </div>
-        <div class="filter-btn-group">
-            <button>SUV</button>
-            <button>Sportive</button>
-            <button>Citadine</button>
-            <button>Coupé</button>
-        </div>
-    </div>
-    
-    <!-- Transmission -->
-    <div class="filter-option">
-        <div class="fliter-label">
-        <label>Transmission</label>
-        </div>
-        <div class="filter-btn-group">
-            <button>Traction</button>
-            <button>Propulsion</button>
-            <button>Intégrale</button>
-        </div>
-    </div>
-    
-    <!-- Nombre de places -->
-    <div class="filter-option">
-        <div class="fliter-label">
-        <label>Nombre de places</label>
-        </div>
-        <div class="filter-btn-group">
-            <input type="number" placeholder="Nombre de places">
-        </div>
-    </div>
-    
-    <!-- Puissance -->
-    <div class="filter-option">
-        <div class="fliter-label">
-        <label>Puissance</label>
-        </div>
-        <div class="filter-btn-group">
-            <input type="number" placeholder="Puissance en CV">
-        </div>
-    </div>
-    
-    <!-- Apply Filters Button -->
-    <button class="btn-orange">Afficher les offres</button>
+
+        <button type="submit" class="btn-orange">Afficher les offres</button>
+    </form>
 </aside>
 
-
-
-<!-- Cars Section -->
 <div class="cars-section">
-    <!-- Car Card 1 -->
+    <?php if (!empty($voitures)): ?>
+        <?php foreach ($voitures as $voiture): ?>
     <div class="car-card">
-        <img src="car_image_1.jpg" alt="Citroën E-C3">
+        <?php
+        $image_path = $voiture['image_path'] ?? $voiture['ImagePath'] ?? 'default.jpg';
+        if (empty($image_path)) {
+            $image_path ='html/icons/car.png';
+        }
+        ?>
+        <img src="/siteSAE2A/<?php echo htmlspecialchars($image_path); ?>" alt="Image voiture">
         <div class="car-info">
-            <h3>Citroën E-C3 ou similaire</h3>
-            <p>Citadine SUV Automatique</p>
-            <p><span>293km</span> | <span>4 Sièges</span> | <span>2 Bagages</span></p>
-            <span class="price">22,74 € / jour</span>
+            <h3><?php echo htmlspecialchars($voiture['Nom']); ?></h3>
+            <p>Marque : <?php echo htmlspecialchars($voiture['Marque']); ?></p>
+            
+            <p>
+                Couleur : <?php echo htmlspecialchars($voiture['Couleur']); ?> | 
+                Boîte : <strong><?php echo htmlspecialchars($voiture['Boite'] ?? 'N/C'); ?></strong> | 
+                Énergie : <strong><?php echo htmlspecialchars($voiture['Energie'] ?? 'N/C'); ?></strong> |
+                Puissance : <?php echo htmlspecialchars($voiture['Puissance']); ?>
+            </p>
+            <span class="price">
+                <?php echo isset($voiture['Prix']) ? htmlspecialchars($voiture['Prix']) . " € / jour" : "Prix à définir"; ?>
+            </span>
             <button class="btn-orange">Réserver</button>
         </div>
     </div>
-
-    <!-- Car Card 2 -->
-    <div class="car-card">
-        <img src="car_image_2.jpg" alt="VW Polo">
-        <div class="car-info">
-            <h3>VW Polo ou similaire</h3>
-            <p>Citadine Berline Manuelle</p>
-            <p><span>350km</span> | <span>5 Sièges</span> | <span>3 Bagages</span></p>
-            <span class="price">27,32 € / jour</span>
-            <button class="btn-orange">Réserver</button>
-        </div>
-    </div>
-
-    <!-- Car Card 3 -->
-    <div class="car-card">
-        <img src="car_image_3.jpg" alt="Opel Mokka Electric">
-        <div class="car-info">
-            <h3>Opel Mokka Electric ou similaire</h3>
-            <p>Compact SUV Automatique</p>
-            <p><span>340km</span> | <span>5 Sièges</span> | <span>3 Bagages</span></p>
-            <span class="price">27,32 € / jour</span>
-            <button class="btn-orange">Réserver</button>
-        </div>
-    </div>
+    <?php endforeach; ?>
+    <?php else: ?>
+        <p style="text-align: center; width: 100%;">Aucune voiture ne correspond à vos critères.</p>
+    <?php endif; ?>
 </div>
 
-<!-- Car Details Modal -->
-<div class="car-details">
-    <div class="details-content">
-        <img src="car_image_1.jpg" alt="Citroën E-C3">
-        <div class="details-info">
-            <h3>Citroën E-C3</h3>
-            <p>Citadine SUV Automatique</p>
-            <p>Gamme : 293km | 4 Sièges | 2 Bagages</p>
-            <p>Âge minimum du conducteur : 18 ans</p>
-            <button class="btn-orange">Suivant</button>
-        </div>
-    </div>
-</div>
+<script>
+function toggleMenu() {
+    const sidebar = document.getElementById("sidebar");
+    sidebar.classList.toggle("open");
+}
+</script>
 
 </body>
 </html>

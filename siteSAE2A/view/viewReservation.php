@@ -10,6 +10,20 @@ $isAdmin = ($role === 'admin');
 <head>
     <meta charset="utf-8">
     <title>RentPark - Reservation</title>
+      <script>
+    (function () {
+        try {
+            const theme = localStorage.getItem('theme') || 'light';
+            if (theme === 'dark') {
+                document.documentElement.classList.add('dark-theme');
+            } else {
+                document.documentElement.classList.remove('dark-theme');
+            }
+        } catch (e) { }
+    })();
+    </script>
+    <link rel="stylesheet" href="/siteSAE2A/html/css/menu.css">
+    <link rel="stylesheet" href="/siteSAE2A/html/css/parametres.css">
     <link rel="stylesheet" href="html/css/reservation.css">
     <link rel="icon" type="image/png" href="html/icons/voiture.png">
     <link rel="shortcut icon" href="html/icons/favicon.ico" type="image/x-icon">
@@ -91,8 +105,8 @@ $isAdmin = ($role === 'admin');
             <div class="rectangle">
                 <p>
                     Reservation n°<?= htmlspecialchars($row['idContrat']) ?><br>
-                    Client : <?= htmlspecialchars($row['Client']) ?><br>
-                    Vehicule : <?= htmlspecialchars($row['Vehicule']) ?><br>
+                    Client : <?= htmlspecialchars($row['IdClient']) ?><br>
+                    Vehicule : <?= htmlspecialchars($row['idVehicule']) ?><br>
                     Debut : <?= htmlspecialchars($row['DateDebut']) ?><br>
                     Fin : <?= htmlspecialchars($row['DateFin']) ?><br>
                 </p>
@@ -117,11 +131,11 @@ $isAdmin = ($role === 'admin');
               <input type="hidden" name="id" value="<?= htmlspecialchars($row['idContrat']) ?>">
 
               <label>Véhicule (VIN)<br>
-                <input type="text" name="Vehicule" required value="<?= htmlspecialchars($row['Vehicule']) ?>">
+                <input type="text" name="Vehicule" required value="<?= htmlspecialchars($row['idVehicule']) ?>">
               </label><br><br>
 
               <label>Client (ID)<br>
-                <input type="number" name="Client" required value="<?= htmlspecialchars($row['Client']) ?>">
+                <input type="number" name="Client" required value="<?= htmlspecialchars($row['IdClient']) ?>">
               </label><br><br>
 
               <label>Début<br>

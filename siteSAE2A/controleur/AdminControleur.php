@@ -138,13 +138,68 @@ class AdminControleur
         $this->afficherVue('flotte', $dVueEreur, $results, 'admin');
 
     }
+
     // ajouter les vue erreur et les vérif 
 
     public function afficheDashboard(array $dVueEreur)
     {
+        $results = [
+            "revenusMensuels"   => $this->reservationGateway->getMonthlyIncome(),
+            "voiturePlusLouee"  => $this->gateway->getMostRentedCar(),
+            "totalUsers"      => $this->userGateway->countUser()
+        ];
 
-        $this->afficherVue('dashboard', $dVueEreur, $results = null, 'admin');
+        $alerts = [];
 
+    // Contrôle technique < 2 mois
+    $vehiculesCT = $this->gateway->getVehiculesControleTechniqueBientotExpire();
+
+    foreach ($vehiculesCT as $v) {
+        $alerts[] = [
+            "label"    => "Contrôle technique",
+            "vehicule" => $v["Marque"] . " " . $v["Modele"]
+        ];
+    }
+
+    // On injecte les alertes dans les résultats
+    $results["alerts"] = $alerts;
+
+    $contrats = $this->reservationGateway->getContractsForNextMonth();
+    $planning = [];
+    $today = date('Y-m-d'); // date du jour
+
+    foreach ($contrats as $c) {
+        // Départ (date de début) uniquement si futur ou aujourd'hui
+        if ($c['DateDebut'] >= $today) {
+            $planning[] = [
+                'time' => $c['DateDebut'],
+                'action' => 'Location',
+                'vehicule' => $c['Marque'] . ' ' . $c['Modele']
+            ];
+        }
+
+        // Arrivée (date de fin) uniquement si futur ou aujourd'hui
+        if ($c['DateFin'] >= $today) {
+            $planning[] = [
+                'time' => $c['DateFin'],
+                'action' => 'Retour',
+                'vehicule' => $c['Marque'] . ' ' . $c['Modele']
+            ];
+        }
+    }
+
+    // Trier par date
+    usort($planning, fn($a,$b) => strcmp($a['time'], $b['time']));
+
+    $results['planning'] = $planning;
+
+
+
+
+    // Tri chronologique
+    usort($planning, fn($a,$b) => strcmp($a['time'], $b['time']));       
+
+        $this->afficherVue('dashboard', $dVueEreur, $results, 'admin');
     }
 
     public function homeCustomers(array $dVueEreur)
@@ -154,10 +209,59 @@ class AdminControleur
 
     }
 
-    public function cars(array $dVueEreur)
-    {
-        $this->afficherVue('cars', $dVueEreur, $results = null, 'admin');
+    // --- Dans AdminControleur.php, méthode cars() ---
+
+public function cars(array $dVueEreur)
+{
+    // 1. Récupération des filtres depuis l'URL (GET)
+    $date_depart = $_GET['date_depart'] ?? null;
+    $date_retour = $_GET['date_retour'] ?? null;
+    $boite_filtre = $_GET['boite'] ?? null;
+    // AJOUT : Récupération du filtre énergie
+    $energie_filtre = $_GET['energie'] ?? null; 
+    
+    $prix_min = isset($_GET['prix_min']) && $_GET['prix_min'] !== '' ? (float)$_GET['prix_min'] : null;
+    $prix_max = isset($_GET['prix_max']) && $_GET['prix_max'] !== '' ? (float)$_GET['prix_max'] : null;
+
+    // 2. Appel de l'API
+    try {
+        $response = $this->apiClient->get('vehicules');
+        $results = json_decode($response->getBody()->getContents(), true);
+    } catch (RequestException $e) {
+        $dVueEreur[] = "Impossible de récupérer les véhicules depuis l’API.";
+        $results = [];
     }
+
+    // 3. Application des filtres PHP
+    if (!empty($results)) {
+        $results = array_filter($results, function($voiture) use ($boite_filtre, $energie_filtre, $prix_min, $prix_max) {
+            $match = true;
+            $prixVoiture = isset($voiture['Prix']) ? (float)$voiture['Prix'] : 0;
+
+            if ($boite_filtre && (!isset($voiture['Boite']) || $voiture['Boite'] !== $boite_filtre)) {
+                $match = false;
+            }
+            
+            // AJOUT : Logique de filtrage pour l'énergie
+            if ($match && $energie_filtre && (!isset($voiture['Energie']) || $voiture['Energie'] !== $energie_filtre)) {
+                $match = false;
+            }
+
+            if ($match && $prix_min !== null && $prixVoiture < $prix_min) {
+                $match = false;
+            }
+            if ($match && $prix_max !== null && $prixVoiture > $prix_max) {
+                $match = false;
+            }
+            return $match;
+        });
+        
+        $results = array_values($results);
+    }
+
+    $this->afficherVue('cars', $dVueEreur, $results, 'user');
+}
+
 
     public function afficheRecapitulatif(array $dVueEreur)
     {
@@ -178,8 +282,8 @@ class AdminControleur
             $nomFichier = uniqid() . '_' . basename($_FILES['image']['name']);
             $dossier = __DIR__ . '/../html/icons/' . $nomFichier;
 
-            if (move_uploaded_file($nomTemp, $dossier)) {
-                $imagePath = 'html/icons/' . $nomFichier;
+        if (move_uploaded_file($nomTemp, $dossier)) {
+                $imagePath = 'html/icons/' . $nomFichier; 
             }
         }
 
@@ -237,7 +341,7 @@ class AdminControleur
 
         if ($motCle === '') {
             $results = $this->gateway->getAll();
-
+            
         } else {
             $results = $this->gateway->rechercherVoitures($motCle);
 
@@ -245,7 +349,7 @@ class AdminControleur
                 $dVueErreur[] = "Aucune voiture trouvée pour \"$motCle\".";
             }
         }
-
+        
         $this->afficherVue('flotte', $dVueErreur, $results, 'admin');
     }
 
@@ -295,7 +399,7 @@ class AdminControleur
 
     }
 
-    private function afficherVue(string $vueKey, array $dVueEreur, ?array $results = null, string $role)
+    private function afficherVue(string $vueKey, array $dVueEreur, ?array $results = null, string $role="user")
     {
         global $rep, $vues, $twig;
 

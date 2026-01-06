@@ -30,7 +30,7 @@ class ReservationGateway {
             }
         }
 
-        $sql = "SELECT idContrat, Vehicule, DateDebut, DateFin, Client, EtatDesLieu
+        $sql = "SELECT idContrat, idVehicule, DateDebut, DateFin, IdClient, EtatAvant
                 FROM Contrat
                 WHERE ".implode(' AND ', $where)."
                 ORDER BY DateDebut DESC";
@@ -70,4 +70,57 @@ class ReservationGateway {
         ];
         $this->connection->executeQuery($query, $params);
     }
+
+    public function getMonthlyIncome(): float {
+
+        $query = "
+            SELECT SUM(m.Prix) AS total
+            FROM Contrat c
+            JOIN Vehicule v ON c.idVehicule = v.numSerie
+            JOIN Modele m 
+                ON m.Marque = v.Marque
+               AND m.Nom = v.Nom
+               AND m.Annee = v.Annee
+            WHERE MONTH(c.DateDebut) = MONTH(CURRENT_DATE())
+              AND YEAR(c.DateDebut) = YEAR(CURRENT_DATE());
+        ";
+    
+        $this->connection->executeQuery($query);
+        $results = $this->connection->getResults();
+    
+        if (empty($results) || $results[0]["total"] === null) {
+            return 0.0;
+        }
+    
+        return (float)$results[0]["total"];
+    }
+
+    public function getContractsForNextMonth(): array
+{
+    $query = "
+        SELECT 
+            c.DateDebut,
+            c.DateFin,
+            v.Marque,
+            v.Nom AS Modele
+        FROM Contrat c
+        JOIN Vehicule v ON c.IdVehicule = v.NumSerie
+        WHERE (c.DateDebut BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 1 MONTH))
+           OR (c.DateFin   BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 1 MONTH))
+        ORDER BY c.DateDebut ASC
+    ";
+
+    $this->connection->executeQuery($query);
+    $results = $this->connection->getResults();
+
+    // Renvoie un tableau vide si rien trouvé
+    if (empty($results)) {
+        return [];
+    }
+
+    return $results;
+}
+
+    
+    
 }

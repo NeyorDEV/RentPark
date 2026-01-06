@@ -28,12 +28,15 @@ h1 {
     font-size: 36px;
     font-weight: 600;
     margin-top: 20px;
+    color: #FFFFFF;
 }
 
+/* Positionnement du bouton filtre à gauche */
 .filtre {
     position: absolute;
     top: 25px;
-    right: 25px;
+    left: 25px; /* On le force à gauche */
+    right: auto;
     display: flex;
     align-items: center;
     gap: 10px;
@@ -41,6 +44,35 @@ h1 {
     padding: 8px 16px;
     border-radius: 8px;
     cursor: pointer;
+    color: white;
+}
+
+/* Style du bouton Connection identique à la Home */
+.top-right-btn {
+    position: absolute;
+    top: 25px;
+    right: 25px;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 20px;
+    background-color: transparent; 
+    border: 2px solid white;      
+    border-radius: 12px;          
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.top-right-btn span { 
+    color: white; 
+    font-size: 14px;
+}
+
+.circle {
+    width: 12px;
+    height: 12px;
+    background-color: white;
+    border-radius: 50%;
 }
 
 /* Sidebar */
@@ -57,96 +89,137 @@ h1 {
     transition: 0.3s;
     z-index: 100;
     color: black;
+    max-height: 100vh; /* S'assure que la sidebar ne dépasse pas l'écran */
+    overflow-y: auto;  /* Active le scroll vertical si besoin */
+    display: flex;
+    flex-direction: column;
 }
 
 #sidebar.open {
     left: 0; /* Slide in when opened */
 }
 
+#sidebar {
+    position: fixed;
+    top: 0;
+    left: -601px; 
+    width: 450px; /* Réduit un peu la largeur pour plus d'esthétique */
+    height: 100vh;
+    background: #121212; /* FOND NOIR comme l'image */
+    backdrop-filter: blur(10px);
+    box-shadow: 2px 0 20px rgba(0, 0, 0, 0.5);
+    padding: 20px;
+    transition: 0.3s;
+    z-index: 100;
+    color: white; /* TEXTE BLANC */
+}
+
 /* Sidebar Header */
 .sidebar-header {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
-}
-
-.sidebar-header h2 {
-    font-size: 24px;
-    font-weight: bold;
+    justify-content: space-between;
+    padding: 10px 0 20px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    margin-bottom: 30px;
 }
 
 .close-btn {
-    font-size: 24px;
-    background: transparent;
+    background: none;
     border: none;
-    color: black;
+    color: white;
+    font-size: 24px;
     cursor: pointer;
+    width: 80px;
+    text-align: left;
 }
 
-/* Filter Option Group */
+.sidebar-header h2 {
+    flex: 1;
+    text-align: center;
+    font-size: 20px;
+    font-weight: bold;
+    color: white;
+}
+
+.clear-btn {
+    background: none;
+    border: none;
+    color: #bbb;
+    font-size: 14px;
+    cursor: pointer;
+    width: 80px;
+    text-align: right;
+    text-decoration: underline;
+}
+
 .filter-option {
-    margin-bottom: 20px;
-}
-.fliter-label{
-    margin-bottom: 10px;
+    margin-top: 30px;
+    margin-bottom: 30px;
 }
 
-.filter-option label {
-    font-size: 16px;
-    font-weight: 600;
-    color: #333;
-    margin-bottom: 15px;
+.filter-option label, .fliter-label label {
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #888; /* Gris pour les titres comme sur l'image */
+    margin-bottom: 20px;
+    display: block;
 }
 
 .filter-btn-group {
     display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
+    flex-direction: column; /* ALIGNEMENT VERTICAL */
+    gap: 10px;
 }
 
 .filter-btn-group button {
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid white;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.2);
     color: white;
-    border-radius: 50px;
-    padding: 10px 20px;
+    border-radius: 8px; /* Moins arrondi, plus carré comme l'image */
+    padding: 15px 20px;
     cursor: pointer;
     transition: 0.3s;
-    margin: 10px 2px;
-}
-
-.price-max {
-    margin: 0px 0px 10px 20px;
-
+    margin: 0;
+    text-align: left; /* Texte aligné à gauche dans les boutons */
+    width: 100%;
 }
 
 .filter-btn-group button:hover {
-    background: #ff5a19;
+    background: rgba(255, 255, 255, 0.1);
+    border-color: #ff5a19;
 }
 
-/* Input Fields */
+/* Style spécifique pour le champ prix max */
+.price-max {
+    margin: 10px 0 0 0;
+    width: 100%;
+}
+
 .filter-option input {
     width: 100%;
-    padding: 20px;
-    border-radius: 10px;
-    border: none;
-    background: rgba(255, 255, 255, 0.1);
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.05);
     color: white;
     font-size: 16px;
 }
 
-/* Apply Button */
+/* Bouton Afficher les offres tout en bas */
 .btn-orange {
     background: #ff5a19;
     color: white;
     border: none;
-    padding: 14px 22px;
-    border-radius: 12px;
-    font-size: 17px;
+    padding: 18px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
     cursor: pointer;
     width: 100%;
     margin-top: 20px;
+    text-transform: uppercase;
 }
 
 .btn-orange:hover {
@@ -258,3 +331,56 @@ h1 {
     margin-top: 20px;
 }
 
+/* --- Mise en page des inputs prix --- */
+.price-inputs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.price-inputs input {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 12px;
+    border-radius: 8px;
+}
+
+/* --- Groupe vertical de "boutons" --- */
+.filter-btn-group-vertical {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+/* Cacher l'input radio par défaut */
+.filter-btn-group-vertical input[type="radio"] {
+    display: none;
+}
+
+/* Style du label (le faux bouton) */
+.filter-btn-group-vertical label {
+    display: block;
+    padding: 15px 20px;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s;
+    font-size: 14px;
+    margin: 0 !important; /* Reset marges */
+}
+
+/* Effet Hover */
+.filter-btn-group-vertical label:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* EFFET ACTIF : Quand le radio invisible est coché, on change le style du label suivant */
+.filter-btn-group-vertical input[type="radio"]:checked + label {
+    background: #ff5a19 !important; /* Orange */
+    border-color: #ff5a19;
+    font-weight: bold;
+}

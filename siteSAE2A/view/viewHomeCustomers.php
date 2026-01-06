@@ -5,6 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     <title>Rentpark</title>
+    <script>
+    (function () {
+        try {
+            const theme = localStorage.getItem('theme') || 'light';
+            if (theme === 'dark') {
+                document.documentElement.classList.add('dark-theme');
+            } else {
+                document.documentElement.classList.remove('dark-theme');
+            }
+        } catch (e) { }
+    })();
+    </script>
     <link rel="stylesheet" href="html/css/homeCustomers.css">
 </head>
 <body>
@@ -22,50 +34,50 @@
         <li><a href="/siteSAE2A/index.php"><i class="fa-solid fa-house"></i> Accueil</a></li>
         <li><a href="/siteSAE2A/voitures"><i class="fa-solid fa-car"></i> Flotte Automobile</a></li>
         <li><a href="/siteSAE2A/dashboard"><i class="fa-solid fa-dashboard"></i>Tableau de bord</a></li>
-        <li><i class="fa-solid fa-file-signature"></i> Contrats</li>
+        <li><a href="#"><i class="fa-solid fa-file-signature"></i> Contrats</a></li>
         <li><a href="/siteSAE2A/reservation"><i class="fa-solid fa-calendar-days"></i> Réservations</a></li>
-        <li><i class="fa-solid fa-user"></i> Utilisateurs</li>
+        <li><a href="#"><i class="fa-solid fa-user"></i> Utilisateurs</a></li>
         <li><a href="/siteSAE2A/parametres"><i class="fa-solid fa-gear"></i> Paramètres</a></li>
     </ul>
 </aside>
 
 <!-- ========== HEADER + FORMULAIRE ========== -->
 <header>
-     <a href="/siteSAE2A/connection">
+    <a href="/siteSAE2A/connection">
         <div class="top-right-btn">
             <div class="circle"></div>
-            <span>Connection/Inscription</span>
+            <span>Connexion/Inscription</span>
         </div>
     </a>
-    <h1>RENTPARK</h1>
+    <h1 id="RentPark">RENTPARK</h1>
 
-    <div class="search-box">
+    <form action="/siteSAE2A/cars" method="GET" class="search-box">
 
         <div class="row">
 
             <div class="input-block">
-                <label>Date de départ</label>
+                <label for="date_depart">Date de départ</label>
                 <div class="dual">
                     <div class="input-icon">
                         <i class="fa-solid fa-calendar"></i>
-                        <input type="date">
+                        <input type="date" name="date_depart" id="date_depart" required>
                     </div>
                 </div>
             </div>
 
             <div class="input-block">
-                <label>Date de retour</label>
+                <label for="date_retour">Date de retour</label>
                 <div class="dual">
                    <div class="input-icon">
                         <i class="fa-solid fa-calendar"></i>
-                        <input type="date">
+                        <input type="date" name="date_retour" id="date_retour" required>
                     </div>
                 </div>
             </div>
 
-            <button class="btn-orange">Voir les véhicules</button>
+            <button type="submit" class="btn-orange">Voir les véhicules</button>
         </div>
-    </div>
+    </form>
 </header>
 
 <script>
