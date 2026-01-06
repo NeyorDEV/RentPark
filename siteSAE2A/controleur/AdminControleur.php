@@ -17,17 +17,17 @@ class AdminControleur
 
     // test pour l'API
     private Client $apiClient;
-    
+
     public function __construct()
     {
-        global $rep, $vues, $user, $pass, $dsn,$action;
+        global $rep, $vues, $user, $pass, $dsn, $action;
 
         $dVueEreur = [];
 
         try {
-            
+
             $this->connection = new Connection($dsn, $user, $pass);
-            
+
             $this->gateway = new VehicleGateway($this->connection);
             $this->userGateway = new UserGateway($this->connection);
             $this->reservationGateway = new ReservationGateway($this->connection);
@@ -35,23 +35,23 @@ class AdminControleur
             // test pour l'API
             $this->apiClient = new Client([
                 'base_uri' => 'http://localhost:8880/',
-                'timeout'  => 2.0
+                'timeout' => 2.0
             ]);
-            
+
 
             switch ($action) {
                 case "listeVoitures":
                     $this->listeVoitures($dVueEreur);
                     break;
                 case "afficheInscription":
-                    $this->afficheInscription( $dVueEreur);
+                    $this->afficheInscription($dVueEreur);
                     break;
                 case "afficheDashboard":
-                        $this->afficheDashboard( $dVueEreur);
-                        break;
-                 case "afficheConnection":
-                        $this->afficheConnection( $dVueEreur);
-                        break;
+                    $this->afficheDashboard($dVueEreur);
+                    break;
+                case "afficheConnection":
+                    $this->afficheConnection($dVueEreur);
+                    break;
                 case "rechercherVoitures":
                     $this->rechercherVoitures($dVueEreur);
                     break;
@@ -63,12 +63,12 @@ class AdminControleur
                     $this->listeReservation($dVueEreur);
                     break;
                 case 'deconnecter':
-                        $this->deconnecter();
-                        break;
-                case 'homeCustomers' :
+                    $this->deconnecter();
+                    break;
+                case 'homeCustomers':
                     $this->homeCustomers($dVueEreur);
                     break;
-                case 'cars' :
+                case 'cars':
                     $this->cars($dVueEreur);
                     break;
                 case 'afficheRecapitulatif':
@@ -79,13 +79,13 @@ class AdminControleur
                     break;
                 default:
                     $dVueEreur[] = "Action inconnue";
-                    $this->afficherVue('flotte', $dVueEreur,$results=null,'admin');
+                    $this->afficherVue('flotte', $dVueEreur, $results = null, 'admin');
                     break;
             }
 
         } catch (\PDOException $e) {
             $dVueEreur[] = "Erreur BDD : " . $e->getMessage();
-            $this->afficherVue('erreur', $dVueEreur, $results = null,'admin');
+            $this->afficherVue('erreur', $dVueEreur, $results = null, 'admin');
         }
 
         exit(0);
@@ -95,7 +95,7 @@ class AdminControleur
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $sousAction = $_POST['action'] ?? '';
-            
+
             switch ($sousAction) {
                 case 'ajouterVoiture':
                     $this->ajouterVoiture($dVueEreur);
@@ -114,29 +114,29 @@ class AdminControleur
             exit;
         }
 
-         
-        $sousAction = $_GET['action'] ?? '';
-         if ($sousAction === 'rechercherVoitures') {
-              $this->rechercherVoitures($dVueEreur);
-              return;
-          }
 
-        
+        $sousAction = $_GET['action'] ?? '';
+        if ($sousAction === 'rechercherVoitures') {
+            $this->rechercherVoitures($dVueEreur);
+            return;
+        }
+
+
         try {
-            $response = $this->apiClient->get('vehicules');
-        
+            $response = $this->apiClient->get('voitures');
+
             $results = json_decode(
                 $response->getBody()->getContents(),
                 true
             );
-        
+
         } catch (RequestException $e) {
             $dVueEreur[] = "Impossible de récupérer les véhicules depuis l’API.";
             $results = [];
         }
-        
+
         $this->afficherVue('flotte', $dVueEreur, $results, 'admin');
-        
+
     }
 
     // ajouter les vue erreur et les vérif 
@@ -204,8 +204,8 @@ class AdminControleur
 
     public function homeCustomers(array $dVueEreur)
     {
-        
-    $this->afficherVue('homeCustomers',$dVueEreur,$results=null,'admin');
+
+        $this->afficherVue('homeCustomers', $dVueEreur, $results = null, 'admin');
 
     }
 
@@ -263,37 +263,39 @@ public function cars(array $dVueEreur)
 }
 
 
-    public function afficheRecapitulatif(array $dVueEreur){
-    $this->afficherVue('recapitulatif',$dVueEreur,$results=null,'admin');
+    public function afficheRecapitulatif(array $dVueEreur)
+    {
+        $this->afficherVue('recapitulatif', $dVueEreur, $results = null, 'admin');
     }
 
-    public function afficheParametres(array $dVueEreur){
-    $this->afficherVue('parametres',$dVueEreur,$results=null,'admin');
+    public function afficheParametres(array $dVueEreur)
+    {
+        $this->afficherVue('parametres', $dVueEreur, $results = null, 'admin');
     }
 
     private function ajouterVoiture(array $dVueEreur)
     {
 
-        $imagePath = ''; 
+        $imagePath = '';
         if (isset($_FILES['image']) && $_FILES['image']['error'] === 0) {
             $nomTemp = $_FILES['image']['tmp_name'];
-            $nomFichier = uniqid() . '_' . basename($_FILES['image']['name']); 
-            $dossier = __DIR__ . '/../html/icons/' . $nomFichier; 
+            $nomFichier = uniqid() . '_' . basename($_FILES['image']['name']);
+            $dossier = __DIR__ . '/../html/icons/' . $nomFichier;
 
         if (move_uploaded_file($nomTemp, $dossier)) {
                 $imagePath = 'html/icons/' . $nomFichier; 
             }
         }
 
-        $modele    = $_POST['modele'] ?? '';
-        $couleur   = $_POST['couleur'] ?? '';
+        $modele = $_POST['modele'] ?? '';
+        $couleur = $_POST['couleur'] ?? '';
         $puissance = $_POST['puissance'] ?? '';
 
 
         Validation::val_voiture($modele, $couleur, $puissance, $dVueEreur);
 
         if (empty($dVueEreur)) {
-            $this->gateway->add( $modele, $couleur, $puissance,$imagePath);
+            $this->gateway->add($modele, $couleur, $puissance, $imagePath);
             header("Location: /sitesae2A/voitures");
             exit;
         }
@@ -304,22 +306,26 @@ public function cars(array $dVueEreur)
 
     private function supprimerVoiture(array $dVueEreur)
     {
-        $id = (int)($_POST['id'] ?? 0);       
-        $this->gateway->delete($id);
+        $id = ($_POST['NumSerie'] ?? -1);
+        try {
+            $this->apiClient->delete("/voitures/$id");
+        } catch (RequestException $e) {
+            $dVueEreur[] = "Erreur lors de la suppression via l’API.";
+        }
         header("Location: /sitesae2A/voitures");
         exit;
     }
 
     private function modifierVoiture(array $dVueEreur)
     {
-        $id        = (int)($_POST['id'] ?? 0);
-        $modele    = $_POST['modele'] ?? '';
-        $couleur   = $_POST['couleur'] ?? '';
+        $id = (int) ($_POST['id'] ?? 0);
+        $modele = $_POST['modele'] ?? '';
+        $couleur = $_POST['couleur'] ?? '';
         $puissance = $_POST['puissance'] ?? '';
 
         Validation::val_voiture($modele, $couleur, $puissance, $dVueEreur);
 
-       if (empty($dVueEreur) && $id > 0) {
+        if (empty($dVueEreur) && $id > 0) {
 
             $this->gateway->update($id, $modele, $couleur, $puissance);
             header("Location: /sitesae2A/voitures");
@@ -352,27 +358,27 @@ public function cars(array $dVueEreur)
     {
         $username = $_POST['username'] ?? '';
         $password = $_POST['password'] ?? '';
-        $confirm  = $_POST['confirm'] ?? '';
-        $role     = $_POST['role'] ?? '';
+        $confirm = $_POST['confirm'] ?? '';
+        $role = $_POST['role'] ?? '';
 
-        
+
         Validation::val_user($username, $password, $confirm, $role, $dVueErreur);
 
         if (!empty($dVueErreur)) {
             $dVueErreur[] = "erreur dans l'inscription";
-            $this->afficherVue('erreur', $dVueErreur, $results=null, 'admin');
+            $this->afficherVue('erreur', $dVueErreur, $results = null, 'admin');
         }
 
         $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
-        
+
         $user = new User(null, $username, $hashedPassword, $role);
         $this->userGateway->login($user);
 
-        
+
     }
 
-  
+
     public function connection(array $dVueErreur)
     {
         global $role;
@@ -387,10 +393,10 @@ public function cars(array $dVueEreur)
 
 
         if (!empty($dVueErreur)) {
-            $this->afficherVue('erreur', $dVueErreur, $results=null, 'admin');
+            $this->afficherVue('erreur', $dVueErreur, $results = null, 'admin');
             exit;
-        }        
-        
+        }
+
     }
 
     private function afficherVue(string $vueKey, array $dVueEreur, ?array $results = null, string $role="user")
@@ -399,36 +405,36 @@ public function cars(array $dVueEreur)
 
         $role = $_SESSION['role'] ?? 'visiteur';
 
-    
-        
+
+
         if (!isset($vues[$vueKey])) {
             echo "Vue '$vueKey' non définie.";
             exit;
         }
-    
+
         $vuePath = $vues[$vueKey];
-    
+
         // twig 
         if (str_ends_with($vuePath, '.twig')) {
             echo $twig->render($vuePath, [
                 'erreurs' => $dVueEreur,
                 'results' => $results,
-                'role'    => $role
+                'role' => $role
             ]);
             return;
         }
-    
+
         // php
         $cheminVue = realpath($rep . $vuePath);
         if ($cheminVue && file_exists($cheminVue)) {
-            $resultsTwig = $results; 
+            $resultsTwig = $results;
             require_once($cheminVue); // NOSONAR
         } else {
             echo "Fichier de vue introuvable : " . ($rep . $vuePath);
             exit;
         }
     }
-    
+
 
     private function rechercherUtilisateur(array $dVueErreur = []): void
     {
@@ -436,8 +442,7 @@ public function cars(array $dVueEreur)
 
         if ($motCle === '') {
             $results = $this->userGateway->getAllUser();
-        } 
-        else {
+        } else {
             $results = $this->userGateway->rechercherUtilisateur($motCle);
 
             if (empty($results)) {
@@ -474,15 +479,15 @@ public function cars(array $dVueEreur)
 
     private function ajouterUtilisateur(array $dVueEreur)
     {
-        $username   = $_POST['username'] ?? '';
-        $password   = $_POST['password'] ?? '';
-        $confirm    = $_POST['confirm'] ?? '';
+        $username = $_POST['username'] ?? '';
+        $password = $_POST['password'] ?? '';
+        $confirm = $_POST['confirm'] ?? '';
         $role = $_POST['role'] ?? '';
 
         Validation::val_user($username, $password, $confirm, $role, $dVueEreur);
 
         if (empty($dVueEreur)) {
-            $this->userGateway->addUser( $username, $password, $role);
+            $this->userGateway->addUser($username, $password, $role);
             header("Location: /siteSAE2A/utilisateurs");
             exit;
 
@@ -513,51 +518,58 @@ public function cars(array $dVueEreur)
 
             }
 
-            
+
             header("Location: /siteSAE2A/utilisateurs");
             exit;
         }
-         
+
         $sousAction = $_GET['action'] ?? '';
-         if ($sousAction === 'rechercherUtilisateur') {
-              $this->rechercherUtilisateur($dVueEreur);
-              return;
-          }
+        if ($sousAction === 'rechercherUtilisateur') {
+            $this->rechercherUtilisateur($dVueEreur);
+            return;
+        }
         $results = $this->userGateway->getAllUser();
-        $this->afficherVue('user', $dVueEreur, $results,'admin');
+        $this->afficherVue('user', $dVueEreur, $results, 'admin');
     }
 
 
-// ---------------------------| Reservations |-----------------------------------------------------------
+    // ---------------------------| Reservations |-----------------------------------------------------------
     private function rechercherReservation(): void
     {
-        $champ  = $_GET['champ']  ?? 'idContrat';
-        $q      = trim($_GET['q'] ?? '');
+        $champ = $_GET['champ'] ?? 'idContrat';
+        $q = trim($_GET['q'] ?? '');
         $filtre = $_GET['filtre'] ?? 'en-cours';
 
         // whitelist des champs autorisé
         $allowed = ['idContrat' => 'idContrat', 'Vehicule' => 'Vehicule', 'Client' => 'Client'];
-        if (!isset($allowed[$champ])) { $champ = 'idContrat'; }
+        if (!isset($allowed[$champ])) {
+            $champ = 'idContrat';
+        }
 
         $results = $this->reservationGateway->searchReservations($champ, $q, $filtre);
 
         $this->afficherVue('reservation', [], $results, 'admin');
     }
-    private function ajouterReservation(array $post): void {
-        $vehicule  = trim($post['Vehicule']  ?? '');
-        $client    = (int)($post['Client']   ?? 0);
+    private function ajouterReservation(array $post): void
+    {
+        $vehicule = trim($post['Vehicule'] ?? '');
+        $client = (int) ($post['Client'] ?? 0);
         $dateDebut = trim($post['DateDebut'] ?? '');
-        $dateFin   = trim($post['DateFin']   ?? '');
+        $dateFin = trim($post['DateFin'] ?? '');
 
         $err = [];
 
-        if ($vehicule === '') $err[] = "Le véhicule (VIN) est obligatoire.";
-        if ($client <= 0)     $err[] = "Le client (ID) doit être un entier positif.";
-        if ($dateDebut === '') $err[] = "La date de début est obligatoire.";
-        if ($dateFin   === '') $err[] = "La date de fin est obligatoire.";
+        if ($vehicule === '')
+            $err[] = "Le véhicule (VIN) est obligatoire.";
+        if ($client <= 0)
+            $err[] = "Le client (ID) doit être un entier positif.";
+        if ($dateDebut === '')
+            $err[] = "La date de début est obligatoire.";
+        if ($dateFin === '')
+            $err[] = "La date de fin est obligatoire.";
 
         $d1 = \DateTime::createFromFormat('Y-m-d', $dateDebut) ?: null;
-        $d2 = \DateTime::createFromFormat('Y-m-d', $dateFin)   ?: null;
+        $d2 = \DateTime::createFromFormat('Y-m-d', $dateFin) ?: null;
         if (!$d1 || !$d2) {
             $err[] = "Format de date invalide (attendu : AAAA-MM-JJ).";
         } elseif ($d1 > $d2) {
@@ -570,26 +582,31 @@ public function cars(array $dVueEreur)
                 $err[] = "Erreur base de données : " . $e->getMessage();
             }
         }
-        $this->rechercherReservation(); 
+        $this->rechercherReservation();
     }
     private function modifierReservation(array $post): void
     {
-        $id        = (int)($post['id'] ?? 0);
-        $vehicule  = trim($post['Vehicule']  ?? '');
-        $client    = (int)($post['Client']   ?? 0);
+        $id = (int) ($post['id'] ?? 0);
+        $vehicule = trim($post['Vehicule'] ?? '');
+        $client = (int) ($post['Client'] ?? 0);
         $dateDebut = trim($post['DateDebut'] ?? '');
-        $dateFin   = trim($post['DateFin'] ?? '');
+        $dateFin = trim($post['DateFin'] ?? '');
 
         $err = [];
 
-        if ($id <= 0) $err[] = "Identifiant de contrat invalide.";
-        if ($vehicule === '') $err[] = "Le véhicule (VIN) est obligatoire.";
-        if ($client <= 0)     $err[] = "Le client (ID) doit être un entier positif.";
-        if ($dateDebut === '') $err[] = "La date de début est obligatoire.";
-        if ($dateFin   === '') $err[] = "La date de fin est obligatoire.";
+        if ($id <= 0)
+            $err[] = "Identifiant de contrat invalide.";
+        if ($vehicule === '')
+            $err[] = "Le véhicule (VIN) est obligatoire.";
+        if ($client <= 0)
+            $err[] = "Le client (ID) doit être un entier positif.";
+        if ($dateDebut === '')
+            $err[] = "La date de début est obligatoire.";
+        if ($dateFin === '')
+            $err[] = "La date de fin est obligatoire.";
 
         $d1 = \DateTime::createFromFormat('Y-m-d', $dateDebut) ?: null;
-        $d2 = \DateTime::createFromFormat('Y-m-d', $dateFin)   ?: null;
+        $d2 = \DateTime::createFromFormat('Y-m-d', $dateFin) ?: null;
         if (!$d1 || !$d2) {
             $err[] = "Format de date invalide (attendu : AAAA-MM-JJ).";
         } elseif ($d1 > $d2) {
@@ -604,18 +621,17 @@ public function cars(array $dVueEreur)
                 $err[] = "Erreur base de données : " . $e->getMessage();
             }
         }
-        $this->rechercherReservation(); 
+        $this->rechercherReservation();
     }
     private function supprimerReservation(array $dVueEreur)
     {
-        $id = (int)($_POST['id'] ?? -1);
+        $id = (int) ($_POST['id'] ?? -1);
         if ($id >= 0) {
             $this->reservationGateway->delete($id);
-        }
-        else{
+        } else {
             $dVueErreur[] = "Cette réservation n'existe pas, impossible de la supprimer .";
         }
-        
+
         $this->rechercherReservation();
         exit;
     }
@@ -634,7 +650,7 @@ public function cars(array $dVueEreur)
                 case 'supprimerReservation':
                     $this->supprimerReservation($dVueEreur);
                     break;
-            }            
+            }
             exit;
         }
         $sousAction = $_GET['action'] ?? '';
@@ -646,17 +662,17 @@ public function cars(array $dVueEreur)
         $results = $this->reservationGateway->searchReservations('idContrat', '', 'en-cours');
         $this->afficherVue('reservation', [], $results, 'admin');
     }
-// ------------------------------------------------------------------------------------------------------
+    // ------------------------------------------------------------------------------------------------------
     private function modifierUtilisateur(array $dVueEreur)
     {
-        $username   = $_POST['username'] ?? '';
-        $id = (int)($_POST['id'] ?? -1);
+        $username = $_POST['username'] ?? '';
+        $id = (int) ($_POST['id'] ?? -1);
 
-        
 
-       if (empty($dVueEreur)) {
 
-            $this->userGateway->update($username,$id);
+        if (empty($dVueEreur)) {
+
+            $this->userGateway->update($username, $id);
             header("Location: /sitesae2A/utilisateurs");
             exit;
         }
@@ -669,18 +685,18 @@ public function cars(array $dVueEreur)
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $sousAction = $_POST['action'] ?? '';
-            
+
             switch ($sousAction) {
                 case 'inscription':
                     $this->inscription($dVueEreur);
                     break;
             }
 
-           
+
             header("Location: /siteSAE2A/connection");
             exit;
         }
-      $this->afficherVue('inscription',$dVueEreur,$results=null,'admin');
+        $this->afficherVue('inscription', $dVueEreur, $results = null, 'admin');
 
     }
 
@@ -688,28 +704,28 @@ public function cars(array $dVueEreur)
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $sousAction = $_POST['action'] ?? '';
-            
+
             switch ($sousAction) {
                 case 'connection':
                     $this->connection($dVueEreur);
                     break;
             }
 
-           
+
             header("Location: /siteSAE2A/voitures");
             exit;
         }
-      $this->afficherVue('connection',$dVueEreur,$results=null,'admin');
+        $this->afficherVue('connection', $dVueEreur, $results = null, 'admin');
 
     }
 
     public function deconnecter(): void
-{
-    session_unset();
-    session_destroy();
-    header("Location: /siteSAE2A/connection");
-    exit;
-}
+    {
+        session_unset();
+        session_destroy();
+        header("Location: /siteSAE2A/connection");
+        exit;
+    }
 
 }
 
