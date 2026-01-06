@@ -224,6 +224,61 @@ $app->post('/contrat', function (Request $request, Response $response, $args) us
     }
 });
 
+$app->patch('/contrat/{id}', function (Request $request, Response $response, $args) use ($conn) {
+    $id = $args['id'];
+    $data = $request->getParsedBody();
+
+    if (empty($data['DateFin'])) {
+        $response->getBody()->write(json_encode([
+            'error' => 'Le champ DateFin est obligatoire.'
+        ]));
+        return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
+    }
+
+    $checkSql = "SELECT Statut FROM Contrat WHERE idContrat = :id";
+    $checkParams = ['id' => $id];
+
+    try {
+        $stmt = $conn->prepare($checkSql);
+
+        $stmt->execute($checkParams);
+
+        $checkResult = $stmt->fetch(\PDO::FETCH_ASSOC);
+        
+        if (!$checkResult) {
+            $response->getBody()->write(json_encode(['error' => 'Contrat non trouvé.']));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(404);
+        }
+
+        if ($checkResult['Statut'] === 'Terminé') {
+            $response->getBody()->write(json_encode(['error' => 'Impossible de modifier la date de fin d\'un contrat terminé.']));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(403);
+        }
+        
+        $sql = "UPDATE Contrat SET DateFin = :dateFin WHERE idContrat = :id";
+        
+        $params = [
+            'dateFin' => $data['DateFin'],
+            'id' => $id
+        ];
+
+        $updateStmt = $conn->prepare($sql);
+        $updateStmt->execute($params);
+        
+        $response->getBody()->write(json_encode([
+            'message' => 'Date de fin du contrat mise à jour avec succès'
+        ]));
+
+        return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
+
+    } catch (\Exception $e) {
+        $response->getBody()->write(json_encode([
+            'error' => 'Erreur lors de la mise à jour : ' . $e->getMessage()
+        ]));
+        return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
+    }
+});
+
 
 $app->addRoutingMiddleware();
 
