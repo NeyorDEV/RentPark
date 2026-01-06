@@ -25,7 +25,6 @@ $app->get('/voitures', function (Request $request, Response $response, $args) us
     return $response->withHeader('Content-Type', 'application/json');
 });
 
-
 $app->get('/client', function (Request $request, Response $response, $args) use ($conn) {
     $conn->executeQuery("SELECT * FROM Client");
     $client = $conn->getResults();
@@ -41,7 +40,6 @@ $app->get('/contrat', function (Request $request, Response $response, $args) use
     $response->getBody()->write(json_encode($client));
     return $response->withHeader('Content-Type', 'application/json');
 });
-
 
 $app->delete('/users/{id}', function (Request $request, Response $response, array $args) use ($conn) {
 
@@ -130,9 +128,6 @@ $app->delete('/voitures/{numSerie}', function ($request, $response, $args) use (
     $response->getBody()->write(json_encode(['message' => 'Voiture supprimée avec succès']));
     return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
 });
-
-
-
 
 $app->delete('/contrat/{idContrat}', function (Request $request, Response $response, array $args) use ($conn) {
 
