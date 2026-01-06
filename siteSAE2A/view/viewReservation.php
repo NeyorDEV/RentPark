@@ -105,8 +105,8 @@ $isAdmin = ($role === 'admin');
             <div class="rectangle">
                 <p>
                     Reservation n°<?= htmlspecialchars($row['idContrat']) ?><br>
-                    Client : <?= htmlspecialchars($row['Client']) ?><br>
-                    Vehicule : <?= htmlspecialchars($row['Vehicule']) ?><br>
+                    Client : <?= htmlspecialchars($row['IdClient']) ?><br>
+                    Vehicule : <?= htmlspecialchars($row['idVehicule']) ?><br>
                     Debut : <?= htmlspecialchars($row['DateDebut']) ?><br>
                     Fin : <?= htmlspecialchars($row['DateFin']) ?><br>
                 </p>
@@ -131,11 +131,11 @@ $isAdmin = ($role === 'admin');
               <input type="hidden" name="id" value="<?= htmlspecialchars($row['idContrat']) ?>">
 
               <label>Véhicule (VIN)<br>
-                <input type="text" name="Vehicule" required value="<?= htmlspecialchars($row['Vehicule']) ?>">
+                <input type="text" name="Vehicule" required value="<?= htmlspecialchars($row['idVehicule']) ?>">
               </label><br><br>
 
               <label>Client (ID)<br>
-                <input type="number" name="Client" required value="<?= htmlspecialchars($row['Client']) ?>">
+                <input type="number" name="Client" required value="<?= htmlspecialchars($row['IdClient']) ?>">
               </label><br><br>
 
               <label>Début<br>
