@@ -15,7 +15,6 @@
         } catch (e) { }
     })();
     </script>
-    <link rel="stylesheet" href="/siteSAE2A/html/css/menu.css">
     <link rel="stylesheet" href="/siteSAE2A/html/css/parametres.css">
     <link rel="stylesheet" href="html/css/dashboard.css">
     <link rel="icon" type="image/png" href="html/icons/voiture.png">
