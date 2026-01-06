@@ -83,11 +83,24 @@ class VehicleGateway {
         return $rows[0]; // On renvoie seulement la voiture la plus louée
     }
     
-    
+    public function getRentableVehiculesBetweenDates(string $date_depart, string $date_retour): array
+    {
+    // On utilise la table 'cars' comme dans vos autres méthodes
+    $query = "SELECT * FROM Vehicule v 
+            WHERE v.NumSerie NOT IN (
+                SELECT c.idVehicule 
+                FROM Contrat c 
+                WHERE NOT (c.DateFin< :date_depart OR c.DateDebut > :date_retour)
+            )";
 
+    $params = [
+        ':date_depart' => [$date_depart, \PDO::PARAM_STR],
+        ':date_retour' => [$date_retour, \PDO::PARAM_STR]
+    ];
 
-
-
+    $this->connection->executeQuery($query, $params);
+    return $this->connection->getResults();
+}
 }
 ?>
 
