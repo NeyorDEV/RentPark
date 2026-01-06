@@ -193,8 +193,9 @@ $app->delete('/contrat/{idContrat}', function (Request $request, Response $respo
 //  /users - GET, DELETE et POST
 // -----------------------------------------------------------------------
 
+// GET
 $app->get('/users', function (Request $request, Response $response, $args) use ($conn) {
-    $conn->executeQuery("SELECT * FROM Compte");
+    $conn->executeQuery("SELECT * FROM users");
     $users = $conn->getResults();
 
     $response->getBody()->write(json_encode($users));
@@ -212,12 +213,12 @@ $app->delete('/users/{id}', function (Request $request, Response $response, arra
             'error' => 'ID invalide'
         ]));
         return $response->withHeader('Content-Type', 'application/json')
-            ->withStatus(400);
+                        ->withStatus(400);
     }
 
     // 2️⃣ Vérifier si l'utilisateur existe
     $conn->executeQuery(
-        "SELECT id FROM Compte WHERE id = :id",
+        "SELECT id FROM users WHERE id = :id",
         [':id' => [$id, \PDO::PARAM_INT]]
     );
 
@@ -228,12 +229,12 @@ $app->delete('/users/{id}', function (Request $request, Response $response, arra
             'error' => 'Utilisateur non trouvé'
         ]));
         return $response->withHeader('Content-Type', 'application/json')
-            ->withStatus(404);
+                        ->withStatus(404);
     }
 
     // 3️⃣ Suppression
     $conn->executeQuery(
-        "DELETE FROM Compte WHERE id = :id",
+        "DELETE FROM users WHERE id = :id",
         [':id' => [$id, \PDO::PARAM_INT]]
     );
 
@@ -243,55 +244,47 @@ $app->delete('/users/{id}', function (Request $request, Response $response, arra
     ]));
 
     return $response->withHeader('Content-Type', 'application/json')
-        ->withStatus(200);
+                    ->withStatus(200);
 });
 
-// POST
-$app->post('/users', function (Request $request, Response $response, array $args) use ($conn) {
-
-    // 1️⃣ Récupérer les données envoyées en JSON dans le corps de la requête
+// POST : Ajout d'un utilisateur
+$app->post('/users', function (Request $request, Response $response) use ($conn) {
+    // 1️⃣ Récupération des données
     $data = $request->getParsedBody();
 
-    $nom  = $data['nom']  ?? null;
-    $mdp  = $data['mdp']  ?? null;
+    $nom     = $data['nom']     ?? null;
+    $mdp     = $data['mdp']     ?? null;
     $confirm = $data['confirm'] ?? null;
-    $role = $data['role'] ?? null;
+    $role    = $data['role']    ?? 'client';
 
-    // 2️⃣ Validation simple
-    if (!$nom || !$mdp || !$role || !$confirm) {
-        if ($confirm != $mdp) {
-                $response->getBody()->write(json_encode([
-                'error' => 'Mot de passe et confirmation non similaire']));
-            return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
-        }
-
-        $response->getBody()->write(json_encode([
-            'error' => 'Données manquantes (nom, mdp, role requis)'
-        ]));
+    // 2️⃣ Validation (Champs vides ou mots de passe différents)
+    if (!$nom || !$mdp || !$role || !$confirm || $confirm !== $mdp) {
+        $msg = ($confirm !== $mdp) ? 'Mots de passe différents' : 'Données manquantes';
+        $response->getBody()->write(json_encode(['error' => $msg]));
         return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
     }
 
-    // 3️⃣ Insertion en base de données
-    // Note : On ne stocke JAMAIS un mot de passe en clair, on utilise password_hash
+    // 3️⃣ Hachage et Insertion
     $hashedPassword = password_hash($mdp, PASSWORD_DEFAULT);
 
-    $conn->executeQuery(
-        "INSERT INTO Compte (UserName, MdpHash, Role) VALUES (:nom, :mdp, :role)",
-        [
-            ':nom'  => [$nom, \PDO::PARAM_STR],
-            ':mdp'  => [$hashedPassword, \PDO::PARAM_STR],
-            ':role' => [$role, \PDO::PARAM_STR]
-        ]
-    );
+    try {
+        $conn->executeQuery(
+            "INSERT INTO users (username, password, role) VALUES (:nom, :mdp, :role)",
+            [
+                ':nom'  => [$nom, \PDO::PARAM_STR],
+                ':mdp'  => [$hashedPassword, \PDO::PARAM_STR],
+                ':role' => [$role, \PDO::PARAM_STR]
+            ]
+        );
 
-    // 4️⃣ Réponse
-    $response->getBody()->write(json_encode([
-        'message' => 'Utilisateur créé avec succès'
-    ]));
+        $response->getBody()->write(json_encode(['message' => 'Utilisateur créé !']));
+        return $response->withHeader('Content-Type', 'application/json')->withStatus(201);
 
-    return $response->withHeader('Content-Type', 'application/json')->withStatus(201); // 201 = Created
+    } catch (\Exception $e) {
+        $response->getBody()->write(json_encode(['error' => 'Erreur BDD : ' . $e->getMessage()]));
+        return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
+    }
 });
-
 // -------------------------------------------------------------------------------------------------
 
 $app->addRoutingMiddleware();
