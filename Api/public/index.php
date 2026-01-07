@@ -75,7 +75,7 @@ $app->delete('/voitures/{numSerie}', function ($request, $response, $args) use (
 });
 
 // -----------------------------------------------------------------------
-//  /client - GET
+//  /client - GET et POST
 // -----------------------------------------------------------------------
 
 $app->get('/client', function (Request $request, Response $response, $args) use ($conn) {
@@ -84,6 +84,53 @@ $app->get('/client', function (Request $request, Response $response, $args) use 
 
     $response->getBody()->write(json_encode($client));
     return $response->withHeader('Content-Type', 'application/json');
+});
+
+// POST 
+$app->post('/client', function (Request $request, Response $response, $args) use ($conn) {
+    
+    $data = $request->getParsedBody();
+
+    // Validation des champs
+    if (empty($data['Nom']) || empty($data['Prenom']) || empty($data['Email']) || empty($data['NumPermis'])) {
+        $response->getBody()->write(json_encode([
+            'error' => 'Les champs Nom, Prenom, Email et NumPermis sont obligatoires.'
+        ]));
+        return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
+    }
+
+    $sql = "INSERT INTO Client (Nom, Prenom, Email, NumTel, NumPermis, DateNaiss, Nationalite) 
+            VALUES (:nom, :prenom, :email, :numTel, :numPermis, :dateNaiss, :nationalite)";
+
+    $params = [
+        ':nom'         => [$data['Nom'], \PDO::PARAM_STR],
+        ':prenom'      => [$data['Prenom'], \PDO::PARAM_STR],
+        ':email'       => [$data['Email'], \PDO::PARAM_STR],
+        ':numTel'      => [$data['NumTel'] ?? null, \PDO::PARAM_STR],
+        ':numPermis'   => [$data['NumPermis'], \PDO::PARAM_STR],
+        ':dateNaiss'   => [$data['DateNaiss'] ?? null, \PDO::PARAM_STR],
+        ':nationalite' => [$data['Nationalite'] ?? null, \PDO::PARAM_STR]
+    ];
+
+    try {
+        $conn->executeQuery($sql, $params);
+        
+        // On récupère l'ID du client qui vient d'être créé pour pouvoir l'utiliser pour le contrat
+        $idClient = $conn->getLastInsertId(); 
+
+        $response->getBody()->write(json_encode([
+            'message'  => 'Client créé avec succès',
+            'idClient' => $idClient
+        ]));
+
+        return $response->withHeader('Content-Type', 'application/json')->withStatus(201);
+
+    } catch (\Exception $e) {
+        $response->getBody()->write(json_encode([
+            'error' => 'Erreur lors de la création du client : ' . $e->getMessage()
+        ]));
+        return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
+    }
 });
 
 // -----------------------------------------------------------------------
