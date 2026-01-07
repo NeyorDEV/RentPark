@@ -10,6 +10,20 @@ $isAdmin = ($role === 'admin');
 <head>
     <meta charset="utf-8">
     <title>RentPark - Reservation</title>
+      <script>
+    (function () {
+        try {
+            const theme = localStorage.getItem('theme') || 'light';
+            if (theme === 'dark') {
+                document.documentElement.classList.add('dark-theme');
+            } else {
+                document.documentElement.classList.remove('dark-theme');
+            }
+        } catch (e) { }
+    })();
+    </script>
+    <link rel="stylesheet" href="/siteSAE2A/html/css/menu.css">
+    <link rel="stylesheet" href="/siteSAE2A/html/css/parametres.css">
     <link rel="stylesheet" href="html/css/reservation.css">
     <link rel="icon" type="image/png" href="html/icons/voiture.png">
     <link rel="shortcut icon" href="html/icons/favicon.ico" type="image/x-icon">
@@ -18,10 +32,10 @@ $isAdmin = ($role === 'admin');
 
 <nav>
     <ul class="menu">
-        <li><a href="/siteSAE2A/index.php"><img src="html/icons/acceuil.jpg" alt="Accueil"> Accueil</a></li>
+        <li><a href="/siteSAE2A/home"><img src="html/icons/acceuil.jpg" alt="Accueil"> Accueil</a></li>
         <li><a href="/siteSAE2A/dashboard"><img src="html/icons/dashboard.png" alt="Tableau de bord"> Tableau de bord</a></li>
         <li><a href="/siteSAE2A/voitures"><img src="html/icons/voiture.png" alt="Flotte"> Flotte Automobile</a></li>
-        <li><a href=""><img src="html/icons/contrat.png" alt="Contrats"> Contrats</a></li>
+        <li><a href="/siteSAE2A/planning"><img src="html/icons/contrat.png" alt="Contrats"> Contrats</a></li>
         <li><a href="/siteSAE2A/reservation"><img src="html/icons/reservation.png" alt="Réservations"> Réservations</a></li>
         <li><a href="siteSAE2A/../utilisateurs"><img src="html/icons/user.png" alt="Utilisateurs"> Utilisateur</a></li>
         <li><a href="/siteSAE2A/parametres"><img src="html/icons/settings.png" alt="Paramètres"> Paramètres</a></li>
@@ -91,8 +105,8 @@ $isAdmin = ($role === 'admin');
             <div class="rectangle">
                 <p>
                     Reservation n°<?= htmlspecialchars($row['idContrat']) ?><br>
-                    Client : <?= htmlspecialchars($row['Client']) ?><br>
-                    Vehicule : <?= htmlspecialchars($row['Vehicule']) ?><br>
+                    Client : <?= htmlspecialchars($row['IdClient']) ?><br>
+                    Vehicule : <?= htmlspecialchars($row['idVehicule']) ?><br>
                     Debut : <?= htmlspecialchars($row['DateDebut']) ?><br>
                     Fin : <?= htmlspecialchars($row['DateFin']) ?><br>
                 </p>
@@ -117,11 +131,11 @@ $isAdmin = ($role === 'admin');
               <input type="hidden" name="id" value="<?= htmlspecialchars($row['idContrat']) ?>">
 
               <label>Véhicule (VIN)<br>
-                <input type="text" name="Vehicule" required value="<?= htmlspecialchars($row['Vehicule']) ?>">
+                <input type="text" name="Vehicule" required value="<?= htmlspecialchars($row['idVehicule']) ?>">
               </label><br><br>
 
               <label>Client (ID)<br>
-                <input type="number" name="Client" required value="<?= htmlspecialchars($row['Client']) ?>">
+                <input type="number" name="Client" required value="<?= htmlspecialchars($row['IdClient']) ?>">
               </label><br><br>
 
               <label>Début<br>

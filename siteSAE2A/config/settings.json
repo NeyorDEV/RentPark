@@ -1,3 +1,7 @@
 {
+<<<<<<< HEAD
     "email_notifications": false
+=======
+    "email_notifications": true
+>>>>>>> origin/main
 }

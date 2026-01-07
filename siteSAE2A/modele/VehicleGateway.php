@@ -54,9 +54,69 @@ class VehicleGateway {
     
        
         return $this->connection->getResults();
-    }   
+    }  
+    
+    
 
+    public function getMostRentedCar(): ?array
+    {
+        $query = "
+            SELECT 
+                v.Marque,
+                v.Nom AS Modele,
+                v.ImagePath,
+                COUNT(*) AS nb_locations
+            FROM Contrat c
+            JOIN Vehicule v ON c.IdVehicule = v.NumSerie
+            WHERE c.Statut = 'Terminé'
+            GROUP BY v.Marque, v.Nom
+            ORDER BY nb_locations DESC
+        ";
+    
+        $this->connection->executeQuery($query);
+        $rows = $this->connection->getResults();
+    
+        if (empty($rows)) {
+            return null;
+        }
+    
+        return $rows[0]; // On renvoie seulement la voiture la plus louée
+    }
+    
+    public function getRentableVehiculesBetweenDates(string $date_depart, string $date_retour): array
+    {
+    // On utilise la table 'cars' comme dans vos autres méthodes
+    $query = "SELECT * FROM Vehicule v 
+            WHERE v.NumSerie NOT IN (
+                SELECT c.idVehicule 
+                FROM Contrat c 
+                WHERE NOT (c.DateFin< :date_depart OR c.DateDebut > :date_retour)
+            )";
 
+    $params = [
+        ':date_depart' => [$date_depart, \PDO::PARAM_STR],
+        ':date_retour' => [$date_retour, \PDO::PARAM_STR]
+    ];
+
+    $this->connection->executeQuery($query, $params);
+    return $this->connection->getResults();
+}
+
+public function getVehiculesControleTechniqueBientotExpire(): array
+{
+    $query = "
+        SELECT 
+            v.Marque,
+            v.Nom AS Modele,
+            v.DateExpirationControleTech
+        FROM Vehicule v
+        WHERE v.DateExpirationControleTech <= DATE_ADD(CURDATE(), INTERVAL 2 MONTH)
+        ORDER BY v.DateExpirationControleTech ASC
+    ";
+
+    $this->connection->executeQuery($query);
+    return $this->connection->getResults();
+}
 
 }
 ?>

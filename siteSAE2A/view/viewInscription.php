@@ -3,8 +3,22 @@
 <head>
   <meta charset="UTF-8">
   <title>Inscription</title>
-  <link rel="stylesheet" href="html/css/inscription.css">
-   <link rel="icon" type="image/png" href="html/icons/voiture.png">
+    <script>
+    (function () {
+        try {
+            const theme = localStorage.getItem('theme') || 'light';
+            if (theme === 'dark') {
+                document.documentElement.classList.add('dark-theme');
+            } else {
+                document.documentElement.classList.remove('dark-theme');
+            }
+        } catch (e) { }
+    })();
+    </script>
+    <link rel="stylesheet" href="/siteSAE2A/html/css/menu.css">
+    <link rel="stylesheet" href="/siteSAE2A/html/css/parametres.css">
+    <link rel="stylesheet" href="html/css/inscription.css">
+    <link rel="icon" type="image/png" href="html/icons/voiture.png">
     <link rel="shortcut icon" href="html/icons/favicon.ico" type="image/x-icon">
 </head>
 <body>

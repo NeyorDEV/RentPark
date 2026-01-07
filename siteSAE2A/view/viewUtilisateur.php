@@ -10,18 +10,39 @@
 <head>
     <meta charset="utf-8">
     <title>RentPark - Utilisateurs</title>
-    <link rel="stylesheet" href="html/css/menu.css">
+    <script>
+    (function () {
+        try {
+            const theme = localStorage.getItem('theme') || 'light';
+            if (theme === 'dark') {
+                document.documentElement.classList.add('dark-theme');
+            } else {
+                document.documentElement.classList.remove('dark-theme');
+            }
+        } catch (e) { }
+    })();
+    </script>
+    <link rel="stylesheet" href="/siteSAE2A/html/css/menu.css">
+    <link rel="stylesheet" href="/siteSAE2A/html/css/parametres.css">
     <link rel="icon" type="image/png" href="html/icons/voiture.png">
     <link rel="shortcut icon" href="html/icons/favicon.ico" type="image/x-icon">
+    <style>
+        .dark-theme .topbar-form input { background: #ffffff;  border: 1px solid rgba(0,0,0,0.12); }
+        .dark-theme .topbar-form input::placeholder {  opacity: 0.9; }
+        .dark-theme .topbar-form input::-webkit-input-placeholder {  opacity: 0.9; }
+        .dark-theme .topbar-form input:-ms-input-placeholder {  opacity: 0.9; }
+        .dark-theme .topbar-form input::-ms-input-placeholder { opacity: 0.9; }
+        .dark-theme .top h1{ color: #ffffff}
+    </style>
 </head>
 <body>
 
 <nav>
     <ul class="menu">
-        <li><a href=""><img src="html/icons/acceuil.jpg" alt="Accueil"> Accueil</a></li>
+        <li><a href="/siteSAE2A/home"><img src="html/icons/acceuil.jpg" alt="Accueil"> Accueil</a></li>
         <li><a href="/siteSAE2A/dashboard"><img src="html/icons/dashboard.png" alt="Tableau de bord"> Tableau de bord</a></li>
         <li><a href="/sitesae2A/voitures"><img src="html/icons/voiture.png" alt="Flotte"> Flotte Automobile</a></li>
-        <li><a href=""><img src="html/icons/contrat.png" alt="Contrats"> Contrats</a></li>
+        <li><a href="/sitesae2A/planning"><img src="html/icons/contrat.png" alt="Contrats"> Contrats</a></li>
         <li><a href="/siteSAE2A/reservation"><img src="html/icons/reservation.png" alt="Réservation"> Réservation</a></li>
         <li><a href="siteSAE2A/../utilisateurs"><img src="html/icons/user.png" alt="Utilisateurs"> Utilisateur</a></li>
         <li><a href="/siteSAE2A/parametres"><img src="html/icons/settings.png" alt="Paramètres"> Paramètres</a></li>
@@ -70,22 +91,25 @@
     <?php if (!empty($results)) : ?>
         <?php foreach ($results as $row) : ?>
             <div class="rectangle">
-                <p>
-                    <?= htmlspecialchars($row['id']) ?><br>
-                    <?= htmlspecialchars($row['username']) ?><br>
-                    <?= htmlspecialchars($row['role']) ?><br>
-                    <img src="html/icons/user.png" alt="User" width="100px">
-                </p>
+                <img src="html/icons/user.png" alt="User" class="bg-img">
+                <div class="info">
+                    <p>ID: <?= htmlspecialchars($row['id']) ?></p>
+                    <p><?= htmlspecialchars($row['username']) ?></p>
+                    <p>Rôle: <?= htmlspecialchars($row['role']) ?></p>
 
-                <form method="POST" action ="/sitesae2A/utilisateurs" onsubmit="return confirm('Supprimer cet utilisateur ?');">
-                    <input type="hidden" name="id" value="<?= htmlspecialchars($row['id']) ?>">
-                    <input type="hidden" name="action" value="supprimerUtilisateur">
-                    <button type="submit"  class="delete-btn">Supprimer</button>
-
-                    
-                </form>
-                <button type="button" class="delete-btn" onclick="location.hash='editModal-<?= htmlspecialchars($row['id']) ?>'">Modifier</button>
+                    <?php if ($isAdmin): ?>
+                        <div class="actions">
+                            <form method="POST" action="/sitesae2A/utilisateurs" onsubmit="return confirm('Supprimer cet utilisateur ?');">
+                                <input type="hidden" name="id" value="<?= htmlspecialchars($row['id']) ?>">
+                                <input type="hidden" name="action" value="supprimerUtilisateur">
+                                <button type="submit">Supprimer</button>
+                            </form>
+                            <button type="button" onclick="location.hash='editModal-<?= htmlspecialchars($row['id']) ?>'">Modifier</button>
+                        </div>
+                    <?php endif; ?>
+                </div>
             </div>
+
             <div id="editModal-<?= htmlspecialchars($row['id']) ?>" class="modal">
                 <div class="modal-content">
                     <a href="#" class="close">×</a>
@@ -109,10 +133,13 @@
         <?php endforeach; ?>
     <?php else : ?>
         <div class="rectangle">
-            <p>Aucun Utilisateur trouvé</p>
+            <div class="info">
+                <p>Aucun Utilisateur trouvé</p>
+            </div>
         </div>
     <?php endif; ?>
 </div>
+
 
 
 
