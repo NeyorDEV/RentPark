@@ -286,19 +286,6 @@ $app->post('/users', function (Request $request, Response $response) use ($conn)
     }
 });
 
-// -----------------------------------------------------------------------
-//  /client - GET et POST
-// -----------------------------------------------------------------------
-
-// GET
-$app->get('/clients', function (Request $request, Response $response, $args) use ($conn) {
-    $conn->executeQuery("SELECT * FROM Client");
-    $users = $conn->getResults();
-
-    $response->getBody()->write(json_encode($users));
-    return $response->withHeader('Content-Type', 'application/json');
-});
-
 // -------------------------------------------------------------------------------------------------
 
 $app->patch('/contrat/{id}', function (Request $request, Response $response, $args) use ($conn) {
