@@ -1,0 +1,157 @@
+/* ==========================================================================
+   1. POLICES & VARIABLES (Cohérence Rentpark)
+   ========================================================================== */
+@font-face {
+    font-family: 'frt';
+    src: url('../fonts/frt.woff2') format('woff2');
+    font-weight: 900;
+}
+
+:root {
+    --bg-dark: #000000; /* */
+    --bg-card: #1b1b1b; /* */
+    --orange-rentpark: #ff5a19; /* */
+    --text-gray: #888;
+    --border-rgba: rgba(255, 255, 255, 0.15); /* */
+}
+
+/* ==========================================================================
+   2. RESET & LAYOUT
+   ========================================================================== */
+body {
+    background-color: var(--bg-dark); /* */
+    color: white;
+    font-family: 'Roboto', Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+}
+
+.page-container {
+    display: flex;
+    gap: 40px; /* Espace entre les deux blocs principaux */
+    padding: 60px 20px;
+    max-width: 1300px;
+    margin: auto;
+    align-items: flex-start;
+}
+
+/* ==========================================================================
+   3. SECTION DEVIS (GAUCHE)
+   ========================================================================== */
+.devis-section {
+    flex: 1;
+    background: var(--bg-card); /* */
+    padding: 30px;
+    border-radius: 15px;
+    border-left: 5px solid var(--orange-rentpark); /* */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    min-width: 300px;
+}
+
+.devis-section h2 {
+    font-family: 'frt', sans-serif; /* */
+    color: var(--orange-rentpark);
+    margin-bottom: 25px;
+    text-transform: uppercase;
+    font-size: 1.5rem;
+}
+
+/* ==========================================================================
+   4. SECTION FORMULAIRE (DROITE)
+   ========================================================================== */
+.form-section {
+    flex: 2;
+    background: rgba(255, 255, 255, 0.05); /* */
+    padding: 40px;
+    border-radius: 20px;
+    border: 1px solid var(--border-rgba); /* */
+    backdrop-filter: blur(15px);
+}
+
+.form-section h2 {
+    font-family: 'frt', sans-serif; /* */
+    font-size: 2rem;
+    margin-bottom: 35px;
+    text-transform: uppercase;
+}
+
+/* Correction du chevauchement des boxes */
+.form-row {
+    display: flex;
+    gap: 20px; /* Espace horizontal entre les colonnes */
+    margin-bottom: 25px; /* Espace vertical entre les lignes */
+}
+
+.form-group {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px; /* Espace entre label et input */
+}
+
+.form-section label {
+    font-size: 0.8rem;
+    color: var(--text-gray);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.input-field {
+    width: 100%;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.05); /* */
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    color: white;
+    font-size: 1rem;
+    transition: 0.3s;
+}
+
+.input-field:focus {
+    outline: none;
+    border-color: var(--orange-rentpark);
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* Spécifique pour l'icône calendrier blanche */
+input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+    cursor: pointer;
+}
+
+/* ==========================================================================
+   5. BOUTON ACTION
+   ========================================================================== */
+.btn-orange {
+    background: var(--orange-rentpark); /* */
+    color: white;
+    border: none;
+    padding: 20px;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 20px;
+    transition: transform 0.2s, filter 0.2s; /* */
+}
+
+.btn-orange:hover {
+    transform: scale(1.02); /* */
+    filter: brightness(1.1);
+}
+
+/* ==========================================================================
+   6. RESPONSIVE
+   ========================================================================== */
+@media (max-width: 900px) {
+    .page-container {
+        flex-direction: column;
+    }
+    .form-row {
+        flex-direction: column;
+        gap: 25px;
+    }
+}

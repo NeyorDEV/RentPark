@@ -20,20 +20,14 @@ $totalTTC = $nbJours * $prixJournalier;
 <head>
     <meta charset="UTF-8">
     <title>Votre Devis - Rentpark</title>
-    <link rel="stylesheet" href="/siteSAE2A/html/css/cars.css">
-    <style>
-        .page-container { display: flex; gap: 40px; padding: 50px; max-width: 1200px; margin: auto; }
-        .devis-section { flex: 1; background: #f9f9f9; padding: 25px; border-radius: 10px; border-left: 6px solid #ff8c00; }
-        .form-section { flex: 1.5; }
-        .input-field { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 5px; }
-    </style>
+    <link rel="stylesheet" href="/siteSAE2A/html/css/reservationForm.css">
 </head>
 <body>
 
 <div class="page-container">
     <div class="devis-section">
         <h2>Votre Devis</h2>
-        <p><strong>Véhicule :</strong> <?php echo htmlspecialchars($numSerie); ?></p>
+        <p><strong>Véhicule (N° Série) :</strong> <?php echo htmlspecialchars($numSerie); ?></p>
         <p><strong>Période :</strong> Du <?php echo htmlspecialchars($date_depart); ?> au <?php echo htmlspecialchars($date_retour); ?></p>
         <p><strong>Durée :</strong> <?php echo $nbJours; ?> jour(s)</p>
         <hr>
@@ -43,18 +37,44 @@ $totalTTC = $nbJours * $prixJournalier;
     <div class="form-section">
         <h2>Informations de réservation</h2>
         <form action="/siteSAE2A/finaliser_reservation.php" method="POST">
-            <input type="hidden" name="num_serie" value="<?php echo $numSerie; ?>">
-            <input type="hidden" name="date_debut" value="<?php echo $date_depart; ?>">
-            <input type="hidden" name="date_fin" value="<?php echo $date_retour; ?>">
+            <input type="hidden" name="num_serie" value="<?php echo htmlspecialchars($numSerie); ?>">
+            <input type="hidden" name="date_debut" value="<?php echo htmlspecialchars($date_depart); ?>">
+            <input type="hidden" name="date_fin" value="<?php echo htmlspecialchars($date_retour); ?>">
+            <input type="hidden" name="prix_total" value="<?php echo $totalTTC; ?>">
 
-            <label>Nom :</label>
-            <input type="text" name="nom" class="input-field" required>
+            <div style="display: flex; gap: 15px;">
+                <div style="flex: 1;">
+                    <label>Nom :</label>
+                    <input type="text" name="nom" class="input-field" placeholder="Ex: Dupont" required>
+                </div>
+                <div style="flex: 1;">
+                    <label>Prénom :</label>
+                    <input type="text" name="prenom" class="input-field" placeholder="Ex: Jean" required>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 15px;">
+                <div style="flex: 1;">
+                    <label>Date de naissance :</label>
+                    <input type="date" name="datenaiss" class="input-field" required>
+                </div>
+                <div style="flex: 1;">
+                    <label>Nationalité :</label>
+                    <input type="text" name="nationalite" class="input-field" placeholder="Ex: Française" required>
+                </div>
+            </div>
+
+            <label>Numéro de téléphone :</label>
+            <input type="tel" name="numTel" class="input-field" placeholder="06 00 00 00 00" required>
 
             <label>Email :</label>
-            <input type="email" name="email" class="input-field" required>
+            <input type="email" name="email" class="input-field" placeholder="jean.dupont@exemple.com" required>
 
-            <button type="submit" class="btn-orange" style="width: 100%; border: none; cursor: pointer;">
-                Confirmer et Payer
+            <label>Numéro de permis de conduire :</label>
+            <input type="text" name="numPermis" class="input-field" placeholder="Ex: 15AA00000" required>
+
+            <button type="submit" class="btn-orange" style="width: 100%; border: none; cursor: pointer; margin-top: 20px; font-weight: bold;">
+                Confirmer la réservation
             </button>
         </form>
     </div>
