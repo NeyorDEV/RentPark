@@ -1,5 +1,5 @@
 /* ==========================================================================
-   1. POLICES & VARIABLES (Cohérence Rentpark)
+   1. POLICES & VARIABLES
    ========================================================================== */
 @font-face {
     font-family: 'frt';
@@ -8,20 +8,19 @@
 }
 
 :root {
-    --bg-dark: #000000; /* */
-    --bg-card: #1b1b1b; /* */
-    --orange-rentpark: #ff5a19; /* */
-    --text-gray: #888;
-    --border-rgba: rgba(255, 255, 255, 0.15); /* */
+    --bg-dark: #000000;
+    --bg-card: #1b1b1b;
+    --orange-rentpark: #ff5a19;
+    --border-white: rgba(255, 255, 255, 0.15);
 }
 
 /* ==========================================================================
-   2. RESET & LAYOUT
+   2. LAYOUT
    ========================================================================== */
 body {
-    background-color: var(--bg-dark); /* */
+    background-color: var(--bg-dark);
     color: white;
-    font-family: 'Roboto', Arial, sans-serif;
+    font-family: 'Roboto', sans-serif;
     margin: 0;
     padding: 0;
     min-height: 100vh;
@@ -29,129 +28,141 @@ body {
 
 .page-container {
     display: flex;
-    gap: 40px; /* Espace entre les deux blocs principaux */
-    padding: 60px 20px;
-    max-width: 1300px;
+    gap: 50px;
+    padding: 80px 40px;
+    max-width: 1200px;
     margin: auto;
-    align-items: flex-start;
+    align-items: stretch;
 }
 
 /* ==========================================================================
-   3. SECTION DEVIS (GAUCHE)
+   3. DEVIS (GAUCHE)
    ========================================================================== */
 .devis-section {
     flex: 1;
-    background: var(--bg-card); /* */
-    padding: 30px;
-    border-radius: 15px;
-    border-left: 5px solid var(--orange-rentpark); /* */
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-    min-width: 300px;
+    background: var(--bg-card);
+    padding: 40px;
+    border-radius: 20px;
+    border-left: 6px solid var(--orange-rentpark);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
 }
 
 .devis-section h2 {
-    font-family: 'frt', sans-serif; /* */
+    font-family: 'frt', sans-serif;
     color: var(--orange-rentpark);
-    margin-bottom: 25px;
+    margin-bottom: 30px;
     text-transform: uppercase;
-    font-size: 1.5rem;
+}
+
+.devis-section p {
+    display: flex;
+    justify-content: space-between;
+    margin: 20px 0;
+    color: #ccc;
+}
+
+.total-container {
+    margin-top: 30px;
+}
+
+.price-tag {
+    font-size: 2rem;
+    color: var(--orange-rentpark);
+    font-weight: bold;
 }
 
 /* ==========================================================================
-   4. SECTION FORMULAIRE (DROITE)
+   4. FORMULAIRE (DROITE) - ESPACEMENT VERTICAL CIBLÉ
    ========================================================================== */
 .form-section {
     flex: 2;
-    background: rgba(255, 255, 255, 0.05); /* */
-    padding: 40px;
-    border-radius: 20px;
-    border: 1px solid var(--border-rgba); /* */
+    background: rgba(255, 255, 255, 0.05);
+    padding: 60px;
+    border-radius: 25px;
+    border: 1px solid var(--border-white);
     backdrop-filter: blur(15px);
 }
 
 .form-section h2 {
-    font-family: 'frt', sans-serif; /* */
-    font-size: 2rem;
-    margin-bottom: 35px;
+    font-family: 'frt', sans-serif;
+    font-size: 2.2rem;
+    margin-bottom: 60px;
     text-transform: uppercase;
 }
 
-/* Correction du chevauchement des boxes */
+/* ESPACE ENTRE CHAQUE LIGNE DE BOXS */
 .form-row {
     display: flex;
-    gap: 20px; /* Espace horizontal entre les colonnes */
-    margin-bottom: 25px; /* Espace vertical entre les lignes */
+    gap: 30px;
+    margin-bottom: 25px; 
+    width: 100%;
 }
 
+/* ESPACE ENTRE LABEL ET BOX */
 .form-group {
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 10px; /* Espace entre label et input */
+    gap: 5px;
 }
 
 .form-section label {
-    font-size: 0.8rem;
-    color: var(--text-gray);
+    font-size: 0.9rem;
+    color: #888;
     text-transform: uppercase;
-    letter-spacing: 1px;
+    font-weight: bold;
+    letter-spacing: 1.2px;
 }
 
 .input-field {
     width: 100%;
-    padding: 15px;
-    background: rgba(255, 255, 255, 0.05); /* */
+    padding: 18px;
+    background: rgba(255, 255, 255, 0.07);
     border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 10px;
+    border-radius: 12px;
     color: white;
-    font-size: 1rem;
-    transition: 0.3s;
+    font-size: 1.1rem;
+    height: 60px; 
+    box-sizing: border-box;
 }
 
 .input-field:focus {
-    outline: none;
     border-color: var(--orange-rentpark);
-    background: rgba(255, 255, 255, 0.1);
+    outline: none;
+    background: rgba(255, 255, 255, 0.12);
 }
 
-/* Spécifique pour l'icône calendrier blanche */
+/* Style calendrier blanc */
 input[type="date"]::-webkit-calendar-picker-indicator {
     filter: invert(1);
     cursor: pointer;
 }
 
 /* ==========================================================================
-   5. BOUTON ACTION
+   5. BOUTON
    ========================================================================== */
 .btn-orange {
-    background: var(--orange-rentpark); /* */
+    background: var(--orange-rentpark);
     color: white;
     border: none;
-    padding: 20px;
-    border-radius: 12px;
-    font-size: 1.1rem;
-    font-weight: bold;
+    padding: 22px;
+    border-radius: 15px;
+    font-size: 1.2rem;
+    font-weight: 900;
     text-transform: uppercase;
     cursor: pointer;
     width: 100%;
     margin-top: 20px;
-    transition: transform 0.2s, filter 0.2s; /* */
+    transition: all 0.3s ease;
 }
 
 .btn-orange:hover {
-    transform: scale(1.02); /* */
-    filter: brightness(1.1);
+    filter: brightness(1.2);
+    transform: translateY(-3px);
 }
 
-/* ==========================================================================
-   6. RESPONSIVE
-   ========================================================================== */
+/* RESPONSIVE */
 @media (max-width: 900px) {
-    .page-container {
-        flex-direction: column;
-    }
-    .form-row {
-        flex-direction: column;
-        gap: 25px;
-    }
+    .page-container { flex-direction: column; }
+    .form-row { flex-direction: column; gap: 40px; margin-bottom: 40px; }
 }

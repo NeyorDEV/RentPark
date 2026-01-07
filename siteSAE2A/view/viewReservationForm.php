@@ -10,8 +10,8 @@ $d2 = new DateTime($date_retour);
 $interval = $d1->diff($d2);
 $nbJours = $interval->days > 0 ? $interval->days : 1; 
 
-// Note : Idéalement, récupérez le prix via votre API pour afficher le montant total ici
-$prixJournalier = 100; // Exemple statique à remplacer
+// Note : Idéalement, récupérez le prix via votre API
+$prixJournalier = 100; 
 $totalTTC = $nbJours * $prixJournalier;
 ?>
 
@@ -27,11 +27,14 @@ $totalTTC = $nbJours * $prixJournalier;
 <div class="page-container">
     <div class="devis-section">
         <h2>Votre Devis</h2>
-        <p><strong>Véhicule (N° Série) :</strong> <?php echo htmlspecialchars($numSerie); ?></p>
-        <p><strong>Période :</strong> Du <?php echo htmlspecialchars($date_depart); ?> au <?php echo htmlspecialchars($date_retour); ?></p>
-        <p><strong>Durée :</strong> <?php echo $nbJours; ?> jour(s)</p>
+        <p><strong>Véhicule (N° Série) :</strong> <span><?php echo htmlspecialchars($numSerie); ?></span></p>
+        <p><strong>Période :</strong> <span>Du <?php echo htmlspecialchars($date_depart); ?> au <?php echo htmlspecialchars($date_retour); ?></span></p>
+        <p><strong>Durée :</strong> <span><?php echo $nbJours; ?> jour(s)</span></p>
         <hr>
-        <h3 style="color: #ff8c00;">Total à régler : <?php echo $totalTTC; ?> €</h3>
+        <div class="total-container">
+            <h3>Total à régler :</h3>
+            <span class="price-tag"><?php echo $totalTTC; ?> €</span>
+        </div>
     </div>
 
     <div class="form-section">
@@ -42,38 +45,50 @@ $totalTTC = $nbJours * $prixJournalier;
             <input type="hidden" name="date_fin" value="<?php echo htmlspecialchars($date_retour); ?>">
             <input type="hidden" name="prix_total" value="<?php echo $totalTTC; ?>">
 
-            <div style="display: flex; gap: 15px;">
-                <div style="flex: 1;">
+            <div class="form-row">
+                <div class="form-group">
                     <label>Nom :</label>
                     <input type="text" name="nom" class="input-field" placeholder="Ex: Dupont" required>
                 </div>
-                <div style="flex: 1;">
+                <div class="form-group">
                     <label>Prénom :</label>
                     <input type="text" name="prenom" class="input-field" placeholder="Ex: Jean" required>
                 </div>
             </div>
 
-            <div style="display: flex; gap: 15px;">
-                <div style="flex: 1;">
+            <div class="form-row">
+                <div class="form-group">
                     <label>Date de naissance :</label>
                     <input type="date" name="datenaiss" class="input-field" required>
                 </div>
-                <div style="flex: 1;">
+                <div class="form-group">
                     <label>Nationalité :</label>
                     <input type="text" name="nationalite" class="input-field" placeholder="Ex: Française" required>
                 </div>
             </div>
 
-            <label>Numéro de téléphone :</label>
-            <input type="tel" name="numTel" class="input-field" placeholder="06 00 00 00 00" required>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Numéro de téléphone :</label>
+                    <input type="tel" name="numTel" class="input-field" placeholder="06 00 00 00 00" required>
+                </div>
+            </div>
 
-            <label>Email :</label>
-            <input type="email" name="email" class="input-field" placeholder="jean.dupont@exemple.com" required>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Email :</label>
+                    <input type="email" name="email" class="input-field" placeholder="jean.dupont@exemple.com" required>
+                </div>
+            </div>
 
-            <label>Numéro de permis de conduire :</label>
-            <input type="text" name="numPermis" class="input-field" placeholder="Ex: 15AA00000" required>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Numéro de permis de conduire :</label>
+                    <input type="text" name="numPermis" class="input-field" placeholder="Ex: 15AA00000" required>
+                </div>
+            </div>
 
-            <button type="submit" class="btn-orange" style="width: 100%; border: none; cursor: pointer; margin-top: 20px; font-weight: bold;">
+            <button type="submit" class="btn-orange">
                 Confirmer la réservation
             </button>
         </form>
