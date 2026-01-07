@@ -5,7 +5,7 @@ using static System.Net.WebRequestMethods;
 
 namespace BlazorAdminRentPark.Services
 {
-    public class ClientService : IClientService
+    public class ClientService : IClientService 
     {
         private readonly HttpClient _http; 
 
@@ -23,11 +23,6 @@ namespace BlazorAdminRentPark.Services
                 Items = items,
                 TotalItemCount = items.Count
             };
-        }
-
-        public async Task Delete(int IdClient)
-        {
-            await _http.DeleteAsync($"http://localhost:8880/users/{IdClient}");
         }
     }
 }
