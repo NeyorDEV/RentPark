@@ -1,21 +1,27 @@
 ﻿@page "/account"
 @rendermode InteractiveServer
-@using MudBlazor;
+@using MudBlazor
+@inject IDialogService DialogService 
+@* Injection du service *@
 
 <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-8">
     <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Class="mb-6">
         <MudText Typo="Typo.h4" Style="font-weight: bold;">Compte</MudText>
-        <MudButton Variant="Variant.Filled" Color="Color.Success" StartIcon="@Icons.Material.Filled.Add">
+        @* Ajout de l'événement OnClick *@
+        <MudButton Variant="Variant.Filled" 
+                   Color="Color.Success" 
+                   StartIcon="@Icons.Material.Filled.Add"
+                   OnClick="OpenAddUserDialog">
             AJOUTER
         </MudButton>
     </MudStack>
 
     @* Barre de recherche *@
-    <MudTextField @bind-Value="_searchString" 
-                  Placeholder="Rechercher..." 
-                  Adornment="Adornment.End" 
-                  AdornmentIcon="@Icons.Material.Filled.Search" 
-                  Variant="Variant.Outlined" 
+    <MudTextField @bind-Value="_searchString"
+                  Placeholder="Rechercher..."
+                  Adornment="Adornment.End"
+                  AdornmentIcon="@Icons.Material.Filled.Search"
+                  Variant="Variant.Outlined"
                   Margin="Margin.Dense"
                   Class="mb-8" />
 
@@ -28,7 +34,7 @@
                     <MudText Typo="Typo.body1">@user.Username</MudText>
                     <MudText Typo="Typo.caption">@user.Role</MudText>
                     <div class="d-flex justify-center my-4">
-                         <MudIcon Icon="@Icons.Material.Filled.AccountCircle" Style="font-size: 6rem;" />
+                        <MudIcon Icon="@Icons.Material.Filled.AccountCircle" Style="font-size: 6rem;" />
                     </div>
                     <MudButton Variant="Variant.Filled" Color="Color.Error" FullWidth="true" Class="mb-2">SUPPRIMER</MudButton>
                     <MudButton Variant="Variant.Filled" Style="background-color: #f44336; color: white;" FullWidth="true">MODIFIER</MudButton>
@@ -36,14 +42,29 @@
             </MudItem>
         }
     </MudGrid>
+s
+
 </MudContainer>
 
 @code {
     private string _searchString = "";
 
+    // Méthode pour ouvrir la boîte de dialogue
+    private async Task OpenAddUserDialog()
+    {
+        var options = new DialogOptions { CloseOnEscapeKey = true, MaxWidth = MaxWidth.Small, FullWidth = true };
+        var dialog = await DialogService.ShowAsync<AddUserDialog>("", options);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            // Logique future pour rafraîchir la liste
+        }
+    }
+
     public class UserDto
     {
-        public int Id { get; set; }
+        public int Id { get; set; } 
         public string Username { get; set; }
         public string Role { get; set; }
     }

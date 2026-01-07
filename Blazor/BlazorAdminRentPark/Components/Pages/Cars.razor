@@ -1,0 +1,163 @@
+﻿@page "/cars"
+@rendermode InteractiveServer
+@using MudBlazor
+@layout EmptyLayout
+
+<MudLayout>
+    <MudDrawer @bind-Open="@_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2" Variant="@DrawerVariant.Responsive">
+        <MudDrawerHeader>
+            <MudText Typo="Typo.h6"><b>Filtres</b></MudText>
+        </MudDrawerHeader>  
+        <MudNavMenu Class="pa-4">
+            <MudText Typo="Typo.subtitle2" Class="mb-2"><b>Trié par prix</b></MudText>
+            <MudButton Variant="Variant.Outlined" FullWidth="true" Class="mb-2">Prix le plus bas</MudButton>
+            <MudTextField T="string" Label="Prix Max" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Euro" Margin="Margin.Dense" />
+            
+            <MudDivider Class="my-4"/>
+
+            <MudText Typo="Typo.subtitle2" Class="mb-2"><b>Boîte</b></MudText>
+            <MudStack Row="true" Spacing="2">
+                <MudButton Variant="Variant.Outlined" Size="Size.Small">Auto</MudButton>
+                <MudButton Variant="Variant.Outlined" Size="Size.Small">Manuelle</MudButton>
+            </MudStack>
+
+            <MudDivider Class="my-4" />
+
+            <MudText Typo="Typo.subtitle2" Class="mb-2"><b>Énergie</b></MudText>
+            <MudChipSet T="string" SelectionMode="SelectionMode.MultiSelection" CheckMark="true">
+                <MudChip Text="Diesel" Variant="Variant.Text" Color="Color.Primary" />
+                <MudChip Text="Essence" Variant="Variant.Text" Color="Color.Primary" />
+                <MudChip Text="Hybride" Variant="Variant.Text" Color="Color.Primary" />
+                <MudChip Text="Élec" Variant="Variant.Text" Color="Color.Primary" />
+            </MudChipSet>
+
+            <MudDivider Class="my-4" />
+
+            <MudButton Variant="Variant.Filled" Color="Color.Warning" FullWidth="true" Class="mt-4">Afficher les offres</MudButton>
+        </MudNavMenu>
+    </MudDrawer>
+
+    <MudMainContent>
+        <MudContainer MaxWidth="MaxWidth.False" Class="ma-0 pa-4">
+            
+            <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Class="mb-6">
+                <div>
+                    <MudText Typo="Typo.caption">Paramètres : Date début - Date fin</MudText>
+                    <MudText Typo="Typo.h4" Style="font-weight: bold;">Quelle voiture voulez-vous conduire ?</MudText>
+                </div>
+                <MudButton OnClick="@ToggleDrawer" StartIcon="@Icons.Material.Filled.FilterList" Variant="Variant.Outlined" Color="Color.Dark">
+                    @(_drawerOpen ? "Masquer Filtres" : "Afficher Filtres")
+                </MudButton>
+            </MudStack>
+
+            <MudGrid>
+                @foreach (var car in _cars)
+                {
+                    <MudItem xs="12" sm="6" md="4">
+                        <MudCard Elevation="3" Class="rounded-lg hover-effect">
+                            <MudCardMedia Image="@car.ImageUrl" Height="200" />
+                            
+                            <MudCardContent>
+                                <MudText Typo="Typo.h6" Style="font-weight:bold;">@car.Name</MudText>
+                                <MudText Typo="Typo.body2" Color="Color.Secondary" Class="mb-3">@car.Category</MudText>
+
+                                <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="4" Class="mb-4">
+                                    <MudTooltip Text="Autonomie/Distance">
+                                        <div class="d-flex align-center gap-1">
+                                            <MudIcon Icon="@Icons.Material.Filled.Speed" Size="Size.Small" />
+                                            <MudText Typo="Typo.caption">@car.Range</MudText>
+                                        </div>
+                                    </MudTooltip>
+                                    <MudDivider Vertical="true" FlexItem="true" />
+                                    <MudTooltip Text="Nombre de sièges">
+                                        <div class="d-flex align-center gap-1">
+                                            <MudIcon Icon="@Icons.Material.Filled.EventSeat" Size="Size.Small" />
+                                            <MudText Typo="Typo.caption">@car.Seats</MudText>
+                                        </div>
+                                    </MudTooltip>
+                                    <MudDivider Vertical="true" FlexItem="true" />
+                                    <MudTooltip Text="Bagages">
+                                        <div class="d-flex align-center gap-1">
+                                            <MudIcon Icon="@Icons.Material.Filled.Luggage" Size="Size.Small" />
+                                            <MudText Typo="Typo.caption">@car.Bags</MudText>
+                                        </div>
+                                    </MudTooltip>
+                                </MudStack>
+
+                                <MudText Typo="Typo.h5" Color="Color.Success" Style="font-weight:bold;">@car.PricePerDay € <span style="font-size:0.8rem; color:gray;">/ jour</span></MudText>
+                            </MudCardContent>
+
+                            <MudCardActions Class="d-flex justify-end pa-4">
+                                <MudButton Variant="Variant.Filled" Style="background-color: #ff9800; color: white;" FullWidth="true">Réserver</MudButton>
+                            </MudCardActions>
+                        </MudCard>
+                    </MudItem>
+                }
+            </MudGrid>
+        </MudContainer>
+    </MudMainContent>
+</MudLayout>
+
+@code {
+    // Gestion de l'ouverture/fermeture du menu filtres
+    bool _drawerOpen = true;
+
+    void ToggleDrawer()
+    {
+        _drawerOpen = !_drawerOpen;
+    }
+
+    // Nouveau modèle de données correspondant à une voiture
+    public class CarModel
+    {
+        public int Id { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public string Category { get; set; } = string.Empty; // Ex: Citadine SUV Automatique
+        public string Range { get; set; } = string.Empty; // Ex: 293km
+        public int Seats { get; set; }
+        public int Bags { get; set; }
+        public double PricePerDay { get; set; }
+        public string ImageUrl { get; set; } = "https://via.placeholder.com/300x200?text=Voiture"; // Placeholder par défaut
+    }
+
+    // Liste des voitures (basée sur votre HTML PHP)
+    private List<CarModel> _cars = new()
+    {
+        new CarModel 
+        { 
+            Id = 1, 
+            Name = "Citroën E-C3 ou similaire", 
+            Category = "Citadine SUV Automatique", 
+            Range = "293km", 
+            Seats = 4, 
+            Bags = 2, 
+            PricePerDay = 22.74,
+            ImageUrl = "car_image_1.jpg" // Assurez-vous que l'image est accessible dans wwwroot
+        },
+        new CarModel 
+        { 
+            Id = 2, 
+            Name = "VW Polo ou similaire", 
+            Category = "Citadine Berline Manuelle", 
+            Range = "350km", 
+            Seats = 5, 
+            Bags = 3, 
+            PricePerDay = 27.32,
+            ImageUrl = "car_image_2.jpg"
+        },
+        new CarModel 
+        { 
+            Id = 3, 
+            Name = "Opel Mokka Electric", 
+            Category = "Compact SUV Automatique", 
+            Range = "340km", 
+            Seats = 5, 
+            Bags = 3, 
+            PricePerDay = 27.32,
+            ImageUrl = "car_image_3.jpg"
+        },
+        // Données fictives supplémentaires pour tester la grille
+        new CarModel { Id = 4, Name = "Peugeot 208", Category = "Citadine", Range = "400km", Seats = 5, Bags = 2, PricePerDay = 35.00 },
+        new CarModel { Id = 5, Name = "Tesla Model 3", Category = "Berline Électrique", Range = "500km", Seats = 5, Bags = 4, PricePerDay = 85.00 },
+    };
+}
