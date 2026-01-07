@@ -342,6 +342,81 @@ $app->patch('/contrat/{id}', function (Request $request, Response $response, $ar
     }
 });
 
+$app->post('/vehicule', function (Request $request, Response $response, $args) use ($conn) {
+    
+    $data = $request->getParsedBody();
+
+    if (empty($data['NumSerie'])) {
+        $response->getBody()->write(json_encode([
+            'error' => 'Le champ NumSerie est obligatoire.'
+        ]));
+        return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
+    }
+
+    $sql = "INSERT INTO Vehicule (
+                NumSerie, Energie, NbPlaces, Categorie, Transmission, Boite, Etat, 
+                Puissance, DateAchat, DateExpirationControleTech, DateDernierControleTech, 
+                Marque, Nom, Annee, IdAssureur, IdFournisseur, ImagePath, Couleur, Prix
+            ) VALUES (
+                :numSerie, :energie, :nbPlaces, :categorie, :transmission, :boite, :etat, 
+                :puissance, :dateAchat, :dateExpiration, :dateDernierControle, 
+                :marque, :nom, :annee, :idAssureur, :idFournisseur, :imagePath, :couleur, :prix
+            )";
+
+    $params = [
+        ':numSerie' => [$data['NumSerie'], \PDO::PARAM_STR],
+        ':energie' => [$data['Energie'], \PDO::PARAM_STR],
+        ':nbPlaces' => [$data['NbPlaces'], \PDO::PARAM_STR],
+        ':categorie' => [$data['Categorie'], \PDO::PARAM_STR],
+        
+        ':transmission' => [$data['Transmission'] ?? 'Traction', \PDO::PARAM_STR],
+        ':boite' => [$data['Boite'] ?? 'Manuelle', \PDO::PARAM_STR],
+        ':etat' => [$data['Etat'] ?? 'Libre', \PDO::PARAM_STR],
+        
+        ':puissance' => [$data['Puissance'], \PDO::PARAM_STR],
+        ':dateAchat' => [$data['DateAchat'], \PDO::PARAM_STR],
+        ':dateExpiration' => [$data['DateExpirationControleTech'], \PDO::PARAM_STR],
+        ':dateDernierControle' => [$data['DateDernierControleTech'], \PDO::PARAM_STR],
+        
+        ':marque' => [$data['Marque'], \PDO::PARAM_STR],
+        ':nom' => [$data['Nom'], \PDO::PARAM_STR],
+        ':annee' => [$data['Annee'], \PDO::PARAM_STR],
+        ':idAssureur' => [$data['IdAssureur'], \PDO::PARAM_INT],
+        ':idFournisseur' => [$data['IdFournisseur'], \PDO::PARAM_INT],
+        
+        ':imagePath' => [$data['ImagePath'] ?? '', \PDO::PARAM_STR],
+        
+        ':couleur' => [$data['Couleur'] ?? null, \PDO::PARAM_STR],
+        ':prix' => [$data['Prix'] ?? null, \PDO::PARAM_STR]
+    ];
+
+    try {
+        $conn->executeQuery($sql, $params);
+        
+        $response->getBody()->write(json_encode([
+            'message' => 'Véhicule ajouté avec succès',
+            'NumSerie' => $data['NumSerie']
+        ]));
+
+        return $response->withHeader('Content-Type', 'application/json')->withStatus(201);
+
+    } catch (\Exception $e) {
+        $errorCode = $e->getCode();
+        $status = 500;
+        $message = 'Erreur lors de l\'ajout du véhicule : ' . $e->getMessage();
+
+        if (strpos($e->getMessage(), 'Duplicate entry') !== false) {
+            $status = 409; // Conflict
+            $message = 'Un véhicule avec ce Numéro de Série existe déjà.';
+        }
+
+        $response->getBody()->write(json_encode([
+            'error' => $message
+        ]));
+        return $response->withHeader('Content-Type', 'application/json')->withStatus($status);
+    }
+});
+
 $app->addRoutingMiddleware();
 
 $errorMiddleware = $app->addErrorMiddleware(true, true, true);
