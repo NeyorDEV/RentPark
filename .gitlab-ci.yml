@@ -30,7 +30,7 @@ build-blazor:
   script:
     - cd Blazor/BlazorAdminRentPark
     - echo "Restoring .NET packages..."
-    - dotnet restore blazorAdminRentPark.csproj
+    - dotnet restore BlazorAdminRentPark.csproj
     - echo "Building Blazor app..."
     - dotnet build BlazorAdminRentPark.csproj -c Release
   artifacts:
