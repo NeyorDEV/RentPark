@@ -15,13 +15,13 @@ build-php:
     - mv composer.phar /usr/local/bin/composer
   script:
     - echo "Installing PHP dependencies..."
-    - cd SiteSAE2A
+    - cd siteSAE2A
     - composer install --no-interaction --prefer-dist
     - composer dump-autoload
     - echo "PHP build done"
   artifacts:
     paths:
-      - SiteSAE2A/vendor/
+      - siteSAE2A/vendor/
 
 
 # ----------------------
