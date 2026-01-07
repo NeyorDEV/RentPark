@@ -19,7 +19,7 @@ build-php:
     - echo "PHP build done"
   artifacts:
     paths:
-      - SiteSae2A/vendor/
+      - SiteSAE2A/vendor/
 
 # ----------------------
 # BUILD Blazor (Blazor/blazorAdminRentPark)
@@ -32,10 +32,10 @@ build-blazor:
     - echo "Restoring .NET packages..."
     - dotnet restore blazorAdminRentPark.csproj
     - echo "Building Blazor app..."
-    - dotnet build blazorAdminRentPark.csproj -c Release
+    - dotnet build BlazorAdminRentPark.csproj -c Release
   artifacts:
     paths:
-      - Blazor/blazorAdminRentPark/bin/Release/
+      - Blazor/BlazorAdminRentPark/bin/Release/
 
 # ----------------------
 # SONAR SCANNER
