@@ -8,120 +8,76 @@ use modeleApi\Connection;
 $loader = require_once __DIR__ . '/../vendor/autoload.php';
 $loader->addPsr4('BL\\', __DIR__);
 
-// Récupération de la connexion via database.php
+// Connexion à la DB
 $databaseFactory = require_once __DIR__ . '/../config/database.php';
-$conn = $databaseFactory(); // $conn est maintenant une instance de Connection
+$conn = $databaseFactory();
 
 $app = AppFactory::create();
-
 $app->addBodyParsingMiddleware();
 
-// -----------------------------------------------------------------------
-//  /voitures - GET et DELETE
-// -----------------------------------------------------------------------
+// ----------------------
+// Helpers DRY
+// ----------------------
+function jsonResponse(Response $response, $data, int $status = 200): Response {
+    $response->getBody()->write(json_encode($data));
+    return $response->withHeader('Content-Type', 'application/json')->withStatus($status);
+}
 
-// GET
-$app->get('/voitures', function (Request $request, Response $response, $args) use ($conn) {
-    $conn->executeQuery("SELECT * FROM Vehicule");
-    $vehicules = $conn->getResults();
+function getAll(Response $response, Connection $conn, string $table): Response {
+    $conn->executeQuery("SELECT * FROM $table");
+    return jsonResponse($response, $conn->getResults());
+}
 
-    $response->getBody()->write(json_encode($vehicules));
-    return $response->withHeader('Content-Type', 'application/json');
-});
+function deleteById(Response $response, Connection $conn, string $table, string $idColumn, $id, string $fkErrorMessage = null): Response {
+    $conn->executeQuery("SELECT $idColumn FROM $table WHERE $idColumn = :id", [':id' => [$id, \PDO::PARAM_STR]]);
+    $item = $conn->getResults();
 
-$app->get('/vehicules', function (Request $request, Response $response, $args) use ($conn) {
-    $conn->executeQuery("SELECT * FROM Vehicule");
-    $vehicules = $conn->getResults();
-
-    $response->getBody()->write(json_encode($vehicules));
-    return $response->withHeader('Content-Type', 'application/json');
-});
-
-// DELETE (numSerie)
-$app->delete('/voitures/{numSerie}', function ($request, $response, $args) use ($conn) {
-    $numSerie = (string) $args['numSerie'];
-
-    // 1️⃣ Vérifier si la voiture existe
-    $conn->executeQuery(
-        "SELECT NumSerie FROM Vehicule WHERE NumSerie = :numSerie",
-        [':numSerie' => [$numSerie, \PDO::PARAM_STR]]
-    );
-    $voiture = $conn->getResults();
-
-    if (empty($voiture)) {
-        $response->getBody()->write(json_encode(['error' => 'Voiture non trouvée']));
-        return $response->withHeader('Content-Type', 'application/json')->withStatus(404);
+    if (empty($item)) {
+        return jsonResponse($response, ['error' => "$table non trouvé"], 404);
     }
 
-    // 2️⃣ Essayer de supprimer la voiture
     try {
-        $conn->executeQuery(
-            "DELETE FROM Vehicule WHERE NumSerie = :numSerie",
-            [':numSerie' => [$numSerie, \PDO::PARAM_STR]]
-        );
+        $conn->executeQuery("DELETE FROM $table WHERE $idColumn = :id", [':id' => [$id, \PDO::PARAM_STR]]);
     } catch (\PDOException $e) {
-        // 3️⃣ Gestion propre de la clé étrangère
-        if ($e->getCode() === '23000') { // SQLSTATE pour contrainte FK
-            $response->getBody()->write(json_encode([
-                'error' => 'Impossible de supprimer la voiture',
-                'message' => 'Cette voiture est utilisée dans un ou plusieurs contrats'
-            ]));
-            return $response->withHeader('Content-Type', 'application/json')->withStatus(409);
+        if ($e->getCode() === '23000' && $fkErrorMessage) {
+            return jsonResponse($response, ['error' => $fkErrorMessage], 409);
         }
-
-        // Autres erreurs SQL
-        $response->getBody()->write(json_encode([
-            'error' => 'Erreur SQL',
-            'message' => $e->getMessage()
-        ]));
-        return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
+        return jsonResponse($response, ['error' => 'Erreur SQL', 'message' => $e->getMessage()], 500);
     }
 
-    // 4️⃣ Suppression réussie
-    $response->getBody()->write(json_encode(['message' => 'Voiture supprimée avec succès']));
-    return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
-});
+    return jsonResponse($response, ['message' => "$table supprimé avec succès"]);
+}
 
-// -----------------------------------------------------------------------
-//  /client - GET
-// -----------------------------------------------------------------------
+// ----------------------
+// Routes GET
+// ----------------------
+$app->get('/voitures', fn($req, $res) => getAll($res, $conn, 'Vehicule'));
+$app->get('/vehicules', fn($req, $res) => getAll($res, $conn, 'Vehicule'));
+$app->get('/client', fn($req, $res) => getAll($res, $conn, 'Client'));
+$app->get('/contrat', fn($req, $res) => getAll($res, $conn, 'Contrat'));
+$app->get('/users', fn($req, $res) => getAll($res, $conn, 'users'));
 
-$app->get('/client', function (Request $request, Response $response, $args) use ($conn) {
-    $conn->executeQuery("SELECT * FROM Client");
-    $client = $conn->getResults();
+// ----------------------
+// Routes DELETE
+// ----------------------
+$app->delete('/voitures/{numSerie}', fn($req, $res, $args) =>
+    deleteById($res, $conn, 'Vehicule', 'NumSerie', $args['numSerie'], 'Cette voiture est utilisée dans un ou plusieurs contrats')
+);
 
-    $response->getBody()->write(json_encode($client));
-    return $response->withHeader('Content-Type', 'application/json');
-});
+$app->delete('/contrat/{id}', fn($req, $res, $args) => deleteById($res, $conn, 'Contrat', 'idContrat', $args['id']));
+$app->delete('/users/{id}', fn($req, $res, $args) => deleteById($res, $conn, 'users', 'id', $args['id']));
 
-// -----------------------------------------------------------------------
-//  /contrat - GET, POST et DELETE
-// -----------------------------------------------------------------------
-
-// GET
-$app->get('/contrat', function (Request $request, Response $response, $args) use ($conn) {
-    $conn->executeQuery("SELECT * FROM Contrat");
-    $client = $conn->getResults();
-
-    $response->getBody()->write(json_encode($client));
-    return $response->withHeader('Content-Type', 'application/json');
-});
-
-// POST 
-$app->post('/contrat', function (Request $request, Response $response, $args) use ($conn) {
-    
+// ----------------------
+// Routes POST
+// ----------------------
+$app->post('/contrat', function(Request $request, Response $response) use ($conn) {
     $data = $request->getParsedBody();
-
     if (empty($data['DateDebut']) || empty($data['DateFin'])) {
-        $response->getBody()->write(json_encode([
-            'error' => 'Les champs DateDebut et DateFin sont obligatoires.'
-        ]));
-        return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
+        return jsonResponse($response, ['error' => 'DateDebut et DateFin obligatoires'], 400);
     }
 
     $sql = "INSERT INTO Contrat (DateDebut, DateFin, Statut, IdClient, EtatAvant, EtatApres, IdVehicule, Marque, NomModele, AnneeModele) 
             VALUES (:dateDebut, :dateFin, :statut, :idClient, :etatAvant, :etatApres, :idVehicule, :marque, :nomModele, :anneeModele)";
-
     $params = [
         ':dateDebut' => [$data['DateDebut'], \PDO::PARAM_STR],
         ':dateFin' => [$data['DateFin'], \PDO::PARAM_STR],
@@ -137,232 +93,71 @@ $app->post('/contrat', function (Request $request, Response $response, $args) us
 
     try {
         $conn->executeQuery($sql, $params);
-        
-        $response->getBody()->write(json_encode([
-            'message' => 'Contrat créé avec succès'
-        ]));
-
-        return $response->withHeader('Content-Type', 'application/json')->withStatus(201);
-
+        return jsonResponse($response, ['message' => 'Contrat créé avec succès'], 201);
     } catch (\Exception $e) {
-        $response->getBody()->write(json_encode([
-            'error' => 'Erreur lors de la création du contrat : ' . $e->getMessage()
-        ]));
-        return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
+        return jsonResponse($response, ['error' => 'Erreur création contrat', 'message' => $e->getMessage()], 500);
     }
 });
 
-// DELETE 
-$app->delete('/contrat/{idContrat}', function (Request $request, Response $response, array $args) use ($conn) {
-
-    // 1️⃣ Récupération et validation de l'ID
-    $id = (int) $args['idContrat'];
-
-    if ($id <= 0) {
-        $response->getBody()->write(json_encode([
-            'error' => 'ID invalide'
-        ]));
-        return $response->withHeader('Content-Type', 'application/json')
-                        ->withStatus(400);
-    }
-
-    // 2️⃣ Vérifier si l'utilisateur existe
-    $conn->executeQuery(
-        "SELECT idContrat FROM Contrat WHERE idContrat = :idContrat",
-        [':idContrat' => [$id, \PDO::PARAM_INT]]
-    );
-
-    $user = $conn->getResults();
-
-    if (empty($user)) {
-        $response->getBody()->write(json_encode([
-            'error' => 'Contrat non trouvé'
-        ]));
-        return $response->withHeader('Content-Type', 'application/json')
-                        ->withStatus(404);
-    }
-
-    // 3️⃣ Suppression
-    $conn->executeQuery(
-        "DELETE FROM Contrat WHERE idContrat = :idContrat",
-        [':idContrat' => [$id, \PDO::PARAM_INT]]
-    );
-
-    // 4️⃣ Réponse OK
-    $response->getBody()->write(json_encode([
-        'message' => 'Contrat supprimé avec succès'
-    ]));
-
-    return $response->withHeader('Content-Type', 'application/json')
-                    ->withStatus(200);
-});
-
-// -----------------------------------------------------------------------
-//  /users - GET, DELETE et POST
-// -----------------------------------------------------------------------
-
-// GET
-$app->get('/users', function (Request $request, Response $response, $args) use ($conn) {
-    $conn->executeQuery("SELECT * FROM users");
-    $users = $conn->getResults();
-
-    $response->getBody()->write(json_encode($users));
-    return $response->withHeader('Content-Type', 'application/json');
-});
-
-// DELETE
-$app->delete('/users/{id}', function (Request $request, Response $response, array $args) use ($conn) {
-
-    // 1️⃣ Récupération et validation de l'ID
-    $id = (int) $args['id'];
-
-    if ($id <= 0) {
-        $response->getBody()->write(json_encode([
-            'error' => 'ID invalide'
-        ]));
-        return $response->withHeader('Content-Type', 'application/json')
-                        ->withStatus(400);
-    }
-
-    // 2️⃣ Vérifier si l'utilisateur existe
-    $conn->executeQuery(
-        "SELECT id FROM users WHERE id = :id",
-        [':id' => [$id, \PDO::PARAM_INT]]
-    );
-
-    $user = $conn->getResults();
-
-    if (empty($user)) {
-        $response->getBody()->write(json_encode([
-            'error' => 'Utilisateur non trouvé'
-        ]));
-        return $response->withHeader('Content-Type', 'application/json')
-                        ->withStatus(404);
-    }
-
-    // 3️⃣ Suppression
-    $conn->executeQuery(
-        "DELETE FROM users WHERE id = :id",
-        [':id' => [$id, \PDO::PARAM_INT]]
-    );
-
-    // 4️⃣ Réponse OK
-    $response->getBody()->write(json_encode([
-        'message' => 'Utilisateur supprimé avec succès'
-    ]));
-
-    return $response->withHeader('Content-Type', 'application/json')
-                    ->withStatus(200);
-});
-
-// POST : Ajout d'un utilisateur
-$app->post('/users', function (Request $request, Response $response) use ($conn) {
-    // 1️⃣ Récupération des données
+$app->post('/users', function(Request $request, Response $response) use ($conn) {
     $data = $request->getParsedBody();
-
-    $nom     = $data['nom']     ?? null;
-    $mdp     = $data['mdp']     ?? null;
+    $nom = $data['nom'] ?? null;
+    $mdp = $data['mdp'] ?? null;
     $confirm = $data['confirm'] ?? null;
-    $role    = $data['role']    ?? 'client';
+    $role = $data['role'] ?? 'client';
 
-    // 2️⃣ Validation (Champs vides ou mots de passe différents)
-    if (!$nom || !$mdp || !$role || !$confirm || $confirm !== $mdp) {
-        $msg = ($confirm !== $mdp) ? 'Mots de passe différents' : 'Données manquantes';
-        $response->getBody()->write(json_encode(['error' => $msg]));
-        return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
+    if (!$nom || !$mdp || !$role || !$confirm || $mdp !== $confirm) {
+        $msg = $mdp !== $confirm ? 'Mots de passe différents' : 'Données manquantes';
+        return jsonResponse($response, ['error' => $msg], 400);
     }
-
-    // 3️⃣ Hachage et Insertion
-    $hashedPassword = password_hash($mdp, PASSWORD_DEFAULT);
 
     try {
         $conn->executeQuery(
             "INSERT INTO users (username, password, role) VALUES (:nom, :mdp, :role)",
             [
                 ':nom'  => [$nom, \PDO::PARAM_STR],
-                ':mdp'  => [$hashedPassword, \PDO::PARAM_STR],
+                ':mdp'  => [password_hash($mdp, PASSWORD_DEFAULT), \PDO::PARAM_STR],
                 ':role' => [$role, \PDO::PARAM_STR]
             ]
         );
-
-        $response->getBody()->write(json_encode(['message' => 'Utilisateur créé !']));
-        return $response->withHeader('Content-Type', 'application/json')->withStatus(201);
-
+        return jsonResponse($response, ['message' => 'Utilisateur créé !'], 201);
     } catch (\Exception $e) {
-        $response->getBody()->write(json_encode(['error' => 'Erreur BDD : ' . $e->getMessage()]));
-        return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
+        return jsonResponse($response, ['error' => 'Erreur BDD : ' . $e->getMessage()], 500);
     }
 });
-// -------------------------------------------------------------------------------------------------
 
-$app->patch('/contrat/{id}', function (Request $request, Response $response, $args) use ($conn) {
+// ----------------------
+// PATCH /contrat/{id} - mise à jour DateFin
+// ----------------------
+$app->patch('/contrat/{id}', function(Request $request, Response $response, $args) use ($conn) {
     $id = $args['id'];
     $data = $request->getParsedBody();
 
     if (empty($data['DateFin'])) {
-        $response->getBody()->write(json_encode([
-            'error' => 'Le champ DateFin est obligatoire.'
-        ]));
-        return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
+        return jsonResponse($response, ['error' => 'DateFin obligatoire'], 400);
     }
 
-    $checkSql = "SELECT Statut FROM Contrat WHERE idContrat = :id";
-    $checkParams = ['id' => $id];
+    $stmt = $conn->prepare("SELECT Statut FROM Contrat WHERE idContrat = :id");
+    $stmt->execute(['id' => $id]);
+    $contrat = $stmt->fetch(\PDO::FETCH_ASSOC);
 
-    try {
-        $stmt = $conn->prepare($checkSql);
+    if (!$contrat) return jsonResponse($response, ['error' => 'Contrat non trouvé'], 404);
+    if ($contrat['Statut'] === 'Terminé') return jsonResponse($response, ['error' => 'Impossible de modifier un contrat terminé'], 403);
 
-        $stmt->execute($checkParams);
+    $updateStmt = $conn->prepare("UPDATE Contrat SET DateFin = :dateFin WHERE idContrat = :id");
+    $updateStmt->execute(['dateFin' => $data['DateFin'], 'id' => $id]);
 
-        $checkResult = $stmt->fetch(\PDO::FETCH_ASSOC);
-        
-        if (!$checkResult) {
-            $response->getBody()->write(json_encode(['error' => 'Contrat non trouvé.']));
-            return $response->withHeader('Content-Type', 'application/json')->withStatus(404);
-        }
-
-        if ($checkResult['Statut'] === 'Terminé') {
-            $response->getBody()->write(json_encode(['error' => 'Impossible de modifier la date de fin d\'un contrat terminé.']));
-            return $response->withHeader('Content-Type', 'application/json')->withStatus(403);
-        }
-        
-        $sql = "UPDATE Contrat SET DateFin = :dateFin WHERE idContrat = :id";
-        
-        $params = [
-            'dateFin' => $data['DateFin'],
-            'id' => $id
-        ];
-
-        $updateStmt = $conn->prepare($sql);
-        $updateStmt->execute($params);
-        
-        $response->getBody()->write(json_encode([
-            'message' => 'Date de fin du contrat mise à jour avec succès'
-        ]));
-
-        return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
-
-    } catch (\Exception $e) {
-        $response->getBody()->write(json_encode([
-            'error' => 'Erreur lors de la mise à jour : ' . $e->getMessage()
-        ]));
-        return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
-    }
+    return jsonResponse($response, ['message' => 'DateFin mise à jour']);
 });
 
+// ----------------------
+// Middleware / Erreurs
+// ----------------------
 $app->addRoutingMiddleware();
-
 $errorMiddleware = $app->addErrorMiddleware(true, true, true);
 $errorMiddleware->setErrorHandler(
     Slim\Exception\HttpNotFoundException::class,
-    function ($request, $exception, $displayErrorDetails) use ($app) {
-        $response = $app->getResponseFactory()->createResponse();
-        $response->getBody()->write(json_encode([
-            "error" => "Route non dispo ou inexistante"
-        ]));
-        return $response->withHeader('Content-Type', 'application/json')->withStatus(404);
-    }
+    fn($req, $ex, $display) => jsonResponse($app->getResponseFactory()->createResponse(), ['error' => 'Route non dispo'], 404)
 );
-
 
 $app->run();

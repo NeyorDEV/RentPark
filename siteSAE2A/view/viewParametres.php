@@ -25,7 +25,7 @@ if (file_exists($settingsFile)) {
 <body>
 <nav>
     <ul class="menu">
-        <li><a href="/siteSAE2A/index.php"><img src="/siteSAE2A/html/icons/acceuil.jpg" alt="Accueil"> Accueil</a></li>
+        <li><a href="/siteSAE2A/home"><img src="/siteSAE2A/html/icons/acceuil.jpg" alt="Accueil"> Accueil</a></li>
         <li><a href="/siteSAE2A/dashboard"><img src="/siteSAE2A/html/icons/dashboard.png" alt="Tableau de bord"> Tableau de bord</a></li>
         <li><a href="/siteSAE2A/voitures"><img src="/siteSAE2A/html/icons/voiture.png" alt="Flotte"> Flotte Automobile</a></li>
         <li><a href="/siteSAE2A/contrats"><img src="/siteSAE2A/html/icons/contrat.png" alt="Contrats"> Contrats</a></li>

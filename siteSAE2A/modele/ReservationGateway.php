@@ -121,6 +121,27 @@ class ReservationGateway {
     return $results;
 }
 
+public function getMonthlyPlanning(): array
+{
+    $sql = "
+        SELECT 
+            c.DateDebut,
+            c.DateFin,
+            v.Marque,
+            v.Nom
+        FROM Contrat c
+        JOIN Vehicule v ON v.NumSerie = c.IdVehicule
+        WHERE 
+            c.DateFin >= CURDATE()
+            AND c.DateDebut <= LAST_DAY(CURDATE())
+        ORDER BY c.DateDebut ASC
+    ";
+
+    $this->connection->executeQuery($sql);
+    return $this->connection->getResults();
+}
+
+
     
     
 }
