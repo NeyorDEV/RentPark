@@ -4,7 +4,7 @@ stages:
   - deploy
 
 # ----------------------
-# BUILD PHP
+# BUILD PHP (SiteSae2A)
 # ----------------------
 build-php:
   stage: build
@@ -13,27 +13,29 @@ build-php:
     - apt-get update && apt-get install -y unzip git curl
   script:
     - echo "Installing PHP dependencies..."
+    - cd SiteSAE2A
     - composer install --no-interaction --prefer-dist
     - composer dump-autoload
     - echo "PHP build done"
   artifacts:
     paths:
-      - vendor/
+      - SiteSae2A/vendor/
 
 # ----------------------
-# BUILD Blazor
+# BUILD Blazor (Blazor/blazorAdminRentPark)
 # ----------------------
 build-blazor:
   stage: build
   image: mcr.microsoft.com/dotnet/sdk:9.0
   script:
+    - cd Blazor/blazorAdminRentPark
     - echo "Restoring .NET packages..."
-    - dotnet restore ./BlazorApp/BlazorApp.csproj
+    - dotnet restore blazorAdminRentPark.csproj
     - echo "Building Blazor app..."
-    - dotnet build ./BlazorApp/BlazorApp.csproj -c Release
+    - dotnet build blazorAdminRentPark.csproj -c Release
   artifacts:
     paths:
-      - BlazorApp/bin/Release/
+      - Blazor/blazorAdminRentPark/bin/Release/
 
 # ----------------------
 # SONAR SCANNER
@@ -69,6 +71,5 @@ deploy:
   dependencies:
     - build-php
     - build-blazor
-
 
 
