@@ -1,12 +1,22 @@
 ﻿@page "/account"
 @rendermode InteractiveServer
+<<<<<<< HEAD
 @using MudBlazor;
 @using System.Linq;
+=======
+@using MudBlazor
+@inject IDialogService DialogService 
+@* Injection du service *@
+>>>>>>> 950ab224ddf0be34a072b449d7094447bf1d56a2
 
 <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-8">
     <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Class="mb-6">
         <MudText Typo="Typo.h4" Style="font-weight: bold;">Compte</MudText>
-        <MudButton Variant="Variant.Filled" Color="Color.Success" StartIcon="@Icons.Material.Filled.Add">
+        @* Ajout de l'événement OnClick *@
+        <MudButton Variant="Variant.Filled" 
+                   Color="Color.Success" 
+                   StartIcon="@Icons.Material.Filled.Add"
+                   OnClick="OpenAddUserDialog">
             AJOUTER
         </MudButton>
     </MudStack>
@@ -47,22 +57,42 @@
             </MudItem>
         }
     </MudGrid>
+<<<<<<< HEAD
 
     @* Pagination control *@
     <MudStack Row="true" Justify="Justify.Center" Class="mt-6">
         <MudPagination Page="@_currentPage" PageCount="@PageCount" OnPageChanged="OnPageChanged" />
     </MudStack>
+=======
+s
+
+>>>>>>> 950ab224ddf0be34a072b449d7094447bf1d56a2
 </MudContainer>
 
 @code {
     private string _searchString = "";
 
+<<<<<<< HEAD
     private int _currentPage = 1;
     private int _pageSize = 8;
+=======
+    // Méthode pour ouvrir la boîte de dialogue
+    private async Task OpenAddUserDialog()
+    {
+        var options = new DialogOptions { CloseOnEscapeKey = true, MaxWidth = MaxWidth.Small, FullWidth = true };
+        var dialog = await DialogService.ShowAsync<AddUserDialog>("", options);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            // Logique future pour rafraîchir la liste
+        }
+    }
+>>>>>>> 950ab224ddf0be34a072b449d7094447bf1d56a2
 
     public class UserDto
     {
-        public int Id { get; set; }
+        public int Id { get; set; } 
         public string Username { get; set; }
         public string Role { get; set; }
     }
