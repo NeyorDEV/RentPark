@@ -26,7 +26,7 @@ $vues['connection'] = 'view/viewConnection.php';
 $vues['dashboard'] = 'view/viewDashboard.php';
 $vues['homeCustomers'] = 'view/viewHomeCustomers.php';
 $vues['cars'] = 'view/viewCars.php';
-$vues['recapitulatif'] = 'view/viewRecapitulatif.php';
+$vues['recapitulatif'] = 'view/viewRecap.php';
 $vues['parametres'] = 'view/viewParametres.php';
 $vues['reservationForm'] = 'view/viewReservationForm.php';
 

@@ -108,9 +108,25 @@ $ht = $prix_total - $tva;
     </div>
 
     <div class="actions-bar">
-        <button onclick="window.print()" class="btn-secondary"><i class="fa-solid fa-print"></i> Imprimer le devis</button>
-        <button class="btn-orange">Confirmer ma réservation <i class="fa-solid fa-check"></i></button>
-    </div>
+    <button onclick="window.print()" class="btn-secondary">
+        <i class="fa-solid fa-print"></i> Imprimer le devis
+    </button>
+
+    <form action="/siteSAE2A/finaliserReservation" method="POST" style="flex: 2;">
+        <input type="hidden" name="nom" value="<?php echo htmlspecialchars($nom); ?>">
+        <input type="hidden" name="prenom" value="<?php echo htmlspecialchars($prenom); ?>">
+        <input type="hidden" name="email" value="<?php echo htmlspecialchars($email); ?>">
+        <input type="hidden" name="numTel" value="<?php echo htmlspecialchars($numTel); ?>">
+        <input type="hidden" name="numPermis" value="<?php echo htmlspecialchars($numPermis); ?>">
+        <input type="hidden" name="num_serie" value="<?php echo htmlspecialchars($numSerie); ?>">
+        <input type="hidden" name="date_debut" value="<?php echo htmlspecialchars($date_debut); ?>">
+        <input type="hidden" name="date_fin" value="<?php echo htmlspecialchars($date_fin); ?>">
+        <input type="hidden" name="prix_total" value="<?php echo htmlspecialchars($prix_total); ?>">
+
+        <button type="submit" class="btn-orange" style="width: 100%;">
+            Confirmer ma réservation <i class="fa-solid fa-check"></i>
+        </button>
+    </form>
 </div>
 
 </body>

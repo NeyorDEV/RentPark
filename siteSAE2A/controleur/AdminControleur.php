@@ -80,6 +80,9 @@ class AdminControleur
                 case 'afficheParametres':
                     $this->afficheParametres($dVueEreur);
                     break;
+                case 'finaliserReservation':
+                    $this->finaliserReservation($dVueEreur);
+                    break;
                 default:
                     $dVueEreur[] = "Action inconnue";
                     $this->afficherVue('flotte', $dVueEreur, $results = null, 'admin');
@@ -733,6 +736,58 @@ public function cars(array $dVueEreur)
         exit;
     }
 
+    function finaliserReservation(array &$dVueEreur) 
+    {
+        try {
+            // 1. Récupération des données du formulaire
+            // Données Client
+            $nom = $_POST['nom'] ?? null;
+            $prenom = $_POST['prenom'] ?? null;
+            $email = $_POST['email'] ?? null;
+            $tel = $_POST['numTel'] ?? null;
+            $permis = $_POST['numPermis'] ?? null;
+            $dateNaiss = $_POST['datenaiss'] ?? null; // Assure-toi que le nom correspond au hidden input
+            $nationalite = $_POST['nationalite'] ?? null;
+
+            // Données Contrat
+            $numSerie = $_POST['num_serie'] ?? null;
+            $dateDebut = $_POST['date_debut'] ?? null;
+            $dateFin = $_POST['date_fin'] ?? null;
+            $prixTotal = $_POST['prix_total'] ?? 0;
+            $statut = 'EnCoursValidation';
+
+            // 2. Validation sommaire
+            if (empty($nom) || empty($email) || empty($numSerie)) {
+                $dVueEreur[] = "Toutes les informations n'ont pas été reçues.";
+                $this->afficherVue('recapitulatif', $dVueEreur); // Retour au récap si erreur
+                return;
+            }
+
+            //Creer le client
+            $idClient = null; // TODO: API creer client
+
+            if ($idClient) {
+                // On crée le contrat lié à cet ID client
+                $resContrat = null; // TODO: API creer contrat grace aux données récupérées et au client
+                
+                if ($resContrat) {
+                    // 4. Succès : On affiche une vue de confirmation
+                    $this->afficherVue('confirmationSucces', $dVueEreur); // TODO vue confirmation
+                } else {
+                    $dVueEreur[] = "Erreur lors de la création du contrat.";
+                    $this->afficherVue('recapitulatif', $dVueEreur); // TODO peut etre affiner un peu cette partie
+                }
+
+            } else {
+                $dVueEreur[] = "Erreur lors de l'enregistrement du client.";            // TODO peut etre affiner un peu cette partie
+                $this->afficherVue('recapitulatif', $dVueEreur);
+            }
+
+        } catch (\Exception $e) {
+            $dVueEreur[] = "Une erreur technique est survenue : " . $e->getMessage();
+            $this->afficherVue('recapitulatif', $dVueEreur);        // TODO peut etre affiner un peu cette partie
+        }
+    }
 }
 
 

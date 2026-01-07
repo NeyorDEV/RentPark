@@ -39,7 +39,7 @@ $totalTTC = $nbJours * $prixJournalier;
 
     <div class="form-section">
         <h2>Informations de réservation</h2>
-        <form action="/siteSAE2A/finaliser_reservation.php" method="POST">
+        <form action="/siteSAE2A/recapitulatif" method="POST">
             <input type="hidden" name="num_serie" value="<?php echo htmlspecialchars($numSerie); ?>">
             <input type="hidden" name="date_debut" value="<?php echo htmlspecialchars($date_depart); ?>">
             <input type="hidden" name="date_fin" value="<?php echo htmlspecialchars($date_retour); ?>">
