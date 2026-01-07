@@ -11,15 +11,18 @@ build-php:
   image: php:8.2-cli
   before_script:
     - apt-get update && apt-get install -y unzip git curl
+    - curl -sS https://getcomposer.org/installer | php
+    - mv composer.phar /usr/local/bin/composer
   script:
     - echo "Installing PHP dependencies..."
-    - cd siteSAE2A
+    - cd SiteSAE2A
     - composer install --no-interaction --prefer-dist
     - composer dump-autoload
     - echo "PHP build done"
   artifacts:
     paths:
       - SiteSAE2A/vendor/
+
 
 # ----------------------
 # BUILD Blazor (Blazor/blazorAdminRentPark)
