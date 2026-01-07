@@ -9,9 +9,12 @@ stages:
 build-php:
   stage: build
   image: php:8.2-cli
+  before_script:
+    - apt-get update && apt-get install -y unzip git curl
   script:
     - echo "Installing PHP dependencies..."
-    - composer install
+    - composer install --no-interaction --prefer-dist
+    - composer dump-autoload
     - echo "PHP build done"
   artifacts:
     paths:
@@ -45,7 +48,7 @@ sonarqube-check:
   script:
     - echo "Running SonarScanner..."
     - sonar-scanner -X
-  allow_failure: true    # ← Quality Gate échoue = orange, pipeline continue
+  allow_failure: true
   dependencies:
     - build-php
     - build-blazor
@@ -66,5 +69,6 @@ deploy:
   dependencies:
     - build-php
     - build-blazor
+
 
 
