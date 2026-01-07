@@ -71,6 +71,9 @@ class AdminControleur
                 case 'cars':
                     $this->cars($dVueEreur);
                     break;
+                case 'reservationForm':
+                    $this->reservationForm($dVueEreur);
+                    break;
                 case 'afficheRecapitulatif':
                     $this->afficheRecapitulatif($dVueEreur);
                     break;
@@ -262,6 +265,9 @@ public function cars(array $dVueEreur)
     $this->afficherVue('cars', $dVueEreur, $results, 'user');
 }
 
+    public function reservationForm(array $dVueEreur){
+         $this->afficherVue('reservationForm', $dVueEreur, $results = null, 'admin');
+    }
 
     public function afficheRecapitulatif(array $dVueEreur)
     {

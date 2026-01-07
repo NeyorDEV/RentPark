@@ -28,6 +28,7 @@ $vues['homeCustomers'] = 'view/viewHomeCustomers.php';
 $vues['cars'] = 'view/viewCars.php';
 $vues['recapitulatif'] = 'view/viewRecapitulatif.php';
 $vues['parametres'] = 'view/viewParametres.php';
+$vues['reservationForm'] = 'view/viewReservationForm.php';
 
 
 $action = "RAS";

@@ -35,6 +35,7 @@ class FrontControleur
         $router->map('GET|POST', '/dashboard', 'afficheDashboard');
         $router->map('GET|POST', '/homeCustomers', 'homeCustomers');
         $router->map('GET|POST', '/cars', 'cars'); // suite au home, la recherche de vehicule pour réserver
+        $router->map('GET|POST', '/reservationForm', 'reservationForm');
         $router->map('GET|POST', '/recapitulatif', 'afficheRecapitulatif');
         $router->map('GET|POST', '/parametres', 'afficheParametres');
         
