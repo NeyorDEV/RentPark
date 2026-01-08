@@ -15,8 +15,8 @@
         } catch (e) { }
     })();
     </script>
-    <link rel="stylesheet" href="/siteSAE2A/html/css/parametres.css">
-    <link rel="stylesheet" href="html/css/dashboard.css">
+    <link rel="stylesheet" href="/siteSAE2A/html/css/commun.css">
+    <link rel="stylesheet" href="/siteSAE2A/html/css/dashboard.css">
     <link rel="icon" type="image/png" href="html/icons/voiture.png">
     <link rel="shortcut icon" href="html/icons/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
