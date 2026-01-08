@@ -30,22 +30,20 @@ nav {
     position: fixed;
     top: 20px;
     left: 20px;
-    bottom: 20px;              /* Fixe l'espace au bas de la page */
+    bottom: 20px;
     width: 18%;
-    /* On laisse la hauteur se gérer via top/bottom pour un arrondi parfait */
     
-    /* Effet Glassmorphism */
-    background-color: rgba(255, 255, 255, 0.45); /* Plus de transparence */
-    backdrop-filter: blur(15px) saturate(180%);  /* Flou plus intense et couleurs boostées */
-    -webkit-backdrop-filter: blur(15px) saturate(180%);
+    /* Effet Glassmorphism accentué */
+    background-color: rgba(255, 255, 255, 0.3); /* Plus transparent */
+    backdrop-filter: blur(20px) saturate(160%);  /* Flou plus fort */
+    -webkit-backdrop-filter: blur(20px) saturate(160%);
     
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    border-radius: 30px;                       /* Coins encore plus doux */
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 30px;
     padding: 30px 0;
     z-index: 100;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 }
-
 .menu { 
     list-style: none;      /* Supprime les points (puces) */
     padding: 0;           /* Supprime l'espace à gauche par défaut */
@@ -55,9 +53,11 @@ nav {
     flex-direction: column;
 }
 
-/* On s'assure que les éléments de liste n'ont pas de puces non plus */
 .menu li {
-    list-style-type: none; 
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    background: transparent !important; /* Force la transparence du container */
 }
 
 .menu a {
@@ -71,6 +71,7 @@ nav {
     border-radius: 12px;        
     margin: 8px 15px;         
     transition: all 0.3s ease;
+    background: transparent !important; /* Supprime toute couleur de fond par défaut */
 }
 
 .menu a:hover { 
@@ -220,16 +221,25 @@ nav {
 .dark-theme { background-color: #121212; color: #eee; }
 
 .dark-theme nav {
-    background-color: rgba(27, 27, 27, 0.7); /* Noir transparent */
+    background-color: rgba(#333333) !important; 
     border-color: rgba(255, 255, 255, 0.1);
+    background-image: none !important;
 }
 
-.dark-theme .menu a { color: #e0e0e0; }
+.dark-theme .menu a { 
+    color: #e0e0e0; 
+    background: transparent !important; /* Uniformise le fond des boutons */
+}
+
 .dark-theme .menu a i {
-    color: var(--rentpark-orange-dark); /* Orange vif pour la visibilité */
+    color: var(--rentpark-orange-dark);
 }
 
-.dark-theme .menu a:hover { background-color: #333333; color: #ffffff; }
+.dark-theme .menu a:hover {
+    /* Background de survol très léger pour ne pas casser l'effet glass */
+    background-color: rgba(255, 255, 255, 0.1) !important; 
+    color: #ffffff;
+}
 .dark-theme .menu a:hover i {
     color: #fff;
 }
