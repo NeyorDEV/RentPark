@@ -1,129 +1,143 @@
 {% extends "base.twig" %}
 
+{% block stylesheets %}
+    <link rel="stylesheet" href="/siteSAE2A/html/css/flotte.css">
+{% endblock %}
+
 {% block content %}
-<div class="top"> 
-    <h1>Flotte Automobile</h1>
-    {% if role == 'admin' %}
-        <a href="#addModal" class="add-btn">+ Ajouter</a>
-    {% endif %}
-</div>
-   <style>
-        .dark-theme .topbar-form input { background: #ffffff;  border: 1px solid rgba(0,0,0,0.12); }
-        .dark-theme .topbar-form input::placeholder {  opacity: 0.9; }
-        .dark-theme .topbar-form input::-webkit-input-placeholder {  opacity: 0.9; }
-        .dark-theme .topbar-form input:-ms-input-placeholder {  opacity: 0.9; }
-        .dark-theme .topbar-form input::-ms-input-placeholder { opacity: 0.9; }
-        .dark-theme .top h1 { color: #FFFFFF; }
-    </style>
+<div class="main-content">
+    <div class="header-container"> 
+        <h1>Flotte Automobile</h1>
+        {% if role == 'admin' %}
+            <a href="#addModal" class="add-btn-main">
+                <i class="fa-solid fa-plus"></i> Ajouter un véhicule
+            </a>
+        {% endif %}
+    </div>
 
-<header class="topbar">
-    <form action="/sitesae2A/voitures" method="get" role="search" class="topbar-form">
-        <input type="hidden" name="action" value="rechercherVoitures">
-        <input
-            id="q3"
-            name="q"
-            type="search"
-            placeholder="Rechercher..."
-            aria-label="Recherche"
-            value="{{ app.request.get('q')|default('') }}"
-        >
-        <button type="submit">🔍</button>
-    </form>
-</header>
-
-{% if dVueErreur is not empty %}
-<div class="erreurs">
-    <ul>
-        {% for erreur in dVueErreur %}
-            <li>{{ erreur|e }}</li>
-        {% endfor %}
-    </ul>
-</div>
-{% endif %}
-
-<div class="voiture">
-    {% if results is not empty %}
-        {% for row in results %}
-            <div class="rectangle">
-                <!-- Image unique -->
-                <img src="{{ row.ImagePath is not empty ? row.ImagePath|e : 'html/icons/voiture.png' }}" 
-                     alt="Image du véhicule" class="bg-img">
-
-                <!-- Infos du véhicule -->
-                <div class="info">
-                    <p>{{ row.Nom|e }}</p>
-                    <p class="badge">{{ row.Puissance|e }} cv</p>
-                    <p>{{ row.couleur|e }}</p>
-
-                    <!-- Actions -->
-                    {% if role == 'admin' %}
-                    <div class="actions">
-                        <form method="POST" action="/siteSAE2A/voitures" onsubmit="return confirm('Supprimer ce véhicule ?');">
-                            <input type="hidden" name="action" value="supprimerVoiture">
-                            <input type="hidden" name="id" value="{{ row.voiture|e }}">
-                            <button type="submit">Supprimer</button>
-                        </form>
-                        <button type="button" class="edit-btn" onclick="location.hash='editModal-{{ row.voiture|e }}'">Modifier</button>
-
-                    </div>
-                    {% endif %}
-                </div>
+    <header class="search-section">
+        <form action="/sitesae2A/voitures" method="get" class="search-form">
+            <input type="hidden" name="action" value="rechercherVoitures">
+            <div class="search-box">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input
+                    name="q"
+                    type="search"
+                    placeholder="Rechercher un modèle..."
+                    value="{{ app.request.get('q')|default('') }}"
+                >
+                <button type="submit" style="display:none;"></button>
             </div>
-        {% endfor %}
-    {% else %}
-        <div class="rectangle">
-            <p>Aucun véhicule trouvé</p>
+        </form>
+    </header>
+
+    {% if dVueErreur is not empty %}
+        <div class="erreurs">
+            <ul>
+                {% for erreur in dVueErreur %}
+                    <li>{{ erreur|e }}</li>
+                {% endfor %}
+            </ul>
         </div>
     {% endif %}
+
+    <div class="voitures-grid">
+        {% if results is not empty %}
+            {% for row in results %}
+                <div class="car-card">
+                    <div class="car-image">
+                        <img src="{{ row.ImagePath is not empty ? row.ImagePath|e : '/siteSAE2A/html/icons/voiture.png' }}" 
+                             alt="{{ row.Nom|e }}">
+                    </div>
+                    <div class="car-content">
+                        <h2>{{ row.Nom|e }}</h2>
+                        <div class="car-badges">
+                            <span class="badge"><i class="fa-solid fa-bolt"></i> {{ row.Puissance|e }} cv</span>
+                            <span class="badge"><i class="fa-solid fa-palette"></i> {{ row.couleur|e }}</span>
+                        </div>
+                        <div class="car-actions">
+                            {# Lien vers les détails (si tu en as un) #}
+                            <a href="/siteSAE2A/voiture/{{ row.voiture|e }}" class="btn-icon view" title="Voir détails">
+                                <i class="fa-solid fa-eye"></i>
+                            </a>
+                            
+                            {% if role == 'admin' %}
+                                <a href="#editModal-{{ row.voiture|e }}" class="btn-icon edit" title="Modifier">
+                                    <i class="fa-solid fa-pen"></i>
+                                </a>
+                                <form method="POST" action="/siteSAE2A/voitures" class="delete-form" onsubmit="return confirm('Supprimer ce véhicule ?');">
+                                    <input type="hidden" name="action" value="supprimerVoiture">
+                                    <input type="hidden" name="id" value="{{ row.voiture|e }}">
+                                    <button type="submit" class="btn-icon delete"><i class="fa-solid fa-trash"></i></button>
+                                </form>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="no-results">
+                <p>Aucun véhicule trouvé</p>
+            </div>
+        {% endif %}
+    </div>
 </div>
 
-<!-- Modales de modification (une seule fois par véhicule) -->
 {% if role == 'admin' %}
     {% for row in results %}
         <div id="editModal-{{ row.voiture|e }}" class="modal">
-            <div class="modal-content">
+            <div class="modal-content glass-container">
                 <a href="#" class="close">&times;</a>
-                <h2>Modifier le véhicule</h2>
+                <h2>Modifier {{ row.Nom|e }}</h2>
                 <form method="POST" action="/siteSAE2A/voitures" enctype="multipart/form-data">
                     <input type="hidden" name="action" value="modifierVoiture">
                     <input type="hidden" name="id" value="{{ row.voiture|e }}">
                     
-                    <label>Modèle<br>
+                    <div class="form-group">
+                        <label>Modèle</label>
                         <input type="text" name="modele" required value="{{ row.modele|e }}">
-                    </label><br><br>
-                    <label>Puissance<br>
+                    </div>
+                    <div class="form-group">
+                        <label>Puissance (cv)</label>
                         <input type="number" name="puissance" required value="{{ row.puissance|e }}">
-                    </label><br><br>
-                    <label>Couleur<br>
+                    </div>
+                    <div class="form-group">
+                        <label>Couleur</label>
                         <input type="text" name="couleur" required value="{{ row.couleur|e }}">
-                    </label><br><br>
-                    <label>Image<br>
+                    </div>
+                    <div class="form-group">
+                        <label>Changer l'image</label>
                         <input type="file" name="image" accept="image/*">
-                    </label><br><br>
-
-                    <button type="submit">Enregistrer</button>
+                    </div>
+                    
+                    <button type="submit" class="save-btn">Enregistrer</button>
                 </form>
             </div>
         </div>
     {% endfor %}
-{% endif %}
 
-<!-- Modale d'ajout -->
-{% if role == 'admin' %}
-<div id="addModal" class="modal">
-    <div class="modal-content">
-        <a href="#" class="close">&times;</a>
-        <h2>Ajouter un véhicule</h2>
-        <form method="POST" action="/siteSAE2A/voitures" enctype="multipart/form-data">
-            <input type="hidden" name="action" value="ajouterVoiture">
-            <input type="text" name="modele" placeholder="Modèle" required><br><br>
-            <input type="number" name="puissance" placeholder="Puissance" required><br><br>
-            <input type="text" name="couleur" placeholder="Couleur" required><br><br>
-            <input type="file" name="image" accept="image/*"><br><br>
-            <button type="submit">Ajouter</button>
-        </form>
+    <div id="addModal" class="modal">
+        <div class="modal-content glass-container">
+            <a href="#" class="close">&times;</a>
+            <h2>Nouveau Véhicule</h2>
+            <form method="POST" action="/siteSAE2A/voitures" enctype="multipart/form-data">
+                <input type="hidden" name="action" value="ajouterVoiture">
+                <div class="form-group">
+                    <input type="text" name="modele" placeholder="Modèle" required>
+                </div>
+                <div class="form-group">
+                    <input type="number" name="puissance" placeholder="Puissance" required>
+                </div>
+                <div class="form-group">
+                    <input type="text" name="couleur" placeholder="Couleur" required>
+                </div>
+                <div class="form-group">
+                    <label>Image du véhicule</label>
+                    <input type="file" name="image" accept="image/*">
+                </div>
+                <button type="submit" class="save-btn">Ajouter à la flotte</button>
+            </form>
+        </div>
     </div>
-</div>
 {% endif %}
-
 {% endblock %}
