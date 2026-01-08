@@ -1,317 +1,285 @@
+/* ==========================================================================
+   1. IMPORT DES POLICES ET VARIABLES
+   ========================================================================== */
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Allura&family=Michroma&family=Science+Gothic:wght@100..900&display=swap');
 
-h1 {
-    font-family: 'Montserrat', sans-serif;
-    color: #333;
-  }
-
-nav {
-    position: fixed; 
-    top: 0;
-    left: 0;
-    width: 20%;      
-    height: 100%;   
-    background-color:white;
-    border: 1px solid;
-    padding-top: 20px;
-
-
-
+:root {
+    --rentpark-orange: #ff5a19;
+    --rentpark-orange-dark: #ff9800;
+    --logout-red: #e74c3c;
+    --bg-light: #f4f7f6;
+    --card-white: #ffffff;
+    --text-dark: #333333;
+    --text-muted: rgb(80, 80, 80);
 }
 
-
-.menu {
-
+/* ==========================================================================
+   2. RESET ET BASE
+   ========================================================================== */
+body {
     margin: 0;
-    padding: 0;
+    font-family: 'Montserrat', sans-serif;
+    background-color: var(--bg-light);
+    color: var(--text-dark);
 }
 
+/* ==========================================================================
+   3. NAVIGATION (SIDEBAR)
+   ========================================================================== */
+nav {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    bottom: 20px;              /* Fixe l'espace au bas de la page */
+    width: 18%;
+    /* On laisse la hauteur se gérer via top/bottom pour un arrondi parfait */
+    
+    /* Effet Glassmorphism */
+    background-color: rgba(255, 255, 255, 0.45); /* Plus de transparence */
+    backdrop-filter: blur(15px) saturate(180%);  /* Flou plus intense et couleurs boostées */
+    -webkit-backdrop-filter: blur(15px) saturate(180%);
+    
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 30px;                       /* Coins encore plus doux */
+    padding: 30px 0;
+    z-index: 100;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.menu { 
+    list-style: none;      /* Supprime les points (puces) */
+    padding: 0;           /* Supprime l'espace à gauche par défaut */
+    margin: 0;            /* Supprime les marges par défaut */
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+/* On s'assure que les éléments de liste n'ont pas de puces non plus */
 .menu li {
-    margin: 10px 0;
+    list-style-type: none; 
 }
 
 .menu a {
     display: flex;               
     align-items: center;
-    padding: 12px 20px;
+    padding: 18px 25px;
     text-decoration: none;
-    color: rgb(80, 80, 80);      
-    font-size: 18px;
-    border-radius: 10px;        
-    margin: 5px 10px;   
-    
-    font-family: 'Montserrat', sans-serif;
-  }
-  .menu a img {
-    width: 15%;
-    height: 15%;
-    margin-right: 10px;
+    color: var(--text-muted);      
+    font-size: 20px;
+    font-weight: 500;
+    border-radius: 12px;        
+    margin: 8px 15px;         
+    transition: all 0.3s ease;
+}
 
-  }
-  
-  .menu a:hover img {
-    filter: grayscale(70%) brightness(0.9); 
+.menu a:hover { 
+    background-color: #f0f0f0; 
+    color: #000; 
+}
 
-  }
-  
-  .menu a:hover {
-    background-color: rgb(230, 230, 230);
-    color: black;                 
-  }
-/* ZONE PRINCIPALE */
+/* Icônes de la navigation */
+/* Couleur des icônes en THEME CLAIR (Noir) */
+.menu a i {
+    font-size: 24px;
+    width: 40px;
+    margin-right: 15px;
+    color: #1a1a1a;         /* Noir pour le thème clair */
+    transition: all 0.3s ease;
+    text-align: center;
+}
+
+/* On garde l'orange au survol pour garder l'identité Rentpark */
+.menu a:hover i {
+    transform: scale(1.1);
+    color: var(--rentpark-orange);
+}
+
+.logout-item {
+    margin-top: auto; /* Pousse la déconnexion vers le bas proprement */
+    margin-bottom: 20px;
+}
+
+/* Cas spécifique déconnexion */
+.logout-item a i {
+    color: var(--logout-red);
+}
+
+/* Support pour les anciennes images si présentes */
+.menu a img {
+    width: 32px;
+    height: 32px;
+    margin-right: 18px;
+}
+
+/* ==========================================================================
+   4. LAYOUT PRINCIPAL (GRILLE)
+   ========================================================================== */
 .main-content {
     margin-left: 22%;
-    padding: 20px;
-
-    
-}
-
-.dashboard-cards {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 30px;
-}
-
-/* CARTE STATISTIQUE */
-.card {
-    background-color: #fff;
-    width: 300px;
-    height: 200px;
-    border-radius: 12px;
-    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start; 
-    transition: transform 0.3s ease;
-}
-
-.card:hover {
-    transform: scale(1.05);
-}
-
-.card h2 {
-    font-size: 20px;
-    margin: 0 0 10px 0;
-
-    font-family: 'Montserrat', sans-serif;
-}
-
-.card .circle-chart {
-    margin-top: auto;
-    margin-bottom: auto;
-}
-
-
-/* CERCLE STATISTIQUE */
-/* Déclare la variable animable */
-/* Déclare la variable animable */
-@property --value {
-    syntax: '<number>';
-    inherits: false;
-    initial-value: 0;
-}
-
-/* Cercle générique */
-.circle-chart {
-    --value: 0;
-    --final-value: 0; /* valeur finale du cercle (pourcentage) */
-    width: 150px;
-    height: 150px;
-    border-radius: 50%;
-    background:
-        radial-gradient(circle, white 55%, transparent 56%),
-        conic-gradient(#d67608 calc(var(--value) * 1%), #eee 0);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-    font-size: 16px;
-    color: #333;
-    animation: fill-circle 1.7s ease-out forwards;
-
-    font-family: 'Montserrat', sans-serif;
-}
-
-/* Animation générique qui utilise la variable --final-value */
-@keyframes fill-circle {
-    from { --value: 0; }
-    to { --value: var(--final-value); }
-}
-
-
-
-
-
-
-/* CARTE rappel */
-.alert {
-    background-color: #fff;
-    width: 440px;
-    height: 380px;
-
-    border-radius: 12px;
-    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
-
-    padding: 0vh 3vw 3vh 3vw;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-
-    transition: transform 0.3s ease;
-}
-
-/* CARTE planning */
-.planning {
-    background-color: #fff;
-    width: 440px;
-    height: 380px;
-
-    border-radius: 12px;
-    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
-
-    padding: 0vh 3vw 3vh 3vw;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-
-    transition: transform 0.3s ease;
-
-}
-
-.rectangle {
-    display: flex;               
-    align-items: center;
-    padding: 15px 70px;
-    text-decoration: none;
-    color: rgb(0, 0, 0);      
-    font-size: 18px;
-    border-radius: 10px;        
-    margin: 5px 10px;   
-    background-color: rgb(236, 232, 232);     
-
-    font-family: 'Montserrat', sans-serif;
-  }
-
-
-
-
-
-/* Titre */
-.alert h2 {
-    font-size: 19px;
-    margin: 0px 0px 10px 0px;
-    padding: 5% 53%;
-    border-radius: 12px 12px 0px 0px;
-    background-color: rgb(255, 254, 254);
-    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
-
-    font-family: 'Montserrat', sans-serif;
-    color: #333;
-}
-/* Titre */
-.planning h2 {
-    font-size: 19px;
-    margin: 0px 0px 10px 0px;
-    padding: 5% 51%;
-    border-radius: 12px 12px 0px 0px;
-    background-color: rgb(255, 254, 254);
-    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
-
-    font-family: 'Montserrat', sans-serif;
-    color: #333;
-}
-
-/* Zone scrollable */
-.alert-content {
-    overflow-y: auto;
-    padding-right: 5px; /* petit espace pour scrollbar */
-}
-
-/* Zone scrollable */
-.planning-content {
-    overflow-y: auto;
-    padding-right: 5px; /* petit espace pour scrollbar */
+    padding: 40px;
 }
 
 .main-content h1 {
-    margin-left:40% ;
-}
-
-.bottom-cards {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px; /* espace seulement entre Rappel et Planning */
-    align-items: center;
-    justify-content: center;
     text-align: center;
-
-
-}
-.best-car-card {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background-color: #f9f9f9;
-    border-radius: 12px;
-    padding: 16px 24px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    margin: 20px 0;
-    max-width: 600px;
-    gap: 16px;
+    margin-bottom: 40px;
+    font-weight: 700;
 }
 
-.best-car-card .info {
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); 
+    grid-gap: 50px; 
+    margin-top: 20px;
+}
+
+/* ==========================================================================
+   5. COMPOSANTS (CARTES, LISTES, STATS)
+   ========================================================================== */
+
+/* Cartes de base */
+.card {
+    background: var(--card-white);
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
     display: flex;
     flex-direction: column;
-    gap: 6px;
-    flex: 1; /* prend tout l'espace restant */
+    align-items: center;
+    transition: transform 0.3s ease;
 }
 
-.best-car-card .info strong {
-    font-size: 1.2rem;
-    color: #333;
+.card:hover { transform: translateY(-5px); }
+
+.card h2 {
+    font-size: 1.1rem;
+    margin: 0 0 20px 0;
+    color: #444;
 }
 
-.best-car-card .info .small {
-    font-size: 0.9rem;
-    color: #666;
+/* Cartes larges du bas */
+.large-card {
+    grid-column: span 1.5;
+    min-height: 300px;
 }
 
-.best-car-card .image-container {
-    width: 200px;    /* largeur fixe */
-    height: 120px;   /* hauteur fixe */
-    flex-shrink: 0;  /* empêche de rétrécir */
-    overflow: hidden;
-    border-radius: 8px;
-}
-
-.best-car-card .image-container img {
+/* Listes internes */
+.scrollable-list {
     width: 100%;
-    height: 100%;
-    object-fit: cover; /* rempli le conteneur sans déformer l'image */
-    display: block;
+    overflow-y: auto;
+    max-height: 220px;
 }
 
-/* Responsive */
-@media (max-width: 500px) {
-    .best-car-card {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    .best-car-card .image-container {
-        width: 100%;
-        height: 180px;
-        margin-top: 12px;
-    }
+.list-item {
+    background: #f9f9f9;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    display: flex; 
+    align-items: center; 
+    gap: 15px;
+    font-size: 0.9rem;
+    border-left: 4px solid var(--rentpark-orange);
 }
 
-.dark-theme .card h2 { color: #000000; }
-.dark-theme .alert h2 { color: #000000; }
-.dark-theme .planning h2 { color: #000000; }
-.dark-theme .main-content h1 { color: #FFFFFF; }
+.list-item p { margin: 0; }
+
+.date-tag, .badge {
+    background: #eee; 
+    padding: 4px 8px; 
+    border-radius: 5px; 
+    font-weight: bold; 
+    font-size: 0.8rem;
+    color: var(--text-dark);
+}
+
+/* Graphiques circulaires */
+@property --value { syntax: '<number>'; inherits: false; initial-value: 0; }
+
+.circle-chart {
+    --value: 0;
+    width: 140px; height: 140px;
+    border-radius: 50%;
+    background: radial-gradient(circle, white 55%, transparent 56%),
+                conic-gradient(var(--rentpark-orange) calc(var(--value) * 1%), #eee 0);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.2rem; font-weight: 700;
+    animation: fill-circle 1.5s ease-out forwards;
+}
+
+@keyframes fill-circle { from { --value: 0; } to { --value: var(--final-value); } }
+
+/* Voiture la plus louée */
+.best-car-container { width: 100%; text-align: center; }
+.best-car-container .image-wrapper { height: 100px; margin-top: 15px; }
+.best-car-container img { height: 100%; object-fit: contain; }
+
+/* ==========================================================================
+   6. MODE SOMBRE (DARK THEME)
+   ========================================================================== */
+.dark-theme { background-color: #121212; color: #eee; }
+
+.dark-theme nav {
+    background-color: rgba(27, 27, 27, 0.7); /* Noir transparent */
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.dark-theme .menu a { color: #e0e0e0; }
+.dark-theme .menu a i {
+    color: var(--rentpark-orange-dark); /* Orange vif pour la visibilité */
+}
+
+.dark-theme .menu a:hover { background-color: #333333; color: #ffffff; }
+.dark-theme .menu a:hover i {
+    color: #fff;
+}
+
+.dark-theme .card { background-color: #1e1e1e; color: #fff; }
+.dark-theme .card h2 { color: #ffffff; }
+
+.dark-theme .large-card h2 {
+    background-color: #252525;
+}
+
+.dark-theme .list-item { 
+    background-color: #2a2a2a; 
+    border-left-color: var(--rentpark-orange-dark); 
+}
+
+.dark-theme .list-item p { color: #e8e8e8; }
+
+.dark-theme .badge, 
+.dark-theme .date-tag {
+    background-color: #333333;
+    color: #ffffff;
+    border: 1px solid #444444;
+}
+
+.dark-theme .circle-chart { 
+    background: radial-gradient(circle, #1e1e1e 55%, transparent 56%),
+                conic-gradient(var(--rentpark-orange-dark) calc(var(--value) * 1%), #333 0); 
+}
+
+/* ==========================================================================
+   7. RESPONSIVE / MEDIA QUERIES
+   ========================================================================== */
+
+/* Ajustement 2 colonnes (Tablettes) */
+@media (max-width: 1200px) {
+    .dashboard-grid { grid-template-columns: repeat(2, 1fr); }
+    .large-card { grid-column: span 2 !important; width: 100% !important; margin: 0 !important; }
+}
+
+/* Desktop large : alignement spécifique Rappel/Planning */
+@media (min-width: 1201px) {
+    .large-card:nth-of-type(4) { grid-column: 1 / 2; width: 145%; }
+    .large-card:nth-of-type(5) { grid-column: 2 / 4; width: 72%; margin-left: auto; }
+}
+
+/* Mobiles */
+@media (max-width: 768px) {
+    nav { display: none; }
+    .main-content { margin-left: 0; }
+    .dashboard-grid { grid-template-columns: 1fr; }
+    .large-card { grid-column: span 1 !important; }
+}
