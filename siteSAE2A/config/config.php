@@ -30,6 +30,8 @@ $vues['recapitulatif'] = 'view/viewRecap.php';
 $vues['parametres'] = 'view/viewParametres.php';
 $vues['reservationForm'] = 'view/viewReservationForm.php';
 $vues['confirmationSucces'] = 'view/confirmationSucces.php';
+$vues['planning'] = 'view/viewPlanning.php';
+
 
 
 $action = "RAS";
