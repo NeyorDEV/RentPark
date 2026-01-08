@@ -739,56 +739,81 @@ public function cars(array $dVueEreur)
     function finaliserReservation(array &$dVueEreur) 
     {
         try {
-            // 1. Récupération des données du formulaire
-            // Données Client
             $nom = $_POST['nom'] ?? null;
             $prenom = $_POST['prenom'] ?? null;
             $email = $_POST['email'] ?? null;
             $tel = $_POST['numTel'] ?? null;
             $permis = $_POST['numPermis'] ?? null;
-            $dateNaiss = $_POST['datenaiss'] ?? null; // Assure-toi que le nom correspond au hidden input
+            $dateNaiss = $_POST['datenaiss'] ?? null;
             $nationalite = $_POST['nationalite'] ?? null;
 
-            // Données Contrat
+            // 2. Récupération des données de base de la réservation
             $numSerie = $_POST['num_serie'] ?? null;
             $dateDebut = $_POST['date_debut'] ?? null;
             $dateFin = $_POST['date_fin'] ?? null;
-            $prixTotal = $_POST['prix_total'] ?? 0;
-            $statut = 'EnCoursValidation';
 
-            // 2. Validation sommaire
-            if (empty($nom) || empty($email) || empty($numSerie)) {
-                $dVueEreur[] = "Toutes les informations n'ont pas été reçues.";
-                $this->afficherVue('recapitulatif', $dVueEreur); // Retour au récap si erreur
-                return;
+            // On SELECT le véhicule par son NumSerie pour garantir l'exactitude des données
+            $responseVehicule = $this->apiClient->get("voitures/$numSerie"); 
+            $vehicule = json_decode($responseVehicule->getBody()->getContents(), true);
+
+            if (!$vehicule) {
+                throw new \Exception("Véhicule introuvable pour le contrat.");
             }
+            
+            try {
+                // --- ÉTAPE 1 : Créer le client via l'API ---
+                $responseClient = $this->apiClient->post('client', [
+                    'json' => [
+                        'Nom' => $nom,
+                        'Prenom' => $prenom,
+                        'Email' => $email,
+                        'NumTel' => $tel,
+                        'NumPermis' => $permis,
+                        'DateNaiss' => $dateNaiss,
+                        'Nationalite' => $nationalite
+                    ]
+                ]);
+                } catch (RequestException $e) {
+                if ($e->hasResponse()) {
+                    // CECI VA AFFICHER L'ERREUR PHP RÉELLE DE L'API
+                    echo $e->getResponse()->getBody()->getContents(); 
+                    die(); 
+            }
+}
 
-            //Creer le client
-            $idClient = null; // TODO: API creer client
+            $dataClient = json_decode($responseClient->getBody()->getContents(), true);
+            $idClient = $dataClient['idClient'] ?? null;
 
             if ($idClient) {
-                // On crée le contrat lié à cet ID client
-                $resContrat = null; // TODO: API creer contrat grace aux données récupérées et au client
-                
-                if ($resContrat) {
-                    // 4. Succès : On affiche une vue de confirmation
-                    $this->afficherVue('confirmationSucces', $dVueEreur); // TODO vue confirmation
-                } else {
-                    $dVueEreur[] = "Erreur lors de la création du contrat.";
-                    $this->afficherVue('recapitulatif', $dVueEreur); // TODO peut etre affiner un peu cette partie
-                }
+                // --- ÉTAPE 2 : Créer le contrat via l'API ---
+                $responseContrat = $this->apiClient->post('contrat', [
+                    'json' => [
+                        'DateDebut'  => $dateDebut,
+                        'DateFin'    => $dateFin,
+                        'Statut'     => 'EnCoursValidation',
+                        'IdClient'   => (int)$idClient,
+                        'EtatAvant'  => 5,
+                        'IdVehicule' => $numSerie,
+                        'Marque'     => $vehicule['Marque'], 
+                        'NomModele'  => $vehicule['Nom'],    
+                        'AnneeModele'=> $vehicule['Annee']   
+                    ]
+                ]);
 
-            } else {
-                $dVueEreur[] = "Erreur lors de l'enregistrement du client.";            // TODO peut etre affiner un peu cette partie
-                $this->afficherVue('recapitulatif', $dVueEreur);
+                $dataContrat = json_decode($responseContrat->getBody()->getContents(), true);
+
+                if (isset($dataContrat['message']) && $dataContrat['message'] === 'Contrat créé avec succès') {
+                    $this->afficherVue('confirmationSucces', $dVueEreur, null, 'admin');
+                }
             }
 
+        } catch (RequestException $e) {
+            $dVueEreur[] = "Erreur API : " . $e->getMessage();
+            $this->afficherVue('recapitulatif', $dVueEreur, null, 'admin');
         } catch (\Exception $e) {
-            $dVueEreur[] = "Une erreur technique est survenue : " . $e->getMessage();
-            $this->afficherVue('recapitulatif', $dVueEreur);        // TODO peut etre affiner un peu cette partie
+            $dVueEreur[] = "Erreur technique : " . $e->getMessage();
+            $this->afficherVue('recapitulatif', $dVueEreur, null, 'admin');
         }
     }
 }
-
-
 ?>

@@ -82,6 +82,27 @@ $app->delete('/voitures/{numSerie}', function ($request, $response, $args) use (
     return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
 });
 
+// GET voiture par NumSerie
+$app->get('/voitures/{numSerie}', function (Request $request, Response $response, $args) use ($conn) {
+    $numSerie = (string) $args['numSerie'];
+
+    $conn->executeQuery(
+        "SELECT * FROM Vehicule WHERE NumSerie = :numSerie",
+        [':numSerie' => [$numSerie, \PDO::PARAM_STR]]
+    );
+    
+    $result = $conn->getResults();
+
+    if (empty($result)) {
+        $response->getBody()->write(json_encode(['error' => 'Véhicule non trouvé']));
+        return $response->withHeader('Content-Type', 'application/json')->withStatus(404);
+    }
+
+    // On retourne le premier (et seul) résultat
+    $response->getBody()->write(json_encode($result[0]));
+    return $response->withHeader('Content-Type', 'application/json');
+});
+
 // -----------------------------------------------------------------------
 //  /client - GET et POST
 // -----------------------------------------------------------------------

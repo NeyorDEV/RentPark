@@ -38,6 +38,7 @@ class FrontControleur
         $router->map('GET|POST', '/reservationForm', 'reservationForm');
         $router->map('GET|POST', '/recapitulatif', 'afficheRecapitulatif');
         $router->map('GET|POST', '/parametres', 'afficheParametres');
+        $router->map('GET|POST', '/finaliserReservation', 'finaliserReservation');
         
         $match = $router->match();
         if (!$match) { echo "404"; die; }
