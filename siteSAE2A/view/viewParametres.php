@@ -46,11 +46,11 @@ if (file_exists($settingsFile)) {
 
 <div class="main-content">
     <div class="big-glass-box">
-        <h1>Paramètres du Système</h1>
+        <h1>Paramètres</h1>
 
         <div class="section">
             <h3>Mode d'affichage</h3>
-            <p>Personnalisez l'apparence de votre interface :</p>
+            <p>Choisissez entre le mode clair et le mode sombre :</p>
             <div class="theme-buttons-container">
                 <button id="btn-light" class="theme-choice-btn">
                     <i class="fa-solid fa-sun"></i> Mode Clair
@@ -61,10 +61,12 @@ if (file_exists($settingsFile)) {
             </div>
         </div>
 
+        <hr class="separator">
+
         <div class="section">
             <h3>Notifications</h3>
-            <div class="notif-control">
-                <span>Recevoir les alertes de maintenance par email</span>
+            <div class="notif-row">
+                <span class="notif-text">Recevoir les alertes de maintenance par email</span>
                 <button id="emailNotifBtn" class="toggle-btn <?= $emailNotifEnabled ? 'on' : 'off' ?>">
                     <?= $emailNotifEnabled ? 'Activé' : 'Désactivé' ?>
                 </button>
