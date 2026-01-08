@@ -16,123 +16,99 @@ if (file_exists($settingsFile)) {
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Paramètres - RentPark</title>
-    <link rel="stylesheet" href="/siteSAE2A/html/css/menu.css">
+    <script>
+    (function () {
+        try {
+            const theme = localStorage.getItem('theme') || 'light';
+            document.documentElement.classList.toggle('dark-theme', theme === 'dark');
+        } catch (e) { }
+    })();
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="/siteSAE2A/html/css/dashboard.css">
     <link rel="stylesheet" href="/siteSAE2A/html/css/parametres.css">
-    <link rel="shortcut icon" href="/siteSAE2A/html/icons/favicon.ico" type="image/x-icon">
 </head>
 <body>
+
 <nav>
     <ul class="menu">
-        <li><a href="/siteSAE2A/home"><img src="/siteSAE2A/html/icons/acceuil.jpg" alt="Accueil"> Accueil</a></li>
-        <li><a href="/siteSAE2A/dashboard"><img src="/siteSAE2A/html/icons/dashboard.png" alt="Tableau de bord"> Tableau de bord</a></li>
-        <li><a href="/siteSAE2A/voitures"><img src="/siteSAE2A/html/icons/voiture.png" alt="Flotte"> Flotte Automobile</a></li>
-        <li><a href="/siteSAE2A/contrats"><img src="/siteSAE2A/html/icons/contrat.png" alt="Contrats"> Contrats</a></li>
-        <li><a href="/siteSAE2A/reservation"><img src="/siteSAE2A/html/icons/reservation.png" alt="Réservations"> Réservations</a></li>
-        <li><a href="/siteSAE2A/utilisateurs"><img src="/siteSAE2A/html/icons/user.png" alt="Utilisateurs"> Utilisateur</a></li>
-        <li><a href="/siteSAE2A/parametres"><img src="/siteSAE2A/html/icons/settings.png" alt="Paramètres"> Paramètres</a></li>
-        <li><a href="/siteSAE2A/deconnection"><img src="/siteSAE2A/html/icons/logout.png" alt="se déconnecter"> déconnexion</a></li>
+        <li><a href="/siteSAE2A/home"><i class="fa-solid fa-house"></i> Accueil</a></li>
+        <li><a href="/siteSAE2A/dashboard"><i class="fa-solid fa-chart-line"></i> Tableau de bord</a></li>
+        <li><a href="/sitesae2A/voitures"><i class="fa-solid fa-car"></i> Flotte Automobile</a></li>
+        <li><a href="/siteSAE2A/planning"><i class="fa-solid fa-file-contract"></i> Contrats</a></li>
+        <li><a href="/siteSAE2A/reservation"><i class="fa-solid fa-calendar-check"></i> Réservation</a></li>
+        <li><a href="/siteSAE2A/utilisateurs"><i class="fa-solid fa-users-gear"></i> Utilisateurs</a></li>
+        <li><a href="/siteSAE2A/parametres" class="active"><i class="fa-solid fa-gears"></i> Paramètres</a></li>
+        <li class="logout-item"><a href="/siteSAE2A/deconnection"><i class="fa-solid fa-right-from-bracket"></i> Déconnexion</a></li>
     </ul>
 </nav>
 
-<main style="margin-left:22%; padding:24px;">
-<div class="parametres-container">
-    <div class="parametres-content">
-        <h1>Paramètres</h1>
+<div class="main-content">
+    <div class="big-glass-box">
+        <h1>Paramètres du Système</h1>
 
-        <div class="parametres-section">
-            <h2>Apparence</h2>
-            <div class="settings-item">
-                <div class="settings-info">
-                    <h3>Thème</h3>
-                    <p>Choisissez entre thème clair ou sombre</p>
-                </div>
-                <div class="theme-buttons">
-                    <button class="theme-btn light-theme-btn">☀️ Clair</button>
-                    <button class="theme-btn dark-theme-btn">🌙 Sombre</button>
-                </div>
+        <div class="section">
+            <h3>Mode d'affichage</h3>
+            <p>Personnalisez l'apparence de votre interface :</p>
+            <div class="theme-buttons-container">
+                <button id="btn-light" class="theme-choice-btn">
+                    <i class="fa-solid fa-sun"></i> Mode Clair
+                </button>
+                <button id="btn-dark" class="theme-choice-btn">
+                    <i class="fa-solid fa-moon"></i> Mode Sombre
+                </button>
             </div>
         </div>
 
-        <div class="parametres-section">
-            <h2>Notifications</h2>
-            <div class="settings-item">
-                <div class="settings-info">
-                    <h3>Notifications par email</h3>
-                    <p>Recevoir les mises à jour par email</p>
-                </div>
-                <label class="toggle-switch">
-                    <input id="emailNotif" type="checkbox" <?= $emailNotifEnabled ? 'checked' : ''; ?>>
-                    <span class="slider"></span>
-                </label>
-                <div id="notifMessage" role="status" aria-live="polite" style="display:none;margin-top:10px;padding:8px 12px;border-radius:6px;background:#e6fff0;color:#0b3;box-shadow:0 2px 6px rgba(0,0,0,0.08);">Paramètre enregistré</div>
+        <div class="section">
+            <h3>Notifications</h3>
+            <div class="notif-control">
+                <span>Recevoir les alertes de maintenance par email</span>
+                <button id="emailNotifBtn" class="toggle-btn <?= $emailNotifEnabled ? 'on' : 'off' ?>">
+                    <?= $emailNotifEnabled ? 'Activé' : 'Désactivé' ?>
+                </button>
             </div>
+            <div id="notifMessage" class="status-hint"></div>
         </div>
     </div>
 </div>
-</main>
+
 <script>
-(function () {
-    const root = document.documentElement;
-    const lightBtn = document.querySelector('.light-theme-btn');
-    const darkBtn = document.querySelector('.dark-theme-btn');
+// Changement de thème
+document.getElementById('btn-light').addEventListener('click', () => {
+    document.documentElement.classList.remove('dark-theme');
+    localStorage.setItem('theme', 'light');
+});
 
-    function applyTheme(theme) {
-        if (theme === 'dark') {
-            root.classList.add('dark-theme');
-            if (darkBtn) darkBtn.setAttribute('aria-pressed', 'true');
-            if (lightBtn) lightBtn.setAttribute('aria-pressed', 'false');
-        } else {
-            root.classList.remove('dark-theme');
-            if (darkBtn) darkBtn.setAttribute('aria-pressed', 'false');
-            if (lightBtn) lightBtn.setAttribute('aria-pressed', 'true');
-        }
-        localStorage.setItem('theme', theme);
-    }
+document.getElementById('btn-dark').addEventListener('click', () => {
+    document.documentElement.classList.add('dark-theme');
+    localStorage.setItem('theme', 'dark');
+});
 
-    function initTheme() {
-        const saved = localStorage.getItem('theme') || 'light';
-        applyTheme(saved);
-    }
-    if (lightBtn) lightBtn.addEventListener('click', () => applyTheme('light'));
-    if (darkBtn) darkBtn.addEventListener('click', () => applyTheme('dark'));
-
-    initTheme();
-
-    const notifCheckbox = document.getElementById('emailNotif');
-    if (notifCheckbox) {
-        notifCheckbox.addEventListener('change', async function () {
-            const enabled = this.checked ? 1 : 0;
-            const messageEl = document.getElementById('notifMessage');
-            this.disabled = true;
-            try {
-                const res = await fetch('/siteSAE2A/config/updateSettings.php', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email_notifications: enabled })
-                });
-                const data = await res.json();
-                if (!data.success) {
-                    alert('Erreur lors de la mise à jour des paramètres');
-                    this.checked = !this.checked;
-                } else {
-                    if (messageEl) {
-                        messageEl.style.display = 'block';
-                        messageEl.textContent = 'Paramètre enregistré';
-                        clearTimeout(messageEl._hideTimeout);
-                        messageEl._hideTimeout = setTimeout(() => { messageEl.style.display = 'none'; }, 3000);
-                    }
-                }
-            } catch (e) {
-                alert('Erreur réseau');
-                this.checked = !this.checked;
-            } finally {
-                this.disabled = false;
-            }
+// Gestion Notifs (Toggle bouton)
+document.getElementById('emailNotifBtn').addEventListener('click', async function() {
+    const isCurrentlyOn = this.classList.contains('on');
+    const newVal = isCurrentlyOn ? 0 : 1;
+    
+    try {
+        const res = await fetch('/siteSAE2A/config/updateSettings.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email_notifications: newVal })
         });
-    }
-})();
+        if (res.ok) {
+            this.classList.toggle('on');
+            this.classList.toggle('off');
+            this.textContent = isCurrentlyOn ? 'Désactivé' : 'Activé';
+            
+            const msg = document.getElementById('notifMessage');
+            msg.textContent = "Préférence mise à jour.";
+            setTimeout(() => msg.textContent = "", 2500);
+        }
+    } catch (e) { console.error(e); }
+});
 </script>
+
 </body>
 </html>
