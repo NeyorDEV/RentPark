@@ -153,6 +153,7 @@ if (!empty($voitures) && isset($_GET['tri'])) {
         }
         ?>
         <img src="/siteSAE2A/<?php echo htmlspecialchars($image_path); ?>" alt="Image voiture">
+        
         <div class="car-info">
             <h3><?php echo htmlspecialchars($voiture['Nom']); ?></h3>
             <p>Marque : <?php echo htmlspecialchars($voiture['Marque']); ?></p>
@@ -163,10 +164,31 @@ if (!empty($voitures) && isset($_GET['tri'])) {
                 Énergie : <strong><?php echo htmlspecialchars($voiture['Energie'] ?? 'N/C'); ?></strong> |
                 Puissance : <?php echo htmlspecialchars($voiture['Puissance']); ?>
             </p>
+            
             <span class="price">
                 <?php echo isset($voiture['Prix']) ? htmlspecialchars($voiture['Prix']) . " € / jour" : "Prix à définir"; ?>
             </span>
-            <button class="btn-orange">Réserver</button>
+
+            <form action="/siteSAE2A/reservationForm" method="GET" style="width: 100%; margin-top: 10px;">
+                <input type="hidden" name="id" value="<?php echo htmlspecialchars($voiture['NumSerie']); ?>">
+                <input type="hidden" name="date_depart" value="<?php echo htmlspecialchars($date_depart); ?>">
+                <input type="hidden" name="date_retour" value="<?php echo htmlspecialchars($date_retour); ?>">
+
+                <button type="submit" class="btn-orange" 
+                        style="border: none;
+                               cursor: pointer;
+                               display: flex; 
+                               align-items: center; 
+                               justify-content: center; 
+                               text-align: center; 
+                               height: 40px; 
+                               width: 100%; 
+                               box-sizing: border-box;
+                               font-size: 1rem;
+                               font-weight: bold;">
+                    Réserver
+                </button>
+            </form>
         </div>
     </div>
     <?php endforeach; ?>

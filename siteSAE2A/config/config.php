@@ -25,9 +25,13 @@ $vues['inscription'] = 'view/viewInscription.php';
 $vues['connection'] = 'view/viewConnection.php';
 $vues['dashboard'] = 'view/viewDashboard.php';
 $vues['homeCustomers'] = 'view/viewHomeCustomers.php';
-$vues['recapitulatif'] = 'view/viewRecapitulatif.php';
+$vues['cars'] = 'view/viewCars.php';
+$vues['recapitulatif'] = 'view/viewRecap.php';
 $vues['parametres'] = 'view/viewParametres.php';
+$vues['reservationForm'] = 'view/viewReservationForm.php';
+$vues['confirmationSucces'] = 'view/confirmationSucces.php';
 $vues['planning'] = 'view/viewPlanning.php';
+
 
 
 $action = "RAS";

@@ -1,0 +1,202 @@
+@font-face {
+    font-family: 'frt';
+    src: url('../fonts/frt.woff2') format('woff2');
+}
+
+body {
+    background-color: #000;
+    color: #333; /* Texte sombre sur le "papier" blanc */
+    font-family: 'Roboto', sans-serif;
+    padding: 50px 0;
+}
+
+.invoice-container {
+    background: white;
+    max-width: 900px;
+    margin: auto;
+    padding: 50px;
+    border-radius: 5px;
+    box-shadow: 0 0 50px rgba(0,0,0,0.8);
+}
+
+.invoice-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 30px;
+    margin-bottom: 40px;
+}
+
+.logo-font {
+    font-family: 'frt', sans-serif;
+    font-size: 2.5rem;
+    color: #000;
+    margin: 0;
+}
+
+.logo-font span {
+    color: #ff5a19;
+}
+
+.status-badge {
+    background: #fff3e0;
+    color: #ff5a19;
+    padding: 10px 20px;
+    border-radius: 50px;
+    font-weight: bold;
+    font-size: 0.8rem;
+    border: 1px solid #ffe0b2;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    margin-bottom: 50px;
+}
+
+.info-block h3 {
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    color: #999;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+}
+
+.info-block p {
+    margin: 5px 0;
+    font-size: 1rem;
+}
+
+.invoice-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 50px;
+}
+
+.invoice-table th {
+    background: #f8f8f8;
+    text-align: left;
+    padding: 15px;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+}
+
+.invoice-table td {
+    padding: 20px 15px;
+    border-bottom: 1px solid #eee;
+}
+
+.invoice-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.totals {
+    width: 300px;
+}
+
+.total-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+}
+
+.grand-total {
+    border-top: 2px solid #000;
+    font-weight: bold;
+    font-size: 1.4rem;
+    color: #ff5a19;
+    margin-top: 10px;
+}
+
+.actions-bar {
+    margin-top: 50px;
+    display: flex;
+    gap: 20px;
+}
+
+.btn-orange {
+    flex: 2;
+    background: #ff5a19;
+    color: white;
+    border: none;
+    padding: 20px;
+    border-radius: 10px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 1.1rem;
+}
+
+.btn-secondary {
+    flex: 1;
+    background: #f4f4f4;
+    color: #333;
+    border: none;
+    padding: 20px;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+/* Style du bloc de paiement */
+.payment-method {
+    flex: 1;
+}
+
+.payment-title {
+    margin-bottom: 15px;
+    color: #333;
+}
+
+/* Liste en colonne sans puces */
+.payment-list {
+    list-style: none; /* Supprime les puces */
+    padding: 0;
+    margin: 0 0 20px 0;
+    display: flex;
+    flex-direction: column; /* Aligne en colonne */
+    gap: 10px; /* Espace entre chaque mode de paiement */
+}
+
+.payment-list li {
+    display: flex;
+    align-items: center;
+    font-size: 1rem;
+    color: #444;
+}
+
+.payment-list i {
+    width: 30px; /* Largeur fixe pour aligner les textes */
+    color: #ff5a19; /* Orange Rentpark */
+    font-size: 1.1rem;
+}
+
+/* Encadré d'information agence */
+.agency-notice {
+    padding: 15px;
+    background-color: #fff5f2;
+    border-left: 4px solid #ff5a19;
+    border-radius: 4px;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    max-width: 380px;
+    color: #333;
+    font-size: 0.85rem;
+    line-height: 1.4;
+}
+
+.agency-notice i {
+    margin-top: 3px;
+    color: #ff5a19;
+}
+
+/* Print CSS */
+@media print {
+    .actions-bar { display: none; }
+    body { background: white; padding: 0; }
+    .invoice-container { box-shadow: none; border: none; }
+}

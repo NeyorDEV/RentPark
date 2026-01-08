@@ -20,4 +20,8 @@ class Connection extends \PDO {
     public function getResults(): array {
         return $this->stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
+
+    public function getLastInsertId() {
+        return $this->lastInsertId();
+    }
 }
