@@ -63,9 +63,9 @@
                                     <a href="#editModal-<?= htmlspecialchars($row['username']) ?>" class="btn-icon edit">
                                         <i class="fa-solid fa-pen"></i>
                                     </a>
-                                    <form method="POST" action="/siteSAE2A/utilisateurs" onsubmit="return confirm('Supprimer cet utilisateur ?');" style="display:inline;">
+                                    <form method="POST" action="/sitesae2A/utilisateurs" onsubmit="return confirm('Supprimer cet utilisateur ?');" style="display:inline;">
                                         <input type="hidden" name="action" value="supprimerUtilisateur">
-                                        <input type="hidden" name="username" value="<?= htmlspecialchars($row['username']) ?>">
+                                        <input type="hidden" name="id" value="<?= htmlspecialchars($row['id']) ?>">
                                         <button type="submit" class="btn-icon delete"><i class="fa-solid fa-trash"></i></button>
                                     </form>
                                 </td>
@@ -82,11 +82,11 @@
 
 <?php if ($role === 'admin') : ?>
     <div id="addModal" class="modal">
-        <div class="modal-content">
-            <a href="#" class="close">&times;</a>
-            <h2>Nouvel Utilisateur</h2>
-            <form method="POST" action="/siteSAE2A/utilisateurs">
-                <input type="hidden" name="action" value="ajouterUtilisateur">
+    <div class="modal-content">
+        <a href="" class="close">&times;</a>
+        <h2>Ajouter un Utilisateur</h2>
+        <form method="POST" action="/siteSAE2A/utilisateurs">
+            <input type="hidden" name="action" value="ajouterUtilisateur">
                 <div class="form-group">
                     <input type="text" name="username" placeholder="Nom d'utilisateur" required>
                 </div>
@@ -100,9 +100,9 @@
                     <input type="text" name="role" placeholder="Rôle (admin/user)" required>
                 </div>
                 <button type="submit" class="save-btn">Créer le compte</button>
-            </form>
-        </div>
+        </form>
     </div>
+</div>
 
     <?php foreach ($results as $row) : ?>
         <div id="editModal-<?= htmlspecialchars($row['username']) ?>" class="modal">
@@ -112,17 +112,21 @@
                 <form method="POST" action="/siteSAE2A/utilisateurs">
                     <input type="hidden" name="action" value="modifierUtilisateur">
                     <input type="hidden" name="old_username" value="<?= htmlspecialchars($row['username']) ?>">
-                    <div class="form-group">
-                        <label>Nom d'utilisateur</label>
-                        <input type="text" name="username" value="<?= htmlspecialchars($row['username']) ?>" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Rôle</label>
-                        <input type="text" name="role" value="<?= htmlspecialchars($row['role']) ?>" required>
-                    </div>
-                    <button type="submit" class="save-btn">Enregistrer</button>
+                   <input type="hidden" name="id" value="<?= htmlspecialchars($row['id']) ?>">
+                        
+                        <label>Nom d'utilisateur<br>
+                            <input type="text" name="username" required value="<?= htmlspecialchars($row['username']) ?>">
+                        </label><br><br>
+
+                        <label>Rôle<br>
+                            <input type="text" name="role" required value="<?= htmlspecialchars($row['role']) ?>">
+                        </label><br><br>
+
+                        <button type="submit">Enregistrer</button>
+
                 </form>
             </div>
+            
         </div>
     <?php endforeach; ?>
 <?php endif; ?>
