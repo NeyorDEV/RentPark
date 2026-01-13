@@ -1,0 +1,66 @@
+﻿@using MudBlazor
+@using BlazorAdminRentPark.Models
+
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h5" Align="Align.Center" Style="font-weight: bold;">Ajouter un véhicule</MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudStack Spacing="4" Class="pa-4" Style="max-height: 60vh; overflow-y: auto;">
+            @* Informations Générales *@
+            <MudTextField @bind-Value="newVehicule.Nom" Label="Nom" Variant="Variant.Outlined" />
+            <MudTextField @bind-Value="newVehicule.Marque" Label="Marque" Variant="Variant.Outlined" />
+            <MudTextField @bind-Value="newVehicule.NumSerie" Label="Numéro de série" Variant="Variant.Outlined" />
+
+            @* Caractéristiques Techniques *@
+            <MudSelect @bind-Value="newVehicule.Energie" Label="Energie" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                <MudSelectItem Value="@("Hybride")">Hybride</MudSelectItem>
+                <MudSelectItem Value="@("Electrique")">Electrique</MudSelectItem>
+                <MudSelectItem Value="@("Essence")">Essence</MudSelectItem>
+                <MudSelectItem Value="@("Diesel")">Diesel</MudSelectItem>
+            </MudSelect>
+
+            <MudNumericField @bind-Value="newVehicule.NbPlaces" Label="Nombre de places" Variant="Variant.Outlined" Min="1" />
+            <MudTextField @bind-Value="newVehicule.Categorie" Label="Catégorie" Variant="Variant.Outlined" />
+            <MudTextField @bind-Value="newVehicule.Transmission" Label="Transmission" Variant="Variant.Outlined" />
+            <MudTextField @bind-Value="newVehicule.Boite" Label="Boite de vitesse" Variant="Variant.Outlined" />
+            <MudTextField @bind-Value="newVehicule.Puissance" Label="Puissance" Variant="Variant.Outlined" />
+
+            @* État et Prix *@
+            <MudTextField @bind-Value="newVehicule.Etat" Label="État" Variant="Variant.Outlined" />
+            <MudNumericField @bind-Value="newVehicule.Prix" Label="Prix" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.AttachMoney" />
+
+            @* Dates *@
+            <MudDatePicker Label="Date d'achat" @bind-Date="dateAchatWrapper" Variant="Variant.Outlined" />
+            <MudDatePicker Label="Dernier contrôle technique" @bind-Date="dateDernierControleWrapper" Variant="Variant.Outlined" />
+            <MudDatePicker Label="Expiration contrôle technique" @bind-Date="dateExpirationControleWrapper" Variant="Variant.Outlined" />
+        </MudStack>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Annuler</MudButton>
+        <MudButton Color="Color.Success" Variant="Variant.Filled" OnClick="Submit" Style="margin-right: 20px;">Ajouter</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    private dynamic? MudDialog { get; set; }
+
+    private VehiculeModel newVehicule = new VehiculeModel();
+
+    // Wrappers pour gérer la conversion entre DateTime et DateTime? requise par MudDatePicker
+    private DateTime? dateAchatWrapper { get => newVehicule.DateAchat; set => newVehicule.DateAchat = value ?? DateTime.Now; }
+    private DateTime? dateDernierControleWrapper { get => newVehicule.DateDernierControleTech; set => newVehicule.DateDernierControleTech = value ?? DateTime.Now; }
+    private DateTime? dateExpirationControleWrapper { get => newVehicule.DateExpirationControleTech; set => newVehicule.DateExpirationControleTech = value ?? DateTime.Now; }
+
+    private void Submit()
+    {
+        // Retourne l'objet rempli lors de la fermeture
+        MudDialog.Close(DialogResult.Ok(newVehicule));
+    }
+
+    private void Cancel()
+    {
+        MudDialog.Cancel();
+    }
+}

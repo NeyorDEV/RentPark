@@ -15,5 +15,7 @@
         public DateTime DateDernierControleTech { get; set; }
         public string Marque { get; set; }
         public string Nom { get; set; }
+
+        public float Prix { get; set; }
     }
 }
