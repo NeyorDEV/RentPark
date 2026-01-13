@@ -66,16 +66,8 @@ if (file_exists($settingsFile)) {
                     <input id="emailNotif" type="checkbox" <?= $emailNotifEnabled ? 'checked' : ''; ?>>
                     <span class="slider"></span>
                 </label>
-<<<<<<< HEAD
-<<<<<<< Updated upstream
-=======
                 <div id="notifMessage" role="status" aria-live="polite" style="display:none;margin-top:10px;padding:8px 12px;border-radius:6px;background:#e6fff0;color:#0b3;box-shadow:0 2px 6px rgba(0,0,0,0.08);">Paramètre enregistré</div>
->>>>>>> origin/main
             </div>
-=======
-                <div id="notifMessage" role="status" aria-live="polite" style="display:none;margin-top:10px;padding:8px 12px;border-radius:6px;background:#e6fff0;color:#0b3;box-shadow:0 2px 6px rgba(0,0,0,0.08);">Paramètre enregistré</div>
-            </div> 
->>>>>>> Stashed changes
         </div>
     </div>
 </div>
@@ -86,13 +78,7 @@ if (file_exists($settingsFile)) {
     const lightBtn = document.querySelector('.light-theme-btn');
     const darkBtn = document.querySelector('.dark-theme-btn');
 
-<<<<<<< HEAD
-<<<<<<< Updated upstream
-=======
-    function applyTheme(theme) { 
-=======
     function applyTheme(theme) {
->>>>>>> origin/main
         if (theme === 'dark') {
             root.classList.add('dark-theme');
             if (darkBtn) darkBtn.setAttribute('aria-pressed', 'true');
@@ -112,45 +98,5 @@ if (file_exists($settingsFile)) {
     if (lightBtn) lightBtn.addEventListener('click', () => applyTheme('light'));
     if (darkBtn) darkBtn.addEventListener('click', () => applyTheme('dark'));
 
-    initTheme();
-
-    const notifCheckbox = document.getElementById('emailNotif');
-    if (notifCheckbox) {
-        notifCheckbox.addEventListener('change', async function () {
-            const enabled = this.checked ? 1 : 0;
-            const messageEl = document.getElementById('notifMessage');
-            this.disabled = true;
-            try {
-                const res = await fetch('/siteSAE2A/config/updateSettings.php', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email_notifications: enabled })
-                });
-                const data = await res.json();
-                if (!data.success) {
-                    alert('Erreur lors de la mise à jour des paramètres');
-                    this.checked = !this.checked;
-                } else {
-                    if (messageEl) {
-                        messageEl.style.display = 'block';
-                        messageEl.textContent = 'Paramètre enregistré';
-                        clearTimeout(messageEl._hideTimeout);
-                        messageEl._hideTimeout = setTimeout(() => { messageEl.style.display = 'none'; }, 3000);
-                    }
-                }
-            } catch (e) {
-                alert('Erreur réseau');
-                this.checked = !this.checked;
-            } finally {
-                this.disabled = false;
-            }
-        });
-    }
-})();
-</script>
-<<<<<<< HEAD
->>>>>>> Stashed changes
-=======
->>>>>>> origin/main
 </body>
 </html>
