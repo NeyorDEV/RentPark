@@ -15,6 +15,7 @@
     <link rel="stylesheet" href="/siteSAE2A/html/css/commun.css">
     <link rel="stylesheet" href="/siteSAE2A/html/css/utilisateur.css">
     <link rel="icon" type="image/png" href="html/icons/voiture.png">
+    <link rel="shortcut icon" href="html/icons/favicon.ico" type="image/x-icon">
 </head>
 <body>
 
