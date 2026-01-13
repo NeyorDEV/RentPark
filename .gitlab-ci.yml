@@ -93,3 +93,44 @@ push-dotnet-image:
   rules:
     - when: on_success
 
+# ----------------------
+# INCLUDE DOCKER DEPLOY TEMPLATE
+# ----------------------
+include:
+  - project: 'IUT_INF63/generic-ci'
+    ref: 'main'
+    file:
+      - 'deploy/.docker-deploy.yml'
+    token: $CI_PERSONAL_TOKEN
+
+# ----------------------
+# DEPLOYMENT
+# ----------------------
+configure-deploy:
+  extends: .configure-deployment
+  stage: 👨‍🚀configure-deploy
+  variables:
+    CONTAINER_NAME: blazor-admin-pod
+    NAMESPACE_NAME: qumiotto
+    CONTAINER_IMAGE_PATH: codefirst.iut.uca.fr/qumiotto/sae_2a_rentpark:latest
+  rules:
+    - when: manual
+  allow_failure: true
+
+deploy-my-pod:
+  extends: .deploy-image
+  stage: 🚀deploy
+  variables:
+    CONTAINER_NAME: blazor-admin-pod
+    CONTAINER_ENV_VAR_VAR_1: "ENV_PRODUCTION=true"
+    CONTAINER_IMAGE_PATH: codefirst.iut.uca.fr/qumiotto/sae_2a_rentpark:latest
+    NAMESPACE_TOKEN: $CI_JOB_TOKEN
+    NAMESPACE_NAME: qumiotto
+  dependencies:
+    - push-dotnet-image
+    - configure-deploy
+  allow_failure: true
+  rules:
+    - when: manual
+
+
