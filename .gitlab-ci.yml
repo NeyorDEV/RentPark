@@ -110,7 +110,7 @@ configure-deploy:
   stage: 👨‍🚀configure-deploy
   variables:
     CONTAINER_NAME: blazor-admin-pod
-    NAMESPACE_NAME: qumiotto
+    NAMESPACE_NAME: altixier1
     CONTAINER_IMAGE_PATH: codefirst.iut.uca.fr/qumiotto/sae_2a_rentpark:latest
   rules:
     - when: manual
