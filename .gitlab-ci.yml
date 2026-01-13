@@ -147,24 +147,24 @@ expose-service:
     - |
       # Créer le fichier de service
       cat <<EOF > blazor-service.yml
-apiVersion: v1
-kind: Service
-metadata:
-  name: blazor-admin-service
-spec:
-  selector:
-    app: blazor-admin-pod
-  ports:
-    - protocol: TCP
-      port: 80
-      targetPort: 8080
-  type: NodePort 
-    EOF 
-      kubectl config set-cluster my-cluster --server=$K8S_SERVER
-      kubectl config set-credentials deployer --token=$K8S_TOKEN
-      kubectl config set-context my-context --cluster=my-cluster --user=deployer --namespace=altixier1
-      kubectl config use-context my-context
-      kubectl apply -f blazor-service.yml
+      apiVersion: v1
+      kind: Service
+      metadata:
+        name: blazor-admin-service
+      spec:
+        selector:
+          app: blazor-admin-pod
+        ports:
+          - protocol: TCP
+            port: 80
+            targetPort: 8080
+        type: NodePort 
+          EOF 
+            kubectl config set-cluster my-cluster --server=$K8S_SERVER
+            kubectl config set-credentials deployer --token=$K8S_TOKEN
+            kubectl config set-context my-context --cluster=my-cluster --user=deployer --namespace=altixier1
+            kubectl config use-context my-context
+            kubectl apply -f blazor-service.yml
 
   rules:
     - when: manual
