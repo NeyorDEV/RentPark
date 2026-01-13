@@ -41,6 +41,46 @@
     font-size: 0.8rem;
 }
 
+/* --- Limiter la taille de l'image du véhicule le plus loué --- */
+.best-car-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    width: 100%;
+}
+
+.best-car-container .image-wrapper {
+    width: 100%;
+    max-width: 200px; /* Largeur max de l'image */
+    height: 120px;    /* Hauteur fixe pour harmoniser */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    border-radius: 12px;
+    background: rgba(0, 0, 0, 0.02); /* Fond léger si l'image est transparente */
+}
+
+.best-car-container .image-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain; /* L'image s'adapte sans être coupée ni déformée */
+    transition: transform 0.3s ease;
+}
+
+.best-car-container:hover img {
+    transform: scale(1.1); /* Petit effet de zoom au survol */
+}
+
+/* Ajustement des infos pour que ce soit bien centré */
+.best-car-container .info {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
 /* GRAPHIQUES CIRCULAIRES ANIMÉS */
 @property --value {
     syntax: '<number>';
