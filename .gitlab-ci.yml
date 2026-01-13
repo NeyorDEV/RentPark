@@ -133,6 +133,9 @@ deploy-my-pod:
 # ----------------------
 # SERVICE KUBERNETES
 # ----------------------
+# ----------------------
+# SERVICE KUBERNETES
+# ----------------------
 expose-service:
   stage: 🌐expose-service
   image: bitnami/kubectl:latest
@@ -141,7 +144,9 @@ expose-service:
   variables:
     KUBECONFIG: /tmp/kubeconfig
   script:
-    - echo "apiVersion: v1
+    - |
+      cat <<EOF > blazor-service.yml
+      apiVersion: v1
       kind: Service
       metadata:
         name: blazor-admin-service
@@ -152,7 +157,8 @@ expose-service:
           - protocol: TCP
             port: 80
             targetPort: 8080
-        type: NodePort" > blazor-service.yml
+        type: NodePort
+      EOF
     - kubectl config set-cluster my-cluster --server=$K8S_SERVER
     - kubectl config set-credentials deployer --token=$K8S_TOKEN
     - kubectl config set-context my-context --cluster=my-cluster --user=deployer --namespace=altixier1
@@ -161,5 +167,6 @@ expose-service:
   rules:
     - when: manual
   allow_failure: true
+
 
 
