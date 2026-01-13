@@ -792,6 +792,49 @@ $app->post('/vehicule', function (Request $request, Response $response, $args) u
     }
 });
 
+$app->get('/stats/revenus-mensuel', function (Request $request, Response $response) use ($conn) {
+
+    $query = "
+        SELECT SUM(m.Prix) AS total
+        FROM Contrat c
+        JOIN Vehicule v ON c.IdVehicule = v.NumSerie
+        JOIN Modele m 
+            ON m.Marque = v.Marque
+           AND m.Nom = v.Nom
+           AND m.Annee = v.Annee
+        WHERE MONTH(c.DateDebut) = MONTH(CURRENT_DATE())
+          AND YEAR(c.DateDebut) = YEAR(CURRENT_DATE())
+    ";
+
+    try {
+        $conn->executeQuery($query);
+        $results = $conn->getResults();
+
+        $total = 0.0;
+        if (!empty($results) && $results[0]['total'] !== null) {
+            $total = (float)$results[0]['total'];
+        }
+
+        $response->getBody()->write(json_encode([
+            'monthlyIncome' => $total
+        ]));
+
+        return $response
+            ->withHeader('Content-Type', 'application/json')
+            ->withStatus(200);
+
+    } catch (\Exception $e) {
+        $response->getBody()->write(json_encode([
+            'error' => 'Erreur lors du calcul du revenu mensuel'
+        ]));
+
+        return $response
+            ->withHeader('Content-Type', 'application/json')
+            ->withStatus(500);
+    }
+});
+
+
 $app->post('/login', function (Request $request, Response $response, $args) use ($conn) {
     $data = $request->getParsedBody();
     $username = $data['username'] ?? '';
