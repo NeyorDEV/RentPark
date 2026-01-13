@@ -2,24 +2,24 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RentPark - Dashboard</title>
+    
     <script>
     (function () {
         try {
             const theme = localStorage.getItem('theme') || 'light';
-            if (theme === 'dark') {
-                document.documentElement.classList.add('dark-theme');
-            } else {
-                document.documentElement.classList.remove('dark-theme');
-            }
+            document.documentElement.classList.toggle('dark-theme', theme === 'dark');
         } catch (e) { }
     })();
     </script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="/siteSAE2A/html/css/commun.css">
     <link rel="stylesheet" href="/siteSAE2A/html/css/dashboard.css">
+    
     <link rel="icon" type="image/png" href="html/icons/voiture.png">
     <link rel="shortcut icon" href="html/icons/favicon.ico" type="image/x-icon">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
 
@@ -36,21 +36,23 @@
     </ul>
 </nav>
 
-<div class="main-content">
-    <h1>Tableau de bord</h1>
+<main class="main-content">
+    <header class="header-container">
+        <h1>Tableau de bord</h1>
+    </header>
 
     <div class="dashboard-grid">
         
-        <div class="card stat-card">
+        <section class="card stat-card planning-card">
             <h2>Nombre d'utilisateurs</h2>
             <div class="circle-chart" 
                  id="users-circle" 
                  style="--final-value: <?= min($results["totalUsers"], 100) ?>;">
                 <span id="users-counter">0</span>
             </div>
-        </div>
+        </section>
 
-        <div class="card stat-card">
+        <section class="card stat-card planning-card">
             <h2>Voiture la plus louée</h2>
             <?php if (!empty($results["voiturePlusLouee"])) : $bestCar = $results["voiturePlusLouee"]; ?>
                 <div class="best-car-container">
@@ -66,76 +68,78 @@
             <?php else : ?>
                 <p class="empty-data">Aucune donnée disponible</p>
             <?php endif; ?>
-        </div>
+        </section>
 
-        <div class="card stat-card">
+        <section class="card stat-card planning-card">
             <h2>Revenus mensuels</h2>
             <div class="circle-chart" 
                  id="revenus-circle" 
                  style="--final-value: <?= min(($results["revenusMensuels"] / 300000) * 100, 100) ?>;">
-                <span id="revenus-counter">0</span>€
+                <div class="counter-container">
+                    <span id="revenus-counter">0</span>€
+                </div>
             </div>
-        </div>
+        </section>
 
-        <div class="card large-card">
-            <h2>Rappel</h2>
+        <section class="card large-card planning-card">
+            <h2><i class="fa-solid fa-bell"></i> Rappels</h2>
             <div class="scrollable-list">
                 <?php if (!empty($results['alerts'])): ?>
                     <?php foreach ($results['alerts'] as $alert): ?>
                         <div class="list-item">
                             <span class="badge">Alerte</span>
-                            <p><?= htmlspecialchars($alert['label']) ?> – <?= htmlspecialchars($alert['vehicule']) ?></p>
+                            <p><?= htmlspecialchars($alert['label']) ?> – <strong><?= htmlspecialchars($alert['vehicule']) ?></strong></p>
                         </div>
                     <?php endforeach; ?>
                 <?php else: ?>
                     <div class="list-item empty">✅ Aucun rappel en cours</div>
                 <?php endif; ?>
             </div>
-        </div>
+        </section>
 
-        <div class="card large-card">
-            <h2>Planning</h2>
+        <section class="card large-card planning-card">
+            <h2><i class="fa-solid fa-calendar-day"></i> Planning Proche</h2>
             <div class="scrollable-list">
                 <?php if (!empty($results['planning'])): ?>
                     <?php foreach ($results['planning'] as $event): ?>
                         <div class="list-item">
                             <span class="date-tag"><?= htmlspecialchars(date('d/m/Y', strtotime($event['time']))) ?></span>
-                            <p><?= htmlspecialchars($event['action']) ?> : <?= htmlspecialchars($event['vehicule']) ?></p>
+                            <p><strong><?= htmlspecialchars($event['action']) ?></strong> : <?= htmlspecialchars($event['vehicule']) ?></p>
                         </div>
                     <?php endforeach; ?>
                 <?php else: ?>
                     <div class="list-item empty">Aucun événement prévu</div>
                 <?php endif; ?>
             </div>
-        </div>
+        </section>
 
     </div>
-</div>
+</main>
 
 <script>
-// Fonction d'animation des compteurs
 function animateCounter(id, targetValue, duration) {
     const counter = document.getElementById(id);
     if(!counter) return;
-    let start = 0;
-    const fps = 60;
-    const totalFrames = Math.round(duration / (1000 / fps));
-    const increment = targetValue / totalFrames;
-
-    const timer = setInterval(() => {
-        start += increment;
-        if (start >= targetValue) {
-            start = targetValue;
-            clearInterval(timer);
+    
+    let startTimestamp = null;
+    const step = (timestamp) => {
+        if (!startTimestamp) startTimestamp = timestamp;
+        const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+        const currentValue = Math.floor(progress * targetValue);
+        
+        counter.textContent = currentValue.toLocaleString();
+        
+        if (progress < 1) {
+            window.requestAnimationFrame(step);
         }
-        counter.textContent = Math.floor(start).toLocaleString();
-    }, 1000 / fps);
+    };
+    window.requestAnimationFrame(step);
 }
 
-// Initialisation des animations
 document.addEventListener('DOMContentLoaded', () => {
-    animateCounter("revenus-counter", <?= (float)$results["revenusMensuels"] ?>, 800);
-    animateCounter("users-counter", <?= (int)$results["totalUsers"] ?>, 800);
+    // Lancement des animations après chargement du DOM
+    animateCounter("revenus-counter", <?= (float)$results["revenusMensuels"] ?>, 1200);
+    animateCounter("users-counter", <?= (int)$results["totalUsers"] ?>, 1200);
 });
 </script>
 
