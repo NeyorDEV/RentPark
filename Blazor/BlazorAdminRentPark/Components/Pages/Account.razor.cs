@@ -61,8 +61,7 @@ public partial class Account
             .Skip((_currentPage - 1) * _pageSize)
             .Take(_pageSize);
 
-    protected int PageCount =>
-        Math.Max(1, (int)Math.Ceiling(FilteredUsers.Count() / (double)_pageSize));
+    private int PageCount => (int)Math.Ceiling((double)FilteredUsers.Count() / _pageSize);
 
     protected override async Task OnInitializedAsync()
     {
@@ -126,4 +125,16 @@ public partial class Account
     {
         _currentPage = newPage;
     }
+    private void OnPageSizeChanged(int newSize)
+    {
+        _pageSize = newSize;
+        _currentPage = 1;
+    }
+
+    private void OnSearchChanged(string text)
+    {
+        _searchString = text;
+        _currentPage = 1;
+    }
+
 }
