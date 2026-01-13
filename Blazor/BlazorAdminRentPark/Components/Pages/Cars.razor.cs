@@ -7,7 +7,11 @@ using BlazorAdminRentPark.Services;
 
 namespace BlazorAdminRentPark.Components.Pages
 {
+<<<<<<< HEAD
     public partial class Cars : ComponentBase
+=======
+    public partial class Cars
+>>>>>>> cfd191972a16e93521ab6150df58b5025e7d13d9
     {
         [Inject] protected IVehiculeService VehiculeService { get; set; } = default!;
         [Inject] protected IDialogService DialogService { get; set; } = default!; // Nécessaire pour afficher le dialogue 

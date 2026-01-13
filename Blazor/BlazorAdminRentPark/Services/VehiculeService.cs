@@ -25,7 +25,7 @@ namespace BlazorAdminRentPark.Services
 
         public async Task Delete(string NumSerie)
         {
-            await _http.DeleteAsync($"http://localhost:8880/voitures/{NumSerie}");
+            await _http.DeleteAsync($"http://localhost:8880/delete/voitures/{NumSerie}");
         }
     }
 }

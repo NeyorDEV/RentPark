@@ -32,7 +32,7 @@ namespace BlazorAdminRentPark.Services
         {
             var item = UserFactory.Create(model);   
 
-            await _http.PostAsJsonAsync("http://localhost:8880/users", item);       
+            await _http.PostAsJsonAsync("http://localhost:8880/add/users", item);       
         }
     }
 }
