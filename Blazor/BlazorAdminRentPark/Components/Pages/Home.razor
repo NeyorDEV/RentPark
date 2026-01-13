@@ -9,15 +9,15 @@
         <MudText Typo="Typo.h4" Style="font-weight: bold;">Tableau de bord</MudText>
     </MudStack>
 
-    @* Section Statistiques (Graphiques Circulaires) *@
+    @* Section Statistiques *@
     <MudGrid Class="mb-8">
         @* Carte Utilisateurs *@
         <MudItem xs="12" md="4">
             <MudCard Elevation="3" Class="rounded-lg pa-4 d-flex flex-column align-center justify-center" Style="height: 100%;">
                 <MudText Typo="Typo.h6" Class="mb-4" Style="font-weight: bold;">Nombre d'utilisateurs</MudText>
                 <div style="position: relative;">
-                    <MudProgressCircular Color="Color.Warning" Value="75" Size="Size.Large" StrokeWidth="8" Style="height:120px; width:120px;" />
-                    <MudText Typo="Typo.h6" Style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-weight: bold;">75%</MudText>
+                    <MudProgressCircular Color="Color.Warning" Value="@UserPercentage" Size="Size.Large" StrokeWidth="8" Style="height:120px; width:120px;" />
+                    <MudText Typo="Typo.h6" Style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-weight: bold;">@UserPercentage%</MudText>
                 </div>
             </MudCard>
         </MudItem>
@@ -27,8 +27,8 @@
             <MudCard Elevation="3" Class="rounded-lg pa-4 d-flex flex-column align-center justify-center" Style="height: 100%;">
                 <MudText Typo="Typo.h6" Class="mb-4" Style="font-weight: bold;">Voiture la plus louée</MudText>
                 <div style="position: relative;">
-                    <MudProgressCircular Color="Color.Warning" Value="50" Size="Size.Large" StrokeWidth="8" Style="height:120px; width:120px;" />
-                    <MudText Typo="Typo.h6" Style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-weight: bold;">50%</MudText>
+                    <MudProgressCircular Color="Color.Warning" Value="@MostRentedPercentage" Size="Size.Large" StrokeWidth="8" Style="height:120px; width:120px;" />
+                    <MudText Typo="Typo.h6" Style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-weight: bold;">@MostRentedPercentage%</MudText>
                 </div>
             </MudCard>
         </MudItem>
@@ -38,8 +38,8 @@
             <MudCard Elevation="3" Class="rounded-lg pa-4 d-flex flex-column align-center justify-center" Style="height: 100%;">
                 <MudText Typo="Typo.h6" Class="mb-4" Style="font-weight: bold;">Revenus mensuels</MudText>
                 <div style="position: relative;">
-                    <MudProgressCircular Color="Color.Warning" Value="15" Size="Size.Large" StrokeWidth="8" Style="height:120px; width:120px;" />
-                    <MudText Typo="Typo.h6" Style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-weight: bold;">15%</MudText>
+                    <MudProgressCircular Color="Color.Warning" Value="@MonthlyRevenuePercentage" Size="Size.Large" StrokeWidth="8" Style="height:120px; width:120px;" />
+                    <MudText Typo="Typo.h6" Style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-weight: bold;">@MonthlyRevenuePercentage%</MudText>
                 </div>
             </MudCard>
         </MudItem>
@@ -57,22 +57,12 @@
                 </MudCardHeader>
                 <MudCardContent Style="height: 300px; overflow-y: auto;">
                     <MudStack Spacing="2">
-                        @* Liste des rappels factices *@
-                        <MudPaper Elevation="0" Class="pa-3 rounded" Style="background-color: #f2ebeb;">
-                            <MudText>Contrôle technique – BMW Série 4</MudText>
-                        </MudPaper>
-                        <MudPaper Elevation="0" Class="pa-3 rounded" Style="background-color: #f2ebeb;">
-                            <MudText>Vidange – Clio 3</MudText>
-                        </MudPaper>
-                        <MudPaper Elevation="0" Class="pa-3 rounded" Style="background-color: #f2ebeb;">
-                            <MudText>Assurance – Tesla Model 3</MudText>
-                        </MudPaper>
-                        <MudPaper Elevation="0" Class="pa-3 rounded" Style="background-color: #f2ebeb;">
-                            <MudText>Contrôle Pollution – Peugeot 208</MudText>
-                        </MudPaper>
-                        <MudPaper Elevation="0" Class="pa-3 rounded" Style="background-color: #f2ebeb;">
-                            <MudText>Révision – Audi A3</MudText>
-                        </MudPaper>
+                        @foreach (var rappel in ListeRappels)
+                        {
+                            <MudPaper Elevation="0" Class="pa-3 rounded" Style="background-color: #f2ebeb;">
+                                <MudText>@rappel</MudText>
+                            </MudPaper>
+                        }
                     </MudStack>
                 </MudCardContent>
             </MudCard>
@@ -88,26 +78,15 @@
                 </MudCardHeader>
                 <MudCardContent Style="height: 300px; overflow-y: auto;">
                     <MudStack Spacing="2">
-                        @* Liste du planning factice *@
-                        <MudPaper Elevation="0" Class="pa-3 rounded" Style="background-color: #f2ebeb;">
-                            <MudText>09:00 – Location Peugeot 208</MudText>
-                        </MudPaper>
-                        <MudPaper Elevation="0" Class="pa-3 rounded" Style="background-color: #f2ebeb;">
-                            <MudText>10:30 – Retour Tesla Model 3</MudText>
-                        </MudPaper>
-                        <MudPaper Elevation="0" Class="pa-3 rounded" Style="background-color: #f2ebeb;">
-                            <MudText>13:00 – Location BMW Série 4</MudText>
-                        </MudPaper>
-                        <MudPaper Elevation="0" Class="pa-3 rounded" Style="background-color: #f2ebeb;">
-                            <MudText>16:00 – Nettoyage Renault Twingo</MudText>
-                        </MudPaper>
-                        <MudPaper Elevation="0" Class="pa-3 rounded" Style="background-color: #f2ebeb;">
-                            <MudText>18:00 – Clôture caisse</MudText>
-                        </MudPaper>
+                        @foreach (var item in ListePlanning)
+                        {
+                            <MudPaper Elevation="0" Class="pa-3 rounded" Style="background-color: #f2ebeb;">
+                                <MudText>@item</MudText>
+                            </MudPaper>
+                        }
                     </MudStack>
                 </MudCardContent>
             </MudCard>
         </MudItem>
     </MudGrid>
-
 </MudContainer>
