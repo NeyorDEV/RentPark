@@ -68,13 +68,16 @@ sonarqube-check:
 # ----------------------
 push-blazor-image:
   stage: push
-  image: gcr.io/kaniko-project/executor:latest
+  image: docker:latest
+  services:
+    - docker:dind
   script:
-    - echo "{\"auths\":{\"codefirst.iut.uca.fr\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
-    - /kaniko/executor \
-        --context Blazor/BlazorAdminRentPark \
-        --dockerfile Blazor/BlazorAdminRentPark/Dockerfile \
-        --destination codefirst.iut.uca.fr/qumiotto/sae_2a_rentpark:latest
+    - echo "Login Docker registry..."
+    - docker login codefirst.iut.uca.fr -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
+    - echo "Building Docker image..."
+    - docker build -t codefirst.iut.uca.fr/qumiotto/sae_2a_rentpark:latest Blazor/BlazorAdminRentPark
+    - echo "Pushing Docker image..."
+    - docker push codefirst.iut.uca.fr/qumiotto/sae_2a_rentpark:latest
   allow_failure: true
   rules:
     - when: manual
@@ -90,7 +93,7 @@ deploy-my-pod:
   services:
     - docker:dind
   script:
-    - echo "Déploiement du pod Blazor..."
+    - echo "Deploying Blazor pod..."
     - docker login codefirst.iut.uca.fr -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
     - docker pull codefirst.iut.uca.fr/qumiotto/sae_2a_rentpark:latest
     - docker stop blazor-admin-pod || true
@@ -102,6 +105,7 @@ deploy-my-pod:
     - when: manual
   dependencies:
     - push-blazor-image
+
 
 
 
