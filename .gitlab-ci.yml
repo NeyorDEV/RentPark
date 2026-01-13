@@ -1,10 +1,11 @@
 stages:
   - build
   - scan
+  - 📦push
   - deploy
 
 # ----------------------
-# BUILD PHP (SiteSae2A)
+# BUILD PHP
 # ----------------------
 build-php:
   stage: build
@@ -14,44 +15,34 @@ build-php:
     - curl -sS https://getcomposer.org/installer | php
     - mv composer.phar /usr/local/bin/composer
   script:
-    - echo "Installing PHP dependencies..."
     - cd siteSAE2A
     - composer install --no-interaction --prefer-dist
     - composer dump-autoload
-    - echo "PHP build done"
   artifacts:
     paths:
       - siteSAE2A/vendor/
 
-
 # ----------------------
-# BUILD Blazor (Blazor/blazorAdminRentPark)
+# BUILD BLAZOR
 # ----------------------
 build-blazor:
   stage: build
   image: mcr.microsoft.com/dotnet/sdk:9.0
   script:
     - cd Blazor/BlazorAdminRentPark
-    - echo "Restoring .NET packages..."
-    - dotnet restore BlazorAdminRentPark.csproj
-    - echo "Building Blazor app..."
-    - dotnet build BlazorAdminRentPark.csproj -c Release
+    - dotnet restore
+    - dotnet build -c Release
   artifacts:
     paths:
       - Blazor/BlazorAdminRentPark/bin/Release/
 
 # ----------------------
-# SONAR SCANNER
+# SONAR
 # ----------------------
 sonarqube-check:
   stage: scan
   image: sonarsource/sonar-scanner-cli:latest
-  variables:
-    SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"
-    GIT_DEPTH: "0"
-    JAVA_TOOL_OPTIONS: "-Dfile.encoding=UTF-8"
   script:
-    - echo "Running SonarScanner..."
     - sonar-scanner -X
   allow_failure: true
   dependencies:
@@ -61,18 +52,35 @@ sonarqube-check:
     - main
 
 # ----------------------
-# DEPLOY
+# DOCKER BUILD & PUSH
+# ----------------------
+include:
+  - project: 'IUT_INF63/generic-ci'
+    ref: 'main'
+    file:
+      - 'build/.docker-build.yml'
+
+push-blazor-image:
+  extends: .build-and-push-docker-image
+  stage: 📦push
+  variables:
+    DOCKERFILE_RELATIVE_PATH: Blazor/BlazorAdminRentPark/Dockerfile
+    DOCKERFILE_CONTEXT_PATH: Blazor/BlazorAdminRentPark
+    DESTINATION_REGISTRY_IMAGE_NAME: registry.gitlab.com/IUT_INF63/rentpark/blazor-admin
+    DESTINATION_REGISTRY_IMAGE_VERSION: latest
+  rules:
+    - when: manual
+
+# ----------------------
+# DEPLOY (placeholder)
 # ----------------------
 deploy:
   stage: deploy
   image: ubuntu:latest
   script:
-    - echo "Deploying PHP backend..."
-    - echo "Deploying Blazor frontend..."
-    - echo "Deployment finished"
-  environment: production
-  dependencies:
-    - build-php
-    - build-blazor
+    - echo "Déploiement à remplacer par deploy-image"
+  rules:
+    - when: manual
+
 
 
