@@ -2,31 +2,23 @@
 @rendermode InteractiveServer
 @using MudBlazor
 @using BlazorAdminRentPark.Models
-@using BlazorAdminRentPark.Services
-@using Microsoft.AspNetCore.Components.QuickGrid
-@inject IVehiculeService VehiculeService
 
 <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-8">
-    @* En-tête avec bouton Ajouter *@
     <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Class="mb-6">
         <MudText Typo="Typo.h4" Style="font-weight: bold;">Véhicules</MudText>
-        <MudButton Variant="Variant.Filled"
-                   Color="Color.Success"
-                   StartIcon="@Icons.Material.Filled.Add">
+        <MudButton Variant="Variant.Filled" Color="Color.Success" StartIcon="@Icons.Material.Filled.Add">
             AJOUTER UN VÉHICULE
         </MudButton>
     </MudStack>
 
-    @* Barre de recherche (identique à Account.razor) *@
     <MudTextField @bind-Value="SearchString"
-                  Placeholder="Rechercher un modèle, une catégorie..."
+                  Placeholder="Rechercher par nom, marque ou catégorie..."
                   Adornment="Adornment.End"
                   AdornmentIcon="@Icons.Material.Filled.Search"
                   Variant="Variant.Outlined"
                   Margin="Margin.Dense"
                   Class="mb-4" />
 
-    @* Pagination - Sélection du nombre par page *@
     <MudStack Row="true" Justify="Justify.FlexEnd" Class="mb-4">
         <MudText Typo="Typo.subtitle2" Class="mr-4">Afficher par page :</MudText>
         <MudSelect T="int" @bind-Value="PageSize" Dense="true" Style="width:90px;">
@@ -36,84 +28,38 @@
         </MudSelect>
     </MudStack>
 
-    @* Grille des véhicules filtrée et paginée *@
     <MudGrid>
-        @if (_vehicules == null)
+        @foreach (var car in PagedCars)
         {
-            <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
-        }
-        else
-        {
-            @foreach (var car in PagedCars)
-            {
-                <MudItem xs="12" sm="6" md="3">
-                    <MudCard Elevation="2" Class="pa-4 text-center">
-                        <div class="d-flex justify-center mb-4">
-                            @* On utilise une icône par défaut car VehiculeModel n'a pas d'URL d'image *@
-                            <MudIcon Icon="@Icons.Material.Filled.DirectionsCar" Style="font-size: 5rem;" />
-                        </div>
+            <MudItem xs="12" sm="6" md="3">
+                <MudCard Elevation="2" Class="pa-4 text-center">
+                    <div class="d-flex justify-center mb-4">
+                        <MudIcon Icon="@Icons.Material.Filled.DirectionsCar" Style="font-size: 5rem;" />
+                    </div>
 
-                        @* Affichage du nom du véhicule *@
-                        <MudText Typo="Typo.h6" Style="font-weight:bold;">@car.Nom</MudText>
-                        <MudText Typo="Typo.body2">@car.Marque - @car.Categorie</MudText>
-                        <MudText Typo="Typo.caption">Série: @car.NumSerie</MudText>
+                    <MudText Typo="Typo.h6" Style="font-weight:bold;">@car.Nom</MudText>
+                    <MudText Typo="Typo.body2">@car.Marque - @car.Categorie</MudText>
+                    <MudText Typo="Typo.caption" Class="mb-4 d-block">Série: @car.NumSerie</MudText>
 
-                        <MudButton Variant="Variant.Filled"
-                                   Color="Color.Error"
-                                   FullWidth="true"
-                                   Class="mt-4 mb-2"
-                                   OnClick="@(() => DeleteCar(car.NumSerie))">
-                            SUPPRIMER
-                        </MudButton>
-                    </MudCard>
-                </MudItem>
-            }
+                    <MudButton Variant="Variant.Filled"
+                               Color="Color.Error"
+                               FullWidth="true"
+                               Class="mb-2"
+                               OnClick="@(() => DeleteCar(car.NumSerie))">
+                        SUPPRIMER
+                    </MudButton>
+
+                    <MudButton Variant="Variant.Filled"
+                               Style="background-color: #f44336; color: white;"
+                               FullWidth="true">
+                        MODIFIER
+                    </MudButton>
+                </MudCard>
+            </MudItem>
         }
     </MudGrid>
 
-    @* Contrôle de la pagination *@
     <MudStack Row="true" Justify="Justify.Center" Class="mt-6">
         <MudPagination Page="@CurrentPage" PageCount="@PageCount" OnPageChanged="OnPageChanged" />
     </MudStack>
 </MudContainer>
-
-@code {
-    private string SearchString = "";
-    private int PageSize = 8;
-    private int CurrentPage = 1;
-    private List<VehiculeModel> _vehicules = new();
-
-    // Chargement des données au démarrage
-    protected override async Task OnInitializedAsync()
-    {
-        await LoadVehicules();
-    }
-
-    private async Task LoadVehicules()
-    {
-        var request = new GridItemsProviderRequest<VehiculeModel>();
-        var result = await VehiculeService.GetItems(request);
-        _vehicules = result.Items?.ToList() ?? new List<VehiculeModel>();
-    }
-
-    // Filtrage mis à jour pour VehiculeModel
-    private IEnumerable<VehiculeModel> FilteredCars => _vehicules
-        .Where(c => string.IsNullOrWhiteSpace(SearchString) ||
-                    (c.Nom?.Contains(SearchString, StringComparison.OrdinalIgnoreCase) == true) ||
-                    (c.Marque?.Contains(SearchString, StringComparison.OrdinalIgnoreCase) == true) ||
-                    (c.Categorie?.Contains(SearchString, StringComparison.OrdinalIgnoreCase) == true));
-
-    private IEnumerable<VehiculeModel> PagedCars => FilteredCars
-        .Skip((CurrentPage - 1) * PageSize)
-        .Take(PageSize);
-
-    private int PageCount => Math.Max(1, (int)Math.Ceiling((double)FilteredCars.Count() / PageSize));
-
-    private void OnPageChanged(int page) => CurrentPage = page;
-
-    private async Task DeleteCar(string numSerie)
-    {
-        await VehiculeService.Delete(numSerie);
-        await LoadVehicules(); // Recharger la liste après suppression
-    }
-}
