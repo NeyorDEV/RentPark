@@ -1,23 +1,22 @@
 ﻿@page "/account"
 @rendermode InteractiveServer
 @using MudBlazor
-@inject IDialogService DialogService 
-@* Injection du service *@
+@inject IDialogService DialogService
 
 <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-8">
     <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Class="mb-6">
         <MudText Typo="Typo.h4" Style="font-weight: bold;">Compte</MudText>
-        @* Ajout de l'événement OnClick *@
-        <MudButton Variant="Variant.Filled" 
-                   Color="Color.Success" 
+        <MudButton Variant="Variant.Filled"
+                   Color="Color.Success"
                    StartIcon="@Icons.Material.Filled.Add"
                    OnClick="OpenAddUserDialog">
             AJOUTER
         </MudButton>
     </MudStack>
 
-    @* Barre de recherche *@
-    <MudTextField @bind-Value="_searchString"
+    <MudTextField T="string"
+                  Value="_searchString"
+                  ValueChanged="OnSearchChanged"
                   Placeholder="Rechercher..."
                   Adornment="Adornment.End"
                   AdornmentIcon="@Icons.Material.Filled.Search"
@@ -25,10 +24,9 @@
                   Margin="Margin.Dense"
                   Class="mb-4" />
 
-    @* Pagination *@
     <MudStack Row="true" Justify="Justify.FlexEnd" Class="mb-4">
         <MudText Typo="Typo.subtitle2" Class="mr-4">Afficher par page :</MudText>
-        <MudSelect T="int" @bind-Value="_pageSize" Dense="true" Style="width:90px;">
+        <MudSelect T="int" Value="_pageSize" ValueChanged="OnPageSizeChanged" Dense="true" Style="width:90px;">
             <MudSelectItem Value="4">4</MudSelectItem>
             <MudSelectItem Value="8">8</MudSelectItem>
             <MudSelectItem Value="12">12</MudSelectItem>
@@ -52,32 +50,28 @@
             </MudItem>
         }
     </MudGrid>
-    @* Pagination control *@
+
     <MudStack Row="true" Justify="Justify.Center" Class="mt-6">
-        <MudPagination Page="@_currentPage" PageCount="@PageCount" OnPageChanged="OnPageChanged" />
+        <MudPagination Selected="@_currentPage" SelectedChanged="OnPageChanged" Count="@PageCount" />
     </MudStack>
 </MudContainer>
 
 @code {
     private string _searchString = "";
-
     private int _currentPage = 1;
     private int _pageSize = 8;
+
     private async Task OpenAddUserDialog()
     {
         var options = new DialogOptions { CloseOnEscapeKey = true, MaxWidth = MaxWidth.Small, FullWidth = true };
         var dialog = await DialogService.ShowAsync<AddUserDialog>("", options);
         var result = await dialog.Result;
-
-        if (!result.Canceled)
-        {
-            // Logique future pour rafraîchir la liste
-        }
+        if (!result.Canceled) { }
     }
 
     public class UserDto
     {
-        public int Id { get; set; } 
+        public int Id { get; set; }
         public string Username { get; set; }
         public string Role { get; set; }
     }
@@ -107,17 +101,22 @@
             .Skip((_currentPage - 1) * _pageSize)
             .Take(_pageSize);
 
-    private int PageCount =>
-        Math.Max(1, (int)Math.Ceiling(FilteredUsers.Count() / (double)_pageSize));
+    private int PageCount => (int)Math.Ceiling((double)FilteredUsers.Count() / _pageSize);
 
     private void OnPageChanged(int newPage)
     {
         _currentPage = newPage;
     }
 
-    protected override void OnParametersSet()
+    private void OnPageSizeChanged(int newSize)
     {
-        if (_currentPage > PageCount)
-            _currentPage = PageCount;
+        _pageSize = newSize;
+        _currentPage = 1;
+    }
+
+    private void OnSearchChanged(string text)
+    {
+        _searchString = text;
+        _currentPage = 1;
     }
 }
