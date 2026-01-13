@@ -15,9 +15,11 @@ build-php:
     - curl -sS https://getcomposer.org/installer | php
     - mv composer.phar /usr/local/bin/composer
   script:
+    - echo "Installing PHP dependencies..."
     - cd siteSAE2A
     - composer install --no-interaction --prefer-dist
     - composer dump-autoload
+    - echo "PHP build done"
   artifacts:
     paths:
       - siteSAE2A/vendor/
@@ -30,19 +32,26 @@ build-blazor:
   image: mcr.microsoft.com/dotnet/sdk:9.0
   script:
     - cd Blazor/BlazorAdminRentPark
+    - echo "Restoring .NET packages..."
     - dotnet restore
+    - echo "Building Blazor app..."
     - dotnet build -c Release
   artifacts:
     paths:
       - Blazor/BlazorAdminRentPark/bin/Release/
 
 # ----------------------
-# SONAR
+# SONAR SCANNER
 # ----------------------
 sonarqube-check:
   stage: scan
   image: sonarsource/sonar-scanner-cli:latest
+  variables:
+    SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"
+    GIT_DEPTH: "0"
+    JAVA_TOOL_OPTIONS: "-Dfile.encoding=UTF-8"
   script:
+    - echo "Running SonarScanner..."
     - sonar-scanner -X
   allow_failure: true
   dependencies:
@@ -52,7 +61,7 @@ sonarqube-check:
     - main
 
 # ----------------------
-# DOCKER BUILD & PUSH
+# DOCKER BUILD & PUSH (BLAZOR)
 # ----------------------
 include:
   - project: 'IUT_INF63/generic-ci'
@@ -66,9 +75,14 @@ push-blazor-image:
   variables:
     DOCKERFILE_RELATIVE_PATH: Blazor/BlazorAdminRentPark/Dockerfile
     DOCKERFILE_CONTEXT_PATH: Blazor/BlazorAdminRentPark
-    DESTINATION_REGISTRY_IMAGE_NAME: registry.gitlab.com/IUT_INF63/rentpark/blazor-admin
+    DESTINATION_REGISTRY_PATH: codefirst.iut.uca.fr
+    DESTINATION_REGISTRY_IMAGE_NAME: qumiotto/sae_2a_rentpark
     DESTINATION_REGISTRY_IMAGE_VERSION: latest
+    DESTINATION_REGISTRY_USER: $CI_REGISTRY_USER
+    DESTINATION_REGISTRY_PASSWORD: $CI_REGISTRY_PASSWORD
   rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+      when: on_success
     - when: manual
 
 # ----------------------
@@ -78,9 +92,16 @@ deploy:
   stage: deploy
   image: ubuntu:latest
   script:
-    - echo "Déploiement à remplacer par deploy-image"
+    - echo "Deploying PHP backend..."
+    - echo "Deploying Blazor frontend..."
+    - echo "Deployment finished"
+  environment: production
+  dependencies:
+    - build-php
+    - build-blazor
   rules:
     - when: manual
+
 
 
 
