@@ -75,15 +75,13 @@ push-blazor-image:
   variables:
     DOCKERFILE_RELATIVE_PATH: Blazor/BlazorAdminRentPark/Dockerfile
     DOCKERFILE_CONTEXT_PATH: Blazor/BlazorAdminRentPark
-    DESTINATION_REGISTRY_PATH: codefirst.iut.uca.fr
-    DESTINATION_REGISTRY_IMAGE_NAME: qumiotto/sae_2a_rentpark
+    DESTINATION_REGISTRY_IMAGE_NAME: codefirst.iut.uca.fr/qumiotto/sae_2a_rentpark
     DESTINATION_REGISTRY_IMAGE_VERSION: latest
     DESTINATION_REGISTRY_USER: $CI_REGISTRY_USER
     DESTINATION_REGISTRY_PASSWORD: $CI_REGISTRY_PASSWORD
   rules:
-    - if: '$CI_COMMIT_BRANCH == "main"'
-      when: on_success
     - when: manual
+
 
 # ----------------------
 # DEPLOY (placeholder)
