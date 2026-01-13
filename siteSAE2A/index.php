@@ -19,6 +19,6 @@ use controleur\FrontControleur;
     ]);
 
     $controller = new FrontControleur();
-    $controller->run();
+    $controller->run(); 
 
     ?> 
