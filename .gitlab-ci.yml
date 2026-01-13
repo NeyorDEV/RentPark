@@ -78,7 +78,7 @@ push-blazor-image:
     DOCKERFILE_CONTEXT_PATH: Blazor/BlazorAdminRentPark
 
     # Registry GitLab : utilise ton username comme namespace si tu n'as pas de groupe
-    DESTINATION_REGISTRY_IMAGE_NAME: registry.gitlab.com/<your-username>/rentpark/blazor-admin
+    DESTINATION_REGISTRY_IMAGE_NAME: registry.gitlab.com/qumiotto/rentpark/blazor-admin
     DESTINATION_REGISTRY_IMAGE_VERSION: latest
 
     # Auth GitLab CI
