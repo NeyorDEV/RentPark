@@ -1,7 +1,7 @@
 stages:
   - build
   - scan
-  - 📦push
+  - push
   - deploy
 
 # ----------------------
@@ -69,25 +69,33 @@ include:
     file:
       - 'build/.docker-build.yml'
 
+push-blazor-image:
+  extends: .build-and-push-docker-image
+  stage: push
+  variables:
+    DOCKERFILE_RELATIVE_PATH: Blazor/BlazorAdminRentPark/Dockerfile
+    DOCKERFILE_CONTEXT_PATH: Blazor/BlazorAdminRentPark
+    DESTINATION_REGISTRY_IMAGE_NAME: codefirst.iut.uca.fr/qumiotto/sae_2a_rentpark
+    DESTINATION_REGISTRY_IMAGE_VERSION: latest
+    DESTINATION_REGISTRY_USER: $CI_REGISTRY_USER
+    DESTINATION_REGISTRY_PASSWORD: $CI_REGISTRY_PASSWORD
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+      when: on_success
+    - when: manual
+
+# ----------------------
+# DEPLOY
+# ----------------------
 deploy-my-pod:
   extends: .deploy-image
   stage: deploy
   variables:
-    # Nom du conteneur qui sera lancé
     CONTAINER_NAME: blazor-admin-pod
-
-    # Exemple de variable d'environnement pour ton conteneur
     CONTAINER_ENV_VAR_VAR_1: "ENV_PRODUCTION=true"
-
-    # Image Docker complète avec version
     CONTAINER_IMAGE_PATH: codefirst.iut.uca.fr/qumiotto/sae_2a_rentpark:latest
-
-    # Token GitLab pour déployer (déjà stocké dans les variables CI/CD)
     NAMESPACE_TOKEN: $CI_JOB_TOKEN
-
-    # Namespace / projet où déployer
     NAMESPACE_NAME: qumiotto
-
   allow_failure: true
   rules:
     - when: manual
