@@ -96,12 +96,7 @@ push-dotnet-image:
 # ----------------------
 # INCLUDE DEPLOY TEMPLATE
 # ----------------------
-include:
-  - project: 'IUT_INF63/generic-ci'
-    ref: 'main'
-    file:
-      - 'deploy/.docker-deploy.yml'
-    # token: $CI_PERSONAL_TOKEN   # Décommente si projet privé
+
 
 # ----------------------
 # CONFIGURE DEPLOYMENT
