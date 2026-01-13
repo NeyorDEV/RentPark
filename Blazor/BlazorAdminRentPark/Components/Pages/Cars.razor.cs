@@ -7,8 +7,7 @@ using BlazorAdminRentPark.Services;
 
 namespace BlazorAdminRentPark.Components.Pages
 {
-    // L'héritage : ComponentBase est indispensable pour OnInitializedAsync et StateHasChanged
-    public partial class Cars : ComponentBase
+    public partial class Cars
     {
         [Inject] protected IVehiculeService VehiculeService { get; set; }
   

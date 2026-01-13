@@ -5,7 +5,6 @@ namespace BlazorAdminRentPark.Services
 {
     public interface IDataService<T>
     {
-        /*Task Add(Client model);*/
 
         Task<GridItemsProviderResult<T>> GetItems(GridItemsProviderRequest<T> request);
 
