@@ -69,43 +69,32 @@ include:
     file:
       - 'build/.docker-build.yml'
 
-push-blazor-image:
-  extends: .build-and-push-docker-image
-  stage: 📦push
-  variables:
-    # Dockerfile et contexte
-    DOCKERFILE_RELATIVE_PATH: Blazor/BlazorAdminRentPark/Dockerfile
-    DOCKERFILE_CONTEXT_PATH: Blazor/BlazorAdminRentPark
-
-    # Registry GitLab : utilise ton username comme namespace si tu n'as pas de groupe
-    DESTINATION_REGISTRY_IMAGE_NAME: registry.gitlab.com/qumiotto/rentpark/blazor-admin
-    DESTINATION_REGISTRY_IMAGE_VERSION: latest
-
-    # Auth GitLab CI
-    DESTINATION_REGISTRY_USER: $CI_REGISTRY_USER
-    DESTINATION_REGISTRY_PASSWORD: $CI_REGISTRY_PASSWORD
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "main"'
-      when: on_success
-    - when: manual
-
-
-# ----------------------
-# DEPLOY (placeholder)
-# ----------------------
-deploy:
+deploy-my-pod:
+  extends: .deploy-image
   stage: deploy
-  image: ubuntu:latest
-  script:
-    - echo "Deploying PHP backend..."
-    - echo "Deploying Blazor frontend..."
-    - echo "Deployment finished"
-  environment: production
-  dependencies:
-    - build-php
-    - build-blazor
+  variables:
+    # Nom du conteneur qui sera lancé
+    CONTAINER_NAME: blazor-admin-pod
+
+    # Exemple de variable d'environnement pour ton conteneur
+    CONTAINER_ENV_VAR_VAR_1: "ENV_PRODUCTION=true"
+
+    # Image Docker complète avec version
+    CONTAINER_IMAGE_PATH: codefirst.iut.uca.fr/qumiotto/sae_2a_rentpark:latest
+
+    # Token GitLab pour déployer (déjà stocké dans les variables CI/CD)
+    NAMESPACE_TOKEN: $CI_JOB_TOKEN
+
+    # Namespace / projet où déployer
+    NAMESPACE_NAME: qumiotto
+
+  allow_failure: true
   rules:
     - when: manual
+
+
+
+
 
 
 
