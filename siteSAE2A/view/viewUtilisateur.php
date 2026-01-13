@@ -1,10 +1,3 @@
-<?php
-
-
-
- $isAdmin = ($role === 'admin');
-?>
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -14,109 +7,113 @@
     (function () {
         try {
             const theme = localStorage.getItem('theme') || 'light';
-            if (theme === 'dark') {
-                document.documentElement.classList.add('dark-theme');
-            } else {
-                document.documentElement.classList.remove('dark-theme');
-            }
+            document.documentElement.classList.toggle('dark-theme', theme === 'dark');
         } catch (e) { }
     })();
     </script>
-    <link rel="stylesheet" href="/siteSAE2A/html/css/menu.css">
-    <link rel="stylesheet" href="/siteSAE2A/html/css/parametres.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="/siteSAE2A/html/css/commun.css">
+    <link rel="stylesheet" href="/siteSAE2A/html/css/utilisateur.css">
     <link rel="icon" type="image/png" href="html/icons/voiture.png">
     <link rel="shortcut icon" href="html/icons/favicon.ico" type="image/x-icon">
-    <style>
-        .dark-theme .topbar-form input { background: #ffffff;  border: 1px solid rgba(0,0,0,0.12); }
-        .dark-theme .topbar-form input::placeholder {  opacity: 0.9; }
-        .dark-theme .topbar-form input::-webkit-input-placeholder {  opacity: 0.9; }
-        .dark-theme .topbar-form input:-ms-input-placeholder {  opacity: 0.9; }
-        .dark-theme .topbar-form input::-ms-input-placeholder { opacity: 0.9; }
-        .dark-theme .top h1{ color: #ffffff}
-    </style>
 </head>
 <body>
 
 <nav>
     <ul class="menu">
-        <li><a href="/siteSAE2A/home"><img src="html/icons/acceuil.jpg" alt="Accueil"> Accueil</a></li>
-        <li><a href="/siteSAE2A/dashboard"><img src="html/icons/dashboard.png" alt="Tableau de bord"> Tableau de bord</a></li>
-        <li><a href="/sitesae2A/voitures"><img src="html/icons/voiture.png" alt="Flotte"> Flotte Automobile</a></li>
-        <li><a href="/sitesae2A/planning"><img src="html/icons/contrat.png" alt="Contrats"> Contrats</a></li>
-        <li><a href="/siteSAE2A/reservation"><img src="html/icons/reservation.png" alt="Réservation"> Réservation</a></li>
-        <li><a href="siteSAE2A/../utilisateurs"><img src="html/icons/user.png" alt="Utilisateurs"> Utilisateur</a></li>
-        <li><a href="/siteSAE2A/parametres"><img src="html/icons/settings.png" alt="Paramètres"> Paramètres</a></li>
-        <li><a href="/siteSAE2A/deconnection"><img src="html/icons/logout.png" alt="se déconnecter"> déconnexion</a></li>
+        <li><a href="/siteSAE2A/home"><i class="fa-solid fa-house"></i> Accueil</a></li>
+        <li><a href="/siteSAE2A/dashboard" class="active"><i class="fa-solid fa-chart-line"></i> Tableau de bord</a></li>
+        <li><a href="/sitesae2A/voitures"><i class="fa-solid fa-car"></i> Flotte Automobile</a></li>
+        <li><a href="/siteSAE2A/planning"><i class="fa-solid fa-file-contract"></i> Contrats</a></li>
+        <li><a href="/siteSAE2A/reservation"><i class="fa-solid fa-calendar-check"></i> Réservation</a></li>
+        <li><a href="/siteSAE2A/utilisateurs"><i class="fa-solid fa-users-gear"></i> Utilisateurs</a></li>
+        <li><a href="/siteSAE2A/parametres"><i class="fa-solid fa-gears"></i> Paramètres</a></li>
+        <li class="logout-item"><a href="/siteSAE2A/deconnection"><i class="fa-solid fa-right-from-bracket"></i> Déconnexion</a></li>
     </ul>
 </nav>
 
-<div class="top">
-    <h1>Utilisateurs</h1>
-    <?php if ($isAdmin): ?>
-        <a href="#addModal" class="add-btn">+ Ajouter</a>
-    <?php endif; ?>
+<main class="main-content">
+    <div class="header-container">
+        <h1>Gestion des Utilisateurs</h1>
+        <?php if ($role === 'admin') : ?>
+            <a href="#addModal" class="add-btn-main">
+                <i class="fa-solid fa-user-plus"></i> Ajouter un utilisateur
+            </a>
+        <?php endif; ?>
+    </div>
+
+    <div class="user-container">
+        <table class="user-table">
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Rôle</th>
+                    <?php if ($role === 'admin') : ?>
+                        <th>Actions</th>
+                    <?php endif; ?>
+                </tr>
+            </thead>
+            <tbody>
+                <?php if (!empty($results)) : ?>
+                    <?php foreach ($results as $row) : ?>
+                        <tr>
+                            <td><strong><?= htmlspecialchars($row['username']) ?></strong></td>
+                            <td><span class="badge-role"><?= htmlspecialchars($row['role']) ?></span></td>
+                            <?php if ($role === 'admin') : ?>
+                                <td class="actions-cell">
+                                    <a href="#editModal-<?= htmlspecialchars($row['username']) ?>" class="btn-icon edit">
+                                        <i class="fa-solid fa-pen"></i>
+                                    </a>
+                                    <form method="POST" action="/sitesae2A/utilisateurs" onsubmit="return confirm('Supprimer cet utilisateur ?');" style="display:inline;">
+                                        <input type="hidden" name="action" value="supprimerUtilisateur">
+                                        <input type="hidden" name="id" value="<?= htmlspecialchars($row['id']) ?>">
+                                        <button type="submit" class="btn-icon delete"><i class="fa-solid fa-trash"></i></button>
+                                    </form>
+                                </td>
+                            <?php endif; ?>
+                        </tr>
+                    <?php endforeach; ?>
+                <?php else : ?>
+                    <tr><td colspan="3" style="text-align:center; padding: 40px;">Aucun utilisateur trouvé</td></tr>
+                <?php endif; ?>
+            </tbody>
+        </table>
+    </div>
+</main>
+
+<?php if ($role === 'admin') : ?>
+    <div id="addModal" class="modal">
+    <div class="modal-content">
+        <a href="" class="close">&times;</a>
+        <h2>Ajouter un Utilisateur</h2>
+        <form method="POST" action="/siteSAE2A/utilisateurs">
+            <input type="hidden" name="action" value="ajouterUtilisateur">
+                <div class="form-group">
+                    <input type="text" name="username" placeholder="Nom d'utilisateur" required>
+                </div>
+                <div class="form-group">
+                    <input type="password" name="password" placeholder="Mot de passe" required>
+                </div>
+                <div class="form-group">
+                    <input type="password" name="confirm" placeholder="Confirmer mot de passe" required>
+                </div>
+                <div class="form-group">
+                    <input type="text" name="role" placeholder="Rôle (admin/user)" required>
+                </div>
+                <button type="submit" class="save-btn">Créer le compte</button>
+        </form>
+    </div>
 </div>
 
-
-<header class="topbar">
-    <form action="/sitesae2A/utilisateurs" method="get" role="search" class="topbar-form">
-        <input type="hidden" name="action" value="rechercherUtilisateur">
-
-        <input
-                id="q3"
-                name="q"
-                type="search"
-                placeholder="Rechercher..."
-                aria-label="Recherche"
-                value="<?php echo htmlspecialchars($_GET['q'] ?? '', ENT_QUOTES); ?>"
-        >
-
-        <button type="submit">🔍</button>
-    </form>
-</header>
-
-
-
-<?php if (!empty($dVueErreur)) : ?>
-    <div class="erreurs">
-        <ul>
-            <?php foreach ($dVueErreur as $erreur) : ?>
-                <li><?= htmlspecialchars($erreur) ?></li>
-            <?php endforeach; ?>
-        </ul>
-    </div>
-<?php endif; ?>
-
-<div class="voiture">
-    <?php if (!empty($results)) : ?>
-        <?php foreach ($results as $row) : ?>
-            <div class="rectangle">
-                <img src="html/icons/user.png" alt="User" class="bg-img">
-                <div class="info">
-                    <p>ID: <?= htmlspecialchars($row['id']) ?></p>
-                    <p><?= htmlspecialchars($row['username']) ?></p>
-                    <p>Rôle: <?= htmlspecialchars($row['role']) ?></p>
-
-                    <?php if ($isAdmin): ?>
-                        <div class="actions">
-                            <form method="POST" action="/sitesae2A/utilisateurs" onsubmit="return confirm('Supprimer cet utilisateur ?');">
-                                <input type="hidden" name="id" value="<?= htmlspecialchars($row['id']) ?>">
-                                <input type="hidden" name="action" value="supprimerUtilisateur">
-                                <button type="submit">Supprimer</button>
-                            </form>
-                            <button type="button" onclick="location.hash='editModal-<?= htmlspecialchars($row['id']) ?>'">Modifier</button>
-                        </div>
-                    <?php endif; ?>
-                </div>
-            </div>
-
-            <div id="editModal-<?= htmlspecialchars($row['id']) ?>" class="modal">
-                <div class="modal-content">
-                    <a href="#" class="close">×</a>
-                    <h2>Modifier l'utilisateur</h2>
-                    <form method="POST" action="/siteSAE2A/utilisateurs">
-                        <input type="hidden" name="action" value="modifierUtilisateur">
-                        <input type="hidden" name="id" value="<?= htmlspecialchars($row['id']) ?>">
+    <?php foreach ($results as $row) : ?>
+        <div id="editModal-<?= htmlspecialchars($row['username']) ?>" class="modal">
+            <div class="modal-content">
+                <a href="#" class="close">&times;</a>
+                <h2>Modifier l'utilisateur</h2>
+                <form method="POST" action="/siteSAE2A/utilisateurs">
+                    <input type="hidden" name="action" value="modifierUtilisateur">
+                    <input type="hidden" name="old_username" value="<?= htmlspecialchars($row['username']) ?>">
+                   <input type="hidden" name="id" value="<?= htmlspecialchars($row['id']) ?>">
                         
                         <label>Nom d'utilisateur<br>
                             <input type="text" name="username" required value="<?= htmlspecialchars($row['username']) ?>">
@@ -127,40 +124,13 @@
                         </label><br><br>
 
                         <button type="submit">Enregistrer</button>
-                    </form>
-                </div>
+
+                </form>
             </div>
-        <?php endforeach; ?>
-    <?php else : ?>
-        <div class="rectangle">
-            <div class="info">
-                <p>Aucun Utilisateur trouvé</p>
-            </div>
-        </div>
-    <?php endif; ?>
-</div>
-
-
-
-
-<div id="addModal" class="modal">
-    <div class="modal-content">
-        <a href="" class="close">&times;</a>
-        <h2>Ajouter un Utilisateur</h2>
-        <form method="POST" action="/siteSAE2A/utilisateurs">
-            <input type="hidden" name="action" value="ajouterUtilisateur">
-            <input type="text" name="username" placeholder="username" required><br><br>
-            <input type="password" name="password" placeholder="password" required><br><br>
-            <input type="password" name="confirm" placeholder="confirm" required><br><br>
-            <input type="text" name="role" placeholder="role" required><br><br>
-            <button type="submit" name="ajouterUtilisateur">Ajouter</button>
             
-
-        </form>
-    </div>
-</div>
-
+        </div>
+    <?php endforeach; ?>
+<?php endif; ?>
 
 </body>
 </html>
-

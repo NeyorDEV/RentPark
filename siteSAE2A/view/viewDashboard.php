@@ -2,176 +2,146 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RentPark - Dashboard</title>
+    
     <script>
     (function () {
         try {
             const theme = localStorage.getItem('theme') || 'light';
-            if (theme === 'dark') {
-                document.documentElement.classList.add('dark-theme');
-            } else {
-                document.documentElement.classList.remove('dark-theme');
-            }
+            document.documentElement.classList.toggle('dark-theme', theme === 'dark');
         } catch (e) { }
     })();
     </script>
-    <link rel="stylesheet" href="/siteSAE2A/html/css/parametres.css">
-    <link rel="stylesheet" href="html/css/dashboard.css">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="/siteSAE2A/html/css/commun.css">
+    <link rel="stylesheet" href="/siteSAE2A/html/css/dashboard.css">
+    
     <link rel="icon" type="image/png" href="html/icons/voiture.png">
     <link rel="shortcut icon" href="html/icons/favicon.ico" type="image/x-icon">
-
 </head>
 <body>
 
 <nav>
     <ul class="menu">
-        <li><a href="/siteSAE2A/home"><img src="html/icons/acceuil.jpg" alt="Accueil"> Accueil</a></li>
-        <li><a href=""><img src="html/icons/dashboard.png" alt="Tableau de bord"> Tableau de bord</a></li>
-        <li><a href="/sitesae2A/voitures"><img src="html/icons/voiture.png" alt="Flotte"> Flotte Automobile</a></li>
-        <li><a href="/siteSAE2A/planning"><img src="html/icons/contrat.png" alt="Contrats"> Contrats</a></li>
-        <li><a href="/siteSAE2A/reservation"><img src="html/icons/reservation.png" alt="Réservation"> Réservation</a></li>
-        <li><a href="siteSAE2A/../utilisateurs"><img src="html/icons/user.png" alt="Utilisateurs"> Utilisateur</a></li>
-        <li><a href="/siteSAE2A/parametres"><img src="html/icons/settings.png" alt="Paramètres"> Paramètres</a></li>
-        <li><a href="/siteSAE2A/deconnection"><img src="html/icons/logout.png" alt="se déconnecter"> déconnexion</a></li>
+        <li><a href="/siteSAE2A/home"><i class="fa-solid fa-house"></i> Accueil</a></li>
+        <li><a href="/siteSAE2A/dashboard" class="active"><i class="fa-solid fa-chart-line"></i> Tableau de bord</a></li>
+        <li><a href="/sitesae2A/voitures"><i class="fa-solid fa-car"></i> Flotte Automobile</a></li>
+        <li><a href="/siteSAE2A/planning"><i class="fa-solid fa-file-contract"></i> Contrats</a></li>
+        <li><a href="/siteSAE2A/reservation"><i class="fa-solid fa-calendar-check"></i> Réservation</a></li>
+        <li><a href="/siteSAE2A/utilisateurs"><i class="fa-solid fa-users-gear"></i> Utilisateurs</a></li>
+        <li><a href="/siteSAE2A/parametres"><i class="fa-solid fa-gears"></i> Paramètres</a></li>
+        <li class="logout-item"><a href="/siteSAE2A/deconnection"><i class="fa-solid fa-right-from-bracket"></i> Déconnexion</a></li>
     </ul>
 </nav>
 
+<main class="main-content">
+    <header class="header-container">
+        <h1>Tableau de bord</h1>
+    </header>
 
-<!-- ZONE PRINCIPALE -->
-<div class="main-content">
-    <h1>Tableau de bord</h1>
-    <div class="dashboard-cards">
-        <!-- Exemple de carte statistique -->
-        <div class="card">
-    <h2>Nombre d'utilisateurs</h2>
-    <div class="circle-chart" 
-         id="users-circle" 
-         style="--final-value: <?= min($results["totalUsers"], 100) ?>;">
-        <span id="users-counter">0</span>
-    </div>
-</div>
+    <div class="dashboard-grid">
+        
+        <section class="card stat-card planning-card">
+            <h2>Nombre d'utilisateurs</h2>
+            <div class="circle-chart" 
+                 id="users-circle" 
+                 style="--final-value: <?= min($results["totalUsers"], 100) ?>;">
+                <span id="users-counter">0</span>
+            </div>
+        </section>
 
-
-        <div class="card">
-    <h2>Voiture la plus louée</h2>
-    <?php if (!empty($results["voiturePlusLouee"])) : 
-    $bestCar = $results["voiturePlusLouee"];
-?>
-    <div class="best-car-card">
-        <div class="info">
-            <p>
-                <strong><?= htmlspecialchars($bestCar["Marque"]) ?></strong>
-                <?= htmlspecialchars($bestCar["Modele"]) ?><br>
-                <span class="small">Louée <?= (int)$bestCar["nb_locations"] ?> fois</span>
-            </p>
-        </div>
-        <div class="image-container">
-            <?php if (!empty($bestCar["ImagePath"])) : ?>
-                <img src="<?= htmlspecialchars($bestCar["ImagePath"]) ?>" alt="Image de <?= htmlspecialchars($bestCar["Modele"]) ?>">
+        <section class="card stat-card planning-card">
+            <h2>Voiture la plus louée</h2>
+            <?php if (!empty($results["voiturePlusLouee"])) : $bestCar = $results["voiturePlusLouee"]; ?>
+                <div class="best-car-container">
+                    <div class="info">
+                        <strong><?= htmlspecialchars($bestCar["Marque"]) ?></strong>
+                        <span><?= htmlspecialchars($bestCar["Modele"]) ?></span>
+                        <small>Louée <?= (int)$bestCar["nb_locations"] ?> fois</small>
+                    </div>
+                    <div class="image-wrapper">
+                        <img src="<?= !empty($bestCar["ImagePath"]) ? htmlspecialchars($bestCar["ImagePath"]) : 'html/icons/voiture.png' ?>" alt="Véhicule">
+                    </div>
+                </div>
             <?php else : ?>
-                <img src="html/icons/voiture.png" alt="Voiture par défaut">
+                <p class="empty-data">Aucune donnée disponible</p>
             <?php endif; ?>
-        </div>
+        </section>
+
+        <section class="card stat-card planning-card">
+            <h2>Revenus mensuels</h2>
+            <div class="circle-chart" 
+                 id="revenus-circle" 
+                 style="--final-value: <?= min(($results["revenusMensuels"] / 300000) * 100, 100) ?>;">
+                <div class="counter-container">
+                    <span id="revenus-counter">0</span>€
+                </div>
+            </div>
+        </section>
+
+        <section class="card large-card planning-card">
+            <h2><i class="fa-solid fa-bell"></i> Rappels</h2>
+            <div class="scrollable-list">
+                <?php if (!empty($results['alerts'])): ?>
+                    <?php foreach ($results['alerts'] as $alert): ?>
+                        <div class="list-item">
+                            <span class="badge">Alerte</span>
+                            <p><?= htmlspecialchars($alert['label']) ?> – <strong><?= htmlspecialchars($alert['vehicule']) ?></strong></p>
+                        </div>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <div class="list-item empty">✅ Aucun rappel en cours</div>
+                <?php endif; ?>
+            </div>
+        </section>
+
+        <section class="card large-card planning-card">
+            <h2><i class="fa-solid fa-calendar-day"></i> Planning Proche</h2>
+            <div class="scrollable-list">
+                <?php if (!empty($results['planning'])): ?>
+                    <?php foreach ($results['planning'] as $event): ?>
+                        <div class="list-item">
+                            <span class="date-tag"><?= htmlspecialchars(date('d/m/Y', strtotime($event['time']))) ?></span>
+                            <p><strong><?= htmlspecialchars($event['action']) ?></strong> : <?= htmlspecialchars($event['vehicule']) ?></p>
+                        </div>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <div class="list-item empty">Aucun événement prévu</div>
+                <?php endif; ?>
+            </div>
+        </section>
+
     </div>
-<?php endif; ?>
-
-</div>
-
-
-
-        <div class="card">
-    <h2>Revenus mensuels</h2>
-    <div class="circle-chart" 
-         id="revenus-circle" 
-         style="--final-value: <?= min(($results["revenusMensuels"] / 300000) * 100, 100) ?>;">
-        <span id="revenus-counter">0</span>€
-    </div>
-</div>
+</main>
 
 <script>
 function animateCounter(id, targetValue, duration) {
     const counter = document.getElementById(id);
-    let start = 0;
-    const fps = 60; // frames par seconde
-    const totalFrames = Math.round(duration / (1000 / fps));
-    const increment = targetValue / totalFrames;
-
-    const timer = setInterval(() => {
-        start += increment;
-        if (start >= targetValue) {
-            start = targetValue;
-            clearInterval(timer);
+    if(!counter) return;
+    
+    let startTimestamp = null;
+    const step = (timestamp) => {
+        if (!startTimestamp) startTimestamp = timestamp;
+        const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+        const currentValue = Math.floor(progress * targetValue);
+        
+        counter.textContent = currentValue.toLocaleString();
+        
+        if (progress < 1) {
+            window.requestAnimationFrame(step);
         }
-        counter.textContent = Math.floor(start).toLocaleString();
-    }, 1000 / fps);
+    };
+    window.requestAnimationFrame(step);
 }
 
-// Exemple : chiffre d'affaires de PHP
-const revenusMensuels = <?= $results["revenusMensuels"] ?>;
-
-animateCounter("revenus-counter", revenusMensuels, 800); // 0,8s pour atteindre la valeur
-
-
-    // Animation pour le nombre d'utilisateurs
-const totalUsers = <?= $results["totalUsers"] ?>;
-animateCounter("users-counter", totalUsers, 800); // 0,8s pour atteindre la valeur
-
+document.addEventListener('DOMContentLoaded', () => {
+    // Lancement des animations après chargement du DOM
+    animateCounter("revenus-counter", <?= (float)$results["revenusMensuels"] ?>, 1200);
+    animateCounter("users-counter", <?= (int)$results["totalUsers"] ?>, 1200);
+});
 </script>
-
-
-
-
-
-
-
-
-   
-<div class="bottom-cards">
-    <div class="alert">
-        <h2>Rappel</h2>
-
-    <div class="alert-content">
-            <?php if (!empty($results['alerts'])): ?>
-                <?php foreach ($results['alerts'] as $alert): ?>
-                    <div class="rectangle">
-                        <?= htmlspecialchars($alert['label']) ?> –
-                        <?= htmlspecialchars($alert['vehicule']) ?>
-                    </div>
-                <?php endforeach; ?>
-            <?php else: ?>
-                <div class="rectangle">
-                    ✅ Aucun rappel
-                </div>
-            <?php endif; ?>
-        </div>
-    </div>
-</div>
-
-
-
-<div class="planning">
-    <h2>Planning</h2>
-    <div class="planning-content">
-        <?php if (!empty($results['planning'])): ?>
-            <?php foreach ($results['planning'] as $event): ?>
-                <div class="rectangle">
-                    <?= htmlspecialchars(date('d/m/Y', strtotime($event['time']))) ?> – 
-                    <?= htmlspecialchars($event['action']) ?> <?= htmlspecialchars($event['vehicule']) ?>
-                </div>
-            <?php endforeach; ?>
-        <?php else: ?>
-            <div class="rectangle">Aucun événement prévu</div>
-        <?php endif; ?>
-    </div>
-</div>
-
-
-
-</div>
-</div>
-</div>
 
 </body>
 </html>
-
-
