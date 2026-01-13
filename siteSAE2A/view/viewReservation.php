@@ -10,6 +10,20 @@ $isAdmin = ($role === 'admin');
 <head>
     <meta charset="utf-8">
     <title>RentPark - Reservation</title>
+      <script>
+    (function () {
+        try {
+            const theme = localStorage.getItem('theme') || 'light';
+            if (theme === 'dark') {
+                document.documentElement.classList.add('dark-theme');
+            } else {
+                document.documentElement.classList.remove('dark-theme');
+            }
+        } catch (e) { }
+    })();
+    </script>
+    <link rel="stylesheet" href="/siteSAE2A/html/css/menu.css">
+    <link rel="stylesheet" href="/siteSAE2A/html/css/parametres.css">
     <link rel="stylesheet" href="html/css/reservation.css">
     <link rel="icon" type="image/png" href="html/icons/voiture.png">
     <link rel="shortcut icon" href="html/icons/favicon.ico" type="image/x-icon">

@@ -140,12 +140,17 @@ class AdminControleur
     }
 // ajouter les vue erreur et les vérif 
 
-    public function afficheDashboard(array $dVueEreur)
-    {
-        
-    $this->afficherVue('dashboard',$dVueEreur,$results=null,'admin');
+public function afficheDashboard(array $dVueEreur)
+{
+    $results = [
+        "revenusMensuels"   => $this->reservationGateway->getMonthlyIncome(),
+        "voiturePlusLouee"  => $this->gateway->getMostRentedCar(),
+        "totalUsers" => $this->userGateway->countUser()
+    ];
+    $this->afficherVue('dashboard', $dVueEreur, $results, 'admin');
+}
 
-    }
+
 
     public function homeCustomers(array $dVueEreur)
     {
@@ -289,7 +294,7 @@ class AdminControleur
         
     }
 
-    private function afficherVue(string $vueKey, array $dVueEreur, ?array $results = null, string $role)
+    private function afficherVue(string $vueKey, array $dVueEreur, ?array $results = null, string $role="user")
     {
         global $rep, $vues, $twig;
 

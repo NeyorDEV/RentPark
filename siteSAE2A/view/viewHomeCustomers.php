@@ -5,6 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     <title>Rentpark</title>
+    <script>
+    (function () {
+        try {
+            const theme = localStorage.getItem('theme') || 'light';
+            if (theme === 'dark') {
+                document.documentElement.classList.add('dark-theme');
+            } else {
+                document.documentElement.classList.remove('dark-theme');
+            }
+        } catch (e) { }
+    })();
+    </script>
+    <link rel="stylesheet" href="/siteSAE2A/html/css/menu.css">
+    <link rel="stylesheet" href="/siteSAE2A/html/css/parametres.css">
     <link rel="stylesheet" href="html/css/homeCustomers.css">
 </head>
 <body>
@@ -34,7 +48,7 @@
      <a href="/siteSAE2A/connection">
         <div class="top-right-btn">
             <div class="circle"></div>
-            <span>Connection/Inscription</span>
+            <span>Connexion/Inscription</span>
         </div>
     </a>
     <h1>RENTPARK</h1>
