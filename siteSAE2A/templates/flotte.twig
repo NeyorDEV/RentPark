@@ -67,20 +67,37 @@
                 {# Modales de modification #}
                 {% if role == 'admin' %}
                 <div id="editModal-{{ row.voiture|e }}" class="modal" onclick="event.stopPropagation();">
-                    <div class="modal-content glass-container">
-                        <a href="#" class="close">&times;</a>
-                        <h2>Modifier {{ row.Nom|e }}</h2>
-                        <form method="POST" action="/siteSAE2A/voitures" enctype="multipart/form-data">
-                            <input type="hidden" name="action" value="modifierVoiture">
-                            <input type="hidden" name="id" value="{{ row.voiture|e }}">
-                            <div class="form-group"><input type="text" name="modele" required value="{{ row.modele|e }}"></div>
-                            <div class="form-group"><input type="number" name="puissance" required value="{{ row.puissance|e }}"></div>
-                            <div class="form-group"><input type="text" name="couleur" required value="{{ row.couleur|e }}"></div>
-                            <div class="form-group"><input type="file" name="image" accept="image/*"></div>
-                            <button type="submit" class="save-btn">Enregistrer</button>
-                        </form>
-                    </div>
-                </div>
+    <div class="modal-content glass-container">
+        <a href="#" class="close">&times;</a>
+        <h2>Modifier le véhicule</h2>
+        <form method="POST" action="/siteSAE2A/voitures" enctype="multipart/form-data">
+            <input type="hidden" name="action" value="modifierVoiture">
+            <input type="hidden" name="id" value="{{ row.voiture|e }}">
+            
+            <div class="form-group">
+                <label for="modele-{{ row.voiture|e }}">Modèle du véhicule</label>
+                <input type="text" id="modele-{{ row.voiture|e }}" name="modele" required value="{{ row.modele|e }}">
+            </div>
+            
+            <div class="form-group">
+                <label for="puissance-{{ row.voiture|e }}">Puissance (en cv)</label>
+                <input type="number" id="puissance-{{ row.voiture|e }}" name="puissance" required value="{{ row.puissance|e }}">
+            </div>
+            
+            <div class="form-group">
+                <label for="couleur-{{ row.voiture|e }}">Couleur</label>
+                <input type="text" id="couleur-{{ row.voiture|e }}" name="couleur" required value="{{ row.couleur|e }}">
+            </div>
+            
+            <div class="form-group">
+                <label>Image actuelle ou nouvelle</label>
+                <input type="file" name="image" accept="image/*">
+            </div>
+            
+            <button type="submit" class="save-btn">Mettre à jour</button>
+        </form>
+    </div>
+</div>
                 {% endif %}
             {% endfor %}
         {% else %}
@@ -91,17 +108,35 @@
 
 {# Modale d'ajout #}
 {% if role == 'admin' %}
+{# MODALE D'AJOUT #}
 <div id="addModal" class="modal">
     <div class="modal-content glass-container">
         <a href="#" class="close">&times;</a>
         <h2>Nouveau véhicule</h2>
         <form method="POST" action="/siteSAE2A/voitures" enctype="multipart/form-data">
             <input type="hidden" name="action" value="ajouterVoiture">
-            <input type="text" name="modele" placeholder="Modèle" required>
-            <input type="number" name="puissance" placeholder="Puissance" required>
-            <input type="text" name="couleur" placeholder="Couleur" required>
-            <input type="file" name="image" accept="image/*">
-            <button type="submit" class="save-btn">Ajouter</button>
+            
+            <div class="form-group">
+                <label>Désignation du modèle</label>
+                <input type="text" name="modele" placeholder="ex: Peugeot 208" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Puissance fiscale/réelle</label>
+                <input type="number" name="puissance" placeholder="ex: 110" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Teinte carrosserie</label>
+                <input type="text" name="couleur" placeholder="ex: Gris Anthracite" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Photo du véhicule</label>
+                <input type="file" name="image" accept="image/*">
+            </div>
+            
+            <button type="submit" class="save-btn">Ajouter à la flotte</button>
         </form>
     </div>
 </div>
