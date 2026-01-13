@@ -819,6 +819,48 @@ $app->post('/vehicule', function (Request $request, Response $response, $args) u
     }
 });
 
+$app->post('/login', function (Request $request, Response $response, $args) use ($conn) {
+    $data = $request->getParsedBody();
+    $username = $data['username'] ?? '';
+    $password = $data['password'] ?? '';
+
+    if (empty($username) || empty($password)) {
+        $response->getBody()->write(json_encode(['error' => 'Identifiant et mot de passe requis']));
+        return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
+    }
+
+    $conn->executeQuery(
+        "SELECT * FROM users WHERE username = :username",
+        [':username' => [$username, \PDO::PARAM_STR]]
+    );
+    
+    $users = $conn->getResults();
+
+    if (empty($users)) {
+        $response->getBody()->write(json_encode(['success' => false, 'message' => 'Utilisateur inconnu']));
+        return $response->withHeader('Content-Type', 'application/json')->withStatus(401);
+    }
+
+    $user = $users[0];
+
+    if (password_verify($password, $user['password'])) {
+        
+        $payload = [
+            "success" => true,
+            "token" => bin2hex(random_bytes(16)),
+            "role" => $user['role'],
+            "username" => $user['username'],
+            "id" => $user['id']
+        ];
+
+        $response->getBody()->write(json_encode($payload));
+        return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
+    } else {
+        $response->getBody()->write(json_encode(['success' => false, 'message' => 'Mot de passe incorrect']));
+        return $response->withHeader('Content-Type', 'application/json')->withStatus(401);
+    }
+});
+
 $app->addRoutingMiddleware();
 
 $errorMiddleware = $app->addErrorMiddleware(true, true, true);

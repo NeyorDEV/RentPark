@@ -1,6 +1,26 @@
-﻿<Router AppAssembly="typeof(Program).Assembly">
-    <Found Context="routeData">
-        <RouteView RouteData="routeData" DefaultLayout="typeof(Layout.MainLayout)" />
-        <FocusOnNavigate RouteData="routeData" Selector="h1" />
-    </Found>
-</Router>
+﻿@using BlazorAdminRentPark.Components.Layout
+@using Microsoft.AspNetCore.Components.Authorization
+@using BlazorAdminRentPark.Components  @* <--- Assure-toi que ce using pointe vers où tu as mis RedirectToLogin *@
+
+<CascadingAuthenticationState>
+    <Router AppAssembly="typeof(Program).Assembly">
+        <Found Context="routeData">
+            <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
+                <NotAuthorized>
+                    
+                    <RedirectToLogin />
+                    
+                </NotAuthorized>
+            </AuthorizeRouteView>
+            <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+        </Found>
+        
+        <NotFound>
+            <LayoutView Layout="@typeof(MainLayout)">
+                <MudContainer Class="mt-16">
+                    <MudAlert Severity="Severity.Warning">Page introuvable.</MudAlert>
+                </MudContainer>
+            </LayoutView>
+        </NotFound>
+    </Router>
+</CascadingAuthenticationState>
