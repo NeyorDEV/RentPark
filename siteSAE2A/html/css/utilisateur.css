@@ -1,0 +1,83 @@
+/* --- Tableau des Utilisateurs --- */
+.user-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background: transparent;
+}
+
+.user-table th {
+    text-align: left;
+    padding: 15px;
+    color: var(--rentpark-orange);
+    font-weight: 800;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 1px;
+    border-bottom: 2px solid rgba(0, 0, 0, 0.05);
+}
+
+.user-table td {
+    padding: 15px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.02);
+    vertical-align: middle;
+}
+
+/* --- Badges de Rôle --- */
+.badge-role {
+    display: inline-block;
+    padding: 6px 14px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    background: rgba(0, 0, 0, 0.05);
+    color: #555;
+    text-transform: capitalize;
+}
+
+/* --- Actions & Boutons --- */
+.actions-cell {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+.btn-icon {
+    background: none;
+    border: none;
+    font-size: 1.1rem;
+    cursor: pointer;
+    color: #888;
+    transition: all 0.3s ease;
+    padding: 5px;
+}
+
+.btn-icon.edit:hover {
+    color: var(--rentpark-orange);
+    transform: scale(1.2);
+}
+
+.btn-icon.delete:hover {
+    color: var(--logout-red);
+    transform: scale(1.2);
+}
+
+/* --- Style Spécifique Mode Sombre --- */
+.dark-theme .user-table th {
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+.dark-theme .user-table td {
+    border-bottom-color: rgba(255, 255, 255, 0.05);
+    color: #eee;
+}
+
+.dark-theme .badge-role {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+}
+
+/* --- Ajustement de la planning-card pour les tableaux --- */
+.main-content .planning-card {
+    overflow-x: auto; /* Permet le défilement sur mobile si le tableau est large */
+}
