@@ -1,22 +1,14 @@
 /* ==========================================================================
-   1. ENTÊTE (TITRE ET BOUTON)
+   1. ENTÊTE ET RECHERCHE
    ========================================================================== */
 .header-container {
     display: flex;
-    justify-content: center; /* Centre les éléments horizontalement */
+    justify-content: center;
     align-items: center;
     margin-bottom: 40px;
-    position: relative; /* Permet le positionnement absolu du bouton si besoin */
-    width: 100%;
+    position: relative;
 }
 
-.header-container h1 {
-    margin: 0;
-    text-align: center;
-    flex-grow: 1; /* Le titre prend tout l'espace central */
-}
-
-/* Positionnement du bouton Ajouter à droite pour laisser le titre au centre */
 .add-btn-main {
     position: absolute;
     right: 0;
@@ -29,22 +21,10 @@
     border-radius: 50px;
     text-decoration: none;
     font-weight: 700;
-    font-size: 0.95rem;
     box-shadow: 0 4px 15px rgba(255, 90, 25, 0.3);
-    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    border: none;
-    white-space: nowrap;
+    transition: 0.3s ease;
 }
 
-.add-btn-main:hover {
-    transform: translateY(-3px) scale(1.02);
-    box-shadow: 0 8px 25px rgba(255, 90, 25, 0.4);
-    background: linear-gradient(135deg, #ff7e4d 0%, var(--rentpark-orange) 100%);
-}
-
-/* ==========================================================================
-   2. RECHERCHE
-   ========================================================================== */
 .search-section {
     max-width: 600px;
     margin: 0 auto 50px auto;
@@ -61,197 +41,147 @@
     border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
-.search-box i {
-    color: var(--rentpark-orange);
-    font-size: 1.2rem;
-    margin-right: 15px;
-}
-
-.search-box input {
-    border: none;
-    background: transparent;
-    width: 100%;
-    outline: none;
-    font-size: 1rem;
-    font-family: 'Montserrat', sans-serif;
-}
+.search-box i { color: var(--rentpark-orange); margin-right: 15px; }
+.search-box input { border: none; background: transparent; width: 100%; outline: none; }
 
 /* ==========================================================================
-   3. GRILLE ET CARTES VÉHICULES
+   2. GRILLE DE 4 COLONNES (STYLE PORTRAIT)
    ========================================================================== */
-.voitures-grid {
+.voiture-grid-container {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-    gap: 25px;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 30px;
+    padding: 20px 0;
 }
 
-.car-card {
-    background: white;
-    border-radius: 20px;
+.rectangle-card {
+    position: relative;
+    height: 420px;
+    border-radius: 25px;
     overflow: hidden;
-    box-shadow: 0 8px 25px rgba(0,0,0,0.05);
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease;
     cursor: pointer;
-    border: 1px solid rgba(0,0,0,0.02);
     display: flex;
     flex-direction: column;
+    justify-content: flex-end;
 }
 
-.car-card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 20px 40px rgba(0,0,0,0.12);
-}
+.rectangle-card:hover { transform: translateY(-8px); }
 
-.car-image {
-    width: 100%;
-    height: 160px;
-    overflow: hidden;
-}
-
-.car-image img {
-    width: 100%;
-    height: 100%;
+.bg-img {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
     object-fit: cover;
+    z-index: 1;
     transition: transform 0.5s ease;
 }
 
-.car-card:hover .car-image img {
-    transform: scale(1.08);
-}
-
-.car-content {
-    padding: 15px;
+/* --- BLOC INFO GLASS EFFECT --- */
+.info-glass {
+    position: relative;
+    z-index: 2;
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    padding: 20px;
+    border-radius: 25px 25px 0 0;
     text-align: center;
+    border-top: 1px solid rgba(255, 255, 255, 0.3);
 }
 
-.car-content h2 {
-    margin: 0 0 10px 0;
-    font-size: 1.2rem;
-    color: var(--text-dark);
-}
+.info-glass h2 { margin: 0 0 10px 0; font-size: 1.3rem; color: #111; }
 
-.car-badges {
-    display: flex;
-    justify-content: center;
-    gap: 8px;
-    margin-bottom: 12px;
-}
+.badges { display: flex; justify-content: center; gap: 8px; margin-bottom: 15px; }
 
 .badge {
-    background: #f0f0f0;
-    padding: 4px 10px;
-    border-radius: 8px;
-    font-size: 0.75rem;
+    background: rgba(0, 0, 0, 0.08);
+    padding: 5px 12px;
+    border-radius: 12px;
+    font-size: 0.8rem;
     font-weight: 700;
-    color: #555;
 }
 
-/* Actions Admin */
-.car-admin-actions {
-    margin-top: 10px;
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    padding-top: 10px;
-    border-top: 1px solid rgba(0,0,0,0.05);
+/* --- ACTIONS ADMIN --- */
+.actions-admin { display: flex; justify-content: center; gap: 15px; }
+
+.btn-icon-glass {
+    background: rgba(255, 255, 255, 0.5);
+    border: 1px solid rgba(0,0,0,0.05);
+    width: 35px; height: 35px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; color: #444; transition: 0.3s;
 }
 
-.btn-icon {
-    background: none;
-    border: none;
-    font-size: 1.1rem;
-    cursor: pointer;
-    color: #999;
-    transition: color 0.3s;
-}
-
-.btn-icon.edit:hover { color: var(--rentpark-orange); }
-.btn-icon.delete:hover { color: var(--logout-red); }
+.btn-icon-glass:hover { background: white; transform: scale(1.1); }
 
 /* ==========================================================================
-   4. MODALES
+   3. MODALES (FIX : CACHÉES PAR DÉFAUT)
    ========================================================================== */
 .modal {
-    display: none;
     position: fixed;
-    z-index: 2000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(5px);
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(8px);
+    display: none; /* CRUCIAL : Caché par défaut */
     justify-content: center;
     align-items: center;
+    z-index: 9999;
 }
 
+/* S'affiche uniquement lors du clic (via l'ancre #ID) */
 .modal:target {
     display: flex;
 }
 
 .modal-content {
     background: white;
-    padding: 30px;
+    padding: 35px;
     border-radius: 25px;
     width: 90%;
     max-width: 450px;
     position: relative;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+    text-align: center;
 }
 
 .close {
     position: absolute;
-    top: 15px;
-    right: 20px;
-    font-size: 28px;
+    top: 15px; right: 20px;
+    font-size: 30px;
     text-decoration: none;
     color: #aaa;
 }
 
-.form-group {
-    margin-bottom: 20px;
-    text-align: left;
-}
-
-.form-group label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: 600;
-    color: #444;
-}
-
+.form-group { margin-bottom: 15px; text-align: left; }
 .form-group input {
-    width: 100%;
-    padding: 12px;
-    border-radius: 12px;
-    border: 1px solid #ddd;
+    width: 100%; padding: 12px;
+    border-radius: 12px; border: 1px solid #ddd;
     box-sizing: border-box;
-    font-family: inherit;
 }
 
 .save-btn {
-    width: 100%;
-    padding: 14px;
-    background-color: var(--rentpark-orange);
-    color: white;
-    border: none;
-    border-radius: 12px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: 0.3s;
+    width: 100%; padding: 14px;
+    background: var(--rentpark-orange);
+    color: white; border: none;
+    border-radius: 12px; font-weight: bold; cursor: pointer;
 }
 
 /* ==========================================================================
-   5. MODE SOMBRE
+   4. MODE SOMBRE
    ========================================================================== */
-.dark-theme .car-card { background: #1e1e1e; border-color: #333; }
-.dark-theme .search-box { background: rgba(33, 33, 33, 0.8); border-color: #444; }
-.dark-theme .search-box input { color: white; }
-.dark-theme .badge { background: #2a2a2a; color: #eee; }
-.dark-theme .car-content h2 { color: #fff; }
-.dark-theme .modal-content { background: #1e1e1e; color: white; }
-.dark-theme .form-group label { color: #ccc; }
-.dark-theme .form-group input { background: #2a2a2a; border-color: #444; color: white; }
-.dark-theme .add-btn-main {
-    background: linear-gradient(135deg, var(--rentpark-orange-dark) 0%, #ffb347 100%);
+.dark-theme .info-glass {
+    background: rgba(20, 20, 20, 0.7);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
+.dark-theme .info-glass h2 { color: white; }
+.dark-theme .badge { background: rgba(255, 255, 255, 0.1); color: #eee; }
+.dark-theme .modal-content { background: #1e1e1e; color: white; }
+.dark-theme .form-group input { background: #2a2a2a; border-color: #444; color: white; }
+
+/* Responsive */
+@media (max-width: 1200px) { .voiture-grid-container { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 600px) { .voiture-grid-container { grid-template-columns: 1fr; } }
