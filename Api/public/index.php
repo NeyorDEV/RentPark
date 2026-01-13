@@ -496,6 +496,158 @@ $app->post('/modif/vehicule', function (Request $request, Response $response, $a
 });
 
 
+// -----------------------------------------------------------------------
+// /stats/contrats-prochains - GET
+// -----------------------------------------------------------------------
+$app->get('/stats/contrats-prochains', function (Request $request, Response $response, $args) use ($conn) {
+
+    $query = "
+        SELECT 
+            c.DateDebut,
+            c.DateFin,
+            v.Marque,
+            v.Nom AS Modele
+        FROM Contrat c
+        JOIN Vehicule v ON c.IdVehicule = v.NumSerie
+        WHERE (c.DateDebut BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 1 MONTH))
+           OR (c.DateFin   BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 1 MONTH))
+        ORDER BY c.DateDebut ASC
+    ";
+
+    try {
+        $conn->executeQuery($query);
+        $results = $conn->getResults();
+
+        $response->getBody()->write(json_encode([
+            'contrats_prochains' => $results
+        ]));
+
+        return $response->withHeader('Content-Type', 'application/json');
+
+    } catch (\Exception $e) {
+        $response->getBody()->write(json_encode([
+            'error' => 'Erreur lors de la récupération des contrats : ' . $e->getMessage()
+        ]));
+        return $response->withHeader('Content-Type', 'application/json')
+                        ->withStatus(500);
+    }
+});
+
+// -----------------------------------------------------------------------
+// /stats/total-users - GET
+// -----------------------------------------------------------------------
+$app->get('/stats/total-users', function (Request $request, Response $response, $args) use ($conn) {
+
+    $query = "SELECT COUNT(*) AS totalUsers FROM users";
+
+    try {
+        $conn->executeQuery($query);
+        $result = $conn->getResults();
+
+        $total = isset($result[0]['totalUsers']) ? (int)$result[0]['totalUsers'] : 0;
+
+        $response->getBody()->write(json_encode([
+            'total_users' => $total
+        ]));
+
+        return $response->withHeader('Content-Type', 'application/json');
+
+    } catch (\Exception $e) {
+        $response->getBody()->write(json_encode([
+            'error' => 'Erreur lors du comptage des utilisateurs : ' . $e->getMessage()
+        ]));
+        return $response->withHeader('Content-Type', 'application/json')
+                        ->withStatus(500);
+    }
+});
+
+// -----------------------------------------------------------------------
+// /stats/voiture-plus-louee - GET
+// -----------------------------------------------------------------------
+$app->get('/stats/voiture-plus-louee', function (Request $request, Response $response, $args) use ($conn) {
+
+    $query = "
+        SELECT 
+            v.Marque,
+            v.Nom AS Modele,
+            v.ImagePath,
+            COUNT(*) AS nb_locations
+        FROM Contrat c
+        JOIN Vehicule v ON c.IdVehicule = v.NumSerie
+        WHERE c.Statut = 'Terminé'
+        GROUP BY v.Marque, v.Nom
+        ORDER BY nb_locations DESC
+        LIMIT 1
+    ";
+
+    try {
+        $conn->executeQuery($query);
+        $rows = $conn->getResults();
+
+        if (empty($rows)) {
+            $response->getBody()->write(json_encode([
+                'voiture_plus_louee' => null
+            ]));
+        } else {
+            $response->getBody()->write(json_encode([
+                'voiture_plus_louee' => $rows[0]
+            ]));
+        }
+
+        return $response->withHeader('Content-Type', 'application/json');
+
+    } catch (\Exception $e) {
+        $response->getBody()->write(json_encode([
+            'error' => 'Erreur lors de la récupération de la voiture la plus louée : ' . $e->getMessage()
+        ]));
+        return $response->withHeader('Content-Type', 'application/json')
+                        ->withStatus(500);
+    }
+});
+
+
+
+
+// -----------------------------------------------------------------------
+// /stats/planning-mensuel - GET
+// -----------------------------------------------------------------------
+$app->get('/stats/planning-mensuel', function (Request $request, Response $response, $args) use ($conn) {
+
+    $query = "
+        SELECT 
+            c.DateDebut,
+            c.DateFin,
+            v.Marque,
+            v.Nom
+        FROM Contrat c
+        JOIN Vehicule v ON v.NumSerie = c.IdVehicule
+        WHERE 
+            c.DateFin >= CURDATE()
+            AND c.DateDebut <= LAST_DAY(CURDATE())
+        ORDER BY c.DateDebut ASC
+    ";
+
+    try {
+        $conn->executeQuery($query);
+        $results = $conn->getResults();
+
+        $response->getBody()->write(json_encode([
+            'planning_mensuel' => $results
+        ]));
+
+        return $response->withHeader('Content-Type', 'application/json');
+
+    } catch (\Exception $e) {
+        $response->getBody()->write(json_encode([
+            'error' => 'Erreur lors de la récupération du planning : ' . $e->getMessage()
+        ]));
+        return $response->withHeader('Content-Type', 'application/json')
+                        ->withStatus(500);
+    }
+});
+
+
+
 // -------------------------------------------------------------------------------------------------
 
 $app->patch('/contrat/{id}', function (Request $request, Response $response, $args) use ($conn) {

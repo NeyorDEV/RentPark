@@ -1,129 +1,143 @@
 {% extends "base.twig" %}
 
+{% block stylesheets %}
+    <link rel="stylesheet" href="/siteSAE2A/html/css/flotte.css">
+{% endblock %}
+
 {% block content %}
-<div class="top"> 
-    <h1>Flotte Automobile</h1>
-    {% if role == 'admin' %}
-        <a href="#addModal" class="add-btn">+ Ajouter</a>
+<div class="main-content">
+    <div class="header-container"> 
+        <h1>Flotte Automobile</h1>
+        {% if role == 'admin' %}
+            <a href="#addModal" class="add-btn-main">
+                <i class="fa-solid fa-plus"></i> Ajouter un véhicule
+            </a>
+        {% endif %}
+    </div>
+
+    <header class="search-section">
+        <form action="/sitesae2A/voitures" method="get" class="search-form">
+            <input type="hidden" name="action" value="rechercherVoitures">
+            <div class="search-box">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input name="q" type="search" placeholder="Rechercher un modèle..." value="{{ app.request.get('q')|default('') }}">
+            </div>
+        </form>
+    </header>
+
+    {% if dVueErreur is not empty %}
+    <div class="erreurs">
+        <ul>
+            {% for erreur in dVueErreur %}
+                <li>{{ erreur|e }}</li>
+            {% endfor %}
+        </ul>
+    </div>
     {% endif %}
-</div>
-   <style>
-        .dark-theme .topbar-form input { background: #ffffff;  border: 1px solid rgba(0,0,0,0.12); }
-        .dark-theme .topbar-form input::placeholder {  opacity: 0.9; }
-        .dark-theme .topbar-form input::-webkit-input-placeholder {  opacity: 0.9; }
-        .dark-theme .topbar-form input:-ms-input-placeholder {  opacity: 0.9; }
-        .dark-theme .topbar-form input::-ms-input-placeholder { opacity: 0.9; }
-        .dark-theme .top h1 { color: #FFFFFF; }
-    </style>
 
-<header class="topbar">
-    <form action="/sitesae2A/voitures" method="get" role="search" class="topbar-form">
-        <input type="hidden" name="action" value="rechercherVoitures">
-        <input
-            id="q3"
-            name="q"
-            type="search"
-            placeholder="Rechercher..."
-            aria-label="Recherche"
-            value="{{ app.request.get('q')|default('') }}"
-        >
-        <button type="submit">🔍</button>
-    </form>
-</header>
+    <div class="voiture-grid-container">
+        {% if results is not empty %}
+            {% for row in results %}
+                <div class="rectangle-card" onclick="location.href='/siteSAE2A/voiture/{{ row.voiture|e }}'">
+                    <img src="{{ row.ImagePath is not empty ? row.ImagePath|e : 'html/icons/voiture.png' }}" 
+                         alt="{{ row.Nom|e }}" class="bg-img">
 
-{% if dVueErreur is not empty %}
-<div class="erreurs">
-    <ul>
-        {% for erreur in dVueErreur %}
-            <li>{{ erreur|e }}</li>
-        {% endfor %}
-    </ul>
-</div>
-{% endif %}
-
-<div class="voiture">
-    {% if results is not empty %}
-        {% for row in results %}
-            <div class="rectangle">
-                <!-- Image unique -->
-                <img src="{{ row.ImagePath is not empty ? row.ImagePath|e : 'html/icons/voiture.png' }}" 
-                     alt="Image du véhicule" class="bg-img">
-
-                <!-- Infos du véhicule -->
-                <div class="info">
-                    <p>{{ row.Nom|e }}</p>
-                    <p class="badge">{{ row.Puissance|e }} cv</p>
-                    <p>{{ row.couleur|e }}</p>
-
-                    <!-- Actions -->
-                    {% if role == 'admin' %}
-                    <div class="actions">
-                        <form method="POST" action="/siteSAE2A/voitures" onsubmit="return confirm('Supprimer ce véhicule ?');">
-                            <input type="hidden" name="action" value="supprimerVoiture">
-                            <input type="hidden" name="id" value="{{ row.voiture|e }}">
-                            <button type="submit">Supprimer</button>
-                        </form>
-                        <button type="button" class="edit-btn" onclick="location.hash='editModal-{{ row.voiture|e }}'">Modifier</button>
-
+                    <div class="info-glass">
+                        <h2>{{ row.Nom|e }}</h2>
+                        <div class="badges">
+                            <span class="badge">{{ row.Puissance|e }} cv</span>
+                        </div>
+                        
+                        {% if role == 'admin' %}
+                        <div class="actions-admin" onclick="event.stopPropagation();">
+                            <a href="#editModal-{{ row.voiture|e }}" class="btn-icon-glass edit">
+                                <i class="fa-solid fa-pen"></i>
+                            </a>
+                            <form method="POST" action="/siteSAE2A/voitures" onsubmit="return confirm('Supprimer ce véhicule ?');" style="display:inline;">
+                                <input type="hidden" name="action" value="supprimerVoiture">
+                                <input type="hidden" name="id" value="{{ row.voiture|e }}">
+                                <button type="submit" class="btn-icon-glass delete"><i class="fa-solid fa-trash"></i></button>
+                            </form>
+                        </div>
+                        {% endif %}
                     </div>
-                    {% endif %}
                 </div>
-            </div>
-        {% endfor %}
-    {% else %}
-        <div class="rectangle">
+
+                {# Modales de modification #}
+                {% if role == 'admin' %}
+                <div id="editModal-{{ row.voiture|e }}" class="modal" onclick="event.stopPropagation();">
+                    <div class="modal-content glass-container">
+                            <a href="#" class="close">&times;</a>
+                            <h2>Modifier le véhicule</h2>
+                            <form method="POST" action="/siteSAE2A/voitures" enctype="multipart/form-data">
+                                <input type="hidden" name="action" value="modifierVoiture">
+                                <input type="hidden" name="id" value="{{ row.voiture|e }}">
+                                
+                                <div class="form-group">
+                                    <label for="modele-{{ row.voiture|e }}">Modèle du véhicule</label>
+                                    <input type="text" id="modele-{{ row.voiture|e }}" name="modele" required value="{{ row.modele|e }}">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="puissance-{{ row.voiture|e }}">Puissance (en cv)</label>
+                                    <input type="number" id="puissance-{{ row.voiture|e }}" name="puissance" required value="{{ row.puissance|e }}">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="couleur-{{ row.voiture|e }}">Couleur</label>
+                                    <input type="text" id="couleur-{{ row.voiture|e }}" name="couleur" required value="{{ row.couleur|e }}">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label>Image actuelle ou nouvelle</label>
+                                    <input type="file" name="image" accept="image/*">
+                                </div>
+                                
+                                <button type="submit" class="save-btn">Mettre à jour</button>
+                            </form>
+                        </div>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        {% else %}
             <p>Aucun véhicule trouvé</p>
-        </div>
-    {% endif %}
+        {% endif %}
+    </div>
 </div>
 
-<!-- Modales de modification (une seule fois par véhicule) -->
+{# Modale d'ajout #}
 {% if role == 'admin' %}
-    {% for row in results %}
-        <div id="editModal-{{ row.voiture|e }}" class="modal">
-            <div class="modal-content">
-                <a href="#" class="close">&times;</a>
-                <h2>Modifier le véhicule</h2>
-                <form method="POST" action="/siteSAE2A/voitures" enctype="multipart/form-data">
-                    <input type="hidden" name="action" value="modifierVoiture">
-                    <input type="hidden" name="id" value="{{ row.voiture|e }}">
-                    
-                    <label>Modèle<br>
-                        <input type="text" name="modele" required value="{{ row.modele|e }}">
-                    </label><br><br>
-                    <label>Puissance<br>
-                        <input type="number" name="puissance" required value="{{ row.puissance|e }}">
-                    </label><br><br>
-                    <label>Couleur<br>
-                        <input type="text" name="couleur" required value="{{ row.couleur|e }}">
-                    </label><br><br>
-                    <label>Image<br>
-                        <input type="file" name="image" accept="image/*">
-                    </label><br><br>
-
-                    <button type="submit">Enregistrer</button>
-                </form>
-            </div>
-        </div>
-    {% endfor %}
-{% endif %}
-
-<!-- Modale d'ajout -->
-{% if role == 'admin' %}
+{# MODALE D'AJOUT #}
 <div id="addModal" class="modal">
-    <div class="modal-content">
+    <div class="modal-content glass-container">
         <a href="#" class="close">&times;</a>
-        <h2>Ajouter un véhicule</h2>
+        <h2>Nouveau véhicule</h2>
         <form method="POST" action="/siteSAE2A/voitures" enctype="multipart/form-data">
             <input type="hidden" name="action" value="ajouterVoiture">
-            <input type="text" name="modele" placeholder="Modèle" required><br><br>
-            <input type="number" name="puissance" placeholder="Puissance" required><br><br>
-            <input type="text" name="couleur" placeholder="Couleur" required><br><br>
-            <input type="file" name="image" accept="image/*"><br><br>
-            <button type="submit">Ajouter</button>
+            
+            <div class="form-group">
+                <label>Désignation du modèle</label>
+                <input type="text" name="modele" placeholder="ex: Peugeot 208" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Puissance fiscale/réelle</label>
+                <input type="number" name="puissance" placeholder="ex: 110" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Teinte carrosserie</label>
+                <input type="text" name="couleur" placeholder="ex: Gris Anthracite" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Photo du véhicule</label>
+                <input type="file" name="image" accept="image/*">
+            </div>
+            
+            <button type="submit" class="save-btn">Ajouter à la flotte</button>
         </form>
     </div>
 </div>
 {% endif %}
-
 {% endblock %}

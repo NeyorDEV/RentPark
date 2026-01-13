@@ -7,6 +7,7 @@ stages:
   - 📦push
   - 👨‍🚀configure-deploy
   - 🚀deploy
+  - 🌐expose-service
 
 # ----------------------
 # BUILD PHP
@@ -65,14 +66,20 @@ sonarqube-check:
     - main
 
 # ----------------------
-# INCLUDE DOCKER BUILD TEMPLATE
+# INCLUDE DOCKER TEMPLATES
 # ----------------------
 include:
   - project: 'IUT_INF63/generic-ci'
     ref: 'main'
     file:
       - 'build/.docker-build.yml'
-    token: $CI_PERSONAL_TOKEN   
+    token: $CI_PERSONAL_TOKEN
+
+  - project: 'IUT_INF63/generic-ci'
+    ref: 'main'
+    file:
+      - 'deploy/.docker-deploy.yml'
+    token: $CI_PERSONAL_TOKEN
 
 # ----------------------
 # DOCKER BUILD & PUSH
@@ -94,49 +101,74 @@ push-dotnet-image:
     - when: on_success
 
 # ----------------------
-# INCLUDE DEPLOY TEMPLATE
-# ----------------------
-include:
-  - project: 'IUT_INF63/generic-ci'
-    ref: 'main'
-    file:
-      - 'deploy/.docker-deploy.yml'
-    # token: $CI_PERSONAL_TOKEN   # Décommente si projet privé
-
-# ----------------------
-# CONFIGURE DEPLOYMENT
+# DEPLOYMENT
 # ----------------------
 configure-deploy:
   extends: .configure-deployment
   stage: 👨‍🚀configure-deploy
   variables:
     CONTAINER_NAME: blazor-admin-pod
-    NAMESPACE_NAME: qumiotto
-    CONTAINER_IMAGE_PATH: codefirst.iut.uca.fr/qumiotto/sae_2a_rentpark:latest
-    NAMESPACE_TOKEN: $CI_JOB_TOKEN
-  dependencies:
-    - push-dotnet-image
+    NAMESPACE_NAME: altixier1
+    CONTAINER_IMAGE_PATH: codefirst.iut.cca.fr/qumiotto/sae_2a_rentpark:latest
   rules:
-    - when: on_success
+    - when: manual
+  allow_failure: true
 
-# ----------------------
-# DEPLOY TO KUBERNETES
-# ----------------------
 deploy-my-pod:
   extends: .deploy-image
   stage: 🚀deploy
   variables:
     CONTAINER_NAME: blazor-admin-pod
-    NAMESPACE_NAME: qumiotto
+    CONTAINER_ENV_VAR_VAR_1: "ENV_PRODUCTION=true"
     CONTAINER_IMAGE_PATH: codefirst.iut.uca.fr/qumiotto/sae_2a_rentpark:latest
-    NAMESPACE_TOKEN: $CI_JOB_TOKEN
+    NAMESPACE_TOKEN: $K8S_TOKEN
+    NAMESPACE_NAME: altixier1
   dependencies:
+    - push-dotnet-image
     - configure-deploy
+  allow_failure: true
   rules:
-    - when: on_success
+    - when: manual
+
+# ----------------------
+# SERVICE KUBERNETES
+# ----------------------
+# ----------------------
+# SERVICE KUBERNETES
+# ----------------------
+expose-service:
+  stage: 🌐expose-service
+  image: lachlanevenson/k8s-kubectl:latest 
+  dependencies:
+    - deploy-my-pod
+  variables:
+    KUBECONFIG: /tmp/kubeconfig
+  script:
+    - |
+      echo "apiVersion: v1
+      kind: Service
+      metadata:
+        name: blazor-admin-service
+      spec:
+        selector:
+          app: blazor-admin-pod
+        ports:
+          - protocol: TCP
+            port: 80
+            targetPort: 8080
+        type: NodePort" > blazor-service.yml
+    - kubectl config set-cluster my-cluster --server=$K8S_SERVER
+    - kubectl config set-credentials deployer --token=$K8S_TOKEN
+    - kubectl config set-context my-context --cluster=my-cluster --user=deployer --namespace=altixier1
+    - kubectl config use-context my-context
+    - kubectl apply -f blazor-service.yml
+  rules:
+    - when: manual
+  allow_failure: true
 
 
 
+    
 
 
 

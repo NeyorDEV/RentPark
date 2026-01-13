@@ -23,7 +23,6 @@
                   Margin="Margin.Dense"
                   Class="mb-4" />
 
-    @* Pagination *@
     <MudStack Row="true" Justify="Justify.FlexEnd" Class="mb-4">
         <MudText Typo="Typo.subtitle2" Class="mr-4">Afficher par page :</MudText>
         <MudSelect T="int" @bind-Value="PageSize" Dense="true" Style="width:90px;">
@@ -32,7 +31,7 @@
             <MudSelectItem Value="12">12</MudSelectItem>
         </MudSelect>
     </MudStack>
-
+     
     <MudGrid>
         @foreach (var user in PagedUsers)
         {
