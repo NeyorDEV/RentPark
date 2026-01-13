@@ -432,7 +432,7 @@ $app->post('/add/users', function (Request $request, Response $response) use ($c
 
 
 
-$app->post('/modif/vehicule', function (Request $request, Response $response, $args) use ($conn) {
+$app->post('/add/vehicule', function (Request $request, Response $response, $args) use ($conn) {
     
     $data = $request->getParsedBody();
 
