@@ -6,6 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <base href="/" />
     <link rel="stylesheet" href="@Assets["lib/bootstrap/dist/css/bootstrap.min.css"]" />
+
+    @* --- Ajouts pour MudBlazor --- *@
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet" />
+    <link href="_content/MudBlazor/MudBlazor.min.css" rel="stylesheet" />
+
     <link rel="stylesheet" href="@Assets["app.css"]" />
     <link rel="stylesheet" href="@Assets["BlazorAdminRentPark.styles.css"]" />
     <ImportMap />
@@ -15,7 +20,10 @@
 
 <body>
     <Routes @rendermode="InteractiveServer" />
+
     <script src="_framework/blazor.web.js"></script>
+    @* --- Ajout obligatoire pour MudBlazor --- *@
+    <script src="_content/MudBlazor/MudBlazor.min.js"></script>
 </body>
 
 </html>

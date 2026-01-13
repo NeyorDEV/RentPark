@@ -98,41 +98,5 @@ if (file_exists($settingsFile)) {
     if (lightBtn) lightBtn.addEventListener('click', () => applyTheme('light'));
     if (darkBtn) darkBtn.addEventListener('click', () => applyTheme('dark'));
 
-    initTheme();
-
-    const notifCheckbox = document.getElementById('emailNotif');
-    if (notifCheckbox) {
-        notifCheckbox.addEventListener('change', async function () {
-            const enabled = this.checked ? 1 : 0;
-            const messageEl = document.getElementById('notifMessage');
-            this.disabled = true;
-            try {
-                const res = await fetch('/siteSAE2A/config/updateSettings.php', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email_notifications: enabled })
-                });
-                const data = await res.json();
-                if (!data.success) {
-                    alert('Erreur lors de la mise à jour des paramètres');
-                    this.checked = !this.checked;
-                } else {
-                    if (messageEl) {
-                        messageEl.style.display = 'block';
-                        messageEl.textContent = 'Paramètre enregistré';
-                        clearTimeout(messageEl._hideTimeout);
-                        messageEl._hideTimeout = setTimeout(() => { messageEl.style.display = 'none'; }, 3000);
-                    }
-                }
-            } catch (e) {
-                alert('Erreur réseau');
-                this.checked = !this.checked;
-            } finally {
-                this.disabled = false;
-            }
-        });
-    }
-})();
-</script>
 </body>
 </html>
