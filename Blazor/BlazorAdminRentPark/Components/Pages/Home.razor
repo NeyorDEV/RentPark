@@ -1,14 +1,21 @@
 ﻿@page "/"
 @using MudBlazor
 @using MAlign = MudBlazor.Align
+<<<<<<< HEAD
 @using Microsoft.AspNetCore.Authorization
 @attribute [Authorize]
+=======
+@using System.Globalization
+>>>>>>> 5549b8f (add language selector not the resources)
 
 <MudContainer MaxWidth="MaxWidth.Large" Class="mt-8">
 
     @* Titre Principal *@
     <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Class="mb-6">
         <MudText Typo="Typo.h4" Style="font-weight: bold;">Tableau de bord</MudText>
+        <MudText Typo="Typo.subtitle2" Class="mud-text-right" Style="opacity:0.8;">
+            <b>CurrentCulture</b> : @CultureInfo.CurrentCulture.Name
+        </MudText>
     </MudStack>
 
     @* Section Statistiques (Graphiques Circulaires) *@
