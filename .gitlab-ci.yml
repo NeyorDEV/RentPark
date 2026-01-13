@@ -1,8 +1,12 @@
+# ----------------------
+# STAGES
+# ----------------------
 stages:
   - build
   - scan
   - 📦push
-  - deploy
+  - 👨‍🚀configure-deploy
+  - 🚀deploy
 
 # ----------------------
 # BUILD PHP
@@ -61,46 +65,72 @@ sonarqube-check:
     - main
 
 # ----------------------
-# DOCKER BUILD & PUSH (BLAZOR)
+# INCLUDE DOCKER BUILD TEMPLATE
 # ----------------------
 include:
   - project: 'IUT_INF63/generic-ci'
     ref: 'main'
     file:
       - 'build/.docker-build.yml'
+    token: $CI_PERSONAL_TOKEN   
 
-push-blazor-image:
+# ----------------------
+# DOCKER BUILD & PUSH
+# ----------------------
+push-dotnet-image:
   extends: .build-and-push-docker-image
   stage: 📦push
   variables:
     DOCKERFILE_RELATIVE_PATH: Blazor/BlazorAdminRentPark/Dockerfile
     DOCKERFILE_CONTEXT_PATH: Blazor/BlazorAdminRentPark
-    DESTINATION_REGISTRY_PATH: codefirst.iut.uca.fr
-    DESTINATION_REGISTRY_IMAGE_NAME: qumiotto/sae_2a_rentpark
+    DESTINATION_REGISTRY_IMAGE_NAME: codefirst.iut.uca.fr/qumiotto/sae_2a_rentpark
     DESTINATION_REGISTRY_IMAGE_VERSION: latest
     DESTINATION_REGISTRY_USER: $CI_REGISTRY_USER
     DESTINATION_REGISTRY_PASSWORD: $CI_REGISTRY_PASSWORD
+  dependencies:
+    - build-blazor
+  allow_failure: false
   rules:
-    - if: '$CI_COMMIT_BRANCH == "main"'
-      when: on_success
-    - when: manual
+    - when: on_success
 
 # ----------------------
-# DEPLOY (placeholder)
+# INCLUDE DEPLOY TEMPLATE
 # ----------------------
-deploy:
-  stage: deploy
-  image: ubuntu:latest
-  script:
-    - echo "Deploying PHP backend..."
-    - echo "Deploying Blazor frontend..."
-    - echo "Deployment finished"
-  environment: production
+
+
+# ----------------------
+# CONFIGURE DEPLOYMENT
+# ----------------------
+configure-deploy:
+  extends: .configure-deployment
+  stage: 👨‍🚀configure-deploy
+  variables:
+    CONTAINER_NAME: blazor-admin-pod
+    NAMESPACE_NAME: qumiotto
+    CONTAINER_IMAGE_PATH: codefirst.iut.uca.fr/qumiotto/sae_2a_rentpark:latest
+    NAMESPACE_TOKEN: $CI_JOB_TOKEN
   dependencies:
-    - build-php
-    - build-blazor
+    - push-dotnet-image
   rules:
-    - when: manual
+    - when: on_success
+
+# ----------------------
+# DEPLOY TO KUBERNETES
+# ----------------------
+deploy-my-pod:
+  extends: .deploy-image
+  stage: 🚀deploy
+  variables:
+    CONTAINER_NAME: blazor-admin-pod
+    NAMESPACE_NAME: qumiotto
+    CONTAINER_IMAGE_PATH: codefirst.iut.uca.fr/qumiotto/sae_2a_rentpark:latest
+    NAMESPACE_TOKEN: $CI_JOB_TOKEN
+  dependencies:
+    - configure-deploy
+  rules:
+    - when: on_success
+
+
 
 
 

@@ -18,3 +18,21 @@
 
 nous avons mis une conception initiale de là où nous en sommes dans le projet avec une conception moyenne qui ne respecte pas les principes SOLID mais qui était celle demandée par les professeurs de PHP, la 2e conception est une version améliorée avec un maximum de respect des principes SOLID et l'intégration des webservices qui permettent de mieux respecter ces principes
 
+## Connection à distance
+
+Ouvrez 2 terminaux et faites les deux commandes suivantes en modifiant votre nom d'utilisateur uca
+
+```ssh -L 8888:londres.uca.local:80 [VotreNomUtilisateur]@ssh.iut-clermont.uca.fr```
+
+```ssh -L 3307:londres.uca.local:3306 [VotreNomUtilisateur]@ssh.iut-clermont.uca.fr```
+
+## API
+
+Pour lancer l'API placez vous dans le dépot avec un terminal et faites les commandes suivantes :
+
+```cd Api/public/```
+
+```php -S localhost:8880```
+
+## Blazor
+

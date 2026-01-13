@@ -1,0 +1,60 @@
+﻿@page "/vehicules"
+
+<h3>Liste des Véhicules</h3>
+
+@if (vehicules == null)
+{
+    <p><em>Chargement...</em></p>
+}
+else if (!vehicules.Any())
+{
+    <p><em>Aucun véhicule trouvé.</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>NumSerie</th>
+                <th>Energie</th>
+                <th>NbPlaces</th>
+                <th>Categorie</th>
+                <th>Transmission</th>
+                <th>Boite</th>
+                <th>Etat</th>
+                <th>Puissance</th>
+                <th>DateAchat</th>
+                <th>DateExpirationControleTech</th>
+                <th>DateDernierControleTech</th>
+                <th>Marque</th>
+                <th>Nom</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var vehicule in vehicules)
+            {
+                <tr>
+                    <td>@vehicule.NumSerie</td>
+                    <td>@vehicule.Energie</td>
+                    <td>@vehicule.NbPlaces</td>
+                    <td>@vehicule.Categorie</td>
+                    <td>@vehicule.Transmission</td>
+                    <td>@vehicule.Boite</td>
+                    <td>@vehicule.Etat</td>
+                    <td>@vehicule.Puissance</td>
+                    <td>@vehicule.DateAchat.ToShortDateString()</td>
+                    <td>@vehicule.DateExpirationControleTech.ToShortDateString()</td>
+                    <td>@vehicule.DateDernierControleTech.ToShortDateString()</td>
+                    <td>@vehicule.Marque</td>
+                    <td>@vehicule.Nom</td>
+                    <td>
+                        <button class="btn btn-danger btn-sm" @onclick="() => DeleteVehicule(vehicule.NumSerie)">
+                            Supprimer
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
