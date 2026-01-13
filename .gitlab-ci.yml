@@ -1,3 +1,6 @@
+# ----------------------
+# STAGES
+# ----------------------
 stages:
   - build
   - scan
@@ -61,7 +64,7 @@ sonarqube-check:
     - main
 
 # ----------------------
-# DOCKER BUILD & PUSH (BLAZOR)
+# BUILD & PUSH DOCKER IMAGE (BLAZOR)
 # ----------------------
 include:
   - project: 'IUT_INF63/generic-ci'
@@ -79,14 +82,19 @@ push-blazor-image:
     DESTINATION_REGISTRY_IMAGE_VERSION: latest
     DESTINATION_REGISTRY_USER: $CI_REGISTRY_USER
     DESTINATION_REGISTRY_PASSWORD: $CI_REGISTRY_PASSWORD
+  allow_failure: true
   rules:
-    - if: '$CI_COMMIT_BRANCH == "main"'
-      when: on_success
     - when: manual
 
 # ----------------------
 # DEPLOY
 # ----------------------
+include:
+  - project: 'IUT_INF63/generic-ci'
+    ref: 'main'
+    file:
+      - 'deploy/.docker-deploy.yml'
+
 deploy-my-pod:
   extends: .deploy-image
   stage: deploy
@@ -99,6 +107,7 @@ deploy-my-pod:
   allow_failure: true
   rules:
     - when: manual
+
 
 
 
