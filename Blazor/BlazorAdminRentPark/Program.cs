@@ -15,6 +15,8 @@ builder.Services.AddScoped<IClientService, ClientService>();
 builder.Services.AddScoped<IVehiculeService, VehiculeService>();
 builder.Services.AddScoped<IUserService, UserService>();
 
+builder.Services.AddScoped<IDashboardService, DashboardService>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
