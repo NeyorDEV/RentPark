@@ -8,6 +8,7 @@ __pycache__/
 *.pyd
 
 # --- Dossiers et fichiers de configuration d’IDE ---
+.vs/
 .vscode/
 .idea/
 
