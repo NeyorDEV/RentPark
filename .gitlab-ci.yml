@@ -4,8 +4,8 @@
 stages:
   - build
   - scan
-  - push
-  - deploy
+  - 📦push
+  - 🚀deploy
 
 # ----------------------
 # BUILD PHP
@@ -64,47 +64,59 @@ sonarqube-check:
     - main
 
 # ----------------------
-# BUILD & PUSH DOCKER IMAGE (BLAZOR)
+# INCLUDE JOB GÉNÉRIQUE BUILD/DOCKER
 # ----------------------
-push-blazor-image:
-  stage: push
-  image: docker:latest
-  services:
-    - docker:dind
-  script:
-    - echo "Login Docker registry..."
-    - docker login codefirst.iut.uca.fr -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
-    - echo "Building Docker image..."
-    - docker build -t codefirst.iut.uca.fr/qumiotto/sae_2a_rentpark:latest Blazor/BlazorAdminRentPark
-    - echo "Pushing Docker image..."
-    - docker push codefirst.iut.uca.fr/qumiotto/sae_2a_rentpark:latest
-  allow_failure: true
-  rules:
-    - when: manual
+include:
+  - project: 'IUT_INF63/generic-ci'
+    ref: 'main'
+    file:
+      - 'build/.docker-build.yml'
+
+# ----------------------
+# PUSH DOCKER IMAGE (BLAZOR)
+# ----------------------
+push-dotnet-image:
+  extends: .build-and-push-docker-image
+  stage: 📦push
+  variables:
+    DOCKERFILE_RELATIVE_PATH: Blazor/BlazorAdminRentPark/Dockerfile
+    DOCKERFILE_CONTEXT_PATH: Blazor/BlazorAdminRentPark
+    DESTINATION_REGISTRY_IMAGE_NAME: codefirst.iut.uca.fr/qumiotto/sae_2a_rentpark
+    DESTINATION_REGISTRY_IMAGE_VERSION: latest
+    DESTINATION_REGISTRY_USER: $CI_REGISTRY_USER
+    DESTINATION_REGISTRY_PASSWORD: $CI_REGISTRY_PASSWORD
   dependencies:
     - build-blazor
+  allow_failure: true
+  rules:
+    - when: on_success  # automatique
+
+# ----------------------
+# INCLUDE JOB GÉNÉRIQUE DEPLOY
+# ----------------------
+include:
+  - project: 'IUT_INF63/generic-ci'
+    ref: 'main'
+    file:
+      - 'deploy/.docker-deploy.yml'
 
 # ----------------------
 # DEPLOY
 # ----------------------
 deploy-my-pod:
-  stage: deploy
-  image: docker:latest
-  services:
-    - docker:dind
-  script:
-    - echo "Deploying Blazor pod..."
-    - docker login codefirst.iut.uca.fr -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
-    - docker pull codefirst.iut.uca.fr/qumiotto/sae_2a_rentpark:latest
-    - docker stop blazor-admin-pod || true
-    - docker rm blazor-admin-pod || true
-    - docker run -d --name blazor-admin-pod -e ENV_PRODUCTION=true codefirst.iut.uca.fr/qumiotto/sae_2a_rentpark:latest
-  environment: production
+  extends: .deploy-image
+  stage: 🚀deploy
+  variables:
+    CONTAINER_NAME: blazor-admin-pod
+    CONTAINER_ENV_VAR_VAR_1: "ENV_PRODUCTION=true"
+    CONTAINER_IMAGE_PATH: codefirst.iut.uca.fr/qumiotto/sae_2a_rentpark:latest
+    NAMESPACE_TOKEN: $CI_JOB_TOKEN
+    NAMESPACE_NAME: qumiotto
+  dependencies:
+    - push-dotnet-image
   allow_failure: true
   rules:
-    - when: manual
-  dependencies:
-    - push-blazor-image
+    - when: on_success  # automatique après le push Docker
 
 
 
