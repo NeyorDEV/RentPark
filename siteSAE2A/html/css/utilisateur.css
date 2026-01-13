@@ -1,45 +1,80 @@
-/* --- Tableau des Utilisateurs --- */
+/* --- Header & Titre --- */
+.header-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 40px;
+    position: relative;
+    width: 100%;
+}
+
+.header-container h1 {
+    margin: 0;
+    text-align: center;
+}
+
+.add-btn-main {
+    position: absolute;
+    right: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: linear-gradient(135deg, var(--rentpark-orange) 0%, #ff7e4d 100%);
+    color: white;
+    padding: 12px 25px;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 0.95rem;
+    box-shadow: 0 4px 15px rgba(255, 90, 25, 0.3);
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.add-btn-main:hover {
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 8px 25px rgba(255, 90, 25, 0.4);
+}
+
+/* --- Tableau Utilisateurs --- */
+.user-container {
+    background: white;
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.05);
+}
+
 .user-table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 20px;
-    background: transparent;
 }
 
 .user-table th {
     text-align: left;
     padding: 15px;
     color: var(--rentpark-orange);
-    font-weight: 800;
+    border-bottom: 2px solid #f0f0f0;
+    font-size: 0.9rem;
     text-transform: uppercase;
-    font-size: 0.85rem;
-    letter-spacing: 1px;
-    border-bottom: 2px solid rgba(0, 0, 0, 0.05);
 }
 
 .user-table td {
     padding: 15px;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.02);
+    border-bottom: 1px solid #f9f9f9;
     vertical-align: middle;
 }
 
-/* --- Badges de Rôle --- */
 .badge-role {
-    display: inline-block;
-    padding: 6px 14px;
-    border-radius: 12px;
+    background: #f0f0f0;
+    padding: 5px 12px;
+    border-radius: 8px;
     font-size: 0.8rem;
     font-weight: 700;
-    background: rgba(0, 0, 0, 0.05);
-    color: #555;
-    text-transform: capitalize;
+    color: #666;
 }
 
-/* --- Actions & Boutons --- */
 .actions-cell {
     display: flex;
     gap: 15px;
-    align-items: center;
 }
 
 .btn-icon {
@@ -47,37 +82,61 @@
     border: none;
     font-size: 1.1rem;
     cursor: pointer;
-    color: #888;
-    transition: all 0.3s ease;
-    padding: 5px;
+    color: #999;
+    transition: 0.2s;
 }
 
-.btn-icon.edit:hover {
-    color: var(--rentpark-orange);
-    transform: scale(1.2);
+.btn-icon.edit:hover { color: var(--rentpark-orange); }
+.btn-icon.delete:hover { color: var(--logout-red); }
+
+/* --- Modales --- */
+.modal {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(8px);
+    z-index: 9999; /* Devant tout */
+    display: none;
+    justify-content: center;
+    align-items: center;
 }
 
-.btn-icon.delete:hover {
-    color: var(--logout-red);
-    transform: scale(1.2);
+.modal:target { display: flex; }
+
+.modal-content {
+    background: white;
+    padding: 30px;
+    border-radius: 25px;
+    width: 90%;
+    max-width: 400px;
+    position: relative;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.2);
 }
 
-/* --- Style Spécifique Mode Sombre --- */
-.dark-theme .user-table th {
-    border-bottom-color: rgba(255, 255, 255, 0.1);
+.modal-content h2 { margin-top: 0; margin-bottom: 20px; text-align: center; }
+
+.form-group { margin-bottom: 15px; text-align: left; }
+.form-group label { display: block; margin-bottom: 5px; font-weight: 600; color: #444; }
+.form-group input { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid #ddd; box-sizing: border-box; }
+
+.save-btn {
+    width: 100%;
+    padding: 14px;
+    background: var(--rentpark-orange);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-weight: bold;
+    cursor: pointer;
 }
 
-.dark-theme .user-table td {
-    border-bottom-color: rgba(255, 255, 255, 0.05);
-    color: #eee;
-}
+.close { position: absolute; top: 15px; right: 20px; font-size: 24px; text-decoration: none; color: #aaa; }
 
-.dark-theme .badge-role {
-    background: rgba(255, 255, 255, 0.1);
-    color: #fff;
-}
-
-/* --- Ajustement de la planning-card pour les tableaux --- */
-.main-content .planning-card {
-    overflow-x: auto; /* Permet le défilement sur mobile si le tableau est large */
-}
+/* --- Mode Sombre --- */
+.dark-theme .user-container { background: #1a1a1a; }
+.dark-theme .user-table td { color: #eee; border-color: #2a2a2a; }
+.dark-theme .badge-role { background: #333; color: #ccc; }
+.dark-theme .modal-content { background: #1e1e1e; color: white; }
+.dark-theme .form-group input { background: #2a2a2a; color: white; border-color: #444; }
+.dark-theme .form-group label { color: #ccc; }
