@@ -139,9 +139,5 @@ public function getMonthlyPlanning(): array
 
     $this->connection->executeQuery($sql);
     return $this->connection->getResults();
-}
-
-
-    
-    
+}   
 }

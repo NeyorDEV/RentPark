@@ -29,16 +29,10 @@ $app->get('/voitures', function (Request $request, Response $response, $args) us
     return $response->withHeader('Content-Type', 'application/json');
 });
 
-$app->get('/vehicules', function (Request $request, Response $response, $args) use ($conn) {
-    $conn->executeQuery("SELECT * FROM Vehicule");
-    $vehicules = $conn->getResults();
 
-    $response->getBody()->write(json_encode($vehicules));
-    return $response->withHeader('Content-Type', 'application/json');
-});
 
 // DELETE (numSerie)
-$app->delete('/voitures/{numSerie}', function ($request, $response, $args) use ($conn) {
+$app->delete('/delete/voitures/{numSerie}', function ($request, $response, $args) use ($conn) {
     $numSerie = (string) $args['numSerie'];
 
     // 1️⃣ Vérifier si la voiture existe
@@ -116,7 +110,7 @@ $app->get('/client', function (Request $request, Response $response, $args) use 
 });
 
 // POST 
-$app->post('/client', function (Request $request, Response $response, $args) use ($conn) {
+$app->post('/modif/client', function (Request $request, Response $response, $args) use ($conn) {
     
     $data = $request->getParsedBody();
 
@@ -176,7 +170,7 @@ $app->get('/contrat', function (Request $request, Response $response, $args) use
 });
 
 // POST 
-$app->post('/contrat', function (Request $request, Response $response, $args) use ($conn) {
+$app->post('/modif/contrat', function (Request $request, Response $response, $args) use ($conn) {
     
     $data = $request->getParsedBody();
 
@@ -269,6 +263,7 @@ $app->delete('/contrat/{idContrat}', function (Request $request, Response $respo
 //  /users - GET, DELETE et POST
 // -----------------------------------------------------------------------
 
+
 // GET
 $app->get('/users', function (Request $request, Response $response, $args) use ($conn) {
     $conn->executeQuery("SELECT * FROM users");
@@ -277,6 +272,65 @@ $app->get('/users', function (Request $request, Response $response, $args) use (
     $response->getBody()->write(json_encode($users));
     return $response->withHeader('Content-Type', 'application/json');
 });
+
+// DELETE
+// POST 
+$app->post('/client', function (Request $request, Response $response, $args) use ($conn) {
+    
+    $data = $request->getParsedBody();
+
+    // Validation des champs
+    if (empty($data['Nom']) || empty($data['Prenom']) || empty($data['Email']) || empty($data['NumPermis'])) {
+        $response->getBody()->write(json_encode([
+            'error' => 'Les champs Nom, Prenom, Email et NumPermis sont obligatoires.'
+        ]));
+        return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
+    }
+
+    $sql = "INSERT INTO Client (Nom, Prenom, Email, NumTel, NumPermis, DateNaiss, Nationalite) 
+            VALUES (:nom, :prenom, :email, :numTel, :numPermis, :dateNaiss, :nationalite)";
+
+    $params = [
+        ':nom'         => [$data['Nom'], \PDO::PARAM_STR],
+        ':prenom'      => [$data['Prenom'], \PDO::PARAM_STR],
+        ':email'       => [$data['Email'], \PDO::PARAM_STR],
+        ':numTel'      => [$data['NumTel'] ?? null, \PDO::PARAM_STR],
+        ':numPermis'   => [$data['NumPermis'], \PDO::PARAM_STR],
+        ':dateNaiss'   => [$data['DateNaiss'] ?? null, \PDO::PARAM_STR],
+        ':nationalite' => [$data['Nationalite'] ?? null, \PDO::PARAM_STR]
+    ];
+
+    try {
+        $conn->executeQuery($sql, $params);
+        
+        // On récupère l'ID du client qui vient d'être créé pour pouvoir l'utiliser pour le contrat
+        $idClient = $conn->getLastInsertId(); 
+
+        $response->getBody()->write(json_encode([
+            'message'  => 'Client créé avec succès',
+            'idClient' => $idClient
+        ]));
+
+        return $response->withHeader('Content-Type', 'application/json')->withStatus(201);
+
+    } catch (\Exception $e) {
+        $response->getBody()->write(json_encode([
+            'error' => 'Erreur lors de la création du client : ' . $e->getMessage()
+        ]));
+        return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
+    }
+});
+
+
+
+
+
+
+// -----------------------------------------------------------------------
+//  /users - GET, DELETE et POST
+// -----------------------------------------------------------------------
+
+
 
 // DELETE
 $app->delete('/users/{id}', function (Request $request, Response $response, array $args) use ($conn) {
@@ -324,7 +378,7 @@ $app->delete('/users/{id}', function (Request $request, Response $response, arra
 });
 
 // POST : Ajout d'un utilisateur
-$app->post('/users', function (Request $request, Response $response) use ($conn) {
+$app->post('/modif/users', function (Request $request, Response $response) use ($conn) {
     // 1️⃣ Récupération des données
     $data = $request->getParsedBody();
 
@@ -361,6 +415,277 @@ $app->post('/users', function (Request $request, Response $response) use ($conn)
         return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
     }
 });
+
+// -------------------------------------------------------------------------------------------------
+
+
+
+$app->post('/modif/vehicule', function (Request $request, Response $response, $args) use ($conn) {
+    
+    $data = $request->getParsedBody();
+
+    if (empty($data['NumSerie'])) {
+        $response->getBody()->write(json_encode([
+            'error' => 'Le champ NumSerie est obligatoire.'
+        ]));
+        return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
+    }
+
+    $sql = "INSERT INTO Vehicule (
+                NumSerie, Energie, NbPlaces, Categorie, Transmission, Boite, Etat, 
+                Puissance, DateAchat, DateExpirationControleTech, DateDernierControleTech, 
+                Marque, Nom, Annee, IdAssureur, IdFournisseur, ImagePath, Couleur, Prix
+            ) VALUES (
+                :numSerie, :energie, :nbPlaces, :categorie, :transmission, :boite, :etat, 
+                :puissance, :dateAchat, :dateExpiration, :dateDernierControle, 
+                :marque, :nom, :annee, :idAssureur, :idFournisseur, :imagePath, :couleur, :prix
+            )";
+
+    $params = [
+        ':numSerie' => [$data['NumSerie'], \PDO::PARAM_STR],
+        ':energie' => [$data['Energie'], \PDO::PARAM_STR],
+        ':nbPlaces' => [$data['NbPlaces'], \PDO::PARAM_STR],
+        ':categorie' => [$data['Categorie'], \PDO::PARAM_STR],
+        
+        ':transmission' => [$data['Transmission'] ?? 'Traction', \PDO::PARAM_STR],
+        ':boite' => [$data['Boite'] ?? 'Manuelle', \PDO::PARAM_STR],
+        ':etat' => [$data['Etat'] ?? 'Libre', \PDO::PARAM_STR],
+        
+        ':puissance' => [$data['Puissance'], \PDO::PARAM_STR],
+        ':dateAchat' => [$data['DateAchat'], \PDO::PARAM_STR],
+        ':dateExpiration' => [$data['DateExpirationControleTech'], \PDO::PARAM_STR],
+        ':dateDernierControle' => [$data['DateDernierControleTech'], \PDO::PARAM_STR],
+        
+        ':marque' => [$data['Marque'], \PDO::PARAM_STR],
+        ':nom' => [$data['Nom'], \PDO::PARAM_STR],
+        ':annee' => [$data['Annee'], \PDO::PARAM_STR],
+        ':idAssureur' => [$data['IdAssureur'], \PDO::PARAM_INT],
+        ':idFournisseur' => [$data['IdFournisseur'], \PDO::PARAM_INT],
+        
+        ':imagePath' => [$data['ImagePath'] ?? '', \PDO::PARAM_STR],
+        
+        ':couleur' => [$data['Couleur'] ?? null, \PDO::PARAM_STR],
+        ':prix' => [$data['Prix'] ?? null, \PDO::PARAM_STR]
+    ];
+
+    try {
+        $conn->executeQuery($sql, $params);
+        
+        $response->getBody()->write(json_encode([
+            'message' => 'Véhicule ajouté avec succès',
+            'NumSerie' => $data['NumSerie']
+        ]));
+
+        return $response->withHeader('Content-Type', 'application/json')->withStatus(201);
+
+    } catch (\Exception $e) {
+        $errorCode = $e->getCode();
+        $status = 500;
+        $message = 'Erreur lors de l\'ajout du véhicule : ' . $e->getMessage();
+
+        if (strpos($e->getMessage(), 'Duplicate entry') !== false) {
+            $status = 409; // Conflict
+            $message = 'Un véhicule avec ce Numéro de Série existe déjà.';
+        }
+
+        $response->getBody()->write(json_encode([
+            'error' => $message
+        ]));
+        return $response->withHeader('Content-Type', 'application/json')->withStatus($status);
+    }
+});
+
+// -----------------------------------------------------------------------
+// /stats/revenu-mensuel - GET
+// -----------------------------------------------------------------------
+$app->get('/stats/revenu-mensuel', function (Request $request, Response $response, $args) use ($conn) {
+
+    $query = "
+        SELECT SUM(m.Prix) AS total
+        FROM Contrat c
+        JOIN Vehicule v ON c.IdVehicule = v.NumSerie
+        JOIN Modele m 
+            ON m.Marque = v.Marque
+           AND m.Nom = v.Nom
+           AND m.Annee = v.Annee
+        WHERE MONTH(c.DateDebut) = MONTH(CURRENT_DATE())
+          AND YEAR(c.DateDebut) = YEAR(CURRENT_DATE());
+    ";
+
+    try {
+        $conn->executeQuery($query);
+        $results = $conn->getResults();
+
+        $total = (!empty($results) && $results[0]['total'] !== null) 
+                    ? (float)$results[0]['total'] 
+                    : 0.0;
+
+        $response->getBody()->write(json_encode([
+            'revenu_mensuel' => $total
+        ]));
+
+        return $response->withHeader('Content-Type', 'application/json');
+
+    } catch (\Exception $e) {
+        $response->getBody()->write(json_encode([
+            'error' => 'Erreur lors du calcul du revenu : ' . $e->getMessage()
+        ]));
+        return $response->withHeader('Content-Type', 'application/json')
+                        ->withStatus(500);
+    }
+});
+
+// -----------------------------------------------------------------------
+// /stats/contrats-prochains - GET
+// -----------------------------------------------------------------------
+$app->get('/stats/contrats-prochains', function (Request $request, Response $response, $args) use ($conn) {
+
+    $query = "
+        SELECT 
+            c.DateDebut,
+            c.DateFin,
+            v.Marque,
+            v.Nom AS Modele
+        FROM Contrat c
+        JOIN Vehicule v ON c.IdVehicule = v.NumSerie
+        WHERE (c.DateDebut BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 1 MONTH))
+           OR (c.DateFin   BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 1 MONTH))
+        ORDER BY c.DateDebut ASC
+    ";
+
+    try {
+        $conn->executeQuery($query);
+        $results = $conn->getResults();
+
+        $response->getBody()->write(json_encode([
+            'contrats_prochains' => $results
+        ]));
+
+        return $response->withHeader('Content-Type', 'application/json');
+
+    } catch (\Exception $e) {
+        $response->getBody()->write(json_encode([
+            'error' => 'Erreur lors de la récupération des contrats : ' . $e->getMessage()
+        ]));
+        return $response->withHeader('Content-Type', 'application/json')
+                        ->withStatus(500);
+    }
+});
+
+// -----------------------------------------------------------------------
+// /stats/total-users - GET
+// -----------------------------------------------------------------------
+$app->get('/stats/total-users', function (Request $request, Response $response, $args) use ($conn) {
+
+    $query = "SELECT COUNT(*) AS totalUsers FROM users";
+
+    try {
+        $conn->executeQuery($query);
+        $result = $conn->getResults();
+
+        $total = isset($result[0]['totalUsers']) ? (int)$result[0]['totalUsers'] : 0;
+
+        $response->getBody()->write(json_encode([
+            'total_users' => $total
+        ]));
+
+        return $response->withHeader('Content-Type', 'application/json');
+
+    } catch (\Exception $e) {
+        $response->getBody()->write(json_encode([
+            'error' => 'Erreur lors du comptage des utilisateurs : ' . $e->getMessage()
+        ]));
+        return $response->withHeader('Content-Type', 'application/json')
+                        ->withStatus(500);
+    }
+});
+
+// -----------------------------------------------------------------------
+// /stats/voiture-plus-louee - GET
+// -----------------------------------------------------------------------
+$app->get('/stats/voiture-plus-louee', function (Request $request, Response $response, $args) use ($conn) {
+
+    $query = "
+        SELECT 
+            v.Marque,
+            v.Nom AS Modele,
+            v.ImagePath,
+            COUNT(*) AS nb_locations
+        FROM Contrat c
+        JOIN Vehicule v ON c.IdVehicule = v.NumSerie
+        WHERE c.Statut = 'Terminé'
+        GROUP BY v.Marque, v.Nom
+        ORDER BY nb_locations DESC
+        LIMIT 1
+    ";
+
+    try {
+        $conn->executeQuery($query);
+        $rows = $conn->getResults();
+
+        if (empty($rows)) {
+            $response->getBody()->write(json_encode([
+                'voiture_plus_louee' => null
+            ]));
+        } else {
+            $response->getBody()->write(json_encode([
+                'voiture_plus_louee' => $rows[0]
+            ]));
+        }
+
+        return $response->withHeader('Content-Type', 'application/json');
+
+    } catch (\Exception $e) {
+        $response->getBody()->write(json_encode([
+            'error' => 'Erreur lors de la récupération de la voiture la plus louée : ' . $e->getMessage()
+        ]));
+        return $response->withHeader('Content-Type', 'application/json')
+                        ->withStatus(500);
+    }
+});
+
+
+
+
+// -----------------------------------------------------------------------
+// /stats/planning-mensuel - GET
+// -----------------------------------------------------------------------
+$app->get('/stats/planning-mensuel', function (Request $request, Response $response, $args) use ($conn) {
+
+    $query = "
+        SELECT 
+            c.DateDebut,
+            c.DateFin,
+            v.Marque,
+            v.Nom
+        FROM Contrat c
+        JOIN Vehicule v ON v.NumSerie = c.IdVehicule
+        WHERE 
+            c.DateFin >= CURDATE()
+            AND c.DateDebut <= LAST_DAY(CURDATE())
+        ORDER BY c.DateDebut ASC
+    ";
+
+    try {
+        $conn->executeQuery($query);
+        $results = $conn->getResults();
+
+        $response->getBody()->write(json_encode([
+            'planning_mensuel' => $results
+        ]));
+
+        return $response->withHeader('Content-Type', 'application/json');
+
+    } catch (\Exception $e) {
+        $response->getBody()->write(json_encode([
+            'error' => 'Erreur lors de la récupération du planning : ' . $e->getMessage()
+        ]));
+        return $response->withHeader('Content-Type', 'application/json')
+                        ->withStatus(500);
+    }
+});
+
+
 
 // -------------------------------------------------------------------------------------------------
 

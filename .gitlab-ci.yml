@@ -1,10 +1,16 @@
+# ----------------------
+# STAGES
+# ----------------------
 stages:
   - build
   - scan
-  - deploy
+  - 📦push
+  - 👨‍🚀configure-deploy
+  - 🚀deploy
+  - 🌐expose-service
 
 # ----------------------
-# BUILD PHP (SiteSae2A)
+# BUILD PHP
 # ----------------------
 build-php:
   stage: build
@@ -23,9 +29,8 @@ build-php:
     paths:
       - siteSAE2A/vendor/
 
-
 # ----------------------
-# BUILD Blazor (Blazor/blazorAdminRentPark)
+# BUILD BLAZOR
 # ----------------------
 build-blazor:
   stage: build
@@ -33,9 +38,9 @@ build-blazor:
   script:
     - cd Blazor/BlazorAdminRentPark
     - echo "Restoring .NET packages..."
-    - dotnet restore BlazorAdminRentPark.csproj
+    - dotnet restore
     - echo "Building Blazor app..."
-    - dotnet build BlazorAdminRentPark.csproj -c Release
+    - dotnet build -c Release
   artifacts:
     paths:
       - Blazor/BlazorAdminRentPark/bin/Release/
@@ -61,18 +66,109 @@ sonarqube-check:
     - main
 
 # ----------------------
-# DEPLOY
+# INCLUDE DOCKER TEMPLATES
 # ----------------------
-deploy:
-  stage: deploy
-  image: ubuntu:latest
-  script:
-    - echo "Deploying PHP backend..."
-    - echo "Deploying Blazor frontend..."
-    - echo "Deployment finished"
-  environment: production
+include:
+  - project: 'IUT_INF63/generic-ci'
+    ref: 'main'
+    file:
+      - 'build/.docker-build.yml'
+    token: $CI_PERSONAL_TOKEN
+
+  - project: 'IUT_INF63/generic-ci'
+    ref: 'main'
+    file:
+      - 'deploy/.docker-deploy.yml'
+    token: $CI_PERSONAL_TOKEN
+
+# ----------------------
+# DOCKER BUILD & PUSH
+# ----------------------
+push-dotnet-image:
+  extends: .build-and-push-docker-image
+  stage: 📦push
+  variables:
+    DOCKERFILE_RELATIVE_PATH: Blazor/BlazorAdminRentPark/Dockerfile
+    DOCKERFILE_CONTEXT_PATH: Blazor/BlazorAdminRentPark
+    DESTINATION_REGISTRY_IMAGE_NAME: codefirst.iut.uca.fr/qumiotto/sae_2a_rentpark
+    DESTINATION_REGISTRY_IMAGE_VERSION: latest
+    DESTINATION_REGISTRY_USER: $CI_REGISTRY_USER
+    DESTINATION_REGISTRY_PASSWORD: $CI_REGISTRY_PASSWORD
   dependencies:
-    - build-php
     - build-blazor
+  allow_failure: false
+  rules:
+    - when: on_success
+
+# ----------------------
+# DEPLOYMENT
+# ----------------------
+configure-deploy:
+  extends: .configure-deployment
+  stage: 👨‍🚀configure-deploy
+  variables:
+    CONTAINER_NAME: blazor-admin-pod
+    NAMESPACE_NAME: altixier1
+    CONTAINER_IMAGE_PATH: codefirst.iut.cca.fr/qumiotto/sae_2a_rentpark:latest
+  rules:
+    - when: manual
+  allow_failure: true
+
+deploy-my-pod:
+  extends: .deploy-image
+  stage: 🚀deploy
+  variables:
+    CONTAINER_NAME: blazor-admin-pod
+    CONTAINER_ENV_VAR_VAR_1: "ENV_PRODUCTION=true"
+    CONTAINER_IMAGE_PATH: codefirst.iut.uca.fr/qumiotto/sae_2a_rentpark:latest
+    NAMESPACE_TOKEN: $K8S_TOKEN
+    NAMESPACE_NAME: altixier1
+  dependencies:
+    - push-dotnet-image
+    - configure-deploy
+  allow_failure: true
+  rules:
+    - when: manual
+
+# ----------------------
+# SERVICE KUBERNETES
+# ----------------------
+# ----------------------
+# SERVICE KUBERNETES
+# ----------------------
+expose-service:
+  stage: 🌐expose-service
+  image: lachlanevenson/k8s-kubectl:latest 
+  dependencies:
+    - deploy-my-pod
+  variables:
+    KUBECONFIG: /tmp/kubeconfig
+  script:
+    - |
+      echo "apiVersion: v1
+      kind: Service
+      metadata:
+        name: blazor-admin-service
+      spec:
+        selector:
+          app: blazor-admin-pod
+        ports:
+          - protocol: TCP
+            port: 80
+            targetPort: 8080
+        type: NodePort" > blazor-service.yml
+    - kubectl config set-cluster my-cluster --server=$K8S_SERVER
+    - kubectl config set-credentials deployer --token=$K8S_TOKEN
+    - kubectl config set-context my-context --cluster=my-cluster --user=deployer --namespace=altixier1
+    - kubectl config use-context my-context
+    - kubectl apply -f blazor-service.yml
+  rules:
+    - when: manual
+  allow_failure: true
+
+
+
+    
+
 
 

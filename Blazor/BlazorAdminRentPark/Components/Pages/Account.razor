@@ -1,0 +1,122 @@
+﻿@page "/account"
+@rendermode InteractiveServer
+@using MudBlazor
+@inject IDialogService DialogService
+
+<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-8">
+    <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Class="mb-6">
+        <MudText Typo="Typo.h4" Style="font-weight: bold;">Compte</MudText>
+        <MudButton Variant="Variant.Filled"
+                   Color="Color.Success"
+                   StartIcon="@Icons.Material.Filled.Add"
+                   OnClick="OpenAddUserDialog">
+            AJOUTER
+        </MudButton>
+    </MudStack>
+
+    <MudTextField T="string"
+                  Value="_searchString"
+                  ValueChanged="OnSearchChanged"
+                  Placeholder="Rechercher..."
+                  Adornment="Adornment.End"
+                  AdornmentIcon="@Icons.Material.Filled.Search"
+                  Variant="Variant.Outlined"
+                  Margin="Margin.Dense"
+                  Class="mb-4" />
+
+    <MudStack Row="true" Justify="Justify.FlexEnd" Class="mb-4">
+        <MudText Typo="Typo.subtitle2" Class="mr-4">Afficher par page :</MudText>
+        <MudSelect T="int" Value="_pageSize" ValueChanged="OnPageSizeChanged" Dense="true" Style="width:90px;">
+            <MudSelectItem Value="4">4</MudSelectItem>
+            <MudSelectItem Value="8">8</MudSelectItem>
+            <MudSelectItem Value="12">12</MudSelectItem>
+        </MudSelect>
+    </MudStack>
+     
+    <MudGrid>
+        @foreach (var user in PagedUsers)
+        {
+            <MudItem xs="12" sm="6" md="3">
+                <MudCard Elevation="2" Class="pa-4 text-center">
+                    <MudText Typo="Typo.h6">@user.Id</MudText>
+                    <MudText Typo="Typo.body1">@user.Username</MudText>
+                    <MudText Typo="Typo.caption">@user.Role</MudText>
+                    <div class="d-flex justify-center my-4">
+                        <MudIcon Icon="@Icons.Material.Filled.AccountCircle" Style="font-size: 6rem;" />
+                    </div>
+                    <MudButton Variant="Variant.Filled" Color="Color.Error" FullWidth="true" Class="mb-2">SUPPRIMER</MudButton>
+                    <MudButton Variant="Variant.Filled" Style="background-color: #f44336; color: white;" FullWidth="true">MODIFIER</MudButton>
+                </MudCard>
+            </MudItem>
+        }
+    </MudGrid>
+
+    <MudStack Row="true" Justify="Justify.Center" Class="mt-6">
+        <MudPagination Selected="@_currentPage" SelectedChanged="OnPageChanged" Count="@PageCount" />
+    </MudStack>
+</MudContainer>
+
+@code {
+    private string _searchString = "";
+    private int _currentPage = 1;
+    private int _pageSize = 8;
+
+    private async Task OpenAddUserDialog()
+    {
+        var options = new DialogOptions { CloseOnEscapeKey = true, MaxWidth = MaxWidth.Small, FullWidth = true };
+        var dialog = await DialogService.ShowAsync<AddUserDialog>("", options);
+        var result = await dialog.Result;
+        if (!result.Canceled) { }
+    }
+
+    public class UserDto
+    {
+        public int Id { get; set; }
+        public string Username { get; set; }
+        public string Role { get; set; }
+    }
+
+    private List<UserDto> _users = new()
+    {
+        new UserDto { Id = 31, Username = "neyorrr", Role = "admin" },
+        new UserDto { Id = 36, Username = "popilo", Role = "admin" },
+        new UserDto { Id = 37, Username = "popo", Role = "admin" },
+        new UserDto { Id = 38, Username = "lili", Role = "admin" },
+        new UserDto { Id = 39, Username = "papa", Role = "admin" },
+        new UserDto { Id = 41, Username = "poulet", Role = "admin" },
+        new UserDto { Id = 42, Username = "testcontrolle", Role = "admin" },
+        new UserDto { Id = 43, Username = "lalalalal", Role = "admin" }
+    };
+
+    private IEnumerable<UserDto> FilteredUsers =>
+        string.IsNullOrWhiteSpace(_searchString)
+            ? _users
+            : _users.Where(u =>
+                (u.Username?.Contains(_searchString, StringComparison.OrdinalIgnoreCase) == true) ||
+                (u.Role?.Contains(_searchString, StringComparison.OrdinalIgnoreCase) == true) ||
+                u.Id.ToString().Contains(_searchString));
+
+    private IEnumerable<UserDto> PagedUsers =>
+        FilteredUsers
+            .Skip((_currentPage - 1) * _pageSize)
+            .Take(_pageSize);
+
+    private int PageCount => (int)Math.Ceiling((double)FilteredUsers.Count() / _pageSize);
+
+    private void OnPageChanged(int newPage)
+    {
+        _currentPage = newPage;
+    }
+
+    private void OnPageSizeChanged(int newSize)
+    {
+        _pageSize = newSize;
+        _currentPage = 1;
+    }
+
+    private void OnSearchChanged(string text)
+    {
+        _searchString = text;
+        _currentPage = 1;
+    }
+}
