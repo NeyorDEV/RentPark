@@ -66,51 +66,42 @@ sonarqube-check:
 # ----------------------
 # BUILD & PUSH DOCKER IMAGE (BLAZOR)
 # ----------------------
-include:
-  - project: 'IUT_INF63/generic-ci'
-    ref: 'main'
-    file:
-      - 'build/.docker-build.yml'
-
 push-blazor-image:
-  extends: .build-and-push-docker-image
   stage: push
-  variables:
-    DOCKERFILE_RELATIVE_PATH: Blazor/BlazorAdminRentPark/Dockerfile
-    DOCKERFILE_CONTEXT_PATH: Blazor/BlazorAdminRentPark
-    DESTINATION_REGISTRY_IMAGE_NAME: codefirst.iut.uca.fr/qumiotto/sae_2a_rentpark
-    DESTINATION_REGISTRY_IMAGE_VERSION: latest
-    DESTINATION_REGISTRY_USER: $CI_REGISTRY_USER
-    DESTINATION_REGISTRY_PASSWORD: $CI_REGISTRY_PASSWORD
+  image: gcr.io/kaniko-project/executor:latest
+  script:
+    - echo "{\"auths\":{\"codefirst.iut.uca.fr\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
+    - /kaniko/executor \
+        --context Blazor/BlazorAdminRentPark \
+        --dockerfile Blazor/BlazorAdminRentPark/Dockerfile \
+        --destination codefirst.iut.uca.fr/qumiotto/sae_2a_rentpark:latest
   allow_failure: true
   rules:
     - when: manual
+  dependencies:
+    - build-blazor
 
 # ----------------------
 # DEPLOY
 # ----------------------
-include:
-  - project: 'IUT_INF63/generic-ci'
-    ref: 'main'
-    file:
-      - 'deploy/.docker-deploy.yml'
-
 deploy-my-pod:
-  extends: .deploy-image
   stage: deploy
-  variables:
-    CONTAINER_NAME: blazor-admin-pod
-    CONTAINER_ENV_VAR_VAR_1: "ENV_PRODUCTION=true"
-    CONTAINER_IMAGE_PATH: codefirst.iut.uca.fr/qumiotto/sae_2a_rentpark:latest
-    NAMESPACE_TOKEN: $CI_JOB_TOKEN
-    NAMESPACE_NAME: qumiotto
+  image: docker:latest
+  services:
+    - docker:dind
+  script:
+    - echo "Déploiement du pod Blazor..."
+    - docker login codefirst.iut.uca.fr -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
+    - docker pull codefirst.iut.uca.fr/qumiotto/sae_2a_rentpark:latest
+    - docker stop blazor-admin-pod || true
+    - docker rm blazor-admin-pod || true
+    - docker run -d --name blazor-admin-pod -e ENV_PRODUCTION=true codefirst.iut.uca.fr/qumiotto/sae_2a_rentpark:latest
+  environment: production
   allow_failure: true
   rules:
     - when: manual
-
-
-
-
+  dependencies:
+    - push-blazor-image
 
 
 
