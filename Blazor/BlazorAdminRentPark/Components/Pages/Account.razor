@@ -1,15 +1,14 @@
 ﻿@page "/account"
 @rendermode InteractiveServer
 @using MudBlazor
-@inject IDialogService DialogService 
-@* Injection du service *@
+
 
 <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-8">
     <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Class="mb-6">
         <MudText Typo="Typo.h4" Style="font-weight: bold;">Compte</MudText>
         @* Ajout de l'événement OnClick *@
-        <MudButton Variant="Variant.Filled" 
-                   Color="Color.Success" 
+        <MudButton Variant="Variant.Filled"
+                   Color="Color.Success"
                    StartIcon="@Icons.Material.Filled.Add"
                    OnClick="OpenAddUserDialog">
             AJOUTER
@@ -57,67 +56,3 @@
         <MudPagination Page="@_currentPage" PageCount="@PageCount" OnPageChanged="OnPageChanged" />
     </MudStack>
 </MudContainer>
-
-@code {
-    private string _searchString = "";
-
-    private int _currentPage = 1;
-    private int _pageSize = 8;
-    private async Task OpenAddUserDialog()
-    {
-        var options = new DialogOptions { CloseOnEscapeKey = true, MaxWidth = MaxWidth.Small, FullWidth = true };
-        var dialog = await DialogService.ShowAsync<AddUserDialog>("", options);
-        var result = await dialog.Result;
-
-        if (!result.Canceled)
-        {
-            // Logique future pour rafraîchir la liste
-        }
-    }
-
-    public class UserDto
-    {
-        public int Id { get; set; } 
-        public string Username { get; set; }
-        public string Role { get; set; }
-    }
-
-    private List<UserDto> _users = new()
-    {
-        new UserDto { Id = 31, Username = "neyorrr", Role = "admin" },
-        new UserDto { Id = 36, Username = "popilo", Role = "admin" },
-        new UserDto { Id = 37, Username = "popo", Role = "admin" },
-        new UserDto { Id = 38, Username = "lili", Role = "admin" },
-        new UserDto { Id = 39, Username = "papa", Role = "admin" },
-        new UserDto { Id = 41, Username = "poulet", Role = "admin" },
-        new UserDto { Id = 42, Username = "testcontrolle", Role = "admin" },
-        new UserDto { Id = 43, Username = "lalalalal", Role = "admin" }
-    };
-
-    private IEnumerable<UserDto> FilteredUsers =>
-        string.IsNullOrWhiteSpace(_searchString)
-            ? _users
-            : _users.Where(u =>
-                (u.Username?.Contains(_searchString, StringComparison.OrdinalIgnoreCase) == true) ||
-                (u.Role?.Contains(_searchString, StringComparison.OrdinalIgnoreCase) == true) ||
-                u.Id.ToString().Contains(_searchString));
-
-    private IEnumerable<UserDto> PagedUsers =>
-        FilteredUsers
-            .Skip((_currentPage - 1) * _pageSize)
-            .Take(_pageSize);
-
-    private int PageCount =>
-        Math.Max(1, (int)Math.Ceiling(FilteredUsers.Count() / (double)_pageSize));
-
-    private void OnPageChanged(int newPage)
-    {
-        _currentPage = newPage;
-    }
-
-    protected override void OnParametersSet()
-    {
-        if (_currentPage > PageCount)
-            _currentPage = PageCount;
-    }
-}
