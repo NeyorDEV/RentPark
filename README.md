@@ -20,7 +20,7 @@ nous avons mis une conception initiale de là où nous en sommes dans le projet 
 
 ## Connection à distance
 
-Ouvrez 2 terminaux et faites les deux commandes suivantes en modifiant votre nom d'utilisateur uca
+Ouvrez 2 terminaux et faites les deux commandes suivantes en modifiant votre nom d'utilisateur uca.
 
 ```ssh -L 8888:londres.uca.local:80 [VotreNomUtilisateur]@ssh.iut-clermont.uca.fr```
 
@@ -35,4 +35,10 @@ Pour lancer l'API placez vous dans le dépot avec un terminal et faites les comm
 ```php -S localhost:8880```
 
 ## Blazor
+
+1.Assurez-vous d'être sur la branche main.
+
+2.Ouvrez la solution sae_2a_rentpark/Blazor/BlazorAdminRentPark/BlazorAdminRentPark.slnx.
+
+3.Lancez le projet avec votre IDE (Visual Studio / Rider).
 
