@@ -1,12 +1,16 @@
 ﻿@page "/"
 @using MudBlazor
 @using MAlign = MudBlazor.Align
+@using System.Globalization
 
 <MudContainer MaxWidth="MaxWidth.Large" Class="mt-8">
 
     @* Titre Principal *@
     <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Class="mb-6">
         <MudText Typo="Typo.h4" Style="font-weight: bold;">Tableau de bord</MudText>
+        <MudText Typo="Typo.subtitle2" Class="mud-text-right" Style="opacity:0.8;">
+            <b>CurrentCulture</b> : @CultureInfo.CurrentCulture.Name
+        </MudText>
     </MudStack>
 
     @* Section Statistiques (Graphiques Circulaires) *@
