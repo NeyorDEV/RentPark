@@ -138,7 +138,7 @@ deploy-my-pod:
 # ----------------------
 expose-service:
   stage: 🌐expose-service
-  image: bitnami/kubectl:latest
+  image: lachlanevenson/k8s-kubectl:latest 
   dependencies:
     - deploy-my-pod
   variables:
