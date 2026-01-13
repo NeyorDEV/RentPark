@@ -1,4 +1,50 @@
-/* --- Barre de Recherche stylisée --- */
+/* ==========================================================================
+   1. ENTÊTE (TITRE ET BOUTON)
+   ========================================================================== */
+.header-container {
+    display: flex;
+    justify-content: center; /* Centre les éléments horizontalement */
+    align-items: center;
+    margin-bottom: 40px;
+    position: relative; /* Permet le positionnement absolu du bouton si besoin */
+    width: 100%;
+}
+
+.header-container h1 {
+    margin: 0;
+    text-align: center;
+    flex-grow: 1; /* Le titre prend tout l'espace central */
+}
+
+/* Positionnement du bouton Ajouter à droite pour laisser le titre au centre */
+.add-btn-main {
+    position: absolute;
+    right: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: linear-gradient(135deg, var(--rentpark-orange) 0%, #ff7e4d 100%);
+    color: white;
+    padding: 12px 25px;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 0.95rem;
+    box-shadow: 0 4px 15px rgba(255, 90, 25, 0.3);
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border: none;
+    white-space: nowrap;
+}
+
+.add-btn-main:hover {
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 8px 25px rgba(255, 90, 25, 0.4);
+    background: linear-gradient(135deg, #ff7e4d 0%, var(--rentpark-orange) 100%);
+}
+
+/* ==========================================================================
+   2. RECHERCHE
+   ========================================================================== */
 .search-section {
     max-width: 600px;
     margin: 0 auto 50px auto;
@@ -30,21 +76,25 @@
     font-family: 'Montserrat', sans-serif;
 }
 
-/* --- Grille et Cartes --- */
+/* ==========================================================================
+   3. GRILLE ET CARTES VÉHICULES
+   ========================================================================== */
 .voitures-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: 35px;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 25px;
 }
 
 .car-card {
     background: white;
-    border-radius: 20px; /* Légèrement moins arrondi pour les plus petites cartes */
+    border-radius: 20px;
     overflow: hidden;
     box-shadow: 0 8px 25px rgba(0,0,0,0.05);
     transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     cursor: pointer;
     border: 1px solid rgba(0,0,0,0.02);
+    display: flex;
+    flex-direction: column;
 }
 
 .car-card:hover {
@@ -52,10 +102,9 @@
     box-shadow: 0 20px 40px rgba(0,0,0,0.12);
 }
 
-/* --- Image plein espace --- */
 .car-image {
     width: 100%;
-    height: 160px; /* Taille réduite pour s'adapter aux 4 colonnes */
+    height: 160px;
     overflow: hidden;
 }
 
@@ -70,39 +119,41 @@
     transform: scale(1.08);
 }
 
-/* --- Contenu --- */
 .car-content {
-    padding: 12px 15px 20px 15px; /* Padding haut réduit de 20px à 12px */
+    padding: 15px;
     text-align: center;
 }
 
 .car-content h2 {
-    margin: 0 0 8px 0; /* Marge basse du titre réduite */
-    font-size: 1.2rem; /* Taille de police légèrement plus petite */
+    margin: 0 0 10px 0;
+    font-size: 1.2rem;
     color: var(--text-dark);
 }
 
 .car-badges {
     display: flex;
     justify-content: center;
-    gap: 10px;
-    margin-bottom: 0; /* Suppression de la marge sous les badges */
+    gap: 8px;
+    margin-bottom: 12px;
 }
 
 .badge {
     background: #f0f0f0;
-    padding: 5px 12px;
+    padding: 4px 10px;
     border-radius: 8px;
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     font-weight: 700;
+    color: #555;
 }
 
-/* Actions Admin discrètes */
+/* Actions Admin */
 .car-admin-actions {
-    margin-top: 12px;
+    margin-top: 10px;
     display: flex;
     justify-content: center;
-    gap: 15px;
+    gap: 20px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(0,0,0,0.05);
 }
 
 .btn-icon {
@@ -111,18 +162,96 @@
     font-size: 1.1rem;
     cursor: pointer;
     color: #999;
+    transition: color 0.3s;
 }
 
-/* Mode Sombre */
+.btn-icon.edit:hover { color: var(--rentpark-orange); }
+.btn-icon.delete:hover { color: var(--logout-red); }
+
+/* ==========================================================================
+   4. MODALES
+   ========================================================================== */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 2000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(5px);
+    justify-content: center;
+    align-items: center;
+}
+
+.modal:target {
+    display: flex;
+}
+
+.modal-content {
+    background: white;
+    padding: 30px;
+    border-radius: 25px;
+    width: 90%;
+    max-width: 450px;
+    position: relative;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+}
+
+.close {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 28px;
+    text-decoration: none;
+    color: #aaa;
+}
+
+.form-group {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #444;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px;
+    border-radius: 12px;
+    border: 1px solid #ddd;
+    box-sizing: border-box;
+    font-family: inherit;
+}
+
+.save-btn {
+    width: 100%;
+    padding: 14px;
+    background-color: var(--rentpark-orange);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+/* ==========================================================================
+   5. MODE SOMBRE
+   ========================================================================== */
 .dark-theme .car-card { background: #1e1e1e; border-color: #333; }
 .dark-theme .search-box { background: rgba(33, 33, 33, 0.8); border-color: #444; }
 .dark-theme .search-box input { color: white; }
 .dark-theme .badge { background: #2a2a2a; color: #eee; }
 .dark-theme .car-content h2 { color: #fff; }
-
-.voitures-grid {
-    display: grid;
-    /* On réduit le min de 320px à 240px pour permettre l'alignement de 4 cartes */
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-    gap: 25px; /* Espace entre les cartes légèrement réduit */
+.dark-theme .modal-content { background: #1e1e1e; color: white; }
+.dark-theme .form-group label { color: #ccc; }
+.dark-theme .form-group input { background: #2a2a2a; border-color: #444; color: white; }
+.dark-theme .add-btn-main {
+    background: linear-gradient(135deg, var(--rentpark-orange-dark) 0%, #ffb347 100%);
 }
