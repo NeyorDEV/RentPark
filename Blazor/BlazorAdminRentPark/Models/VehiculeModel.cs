@@ -2,23 +2,23 @@
 
 public class VehiculeModel
 {
-    public string NumSerie { get; set; } = string.Empty;
-    public string Energie { get; set; } = string.Empty;
+    public string NumSerie { get; set; }    
+    public string Energie { get; set; }
     public int NbPlaces { get; set; }
-    public string Categorie { get; set; } = string.Empty;
-    public string Transmission { get; set; } = string.Empty;
-    public string Boite { get; set; } = string.Empty;
-    public string Etat { get; set; } = string.Empty;
-    public string Puissance { get; set; } = string.Empty;
-    public DateTime DateAchat { get; set; }
-    public DateTime DateExpirationControleTech { get; set; }
-    public DateTime DateDernierControleTech { get; set; }
-    public string Marque { get; set; } = string.Empty;
-    public string Nom { get; set; } = string.Empty;
-    public string Annee { get; set; } = string.Empty;
+    public string Categorie { get; set; }
+    public string Transmission { get; set; }
+    public string Boite { get; set; }
+    public string Etat { get; set; }
+    public string Puissance { get; set; }
+    public DateOnly DateAchat { get; set; }
+    public DateOnly DateExpirationControleTech { get; set; }
+    public DateOnly DateDernierControleTech { get; set; }
+    public string Marque { get; set; } 
+    public string Nom { get; set; }
+    public string Annee { get; set; } 
     public int IdAssureur { get; set; }
     public int IdFournisseur { get; set; }
-    public string ImagePath { get; set; } = string.Empty;
-    public string Couleur { get; set; } = string.Empty;
+    public string ImagePath { get; set; } 
+    public string Couleur { get; set; } 
     public float Prix { get; set; }
 }

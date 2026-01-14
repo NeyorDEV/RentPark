@@ -8,7 +8,7 @@
         <MudForm @ref="_form" @bind-IsValid="_isValid">
             <MudStack Spacing="4" Class="pa-4">
                 @* Informations de base *@
-                <MudTextField @bind-Value="_vehiculeModel.NumSerie"
+                <MudTextField @bind-Value="_vehiculeModel.NumSerie" 
                               Label="Numéro de série"
                               Variant="Variant.Outlined"
                               Required="true"
@@ -59,22 +59,31 @@
                            Required="true"
                            RequiredError="Le type d'énergie est obligatoire">
                     <MudSelectItem Value="@("Hybride")">Hybride</MudSelectItem>
-                    <MudSelectItem Value="@("Electrique")">Electrique</MudSelectItem>
+                    <MudSelectItem Value="@("Électrique")">Électrique</MudSelectItem>
                     <MudSelectItem Value="@("Essence")">Essence</MudSelectItem>
                     <MudSelectItem Value="@("Diesel")">Diesel</MudSelectItem>
                 </MudSelect>
 
-                <MudTextField @bind-Value="_vehiculeModel.Transmission"
-                              Label="Transmission"
-                              Variant="Variant.Outlined"
-                              Required="true"
-                              RequiredError="La transmission est obligatoire" />
+                <MudSelect @bind-Value="_vehiculeModel.Transmission"
+                           Label="Transmission"
+                           Variant="Variant.Outlined"
+                           AnchorOrigin="Origin.BottomCenter"
+                           Required="true"
+                           RequiredError="La transmission est obligatoire">
+                    <MudSelectItem Value="@("Propulsion")">Propulsion</MudSelectItem>
+                    <MudSelectItem Value="@("Traction")">Traction</MudSelectItem>
+                    <MudSelectItem Value="@("Intégrale")">Intégrale</MudSelectItem>
+                </MudSelect>
 
-                <MudTextField @bind-Value="_vehiculeModel.Boite"
-                              Label="Boite de vitesse"
-                              Variant="Variant.Outlined"
-                              Required="true"
-                              RequiredError="Le type de boite est obligatoire" />
+                <MudSelect @bind-Value="_vehiculeModel.Boite"
+                           Label="Boite de vitesse"
+                           Variant="Variant.Outlined"
+                           AnchorOrigin="Origin.BottomCenter"
+                           Required="true"
+                           RequiredError="Le type de boite est obligatoire">
+                    <MudSelectItem Value="@("Manuelle")">Manuelle</MudSelectItem>
+                    <MudSelectItem Value="@("Automatique")">Automatique</MudSelectItem>
+                </MudSelect>
 
                 <MudTextField @bind-Value="_vehiculeModel.Puissance"
                               Label="Puissance"
@@ -83,11 +92,17 @@
                               RequiredError="La puissance est obligatoire" />
 
                 @* État et Prix *@
-                <MudTextField @bind-Value="_vehiculeModel.Etat"
-                              Label="État"
-                              Variant="Variant.Outlined"
-                              Required="true"
-                              RequiredError="L'état est obligatoire" />
+                <MudSelect @bind-Value="_vehiculeModel.Etat"
+                           Label="État"
+                           Variant="Variant.Outlined"
+                           AnchorOrigin="Origin.BottomCenter"
+                           Required="true"
+                           RequiredError="L'état est obligatoire">
+                    <MudSelectItem Value="@("Libre")">Libre</MudSelectItem>
+                    <MudSelectItem Value="@("Louée")">Louée</MudSelectItem>
+                    <MudSelectItem Value="@("Vendue")">Vendue</MudSelectItem>
+                    <MudSelectItem Value="@("Réparation")">Réparation</MudSelectItem>
+                </MudSelect>
 
                 <MudNumericField @bind-Value="_vehiculeModel.Prix"
                                  Label="Prix"
@@ -119,19 +134,19 @@
 
                 @* Dates *@
                 <MudDatePicker Label="Date d'achat"
-                               @bind-Date="DateAchatWrapper"
+                               @bind-Value="_vehiculeModel.DateAchat"
                                Variant="Variant.Outlined"
                                Required="true"
                                RequiredError="La date d'achat est obligatoire" />
 
                 <MudDatePicker Label="Dernier contrôle technique"
-                               @bind-Date="DateDernierControleWrapper"
+                               @bind-Value="_vehiculeModel.DateDernierControleTech"
                                Variant="Variant.Outlined"
                                Required="true"
                                RequiredError="La date du dernier contrôle est obligatoire" />
 
                 <MudDatePicker Label="Expiration contrôle technique"
-                               @bind-Date="DateExpirationControleWrapper"
+                               @bind-Value="_vehiculeModel.DateExpirationControleTech"
                                Variant="Variant.Outlined"
                                Required="true"
                                RequiredError="La date d'expiration est obligatoire" />
