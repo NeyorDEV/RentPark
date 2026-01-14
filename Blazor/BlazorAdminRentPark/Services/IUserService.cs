@@ -11,6 +11,7 @@ namespace BlazorAdminRentPark.Services
         Task<GridItemsProviderResult<UserModel>> GetItems(GridItemsProviderRequest<UserModel> request);
         Task Delete(int id);
         Task Add(UserUiModel user);
+        Task Update(int id, UserUiModel user);
         Task<LoginResponse?> LoginAsync(string username, string password);
     }
 }

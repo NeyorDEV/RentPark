@@ -123,11 +123,36 @@ public partial class Account
         StateHasChanged();
     }
 
-    protected void EditUser(int id)
+    protected async Task EditUser(int id)
     {
-        // TODO: Implémenter la logique de modification
-    }
+        // 1. Trouver l'utilisateur dans la liste locale
+        var user = _users.FirstOrDefault(u => u.Id == id);
+        if (user == null) return;
 
+        // 2. Préparer les paramètres pour le dialogue
+        var parameters = new DialogParameters<AddUserDialog>
+    {
+        { x => x.UserToEdit, user }
+    };
+
+        var options = new DialogOptions
+        {
+            CloseOnEscapeKey = true,
+            MaxWidth = MaxWidth.Small,
+            FullWidth = true
+        };
+
+        // 3. Ouvrir le dialogue
+        var dialog = await DialogService.ShowAsync<AddUserDialog>("", parameters, options);
+        var result = await dialog.Result;
+
+        // 4. Si validé, recharger la liste
+        if (!result.Canceled)
+        {
+            await LoadUsers();
+            StateHasChanged();
+        }
+    }
     protected void OnPageChanged(int newPage)
     {
         _currentPage = newPage;

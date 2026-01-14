@@ -54,5 +54,18 @@ namespace BlazorAdminRentPark.Services
                 return null;
             }
         }
+
+        public async Task Update(int id, UserUiModel model)
+        {
+            // On crée un objet anonyme pour correspondre exactement aux champs attendus par ton API PHP
+            var data = new
+            {
+                username = model.Username,
+                role = model.Role,
+                password = model.Password // Si null ou vide, l'API PHP l'ignorera
+            };
+
+            await _http.PutAsJsonAsync($"http://localhost:8880/users/{id}", data); //
+        }
     }
 }
