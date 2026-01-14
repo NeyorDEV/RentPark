@@ -1,12 +1,13 @@
 ﻿using BlazorAdminRentPark.Models;
+using BlazorAdminRentPark.UiModels;
 using Microsoft.AspNetCore.Components.QuickGrid;
 
-namespace BlazorAdminRentPark.Services
+namespace BlazorAdminRentPark.Services;
+
+public interface IVehiculeService
 {
-    public interface IVehiculeService : IDataService<VehiculeModel>
-    {
-        Task<GridItemsProviderResult<VehiculeModel>> GetItems(GridItemsProviderRequest<VehiculeModel> request);
-        Task Delete(string NumSerie);
-        Task Update(string numSerie, VehiculeModel vehicule);
-    }
+    Task<GridItemsProviderResult<VehiculeModel>> GetItems(GridItemsProviderRequest<VehiculeModel> request);
+    Task Add(VehiculeUiModel vehiculeUiModel);
+    Task Delete(string numSerie);
+    Task Update(string numSerie, VehiculeModel vehicule);
 }

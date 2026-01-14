@@ -7,15 +7,16 @@ using BlazorAdminRentPark.Services;
 
 namespace BlazorAdminRentPark.Components.Pages
 {
-    public partial class Cars : ComponentBase
 
+    public partial class Cars
     {
         [Inject] protected IVehiculeService VehiculeService { get; set; } = default!;
-        [Inject] protected IDialogService DialogService { get; set; } = default!; // Nécessaire pour afficher le dialogue 
+        [Inject] protected IDialogService DialogService { get; set; } = default!;
 
         protected string SearchString = "";
         protected int PageSize = 8;
         protected int CurrentPage = 1;
+        protected int PageCount => (int)Math.Ceiling((double)FilteredCars.Count() / PageSize);
         protected List<VehiculeModel> _vehicules = new();
 
         protected override async Task OnInitializedAsync()
@@ -30,7 +31,6 @@ namespace BlazorAdminRentPark.Components.Pages
             _vehicules = result.Items?.ToList() ?? new List<VehiculeModel>();
         }
 
-        // Nouvelle méthode pour ouvrir le dialogue d'ajout
         protected async Task OpenAddCarDialog()
         {
             var options = new DialogOptions
@@ -43,10 +43,8 @@ namespace BlazorAdminRentPark.Components.Pages
             var dialog = await DialogService.ShowAsync<AddCarDialog>("", options);
             var result = await dialog.Result;
 
-            if (!result.Canceled && result.Data is VehiculeModel newCar)
+            if (!result.Canceled)
             {
-                // Ici, vous devriez avoir une méthode Create ou Add dans votre service
-                // await VehiculeService.Create(newCar); 
                 await LoadVehicules();
                 StateHasChanged();
             }
@@ -102,14 +100,6 @@ namespace BlazorAdminRentPark.Components.Pages
         protected IEnumerable<VehiculeModel> PagedCars => FilteredCars
             .Skip((CurrentPage - 1) * PageSize)
             .Take(PageSize);
-
-        protected int PageCount => Math.Max(1, (int)Math.Ceiling((double)FilteredCars.Count() / PageSize));
-
-        protected void OnPageChanged(int page)
-        {
-            CurrentPage = page;
-        }
-
 
     }
 }
