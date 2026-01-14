@@ -33,9 +33,10 @@
         {
             <MudItem xs="12" sm="6" md="3">
                 <MudCard Elevation="2" Class="pa-4 text-center">
-                    <div class="d-flex justify-center mb-4">
-                        <MudIcon Icon="@Icons.Material.Filled.DirectionsCar" Style="font-size: 5rem;" />
-                    </div>
+                    @if (!string.IsNullOrEmpty(car.ImagePath))
+                    {
+                        <MudImage Src="@car.ImagePath" Alt="Top Car" Elevation="0" ObjectFit="ObjectFit.Contain" Height="80" Class="mb-2" />
+                    }
 
                     <MudText Typo="Typo.h6" Style="font-weight:bold;">@car.Nom</MudText>
                     <MudText Typo="Typo.body2">@car.Marque - @car.Categorie</MudText>

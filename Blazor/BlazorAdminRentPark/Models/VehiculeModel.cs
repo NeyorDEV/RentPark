@@ -15,5 +15,6 @@
         public DateTime DateDernierControleTech { get; set; }
         public string Marque { get; set; }
         public string Nom { get; set; }
+        public string ImagePath { get; set; }
     }
 }
