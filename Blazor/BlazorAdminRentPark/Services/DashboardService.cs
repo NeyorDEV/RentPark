@@ -6,6 +6,7 @@ public class DashboardService : IDashboardService
 {
     private readonly HttpClient _http;
     private const string BaseUrl = "http://localhost:8880/stats";
+    private const string ImagesBaseUrl = "http://localhost:9990";
 
     public DashboardService(HttpClient http) => _http = http;
 
@@ -24,7 +25,15 @@ public class DashboardService : IDashboardService
     public async Task<CarDetails> GetMostRentedCarDetailsAsync()
     {
         var response = await _http.GetFromJsonAsync<MostRentedCarResponse>($"{BaseUrl}/voiture-plus-louee");
-        return response?.Voiture;
+        var details = response?.Voiture;
+
+        if (details != null && !string.IsNullOrEmpty(details.ImagePath))
+        {
+            var path = details.ImagePath.StartsWith("/") ? details.ImagePath : "/" + details.ImagePath;
+            details.ImagePath = $"{ImagesBaseUrl}{path}";
+        }
+
+        return details;
     }
 
     public async Task<List<RappelItemModel>> GetRappelsAsync()
