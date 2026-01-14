@@ -9,7 +9,7 @@ using MudBlazor;
 
 namespace BlazorAdminRentPark.Components.Pages
 {
-<<<<<<< HEAD
+
     // L'héritage : ComponentBase est indispensable pour OnInitializedAsync et StateHasChanged
     public partial class Cars : ComponentBase
     {
@@ -17,12 +17,6 @@ namespace BlazorAdminRentPark.Components.Pages
         public IStringLocalizer<Cars> Localizer { get; set; } = default!;
         [Inject] protected IVehiculeService VehiculeService { get; set; }
   
-=======
->>>>>>> BlazorApiSuite
-
-    public partial class Cars
-    {
-        [Inject] protected IVehiculeService VehiculeService { get; set; } = default!;
         [Inject] protected IDialogService DialogService { get; set; } = default!;
 
         protected string SearchString = "";
