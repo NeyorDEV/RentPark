@@ -111,7 +111,7 @@ public partial class Account
 
         if (!result.Canceled)
         {
-            Logger.LogInformation("ACTION : Un nouvel utilisateur a été ajouté via le formulaire.");
+            Logger.LogInformation(@Localizer["AlertAdd"]);
             
             await LoadUsers();
             StateHasChanged();
@@ -120,27 +120,38 @@ public partial class Account
 
     protected async Task DeleteUser(int id)
     {
-        try
+        // 1. Préparer le message de confirmation
+        bool? result = await DialogService.ShowMessageBox(
+            @Localizer["Confirmation"],
+            @Localizer["ConfirmDelete"],
+            yesText: @Localizer["Delete"],
+            cancelText: @Localizer["Cancel"]);
+
+        // 2. Si l'utilisateur a cliqué sur "Supprimer" (vrai)
+        if (result == true)
         {
-            var userToDelete = _users.FirstOrDefault(u => u.Id == id);
-            string userInfos = userToDelete != null ? $"{userToDelete.Username} ({userToDelete.Role})" : "Inconnu";
+            try
+            {
+                var userToDelete = _users.FirstOrDefault(u => u.Id == id);
+                string userInfos = userToDelete != null ? $"{userToDelete.Username} ({userToDelete.Role})" : "Inconnu";
 
-            Logger.LogInformation("ACTION : Demande de suppression de l'utilisateur ID {Id} - {UserInfos}", id, userInfos);
+                Logger.LogInformation("ACTION : Demande de suppression de l'utilisateur ID {Id} - {UserInfos}", id, userInfos);
 
-            await UserService.Delete(id);
-            
-            _users.RemoveAll(u => u.Id == id);
+                await UserService.Delete(id);
 
-            if (_currentPage > PageCount)
-                _currentPage = PageCount;
+                _users.RemoveAll(u => u.Id == id);
 
-            Logger.LogInformation("SUCCÈS : L'utilisateur ID {Id} a été supprimé correctement.", id);
+                if (_currentPage > PageCount)
+                    _currentPage = PageCount;
 
-            StateHasChanged();
-        }
-        catch (Exception ex)
-        {
-            Logger.LogError(ex, "ERREUR : Impossible de supprimer l'utilisateur ID {Id}", id);
+                Logger.LogInformation("SUCCÈS : L'utilisateur ID {Id} a été supprimé correctement.", id);
+
+                StateHasChanged();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "ERREUR : Impossible de supprimer l'utilisateur ID {Id}", id);
+            }
         }
     }
 
