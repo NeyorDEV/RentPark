@@ -4,33 +4,33 @@
 
 <MudDialog>
     <TitleContent>
-        <MudText Typo="Typo.h5" Align="Align.Center" Style="font-weight: bold;">Ajouter un Utilisateur</MudText>
+        <MudText Typo="Typo.h5" Align="Align.Center" Style="font-weight: bold;">@Localizer["Add"]</MudText>
     </TitleContent>
     <DialogContent>
         <MudForm @ref="_form" @bind-IsValid="_isValid">
             <MudStack Spacing="4" Class="pa-4">
                 <MudTextField @bind-Value="_userModel.Username"
-                              Label="Nom d'utilisateur"
+                              Label="@Localizer["Username"]"
                               Variant="Variant.Outlined"
                               Required="true"
-                              RequiredError="Le nom d'utilisateur est obligatoire" />
+                              RequiredError="@Localizer["UsernameObligatoire"]" />
 
                 <MudTextField @bind-Value="_userModel.Password"
-                              Label="Mot de passe"
+                              Label="@Localizer["pass"]"
                               InputType="InputType.Password"
                               Variant="Variant.Outlined"
                               Required="true"
-                              RequiredError="Le mot de passe est obligatoire" />
+                              RequiredError="@Localizer["passObligatoire"]" />
 
                 <MudSelect @bind-Value="_userModel.Role"
-                           Label="Rôle"
+                           Label="@Localizer["Role"]"
                            Variant="Variant.Outlined"
                            AnchorOrigin="Origin.BottomCenter"
                            Required="true"
-                           RequiredError="Le rôle est obligatoire">
-                    <MudSelectItem Value="@("admin")">Admin</MudSelectItem>
-                    <MudSelectItem Value="@("employe")">Employé</MudSelectItem>
-                    <MudSelectItem Value="@("client")">Client</MudSelectItem>
+                           RequiredError="@Localizer["RoleObligatoire"]">
+                    <MudSelectItem Value="@("admin")">@Localizer["Admin"]</MudSelectItem>
+                    <MudSelectItem Value="@("employe")">@Localizer["Employe"]</MudSelectItem>
+                    <MudSelectItem Value="@("client")">@Localizer["Client"]</MudSelectItem>
                 </MudSelect>
             </MudStack>
         </MudForm>
@@ -42,7 +42,7 @@
                    FullWidth="true"
                    Style="max-width: 200px; margin: 0 auto 20px auto;"
                    Disabled="@(!_isValid)">
-            Ajouter
+            @Localizer["Ajouter"]
         </MudButton>
     </DialogActions>
 </MudDialog>

@@ -1,12 +1,16 @@
 using BlazorAdminRentPark.Services;
 using BlazorAdminRentPark.UiModels;
 using Microsoft.AspNetCore.Components;
+using Microsoft.Extensions.Localization;
 using MudBlazor;
 
 namespace BlazorAdminRentPark.Components.Pages;
 
 public partial class AddUserDialog
 {
+    [Inject]
+    public IStringLocalizer<AddUserDialog> Localizer { get; set; } = default!;
+
     [Inject]
     private IUserService UserService { get; set; } = default!;
 
