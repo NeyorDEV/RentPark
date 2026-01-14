@@ -11,7 +11,7 @@ namespace BlazorAdminRentPark.Components.Pages
 {
 
     // L'héritage : ComponentBase est indispensable pour OnInitializedAsync et StateHasChanged
-    public partial class Cars : ComponentBase
+    public partial class Cars 
     {
         [Inject]
         public IStringLocalizer<Cars> Localizer { get; set; } = default!;

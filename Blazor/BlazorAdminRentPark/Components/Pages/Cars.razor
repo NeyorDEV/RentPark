@@ -7,7 +7,7 @@
     <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Class="mb-6">
 
         <MudText Typo="Typo.h4" Style="font-weight: bold;">@Localizer["Vehicules"]</MudText>
-        <MudButton Variant="Variant.Filled" Color="Color.Success" StartIcon="@Icons.Material.Filled.Add">
+        <MudButton Variant="Variant.Filled" Color="Color.Success" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenAddCarDialog">
             @Localizer["Add"]
 
         </MudButton>
@@ -53,7 +53,8 @@
 
                     <MudButton Variant="Variant.Filled"
                                Style="background-color: #f44336; color: white;"
-                               FullWidth="true">
+                               FullWidth="true"
+                               OnClick="@(() => OpenEditCarDialog(car))">
                         @Localizer["Edit"]
                     </MudButton>
                 </MudCard>
