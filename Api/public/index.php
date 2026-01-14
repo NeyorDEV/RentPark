@@ -942,5 +942,61 @@ $errorMiddleware->setErrorHandler(
     }
 );
 
+// PUT : Modification d'un véhicule
+$app->put('/voitures/{numSerie}', function (Request $request, Response $response, $args) use ($conn) {
+    $numSerie = (string) $args['numSerie'];
+    $data = $request->getParsedBody();
+
+    // Vérification basique des données (ajustez selon vos besoins)
+    if (empty($data)) {
+        $response->getBody()->write(json_encode(['error' => 'Aucune donnée envoyée']));
+        return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
+    }
+
+    $sql = "UPDATE Vehicule SET 
+                Nom = :nom, 
+                Marque = :marque, 
+                Energie = :energie, 
+                NbPlaces = :nbPlaces, 
+                Categorie = :categorie, 
+                Transmission = :transmission, 
+                Boite = :boite, 
+                Puissance = :puissance, 
+                Etat = :etat, 
+                Prix = :prix,
+                DateAchat = :dateAchat,
+                DateDernierControleTech = :dateDernierControle,
+                DateExpirationControleTech = :dateExpirationControle
+            WHERE NumSerie = :numSerie";
+
+    $params = [
+        ':nom'          => [$data['Nom'] ?? null, \PDO::PARAM_STR],
+        ':marque'       => [$data['Marque'] ?? null, \PDO::PARAM_STR],
+        ':energie'      => [$data['Energie'] ?? null, \PDO::PARAM_STR],
+        ':nbPlaces'     => [$data['NbPlaces'] ?? 0, \PDO::PARAM_INT],
+        ':categorie'    => [$data['Categorie'] ?? null, \PDO::PARAM_STR],
+        ':transmission' => [$data['Transmission'] ?? null, \PDO::PARAM_STR],
+        ':boite'        => [$data['Boite'] ?? null, \PDO::PARAM_STR],
+        ':puissance'    => [$data['Puissance'] ?? null, \PDO::PARAM_STR],
+        ':etat'         => [$data['Etat'] ?? null, \PDO::PARAM_STR],
+        ':prix'         => [$data['Prix'] ?? 0, \PDO::PARAM_STR], // ou PARAM_INT selon votre BDD
+        ':dateAchat'            => [$data['DateAchat'] ?? null, \PDO::PARAM_STR],
+        ':dateDernierControle'  => [$data['DateDernierControleTech'] ?? null, \PDO::PARAM_STR],
+        ':dateExpirationControle'=> [$data['DateExpirationControleTech'] ?? null, \PDO::PARAM_STR],
+        ':numSerie'     => [$numSerie, \PDO::PARAM_STR]
+    ];
+
+    try {
+        $conn->executeQuery($sql, $params);
+        $response->getBody()->write(json_encode(['message' => 'Véhicule mis à jour avec succès']));
+        return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
+    } catch (\Exception $e) {
+        $response->getBody()->write(json_encode([
+            'error' => 'Erreur lors de la mise à jour : ' . $e->getMessage()
+        ]));
+        return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
+    }
+});
+
 
 $app->run();

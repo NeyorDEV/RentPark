@@ -8,13 +8,16 @@
 
 @using Microsoft.AspNetCore.Authorization
 @attribute [Authorize]
+@using System.Globalization
 
 
 <MudContainer MaxWidth="MaxWidth.Large" Class="mt-8">
 
     @* Titre Principal *@
     <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Class="mb-6">
-        <MudText Typo="Typo.h4" Style="font-weight: bold;">Tableau de bord</MudText>
+        <MudText Typo="Typo.h4" Style="font-weight: bold;">@Localizer["Dashboard"]</MudText>
+        <MudText Typo="Typo.subtitle2" Class="mud-text-right" Style="opacity:0.8;">
+        </MudText>
     </MudStack>
 
     @* Section Statistiques *@
@@ -29,6 +32,7 @@
                     <MudText Typo="Typo.body1" Style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-weight: bold; white-space: nowrap;">
                         @model.total_users
                     </MudText>
+
                 </div>
             </MudCard>
         </MudItem>

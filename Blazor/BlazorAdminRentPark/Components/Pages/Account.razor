@@ -1,22 +1,21 @@
 ﻿@page "/account"
 @rendermode InteractiveServer
 @using MudBlazor
-@inject IDialogService DialogService
 
 <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-8">
     <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Class="mb-6">
-        <MudText Typo="Typo.h4" Style="font-weight: bold;">Compte</MudText>
+        <MudText Typo="Typo.h4" Style="font-weight: bold;">@Localizer["Title"]</MudText>
         <MudButton Variant="Variant.Filled"
                    Color="Color.Success"
                    StartIcon="@Icons.Material.Filled.Add"
                    OnClick="OpenAddUserDialog">
-            AJOUTER
+            @Localizer["Add"]
         </MudButton>
     </MudStack>
 
     @* Barre de recherche *@
     <MudTextField @bind-Value="SearchString" 
-                  Placeholder="Rechercher..."
+                  Placeholder="@Localizer["Search"]"
                   Adornment="Adornment.End"
                   AdornmentIcon="@Icons.Material.Filled.Search"
                   Variant="Variant.Outlined"
@@ -24,7 +23,7 @@
                   Class="mb-4" />
 
     <MudStack Row="true" Justify="Justify.FlexEnd" Class="mb-4">
-        <MudText Typo="Typo.subtitle2" Class="mr-4">Afficher par page :</MudText>
+        <MudText Typo="Typo.subtitle2" Class="mr-4">@Localizer["PageSizeLabel"]</MudText>
         <MudSelect T="int" @bind-Value="PageSize" Dense="true" Style="width:90px;">
             <MudSelectItem Value="4">4</MudSelectItem>
             <MudSelectItem Value="8">8</MudSelectItem>
@@ -43,19 +42,8 @@
                     <div class="d-flex justify-center my-4">
                         <MudIcon Icon="@Icons.Material.Filled.AccountCircle" Style="font-size: 6rem;" />
                     </div>
-                    <MudButton Variant="Variant.Filled"
-                               Color="Color.Error"
-                               FullWidth="true"
-                               Class="mb-2"
-                               OnClick="@(() => DeleteUser(user.Id))">
-                        SUPPRIMER
-                    </MudButton>
-                    <MudButton Variant="Variant.Filled"
-                               Style="background-color: #f44336; color: white;"
-                               FullWidth="true"
-                               OnClick="@(() => EditUser(user.Id))">
-                        MODIFIER
-                    </MudButton>
+                    <MudButton Variant="Variant.Filled" Color="Color.Error" FullWidth="true" Class="mb-2" OnClick="@(() => DeleteUser(user.Id))">@Localizer["Delete"]</MudButton>
+                    <MudButton Variant="Variant.Filled" Style="background-color: #f44336; color: white;" FullWidth="true" OnClick="@(() => EditUser(user.Id))">@Localizer["Edit"]</MudButton>
                 </MudCard>
             </MudItem>
         }
@@ -63,6 +51,6 @@
 
     @* Pagination control *@
     <MudStack Row="true" Justify="Justify.Center" Class="mt-6">
-        <MudPagination Page="@CurrentPage" PageCount="@PageCount" OnPageChanged="OnPageChanged" />
+        <MudPagination Selected="@_currentPage" SelectedChanged="OnPageChanged" Count="@PageCount" />
     </MudStack>
 </MudContainer>

@@ -5,14 +5,16 @@
 
 <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-8">
     <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Class="mb-6">
-        <MudText Typo="Typo.h4" Style="font-weight: bold;">Véhicules</MudText>
-        <MudButton Variant="Variant.Filled" Color="Color.Success" StartIcon="@Icons.Material.Filled.Add">
-            AJOUTER UN VÉHICULE
+
+        <MudText Typo="Typo.h4" Style="font-weight: bold;">@Localizer["Vehicules"]</MudText>
+        <MudButton Variant="Variant.Filled" Color="Color.Success" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenAddCarDialog">
+            @Localizer["Add"]
+
         </MudButton>
     </MudStack>
 
     <MudTextField @bind-Value="SearchString"
-                  Placeholder="Rechercher par nom, marque ou catégorie..."
+                  Placeholder="@Localizer["Search"]"
                   Adornment="Adornment.End"
                   AdornmentIcon="@Icons.Material.Filled.Search"
                   Variant="Variant.Outlined"
@@ -20,7 +22,7 @@
                   Class="mb-4" />
 
     <MudStack Row="true" Justify="Justify.FlexEnd" Class="mb-4">
-        <MudText Typo="Typo.subtitle2" Class="mr-4">Afficher par page :</MudText>
+        <MudText Typo="Typo.subtitle2" Class="mr-4">@Localizer["PageSizeLabel"]</MudText>
         <MudSelect T="int" @bind-Value="PageSize" Dense="true" Style="width:90px;">
             <MudSelectItem Value="4">4</MudSelectItem>
             <MudSelectItem Value="8">8</MudSelectItem>
@@ -47,20 +49,21 @@
                                FullWidth="true"
                                Class="mb-2"
                                OnClick="@(() => DeleteCar(car.NumSerie))">
-                        SUPPRIMER
+                        @Localizer["Delete"]
                     </MudButton>
 
                     <MudButton Variant="Variant.Filled"
                                Style="background-color: #f44336; color: white;"
-                               FullWidth="true">
-                        MODIFIER
+                               FullWidth="true"
+                               OnClick="@(() => OpenEditCarDialog(car))">
+                        @Localizer["Edit"]
                     </MudButton>
                 </MudCard>
             </MudItem>
         }
     </MudGrid>
 
-    <MudStack Row="true" Justify="Justify.Center" Class="mt-6">
+    <MudStack Row="true" Justify="Justify.Center" Class="mt-6"> 
         <MudPagination Page="@CurrentPage" PageCount="@PageCount" OnPageChanged="OnPageChanged" />
     </MudStack>
 </MudContainer>
