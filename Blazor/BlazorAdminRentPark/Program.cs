@@ -8,10 +8,22 @@ using Microsoft.AspNetCore.Localization;
 using Microsoft.Extensions.Options;
 using MudBlazor.Services;
 using System.Globalization;
+using Serilog;
+using Serilog.Events;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+builder.Host.UseSerilog((context, configuration) =>
+    configuration
+        .ReadFrom.Configuration(context.Configuration)
+        .Enrich.FromLogContext()
+        .MinimumLevel.Information()
+        .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+        .MinimumLevel.Override("System", LogEventLevel.Warning)
+        .MinimumLevel.Override("Microsoft.Hosting.Lifetime", LogEventLevel.Information)
+        .WriteTo.Console()
+        .WriteTo.File("logs/log-.txt", rollingInterval: RollingInterval.Day));
+
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
@@ -21,8 +33,6 @@ builder.Services.AddHttpClient();
 builder.Services.AddScoped<IClientService, ClientService>(); 
 builder.Services.AddScoped<IVehiculeService, VehiculeService>();
 builder.Services.AddScoped<IUserService, UserService>();
-
-
 builder.Services.AddScoped<IDashboardService, DashboardService>();
 
 builder.Services.AddBlazoredLocalStorage();
@@ -43,12 +53,53 @@ builder.Services.AddLocalization(opts => { opts.ResourcesPath = "Resources"; });
 builder.Services.Configure<RequestLocalizationOptions>(options =>
 {
     options.DefaultRequestCulture = new RequestCulture(new CultureInfo("fr-FR"));
-
     options.SupportedCultures = new List<CultureInfo> { new CultureInfo("fr-FR"), new CultureInfo("en-US") };
     options.SupportedUICultures = new List<CultureInfo> { new CultureInfo("fr-FR"), new CultureInfo("en-US") };
 });
 
 var app = builder.Build();
+
+app.UseSerilogRequestLogging(options =>
+{
+    options.EnrichDiagnosticContext = (diagnosticContext, httpContext) =>
+    {
+        var user = httpContext.User?.Identity?.Name ?? "Anonyme";
+        diagnosticContext.Set("UserName", user);
+    };
+
+    options.GetLevel = (httpContext, elapsed, ex) =>
+    {
+        if (ex != null || httpContext.Response.StatusCode >= 500)
+            return LogEventLevel.Error;
+
+        var path = httpContext.Request.Path.Value?.ToLower();
+        if (path == null) return LogEventLevel.Information;
+
+        if (path.StartsWith("/_blazor") || 
+            path.StartsWith("/_content") || 
+            path.StartsWith("/lib") ||
+            path.EndsWith(".css") || 
+            path.EndsWith(".js") || 
+            path.EndsWith(".png") || 
+            path.EndsWith(".ico") || 
+            path.EndsWith(".woff2"))
+        {
+            return LogEventLevel.Debug;
+        }
+
+        if (httpContext.Request.Method != "GET")
+        {
+            return LogEventLevel.Information;
+        }
+
+        if (httpContext.Response.StatusCode == 302 || httpContext.Response.StatusCode == 304)
+        {
+            return LogEventLevel.Debug; 
+        }
+
+        return LogEventLevel.Information;
+    };
+});
 
 if (!app.Environment.IsDevelopment())
 {
@@ -65,21 +116,14 @@ if (options?.Value != null)
     app.UseRequestLocalization(options.Value);
 }
 
-app.MapControllers();
-
-if (options?.Value != null)
-{
-    app.UseRequestLocalization(options.Value);
-}
-
-app.MapControllers();
-
 app.UseAntiforgery();
 
 app.MapStaticAssets();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.MapControllers();
 
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
