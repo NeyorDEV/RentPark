@@ -1,21 +1,25 @@
-﻿using BlazorAdminRentPark.Models;
+﻿using System.Net.Http.Json;
+using BlazorAdminRentPark.Factories;
+using BlazorAdminRentPark.Models;
+using BlazorAdminRentPark.UiModels;
 using Microsoft.AspNetCore.Components.QuickGrid;
 
 namespace BlazorAdminRentPark.Services
 {
-    public class VehiculeService : IVehiculeService 
+    public class VehiculeService : IVehiculeService
     {
-        private readonly HttpClient _http;
+        private readonly HttpClient _httpClient;
 
-        public VehiculeService(HttpClient http)
+        public VehiculeService(HttpClient httpClient)
         {
-            _http = http;
+            _httpClient = httpClient;
         }
 
         public async Task<GridItemsProviderResult<VehiculeModel>> GetItems(GridItemsProviderRequest<VehiculeModel> request)
         {
-            var items = await _http.GetFromJsonAsync<List<VehiculeModel>>($"http://localhost:8880/voitures");
-
+            var response = await _httpClient.GetFromJsonAsync<List<VehiculeModel>>("http://localhost:8880/voitures");
+            var items = response ?? new List<VehiculeModel>();
+            
             return new GridItemsProviderResult<VehiculeModel>
             {
                 Items = items,
@@ -23,9 +27,21 @@ namespace BlazorAdminRentPark.Services
             };
         }
 
-        public async Task Delete(string NumSerie)
+        public async Task Add(VehiculeUiModel vehiculeUiModel)
         {
-            await _http.DeleteAsync($"http://localhost:8880/voitures/{NumSerie}");
+            var vehicule = VehiculeFactory.Create(vehiculeUiModel);
+            await _httpClient.PostAsJsonAsync("http://localhost:8880/add/vehicule", vehicule);
         }
+
+        public async Task Delete(string numSerie)
+        {
+            await _httpClient.DeleteAsync($"http://localhost:8880/delete/voitures/{numSerie}");
+        }
+
+        public async Task Update(string numSerie, VehiculeModel vehicule)
+        {
+            await _httpClient.PutAsJsonAsync($"http://localhost:8880/voitures/{numSerie}", vehicule); // [cite: 7]
+        }
+        
     }
 }

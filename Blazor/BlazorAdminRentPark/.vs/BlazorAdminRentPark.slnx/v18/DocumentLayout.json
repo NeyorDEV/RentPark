@@ -88,7 +88,11 @@
               "RelativeDocumentMoniker": "Components\\Pages\\Cars.razor",
               "ToolTip": "C:\\Users\\cleme\\sae_2a_rentpark\\Blazor\\BlazorAdminRentPark\\Components\\Pages\\Cars.razor",
               "RelativeToolTip": "Components\\Pages\\Cars.razor",
+<<<<<<< HEAD
               "ViewState": "AgIAAEAAAAAAAAAAAAAAAEAAAAAPAAAAAAAAAA==",
+=======
+              "ViewState": "AgIAAEQAAAAAAAAAAAAAAEQAAAAPAAAAAAAAAA==",
+>>>>>>> BlazorApiSuite
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
               "WhenOpened": "2026-01-13T08:39:35.395Z",
               "EditorCaption": ""
@@ -101,7 +105,11 @@
               "RelativeDocumentMoniker": "Services\\IUserService.cs",
               "ToolTip": "C:\\Users\\cleme\\sae_2a_rentpark\\Blazor\\BlazorAdminRentPark\\Services\\IUserService.cs",
               "RelativeToolTip": "Services\\IUserService.cs",
+<<<<<<< HEAD
               "ViewState": "AgIAAAYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+=======
+              "ViewState": "AgIAAAUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+>>>>>>> BlazorApiSuite
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-01-14T10:13:11.154Z",
               "EditorCaption": ""
@@ -139,7 +147,11 @@
               "RelativeDocumentMoniker": "Services\\VehiculeService.cs",
               "ToolTip": "C:\\Users\\cleme\\sae_2a_rentpark\\Blazor\\BlazorAdminRentPark\\Services\\VehiculeService.cs",
               "RelativeToolTip": "Services\\VehiculeService.cs",
+<<<<<<< HEAD
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+=======
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAA==",
+>>>>>>> BlazorApiSuite
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-01-13T13:50:38.661Z",
               "EditorCaption": ""

@@ -1,0 +1,166 @@
+﻿@using MudBlazor
+
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h5" Align="Align.Center" Style="font-weight: bold;">Ajouter un Véhicule</MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudForm @ref="_form" @bind-IsValid="_isValid">
+            <MudStack Spacing="4" Class="pa-4">
+                @* Informations de base *@
+                <MudTextField @bind-Value="_vehiculeModel.NumSerie" 
+                              Label="Numéro de série"
+                              Variant="Variant.Outlined"
+                              Required="true"
+                              RequiredError="Le numéro de série est obligatoire" />
+
+                <MudTextField @bind-Value="_vehiculeModel.Nom"
+                              Label="Nom"
+                              Variant="Variant.Outlined"
+                              Required="true"
+                              RequiredError="Le nom est obligatoire" />
+
+                <MudTextField @bind-Value="_vehiculeModel.Marque"
+                              Label="Marque"
+                              Variant="Variant.Outlined"
+                              Required="true"
+                              RequiredError="La marque est obligatoire" />
+
+                <MudTextField @bind-Value="_vehiculeModel.Annee"
+                              Label="Année"
+                              Variant="Variant.Outlined"
+                              Required="true"
+                              RequiredError="L'année est obligatoire" />
+
+                <MudTextField @bind-Value="_vehiculeModel.Couleur"
+                              Label="Couleur"
+                              Variant="Variant.Outlined"
+                              Required="true"
+                              RequiredError="La couleur est obligatoire" />
+
+                @* Catégorie et caractéristiques *@
+                <MudTextField @bind-Value="_vehiculeModel.Categorie"
+                              Label="Catégorie"
+                              Variant="Variant.Outlined"
+                              Required="true"
+                              RequiredError="La catégorie est obligatoire" />
+
+                <MudNumericField @bind-Value="_vehiculeModel.NbPlaces"
+                                 Label="Nombre de places"
+                                 Variant="Variant.Outlined"
+                                 Min="1"
+                                 Required="true"
+                                 RequiredError="Le nombre de places est obligatoire" />
+
+                <MudSelect @bind-Value="_vehiculeModel.Energie"
+                           Label="Énergie"
+                           Variant="Variant.Outlined"
+                           AnchorOrigin="Origin.BottomCenter"
+                           Required="true"
+                           RequiredError="Le type d'énergie est obligatoire">
+                    <MudSelectItem Value="@("Hybride")">Hybride</MudSelectItem>
+                    <MudSelectItem Value="@("Électrique")">Électrique</MudSelectItem>
+                    <MudSelectItem Value="@("Essence")">Essence</MudSelectItem>
+                    <MudSelectItem Value="@("Diesel")">Diesel</MudSelectItem>
+                </MudSelect>
+
+                <MudSelect @bind-Value="_vehiculeModel.Transmission"
+                           Label="Transmission"
+                           Variant="Variant.Outlined"
+                           AnchorOrigin="Origin.BottomCenter"
+                           Required="true"
+                           RequiredError="La transmission est obligatoire">
+                    <MudSelectItem Value="@("Propulsion")">Propulsion</MudSelectItem>
+                    <MudSelectItem Value="@("Traction")">Traction</MudSelectItem>
+                    <MudSelectItem Value="@("Intégrale")">Intégrale</MudSelectItem>
+                </MudSelect>
+
+                <MudSelect @bind-Value="_vehiculeModel.Boite"
+                           Label="Boite de vitesse"
+                           Variant="Variant.Outlined"
+                           AnchorOrigin="Origin.BottomCenter"
+                           Required="true"
+                           RequiredError="Le type de boite est obligatoire">
+                    <MudSelectItem Value="@("Manuelle")">Manuelle</MudSelectItem>
+                    <MudSelectItem Value="@("Automatique")">Automatique</MudSelectItem>
+                </MudSelect>
+
+                <MudTextField @bind-Value="_vehiculeModel.Puissance"
+                              Label="Puissance"
+                              Variant="Variant.Outlined"
+                              Required="true"
+                              RequiredError="La puissance est obligatoire" />
+
+                @* État et Prix *@
+                <MudSelect @bind-Value="_vehiculeModel.Etat"
+                           Label="État"
+                           Variant="Variant.Outlined"
+                           AnchorOrigin="Origin.BottomCenter"
+                           Required="true"
+                           RequiredError="L'état est obligatoire">
+                    <MudSelectItem Value="@("Libre")">Libre</MudSelectItem>
+                    <MudSelectItem Value="@("Louée")">Louée</MudSelectItem>
+                    <MudSelectItem Value="@("Vendue")">Vendue</MudSelectItem>
+                    <MudSelectItem Value="@("Réparation")">Réparation</MudSelectItem>
+                </MudSelect>
+
+                <MudNumericField @bind-Value="_vehiculeModel.Prix"
+                                 Label="Prix"
+                                 Variant="Variant.Outlined"
+                                 Adornment="Adornment.Start"
+                                 AdornmentIcon="@Icons.Material.Filled.AttachMoney"
+                                 Min="0"
+                                 Required="true"
+                                 RequiredError="Le prix est obligatoire" />
+
+                @* IDs *@
+                <MudNumericField @bind-Value="_vehiculeModel.IdAssureur"
+                                 Label="ID Assureur"
+                                 Variant="Variant.Outlined"
+                                 Min="0"
+                                 Required="true"
+                                 RequiredError="L'ID assureur est obligatoire" />
+
+                <MudNumericField @bind-Value="_vehiculeModel.IdFournisseur"
+                                 Label="ID Fournisseur"
+                                 Variant="Variant.Outlined"
+                                 Min="0"
+                                 Required="true"
+                                 RequiredError="L'ID fournisseur est obligatoire" />
+
+                <MudTextField @bind-Value="_vehiculeModel.ImagePath"
+                              Label="Chemin de l'image"
+                              Variant="Variant.Outlined" />
+
+                @* Dates *@
+                <MudDatePicker Label="Date d'achat"
+                               @bind-Value="_vehiculeModel.DateAchat"
+                               Variant="Variant.Outlined"
+                               Required="true"
+                               RequiredError="La date d'achat est obligatoire" />
+
+                <MudDatePicker Label="Dernier contrôle technique"
+                               @bind-Value="_vehiculeModel.DateDernierControleTech"
+                               Variant="Variant.Outlined"
+                               Required="true"
+                               RequiredError="La date du dernier contrôle est obligatoire" />
+
+                <MudDatePicker Label="Expiration contrôle technique"
+                               @bind-Value="_vehiculeModel.DateExpirationControleTech"
+                               Variant="Variant.Outlined"
+                               Required="true"
+                               RequiredError="La date d'expiration est obligatoire" />
+            </MudStack>
+        </MudForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Success"
+                   Variant="Variant.Filled"
+                   OnClick="HandleSubmit"
+                   FullWidth="true"
+                   Style="max-width: 200px; margin: 0 auto 20px auto;"
+                   Disabled="@(!_isValid)">
+            Ajouter
+        </MudButton>
+    </DialogActions>
+</MudDialog>

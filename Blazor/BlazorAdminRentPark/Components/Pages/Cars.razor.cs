@@ -9,6 +9,7 @@ using MudBlazor;
 
 namespace BlazorAdminRentPark.Components.Pages
 {
+<<<<<<< HEAD
     // L'héritage : ComponentBase est indispensable pour OnInitializedAsync et StateHasChanged
     public partial class Cars : ComponentBase
     {
@@ -16,15 +17,23 @@ namespace BlazorAdminRentPark.Components.Pages
         public IStringLocalizer<Cars> Localizer { get; set; } = default!;
         [Inject] protected IVehiculeService VehiculeService { get; set; }
   
+=======
+>>>>>>> BlazorApiSuite
 
-        protected string SearchString = ""; 
-        protected int PageSize = 8; 
-        protected int CurrentPage = 1; 
-        protected List<VehiculeModel> _vehicules = new(); 
+    public partial class Cars
+    {
+        [Inject] protected IVehiculeService VehiculeService { get; set; } = default!;
+        [Inject] protected IDialogService DialogService { get; set; } = default!;
+
+        protected string SearchString = "";
+        protected int PageSize = 8;
+        protected int CurrentPage = 1;
+        protected int PageCount => (int)Math.Ceiling((double)FilteredCars.Count() / PageSize);
+        protected List<VehiculeModel> _vehicules = new();
 
         protected override async Task OnInitializedAsync()
         {
-            await LoadVehicules(); 
+            await LoadVehicules();
         }
 
         protected async Task LoadVehicules()
@@ -34,11 +43,64 @@ namespace BlazorAdminRentPark.Components.Pages
             _vehicules = result.Items?.ToList() ?? new List<VehiculeModel>();
         }
 
+        protected async Task OpenAddCarDialog()
+        {
+            var options = new DialogOptions
+            {
+                CloseOnEscapeKey = true,
+                MaxWidth = MaxWidth.Medium,
+                FullWidth = true
+            };
+
+            var dialog = await DialogService.ShowAsync<AddCarDialog>("", options);
+            var result = await dialog.Result;
+
+            if (!result.Canceled)
+            {
+                await LoadVehicules();
+                StateHasChanged();
+            }
+        }
+
         protected async Task DeleteCar(string numSerie)
         {
             await VehiculeService.Delete(numSerie);
             await LoadVehicules();
             StateHasChanged();
+        }
+        protected async Task OpenEditCarDialog(VehiculeModel car)
+        {
+            var carCopy = new VehiculeModel
+            {
+                NumSerie = car.NumSerie,
+                Nom = car.Nom,
+                Marque = car.Marque,
+                Energie = car.Energie,
+                NbPlaces = car.NbPlaces,
+                Categorie = car.Categorie,
+                Transmission = car.Transmission,
+                Boite = car.Boite,
+                Puissance = car.Puissance,
+                Etat = car.Etat,
+                Prix = car.Prix,
+                DateAchat = car.DateAchat,
+                DateDernierControleTech = car.DateDernierControleTech,
+                DateExpirationControleTech = car.DateExpirationControleTech
+            };
+
+            var parameters = new DialogParameters { { "newVehicule", carCopy } };
+            var options = new DialogOptions { CloseOnEscapeKey = true, MaxWidth = MaxWidth.Medium, FullWidth = true };
+
+            var dialog = await DialogService.ShowAsync<AddCarDialog>("Modifier le véhicule", parameters, options);
+            var result = await dialog.Result;
+
+            if (!result.Canceled && result.Data is VehiculeModel updatedCar)
+            {
+                // Appel au service avec l'objet modifié
+                await VehiculeService.Update(updatedCar.NumSerie, updatedCar);
+                await LoadVehicules();
+                StateHasChanged();
+            }
         }
 
         protected IEnumerable<VehiculeModel> FilteredCars => _vehicules
@@ -50,11 +112,6 @@ namespace BlazorAdminRentPark.Components.Pages
         protected IEnumerable<VehiculeModel> PagedCars => FilteredCars
             .Skip((CurrentPage - 1) * PageSize)
             .Take(PageSize);
-        protected int PageCount => Math.Max(1, (int)Math.Ceiling((double)FilteredCars.Count() / PageSize));
 
-        protected void OnPageChanged(int page)
-        {
-            CurrentPage = page; 
-        }
     }
 }
