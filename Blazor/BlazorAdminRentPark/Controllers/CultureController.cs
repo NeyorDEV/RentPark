@@ -1,11 +1,8 @@
-﻿namespace BlazorAdminRentPark.Controllers
-{
-    using Microsoft.AspNetCore.Localization;
-    using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Localization;
+using Microsoft.AspNetCore.Mvc;
 
-    /// <summary>
-    /// The culture controller.
-    /// </summary>
+namespace BlazorAdminRentPark.Controllers
+{
     [Route("[controller]/[action]")]
     public class CultureController : Controller
     {
@@ -13,14 +10,18 @@
         {
             if (culture != null)
             {
-                // Define a cookie with the selected culture
-                this.HttpContext.Response.Cookies.Append(
+                HttpContext.Response.Cookies.Append(
                     CookieRequestCultureProvider.DefaultCookieName,
                     CookieRequestCultureProvider.MakeCookieValue(
                         new RequestCulture(culture)));
             }
 
-            return this.LocalRedirect(redirectUri);
+            if (!string.IsNullOrEmpty(redirectUri) && Url.IsLocalUrl(redirectUri))
+            {
+                return LocalRedirect(redirectUri);
+            }
+
+            return LocalRedirect("/");
         }
     }
 }

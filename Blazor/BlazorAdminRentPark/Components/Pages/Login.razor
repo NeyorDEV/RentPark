@@ -1,14 +1,11 @@
 ﻿@page "/login"
 @using BlazorAdminRentPark.Services
-@using Microsoft.AspNetCore.Components.Authorization
-@inject AuthenticationStateProvider AuthStateProvider
 @inject NavigationManager NavManager
-@inject ISnackbar Snackbar
-@inject IUserService UserService
 
 <MudContainer MaxWidth="MaxWidth.Small" Class="d-flex align-center justify-center mud-width-full" Style="height: 100vh;">
     <MudPaper Elevation="25" Class="pa-8" Width="100%" MaxWidth="500px">
-        <MudForm @ref="form">
+        
+        <form action="/Account/Login" method="post">
             
             <div class="d-flex justify-center mb-4">
                 <MudIcon Icon="@Icons.Material.Filled.Lock" Color="Color.Primary" Size="Size.Large" />
@@ -17,16 +14,22 @@
             <MudText Typo="Typo.h4" Align="Align.Center" GutterBottom="true">@Localizer["Connexion"]</MudText>
             <MudText Typo="Typo.body2" Align="Align.Center" Class="mb-4">Administration RentPark</MudText>
 
+            @if (ShowError)
+            {
+                <MudAlert Severity="Severity.Error" Class="mb-4">Identifiant ou mot de passe incorrect.</MudAlert>
+            }
+
+            <input type="hidden" name="returnUrl" value="/" />
+
             <MudTextField T="string" 
-                          @bind-Value="username" 
+                          Name="username"
                           Label="@Localizer["id"]" 
                           Variant="Variant.Outlined" 
                           Class="mb-3"
-                          Required="true"
-                          RequiredError="L'identifiant est obligatoire"/>
+                          Required="true"/>
 
             <MudTextField T="string" 
-                          @bind-Value="password" 
+                          Name="password"
                           Label="@Localizer["pass"]"
                           Variant="Variant.Outlined" 
                           InputType="@PasswordInput" 
@@ -34,39 +37,29 @@
                           AdornmentIcon="@PasswordInputIcon" 
                           OnAdornmentClick="TogglePasswordVisibility"
                           Class="mb-6"
-                          Required="true"
-                          RequiredError="Le mot de passe est obligatoire"/>
+                          Required="true"/>
 
-            <MudButton Variant="Variant.Filled" 
+            <MudButton ButtonType="ButtonType.Submit" 
+                       Variant="Variant.Filled" 
                        Color="Color.Primary" 
                        Size="Size.Large" 
-                       FullWidth="true" 
-                       OnClick="HandleLogin"
-                       Disabled="@_processing">
-                @if (_processing)
-                {
-                    <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true"/>
-                    <MudText Class="ms-2">Connexion...</MudText>
-                }
-                else
-                {
-                    <MudText>@Localizer["Connecter"]</MudText>
-                }
+                       FullWidth="true">
+                @Localizer["Connecter"]
             </MudButton>
 
-        </MudForm>
+        </form>
     </MudPaper>
 </MudContainer>
 
 @code {
-    private string username;
-    private string password;
-    private bool _processing = false;
-    
+    [SupplyParameterFromQuery]
+    public string? Error { get; set; }
+
+    private bool ShowError => Error == "true";
+
     bool isShow;
     InputType PasswordInput = InputType.Password;
     string PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
-    MudForm form;
 
     void TogglePasswordVisibility()
     {
@@ -82,31 +75,5 @@
             PasswordInputIcon = Icons.Material.Filled.Visibility;
             PasswordInput = InputType.Text;
         }
-    }
-
-    private async Task HandleLogin()
-    {
-        await form.Validate();
-        if (!form.IsValid) return;
-
-        _processing = true;
-        
-        var result = await UserService.LoginAsync(username, password);
-
-        if (result != null && result.Success)
-        {
-            await ((CustomAuthStateProvider)AuthStateProvider).MarkUserAsAuthenticated(result.Token);
-
-            Snackbar.Add($"Bienvenue {result.Username} !", Severity.Success);
-
-            NavManager.NavigateTo("/");
-        }
-        else
-        {
-            string msg = result?.Message ?? "Identifiant ou mot de passe incorrect.";
-            Snackbar.Add(msg, Severity.Error);
-        }
-
-        _processing = false;
     }
 }
