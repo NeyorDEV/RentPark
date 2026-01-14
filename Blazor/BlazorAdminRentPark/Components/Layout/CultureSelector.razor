@@ -1,0 +1,53 @@
+﻿@using System.Globalization
+@using MudBlazor
+@inject NavigationManager NavigationManager
+
+<MudSelect T="string"
+           Label="Langue"
+           Variant="Variant.Outlined"
+           Dense="true"
+           @bind-Value="SelectedCultureName"
+           Class="ml-2"
+           Style="min-width:150px;">
+    @foreach (var c in supportedCultures)
+    {
+        <MudSelectItem Value="@c.Name">@c.DisplayName</MudSelectItem>
+    }
+</MudSelect>
+
+@code {
+    private readonly CultureInfo[] supportedCultures = new[]
+    {
+        new CultureInfo("fr-FR"),
+        new CultureInfo("en-US")
+    };
+
+            private string selectedCultureNameBacking = CultureInfo.CurrentCulture.Name;
+
+    private string SelectedCultureName
+    {
+        get => selectedCultureNameBacking;
+        set
+        {
+            if (string.Equals(selectedCultureNameBacking, value, StringComparison.Ordinal))
+                return;
+
+            selectedCultureNameBacking = value;
+            OnCultureChanged(value);
+        }
+    }
+
+    private void OnCultureChanged(string cultureName)
+    {
+        if (string.IsNullOrWhiteSpace(cultureName))
+            return;
+
+        var culture = cultureName.ToLower(CultureInfo.InvariantCulture);
+
+        var uri = new Uri(this.NavigationManager.Uri).GetComponents(UriComponents.PathAndQuery, UriFormat.Unescaped);
+        var query = $"?culture={Uri.EscapeDataString(culture)}&redirectUri={Uri.EscapeDataString(uri)}";
+
+        // Redirection vers le controller qui créera le cookie et redirigera
+        this.NavigationManager.NavigateTo("/Culture/SetCulture" + query, forceLoad: true);
+    }
+}

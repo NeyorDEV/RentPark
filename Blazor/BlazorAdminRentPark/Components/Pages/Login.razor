@@ -14,12 +14,12 @@
                 <MudIcon Icon="@Icons.Material.Filled.Lock" Color="Color.Primary" Size="Size.Large" />
             </div>
 
-            <MudText Typo="Typo.h4" Align="Align.Center" GutterBottom="true">Connexion</MudText>
+            <MudText Typo="Typo.h4" Align="Align.Center" GutterBottom="true">@Localizer["Connexion"]</MudText>
             <MudText Typo="Typo.body2" Align="Align.Center" Class="mb-4">Administration RentPark</MudText>
 
             <MudTextField T="string" 
                           @bind-Value="username" 
-                          Label="Identifiant" 
+                          Label="@Localizer["id"]" 
                           Variant="Variant.Outlined" 
                           Class="mb-3"
                           Required="true"
@@ -27,7 +27,7 @@
 
             <MudTextField T="string" 
                           @bind-Value="password" 
-                          Label="Mot de passe" 
+                          Label="@Localizer["pass"]"
                           Variant="Variant.Outlined" 
                           InputType="@PasswordInput" 
                           Adornment="Adornment.End" 
@@ -50,7 +50,7 @@
                 }
                 else
                 {
-                    <MudText>Se connecter</MudText>
+                    <MudText>@Localizer["Connecter"]</MudText>
                 }
             </MudButton>
 

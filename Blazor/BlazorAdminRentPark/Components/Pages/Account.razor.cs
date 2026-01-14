@@ -2,6 +2,7 @@ using BlazorAdminRentPark.Models;
 using BlazorAdminRentPark.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.QuickGrid;
+using Microsoft.Extensions.Localization;
 using MudBlazor;
 
 namespace BlazorAdminRentPark.Components.Pages;
@@ -9,12 +10,18 @@ namespace BlazorAdminRentPark.Components.Pages;
 public partial class Account
 {
     [Inject]
+    public IStringLocalizer<Account> Localizer { get; set; } = default!;
+
+    [Inject]
     private IUserService UserService { get; set; } = default!;
+
+    [Inject]
+    private IDialogService DialogService { get; set; } = default!;
 
     private string _searchString = "";
     private int _currentPage = 1;
     private int _pageSize = 8;
-    private List<UserModel> _users = [];
+    private List<UserModel> _users = new List<UserModel>();
 
     protected string SearchString
     {
@@ -61,8 +68,7 @@ public partial class Account
             .Skip((_currentPage - 1) * _pageSize)
             .Take(_pageSize);
 
-    protected int PageCount =>
-        Math.Max(1, (int)Math.Ceiling(FilteredUsers.Count() / (double)_pageSize));
+    private int PageCount => Math.Max(1, (int)Math.Ceiling(FilteredUsers.Count() / (double)Math.Max(1, _pageSize)));
 
     protected override async Task OnInitializedAsync()
     {
@@ -84,18 +90,18 @@ public partial class Account
         };
 
         var result = await UserService.GetItems(request);
-        _users = result.Items?.ToList() ?? [];
+        _users = result.Items?.ToList() ?? new List<UserModel>();
     }
 
     protected async Task OpenAddUserDialog()
     {
-        var options = new DialogOptions 
-        { 
-            CloseOnEscapeKey = true, 
-            MaxWidth = MaxWidth.Small, 
-            FullWidth = true 
+        var options = new DialogOptions
+        {
+            CloseOnEscapeKey = true,
+            MaxWidth = MaxWidth.Small,
+            FullWidth = true
         };
-        
+
         var dialog = await DialogService.ShowAsync<AddUserDialog>("", options);
         var result = await dialog.Result;
 
@@ -110,10 +116,10 @@ public partial class Account
     {
         await UserService.Delete(id);
         _users.RemoveAll(u => u.Id == id);
-        
+
         if (_currentPage > PageCount)
             _currentPage = PageCount;
-        
+
         StateHasChanged();
     }
 
@@ -126,4 +132,17 @@ public partial class Account
     {
         _currentPage = newPage;
     }
+
+    private void OnPageSizeChanged(int newSize)
+    {
+        _pageSize = newSize;
+        _currentPage = 1;
+    }
+
+    private void OnSearchChanged(string text)
+    {
+        _searchString = text;
+        _currentPage = 1;
+    }
+
 }
