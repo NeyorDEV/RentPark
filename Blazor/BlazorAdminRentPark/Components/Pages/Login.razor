@@ -23,7 +23,7 @@
                           Variant="Variant.Outlined" 
                           Class="mb-3"
                           Required="true"
-                          RequiredError="L'identifiant est obligatoire"/>
+                          RequiredError="@Localizer["idObligatoire"]"/>
 
             <MudTextField T="string" 
                           @bind-Value="password" 
@@ -35,7 +35,7 @@
                           OnAdornmentClick="TogglePasswordVisibility"
                           Class="mb-6"
                           Required="true"
-                          RequiredError="Le mot de passe est obligatoire"/>
+                          RequiredError="@Localizer["passObligatoire"]" />
 
             <MudButton Variant="Variant.Filled" 
                        Color="Color.Primary" 

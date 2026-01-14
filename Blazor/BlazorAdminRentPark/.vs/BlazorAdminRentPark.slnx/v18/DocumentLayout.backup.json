@@ -54,8 +54,7 @@
               "RelativeToolTip": "Components\\Pages\\Account.razor.cs",
               "ViewState": "AgIAADMAAAAAAAAAAAAEwEYAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-14T12:51:04.263Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-14T12:51:04.263Z"
             },
             {
               "$type": "Document",
@@ -63,9 +62,9 @@
               "Title": "Cars.razor.cs",
               "DocumentMoniker": "C:\\Users\\mylan\\Downloads\\2A\\sae_2a_rentpark\\Blazor\\BlazorAdminRentPark\\Components\\Pages\\Cars.razor.cs",
               "RelativeDocumentMoniker": "Components\\Pages\\Cars.razor.cs",
-              "ToolTip": "C:\\Users\\mylan\\Downloads\\2A\\sae_2a_rentpark\\Blazor\\BlazorAdminRentPark\\Components\\Pages\\Cars.razor.cs*",
-              "RelativeToolTip": "Components\\Pages\\Cars.razor.cs*",
-              "ViewState": "AgIAAIEAAAAAAAAAAAAuwDwAAAAAAAAAAAAAAA==",
+              "ToolTip": "C:\\Users\\mylan\\Downloads\\2A\\sae_2a_rentpark\\Blazor\\BlazorAdminRentPark\\Components\\Pages\\Cars.razor.cs",
+              "RelativeToolTip": "Components\\Pages\\Cars.razor.cs",
+              "ViewState": "AgIAAEgAAAAAAAAAAAAywDwAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-01-14T12:50:58.525Z",
               "EditorCaption": ""
@@ -80,8 +79,7 @@
               "RelativeToolTip": "Components\\Pages\\Cars.razor",
               "ViewState": "AgIAADAAAAAAAAAAAAAAAD4AAAAJAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-01-14T12:50:33.587Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-14T12:50:33.587Z"
             },
             {
               "$type": "Document",
@@ -93,8 +91,7 @@
               "RelativeToolTip": "Components\\Pages\\Account.razor",
               "ViewState": "AgIAAB8AAAAAAAAAAAAWwDcAAAAPAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-01-14T12:36:22.576Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-14T12:36:22.576Z"
             }
           ]
         }

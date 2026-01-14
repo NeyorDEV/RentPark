@@ -126,7 +126,13 @@
   <data name="id" xml:space="preserve">
     <value>Identifiant</value>
   </data>
+  <data name="idObligatoire" xml:space="preserve">
+    <value>L'identifiant est obligatoire</value>
+  </data>
   <data name="pass" xml:space="preserve">
     <value>Mot de passe</value>
+  </data>
+  <data name="passObligatoire" xml:space="preserve">
+    <value>Le mot de passe est obligatoire</value>
   </data>
 </root>
