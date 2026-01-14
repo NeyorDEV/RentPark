@@ -7,5 +7,6 @@ namespace BlazorAdminRentPark.Services
     {
         Task<GridItemsProviderResult<VehiculeModel>> GetItems(GridItemsProviderRequest<VehiculeModel> request);
         Task Delete(string NumSerie);
+        Task Update(string numSerie, VehiculeModel vehicule);
     }
 }

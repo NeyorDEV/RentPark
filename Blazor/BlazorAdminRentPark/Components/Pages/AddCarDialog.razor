@@ -44,18 +44,18 @@
 
 @code {
     [CascadingParameter]
-    private dynamic? MudDialog { get; set; }
+    private IMudDialogInstance MudDialog { get; set; }
 
-    private VehiculeModel newVehicule = new VehiculeModel();
+    [Parameter]
+    public VehiculeModel newVehicule { get; set; } = new VehiculeModel();
 
-    // Wrappers pour gérer la conversion entre DateTime et DateTime? requise par MudDatePicker
+    // Wrappers pour gérer la conversion (restent inchangés, ils utiliseront la propriété ci-dessus)
     private DateTime? dateAchatWrapper { get => newVehicule.DateAchat; set => newVehicule.DateAchat = value ?? DateTime.Now; }
     private DateTime? dateDernierControleWrapper { get => newVehicule.DateDernierControleTech; set => newVehicule.DateDernierControleTech = value ?? DateTime.Now; }
     private DateTime? dateExpirationControleWrapper { get => newVehicule.DateExpirationControleTech; set => newVehicule.DateExpirationControleTech = value ?? DateTime.Now; }
 
     private void Submit()
     {
-        // Retourne l'objet rempli lors de la fermeture
         MudDialog.Close(DialogResult.Ok(newVehicule));
     }
 

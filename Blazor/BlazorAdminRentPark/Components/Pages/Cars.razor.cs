@@ -7,11 +7,8 @@ using BlazorAdminRentPark.Services;
 
 namespace BlazorAdminRentPark.Components.Pages
 {
-<<<<<<< HEAD
     public partial class Cars : ComponentBase
-=======
-    public partial class Cars
->>>>>>> cfd191972a16e93521ab6150df58b5025e7d13d9
+
     {
         [Inject] protected IVehiculeService VehiculeService { get; set; } = default!;
         [Inject] protected IDialogService DialogService { get; set; } = default!; // Nécessaire pour afficher le dialogue 
@@ -61,6 +58,40 @@ namespace BlazorAdminRentPark.Components.Pages
             await LoadVehicules();
             StateHasChanged();
         }
+        protected async Task OpenEditCarDialog(VehiculeModel car)
+        {
+            var carCopy = new VehiculeModel
+            {
+                NumSerie = car.NumSerie,
+                Nom = car.Nom,
+                Marque = car.Marque,
+                Energie = car.Energie,
+                NbPlaces = car.NbPlaces,
+                Categorie = car.Categorie,
+                Transmission = car.Transmission,
+                Boite = car.Boite,
+                Puissance = car.Puissance,
+                Etat = car.Etat,
+                Prix = car.Prix,
+                DateAchat = car.DateAchat,
+                DateDernierControleTech = car.DateDernierControleTech,
+                DateExpirationControleTech = car.DateExpirationControleTech
+            };
+
+            var parameters = new DialogParameters { { "newVehicule", carCopy } };
+            var options = new DialogOptions { CloseOnEscapeKey = true, MaxWidth = MaxWidth.Medium, FullWidth = true };
+
+            var dialog = await DialogService.ShowAsync<AddCarDialog>("Modifier le véhicule", parameters, options);
+            var result = await dialog.Result;
+
+            if (!result.Canceled && result.Data is VehiculeModel updatedCar)
+            {
+                // Appel au service avec l'objet modifié
+                await VehiculeService.Update(updatedCar.NumSerie, updatedCar);
+                await LoadVehicules();
+                StateHasChanged();
+            }
+        }
 
         protected IEnumerable<VehiculeModel> FilteredCars => _vehicules
             .Where(c => string.IsNullOrWhiteSpace(SearchString) ||
@@ -78,5 +109,7 @@ namespace BlazorAdminRentPark.Components.Pages
         {
             CurrentPage = page;
         }
+
+
     }
 }

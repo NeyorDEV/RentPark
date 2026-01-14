@@ -27,5 +27,11 @@ namespace BlazorAdminRentPark.Services
         {
             await _http.DeleteAsync($"http://localhost:8880/delete/voitures/{NumSerie}");
         }
+
+        public async Task Update(string numSerie, VehiculeModel vehicule)
+        {
+            await _http.PutAsJsonAsync($"http://localhost:8880/voitures/{numSerie}", vehicule); // [cite: 7]
+        }
+
     }
 }
