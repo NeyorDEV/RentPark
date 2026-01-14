@@ -121,12 +121,18 @@
     <value>Log in</value>
   </data>
   <data name="Connexion" xml:space="preserve">
-    <value>Connection</value>
+    <value>Log In</value>
   </data>
   <data name="id" xml:space="preserve">
     <value>Username</value>
   </data>
+  <data name="idObligatoire" xml:space="preserve">
+    <value>Username is required</value>
+  </data>
   <data name="pass" xml:space="preserve">
     <value>Password</value>
+  </data>
+  <data name="passObligatoire" xml:space="preserve">
+    <value>Password is required</value>
   </data>
 </root>

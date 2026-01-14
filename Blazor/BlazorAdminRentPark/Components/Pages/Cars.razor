@@ -66,6 +66,6 @@
     </MudGrid>
 
     <MudStack Row="true" Justify="Justify.Center" Class="mt-6"> 
-        <MudPagination Page="@CurrentPage" PageCount="@PageCount" OnPageChanged="OnPageChanged" />
+        <MudPagination Selected="@_currentPage" SelectedChanged="OnPageChanged" Count="@PageCount" />
     </MudStack>
 </MudContainer>
