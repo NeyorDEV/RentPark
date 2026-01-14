@@ -377,50 +377,62 @@ $app->delete('/users/{id}', function (Request $request, Response $response, arra
                     ->withStatus(200);
 });
 
-// POST : Ajout d'un utilisateur
-$app->post('/modif/users', function (Request $request, Response $response) use ($conn) {
-    // 1️⃣ Récupération des données
+$app->post('/add/users', function (Request $request, Response $response) use ($conn) {
+
     $data = $request->getParsedBody();
 
-    $nom     = $data['nom']     ?? null;
-    $mdp     = $data['mdp']     ?? null;
-    $confirm = $data['confirm'] ?? null;
-    $role    = $data['role']    ?? 'client';
+    $username = $data['username'] ?? null;
+    $password = $data['password'] ?? null;
+    $role     = $data['role'] ?? 'client';
 
-    // 2️⃣ Validation (Champs vides ou mots de passe différents)
-    if (!$nom || !$mdp || !$role || !$confirm || $confirm !== $mdp) {
-        $msg = ($confirm !== $mdp) ? 'Mots de passe différents' : 'Données manquantes';
-        $response->getBody()->write(json_encode(['error' => $msg]));
+    if (!$username || !$password) {
+        $response->getBody()->write(json_encode([
+            'error' => 'username et password sont obligatoires'
+        ]));
         return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
     }
 
-    // 3️⃣ Hachage et Insertion
-    $hashedPassword = password_hash($mdp, PASSWORD_DEFAULT);
+    $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
     try {
         $conn->executeQuery(
-            "INSERT INTO users (username, password, role) VALUES (:nom, :mdp, :role)",
+            "INSERT INTO users (username, password, role)
+             VALUES (:username, :password, :role)",
             [
-                ':nom'  => [$nom, \PDO::PARAM_STR],
-                ':mdp'  => [$hashedPassword, \PDO::PARAM_STR],
-                ':role' => [$role, \PDO::PARAM_STR]
+                ':username' => [$username, \PDO::PARAM_STR],
+                ':password' => [$hashedPassword, \PDO::PARAM_STR],
+                ':role'     => [$role, \PDO::PARAM_STR]
             ]
         );
 
-        $response->getBody()->write(json_encode(['message' => 'Utilisateur créé !']));
+        $response->getBody()->write(json_encode([
+            'message' => 'Utilisateur créé'
+        ]));
+
         return $response->withHeader('Content-Type', 'application/json')->withStatus(201);
 
-    } catch (\Exception $e) {
-        $response->getBody()->write(json_encode(['error' => 'Erreur BDD : ' . $e->getMessage()]));
+    } catch (\PDOException $e) {
+
+        if ($e->getCode() === '23000') {
+            $response->getBody()->write(json_encode([
+                'error' => 'Username déjà existant'
+            ]));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(409);
+        }
+
+        $response->getBody()->write(json_encode([
+            'error' => 'Erreur serveur'
+        ]));
         return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
     }
 });
+
 
 // -------------------------------------------------------------------------------------------------
 
 
 
-$app->post('/modif/vehicule', function (Request $request, Response $response, $args) use ($conn) {
+$app->post('/add/vehicule', function (Request $request, Response $response, $args) use ($conn) {
     
     $data = $request->getParsedBody();
 
@@ -495,45 +507,6 @@ $app->post('/modif/vehicule', function (Request $request, Response $response, $a
     }
 });
 
-// -----------------------------------------------------------------------
-// /stats/revenu-mensuel - GET
-// -----------------------------------------------------------------------
-$app->get('/stats/revenu-mensuel', function (Request $request, Response $response, $args) use ($conn) {
-
-    $query = "
-        SELECT SUM(m.Prix) AS total
-        FROM Contrat c
-        JOIN Vehicule v ON c.IdVehicule = v.NumSerie
-        JOIN Modele m 
-            ON m.Marque = v.Marque
-           AND m.Nom = v.Nom
-           AND m.Annee = v.Annee
-        WHERE MONTH(c.DateDebut) = MONTH(CURRENT_DATE())
-          AND YEAR(c.DateDebut) = YEAR(CURRENT_DATE());
-    ";
-
-    try {
-        $conn->executeQuery($query);
-        $results = $conn->getResults();
-
-        $total = (!empty($results) && $results[0]['total'] !== null) 
-                    ? (float)$results[0]['total'] 
-                    : 0.0;
-
-        $response->getBody()->write(json_encode([
-            'revenu_mensuel' => $total
-        ]));
-
-        return $response->withHeader('Content-Type', 'application/json');
-
-    } catch (\Exception $e) {
-        $response->getBody()->write(json_encode([
-            'error' => 'Erreur lors du calcul du revenu : ' . $e->getMessage()
-        ]));
-        return $response->withHeader('Content-Type', 'application/json')
-                        ->withStatus(500);
-    }
-});
 
 // -----------------------------------------------------------------------
 // /stats/contrats-prochains - GET
@@ -816,6 +789,91 @@ $app->post('/vehicule', function (Request $request, Response $response, $args) u
             'error' => $message
         ]));
         return $response->withHeader('Content-Type', 'application/json')->withStatus($status);
+    }
+});
+
+$app->get('/stats/revenus-mensuel', function (Request $request, Response $response) use ($conn) {
+
+    $query = "
+        SELECT SUM(m.Prix) AS total
+        FROM Contrat c
+        JOIN Vehicule v ON c.IdVehicule = v.NumSerie
+        JOIN Modele m 
+            ON m.Marque = v.Marque
+           AND m.Nom = v.Nom
+           AND m.Annee = v.Annee
+        WHERE MONTH(c.DateDebut) = MONTH(CURRENT_DATE())
+          AND YEAR(c.DateDebut) = YEAR(CURRENT_DATE())
+    ";
+
+    try {
+        $conn->executeQuery($query);
+        $results = $conn->getResults();
+
+        $total = 0.0;
+        if (!empty($results) && $results[0]['total'] !== null) {
+            $total = (float)$results[0]['total'];
+        }
+
+        $response->getBody()->write(json_encode([
+            'monthlyIncome' => $total
+        ]));
+
+        return $response
+            ->withHeader('Content-Type', 'application/json')
+            ->withStatus(200);
+
+    } catch (\Exception $e) {
+        $response->getBody()->write(json_encode([
+            'error' => 'Erreur lors du calcul du revenu mensuel'
+        ]));
+
+        return $response
+            ->withHeader('Content-Type', 'application/json')
+            ->withStatus(500);
+    }
+});
+
+
+$app->post('/login', function (Request $request, Response $response, $args) use ($conn) {
+    $data = $request->getParsedBody();
+    $username = $data['username'] ?? '';
+    $password = $data['password'] ?? '';
+
+    if (empty($username) || empty($password)) {
+        $response->getBody()->write(json_encode(['error' => 'Identifiant et mot de passe requis']));
+        return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
+    }
+
+    $conn->executeQuery(
+        "SELECT * FROM users WHERE username = :username",
+        [':username' => [$username, \PDO::PARAM_STR]]
+    );
+    
+    $users = $conn->getResults();
+
+    if (empty($users)) {
+        $response->getBody()->write(json_encode(['success' => false, 'message' => 'Utilisateur inconnu']));
+        return $response->withHeader('Content-Type', 'application/json')->withStatus(401);
+    }
+
+    $user = $users[0];
+
+    if (password_verify($password, $user['password'])) {
+        
+        $payload = [
+            "success" => true,
+            "token" => bin2hex(random_bytes(16)),
+            "role" => $user['role'],
+            "username" => $user['username'],
+            "id" => $user['id']
+        ];
+
+        $response->getBody()->write(json_encode($payload));
+        return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
+    } else {
+        $response->getBody()->write(json_encode(['success' => false, 'message' => 'Mot de passe incorrect']));
+        return $response->withHeader('Content-Type', 'application/json')->withStatus(401);
     }
 });
 
