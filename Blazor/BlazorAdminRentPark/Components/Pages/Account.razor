@@ -1,6 +1,8 @@
 ﻿@page "/account"
 @rendermode InteractiveServer
 @using MudBlazor
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize]
 
 <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-8">
     <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Class="mb-6">
