@@ -39,14 +39,17 @@ public class DashboardService : IDashboardService
     public async Task<List<RappelItemModel>> GetRappelsAsync()
     {
         // Correction de l'erreur NotImplemented (image 7347dc)
-        return await _http.GetFromJsonAsync<List<RappelItemModel>>($"{BaseUrl}/rappels-mensuel") //Pas dans l'api
+        return await _http.GetFromJsonAsync<List<RappelItemModel>>($"{BaseUrl}/rappels-mensuel")
                ?? new List<RappelItemModel>();
     }
 
     public async Task<List<PlanningItemModel>> GetPlanningAsync()
     {
-        return await _http.GetFromJsonAsync<List<PlanningItemModel>>($"{BaseUrl}/planning-mensuel")
-               ?? new List<PlanningItemModel>();
+        // On récupère l'objet PlanningResponse
+        var response = await _http.GetFromJsonAsync<PlanningResponse>($"{BaseUrl}/contrats-prochains");
+
+        // On retourne la liste contenue à l'intérieur
+        return response?.Contrats ?? new List<PlanningItemModel>();
     }
 }
 
@@ -72,4 +75,10 @@ public class CarDetails
     public string Modele { get; set; }
     public string ImagePath { get; set; }
     public int nb_locations { get; set; }
+}
+
+public class PlanningResponse
+{
+    [JsonPropertyName("contrats_prochains")]
+    public List<PlanningItemModel> Contrats { get; set; } = new();
 }

@@ -97,22 +97,35 @@
 
         @* Colonne Planning *@
         <MudItem xs="12" md="6">
-            <MudCard Elevation="3" Class="rounded-lg">
-                <MudCardHeader>
-                    <CardHeaderContent>
-                        <MudText Typo="Typo.h6" Align="MAlign.Center" Style="font-weight: bold;">Planning</MudText>
-                    </CardHeaderContent>
-                </MudCardHeader>
-                <MudCardContent Style="height: 300px; overflow-y: auto;">
-                    <MudStack Spacing="2">
-                        @foreach (var p in model.Planning)
-                        {
-                            <MudPaper Elevation="0" Class="pa-3 rounded" Style="background-color: #f2ebeb;">
-                                <MudText><b>@p.Heure</b> – @p.Description</MudText>
-                            </MudPaper>
-                        }
-                    </MudStack>
-                </MudCardContent>
+            <MudCard Elevation="3" Class="rounded-lg pa-4" Style="background-color: white; color: black; min-height: 350px;">
+                <MudText Typo="Typo.h6" Class="mb-4 d-flex align-center justify-center" Style="font-weight: bold; color: black;">
+                    <MudIcon Icon="@Icons.Material.Filled.CalendarMonth" Class="mr-2" Color="Color.Default" /> Planning Proche
+                </MudText>
+
+                <MudStack Spacing="3">
+                    @foreach (var p in model.Planning)
+                    {
+                        @* Item Location (Début) *@
+                        <MudPaper Elevation="0" Class="pa-4 rounded-lg d-flex align-center"
+                                  Style="background-color: #f5f5f5; border-left: 6px solid #ff9800;">
+                            <MudChip T="string" Variant="Variant.Filled" Color="Color.Dark" Size="Size.Small"
+                                     Style="font-weight: bold;" Class="mr-4">
+                                @DateTime.Parse(p.DateDebut).ToString("dd/MM/yyyy")
+                            </MudChip>
+                            <MudText Style="font-weight: bold; color: black;">Location : @p.Marque @p.Modele</MudText>
+                        </MudPaper>
+
+                        @* Item Retour (Fin) *@
+                        <MudPaper Elevation="0" Class="pa-4 rounded-lg d-flex align-center"
+                                  Style="background-color: #f5f5f5; border-left: 6px solid #ff9800;">
+                            <MudChip T="string" Variant="Variant.Filled" Color="Color.Dark" Size="Size.Small"
+                                     Style="font-weight: bold;" Class="mr-4">
+                                @DateTime.Parse(p.DateFin).ToString("dd/MM/yyyy")
+                            </MudChip>
+                            <MudText Style="font-weight: bold; color: black;">Retour : @p.Marque @p.Modele</MudText>
+                        </MudPaper>
+                    }
+                </MudStack>
             </MudCard>
         </MudItem>
     </MudGrid>
