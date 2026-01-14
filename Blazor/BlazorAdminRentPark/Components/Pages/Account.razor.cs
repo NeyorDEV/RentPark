@@ -157,15 +157,13 @@ public partial class Account
 
     protected async Task EditUser(int id)
     {
-        // 1. Trouver l'utilisateur dans la liste locale
         var user = _users.FirstOrDefault(u => u.Id == id);
         if (user == null) return;
 
-        // 2. Pr�parer les param�tres pour le dialogue
         var parameters = new DialogParameters<AddUserDialog>
-    {
-        { x => x.UserToEdit, user }
-    };
+        {
+            { x => x.UserToEdit, user }
+        };
 
         var options = new DialogOptions
         {
@@ -174,17 +172,18 @@ public partial class Account
             FullWidth = true
         };
 
-        // 3. Ouvrir le dialogue
         var dialog = await DialogService.ShowAsync<AddUserDialog>("", parameters, options);
         var result = await dialog.Result;
 
-        // 4. Si valid�, recharger la liste
         if (!result.Canceled)
         {
+            Logger.LogInformation("SUCCÈS : L'utilisateur ID {Id} ({Username}) a été modifié.", user.Id, user.Username);
+
             await LoadUsers();
             StateHasChanged();
         }
     }
+    
     protected void OnPageChanged(int newPage)
     {
         _currentPage = newPage;

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Components.QuickGrid;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.Extensions.Localization;
 using MudBlazor;
+using Microsoft.Extensions.Logging;
 
 namespace BlazorAdminRentPark.Components.Pages
 {
@@ -19,6 +20,9 @@ namespace BlazorAdminRentPark.Components.Pages
 
         [Inject]
         protected IDialogService DialogService { get; set; } = default!;
+
+        [Inject]
+        protected ILogger<Cars> Logger { get; set; } = default!;
 
         private int _pageSize = 8;
         private int _currentPage = 1;
@@ -105,6 +109,8 @@ namespace BlazorAdminRentPark.Components.Pages
 
             if (!result.Canceled)
             {
+                Logger.LogInformation("SUCCÈS : Un nouveau véhicule a été ajouté.");
+                
                 await LoadVehicules();
                 StateHasChanged();
             }
@@ -112,25 +118,36 @@ namespace BlazorAdminRentPark.Components.Pages
 
         protected async Task DeleteCar(string numSerie)
         {
-            // 1. Affichage de la boîte de dialogue de confirmation
             bool? result = await DialogService.ShowMessageBox(
                 @Localizer["Confirmation"],
                 @Localizer["DeleteConfirmation"],
                 yesText: @Localizer["Delete"],
                 cancelText: @Localizer["Cancel"]);
 
-            // 2. Si l'utilisateur confirme la suppression
             if (result == true)
             {
-                
-                await VehiculeService.Delete(numSerie);
+                try 
+                {
+                    var carToDelete = _vehicules.FirstOrDefault(c => c.NumSerie == numSerie);
+                    string carInfo = carToDelete != null ? $"{carToDelete.Marque} {carToDelete.Nom}" : "Inconnu";
+                    
+                    Logger.LogInformation("ACTION : Demande de suppression du véhicule {NumSerie} - {CarInfo}", numSerie, carInfo);
 
-                await LoadVehicules();
+                    await VehiculeService.Delete(numSerie);
 
-                if (CurrentPage > PageCount)
-                    CurrentPage = PageCount;
+                    await LoadVehicules();
 
-                StateHasChanged();
+                    if (CurrentPage > PageCount)
+                        CurrentPage = PageCount;
+                    
+                    Logger.LogInformation("SUCCÈS : Le véhicule {NumSerie} a été supprimé.", numSerie);
+
+                    StateHasChanged();
+                }
+                catch (Exception ex)
+                {
+                    Logger.LogError(ex, "ERREUR : Impossible de supprimer le véhicule {NumSerie}", numSerie);
+                }
             }
         }
 
@@ -162,7 +179,10 @@ namespace BlazorAdminRentPark.Components.Pages
 
             if (!result.Canceled && result.Data is VehiculeModel updatedCar)
             {
+                Logger.LogInformation("ACTION : Mise à jour du véhicule {NumSerie} ({Marque} {Nom})", updatedCar.NumSerie, updatedCar.Marque, updatedCar.Nom);
+
                 await VehiculeService.Update(updatedCar.NumSerie, updatedCar);
+                
                 await LoadVehicules();
                 StateHasChanged();
             }
