@@ -111,7 +111,7 @@ public partial class Account
 
         if (!result.Canceled)
         {
-            Logger.LogInformation("ACTION : Un nouvel utilisateur a été ajouté via le formulaire.");
+            Logger.LogInformation(@Localizer["AlertAdd"]);
             
             await LoadUsers();
             StateHasChanged();
@@ -122,10 +122,10 @@ public partial class Account
     {
         // 1. Préparer le message de confirmation
         bool? result = await DialogService.ShowMessageBox(
-            "Confirmation",
-            "Voulez-vous vraiment supprimer cet utilisateur ?",
-            yesText: "Supprimer",
-            cancelText: "Annuler");
+            @Localizer["Confirmation"],
+            @Localizer["ConfirmDelete"],
+            yesText: @Localizer["Delete"],
+            cancelText: @Localizer["Cancel"]);
 
         // 2. Si l'utilisateur a cliqué sur "Supprimer" (vrai)
         if (result == true)

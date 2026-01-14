@@ -114,10 +114,10 @@ namespace BlazorAdminRentPark.Components.Pages
         {
             // 1. Affichage de la boîte de dialogue de confirmation
             bool? result = await DialogService.ShowMessageBox(
-                "Confirmation",
-                $"Voulez-vous vraiment supprimer le véhicule avec le numéro de série {numSerie} ?",
-                yesText: "Supprimer",
-                cancelText: "Annuler");
+                @Localizer["Confirmation"],
+                @Localizer["DeleteConfirmation"],
+                yesText: @Localizer["Delete"],
+                cancelText: @Localizer["Cancel"]);
 
             // 2. Si l'utilisateur confirme la suppression
             if (result == true)
