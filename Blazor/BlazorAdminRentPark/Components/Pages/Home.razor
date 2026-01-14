@@ -76,18 +76,23 @@
     <MudGrid>
         @* Colonne Rappel *@
         <MudItem xs="12" md="6">
-            <MudCard Elevation="3" Class="rounded-lg">
-                <MudCardHeader>
-                    <CardHeaderContent>
-                        <MudText Typo="Typo.h6" Align="MAlign.Center" Style="font-weight: bold;">Rappel</MudText>
-                    </CardHeaderContent>
-                </MudCardHeader>
-                <MudCardContent Style="height: 300px; overflow-y: auto;">
-                    <MudStack Spacing="2">
+            <MudCard Elevation="3" Class="rounded-lg pa-4" Style="background-color: white; color: black; min-height: 350px;">
+                <MudText Typo="Typo.h6" Class="mb-4 d-flex align-center justify-center" Style="font-weight: bold; color: black;">
+                    <MudIcon Icon="@Icons.Material.Filled.Notifications" Class="mr-2" /> Rappels
+                </MudText>
+
+                <MudCardContent Style="max-height: 400px; overflow-y: auto;" Class="pa-0">
+                    <MudStack Spacing="3">
                         @foreach (var rappel in model.Rappels)
                         {
-                            <MudPaper Elevation="0" Class="pa-3 rounded" Style="background-color: #f2ebeb;">
-                                <MudText>@rappel.TypeAction – @rappel.Vehicule</MudText>
+                            <MudPaper Elevation="0" Class="pa-4 rounded-lg d-flex align-center"
+                                      Style="background-color: #f5f5f5; border-left: 6px solid #ff9800;">
+                                <MudChip T="string" Variant="Variant.Filled" Color="Color.Default" Size="Size.Small"
+                                         Style="background-color: #e0e0e0; color: black; font-weight: bold;" Class="mr-4">
+                                    Alerte
+                                </MudChip>
+                                <MudText Style="color: #616161;" Class="mr-1">Contrôle technique – </MudText>
+                                <MudText Style="font-weight: bold; color: black;">@rappel.NomVehicule</MudText>
                             </MudPaper>
                         }
                     </MudStack>

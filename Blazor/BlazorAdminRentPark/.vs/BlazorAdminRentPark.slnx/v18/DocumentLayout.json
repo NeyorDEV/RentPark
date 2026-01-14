@@ -15,6 +15,10 @@
       "RelativeMoniker": "D:0:0:{7A53A978-03C4-0DE4-E433-BDD6B52049B9}|BlazorAdminRentPark.csproj|solutionrelative:models\\dashboardmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
+      "AbsoluteMoniker": "D:0:0:{7A53A978-03C4-0DE4-E433-BDD6B52049B9}|BlazorAdminRentPark.csproj|c:\\.but\\sae_2a_rentpark\\blazor\\blazoradminrentpark\\models\\rappelitemmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7A53A978-03C4-0DE4-E433-BDD6B52049B9}|BlazorAdminRentPark.csproj|solutionrelative:models\\rappelitemmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{7A53A978-03C4-0DE4-E433-BDD6B52049B9}|BlazorAdminRentPark.csproj|c:\\.but\\sae_2a_rentpark\\blazor\\blazoradminrentpark\\models\\planningitemmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{7A53A978-03C4-0DE4-E433-BDD6B52049B9}|BlazorAdminRentPark.csproj|solutionrelative:models\\planningitemmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
@@ -59,19 +63,19 @@
             {
               "$type": "Document",
               "DocumentIndex": 3,
-              "Title": "PlanningItemModel.cs",
-              "DocumentMoniker": "C:\\.BUT\\sae_2a_rentpark\\Blazor\\BlazorAdminRentPark\\Models\\PlanningItemModel.cs",
-              "RelativeDocumentMoniker": "Models\\PlanningItemModel.cs",
-              "ToolTip": "C:\\.BUT\\sae_2a_rentpark\\Blazor\\BlazorAdminRentPark\\Models\\PlanningItemModel.cs",
-              "RelativeToolTip": "Models\\PlanningItemModel.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAuwAcAAAAAAAAAAAAAAA==",
+              "Title": "RappelItemModel.cs",
+              "DocumentMoniker": "C:\\.BUT\\sae_2a_rentpark\\Blazor\\BlazorAdminRentPark\\Models\\RappelItemModel.cs",
+              "RelativeDocumentMoniker": "Models\\RappelItemModel.cs",
+              "ToolTip": "C:\\.BUT\\sae_2a_rentpark\\Blazor\\BlazorAdminRentPark\\Models\\RappelItemModel.cs*",
+              "RelativeToolTip": "Models\\RappelItemModel.cs*",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAAFAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-14T09:36:29.069Z",
+              "WhenOpened": "2026-01-14T09:47:23.046Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 6,
               "Title": "VehiculeModel.cs",
               "DocumentMoniker": "C:\\.BUT\\sae_2a_rentpark\\Blazor\\BlazorAdminRentPark\\Models\\VehiculeModel.cs",
               "RelativeDocumentMoniker": "Models\\VehiculeModel.cs",
@@ -97,7 +101,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 7,
               "Title": "ClientService.cs",
               "DocumentMoniker": "C:\\.BUT\\sae_2a_rentpark\\Blazor\\BlazorAdminRentPark\\Services\\ClientService.cs",
               "RelativeDocumentMoniker": "Services\\ClientService.cs",
@@ -116,14 +120,14 @@
               "RelativeDocumentMoniker": "Services\\DashboardService.cs",
               "ToolTip": "C:\\.BUT\\sae_2a_rentpark\\Blazor\\BlazorAdminRentPark\\Services\\DashboardService.cs",
               "RelativeToolTip": "Services\\DashboardService.cs",
-              "ViewState": "AgIAACAAAAAAAAAAAAAgwDQAAAAFAAAAAAAAAA==",
+              "ViewState": "AgIAABoAAAAAAAAAAAAgwCoAAAAFAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-01-14T08:17:14.832Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 5,
               "Title": "IDashboardService.cs",
               "DocumentMoniker": "C:\\.BUT\\sae_2a_rentpark\\Blazor\\BlazorAdminRentPark\\Services\\IDashboardService.cs",
               "RelativeDocumentMoniker": "Services\\IDashboardService.cs",
@@ -142,9 +146,22 @@
               "RelativeDocumentMoniker": "Components\\Pages\\Home.razor",
               "ToolTip": "C:\\.BUT\\sae_2a_rentpark\\Blazor\\BlazorAdminRentPark\\Components\\Pages\\Home.razor",
               "RelativeToolTip": "Components\\Pages\\Home.razor",
-              "ViewState": "AgIAAF0AAAAAAAAAAAAkwIEAAAASAAAAAAAAAA==",
+              "ViewState": "AgIAAEIAAAAAAAAAAAAkwGQAAAASAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
               "WhenOpened": "2026-01-14T08:24:37.181Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "PlanningItemModel.cs",
+              "DocumentMoniker": "C:\\.BUT\\sae_2a_rentpark\\Blazor\\BlazorAdminRentPark\\Models\\PlanningItemModel.cs",
+              "RelativeDocumentMoniker": "Models\\PlanningItemModel.cs",
+              "ToolTip": "C:\\.BUT\\sae_2a_rentpark\\Blazor\\BlazorAdminRentPark\\Models\\PlanningItemModel.cs",
+              "RelativeToolTip": "Models\\PlanningItemModel.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAuwAcAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-14T09:36:29.069Z",
               "EditorCaption": ""
             }
           ]
