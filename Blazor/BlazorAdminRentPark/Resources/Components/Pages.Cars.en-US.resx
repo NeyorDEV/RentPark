@@ -120,8 +120,17 @@
   <data name="Add" xml:space="preserve">
     <value>ADD A VEHICULE</value>
   </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="Confirmation" xml:space="preserve">
+    <value>Confirmation</value>
+  </data>
   <data name="Delete" xml:space="preserve">
     <value>DELETE</value>
+  </data>
+  <data name="DeleteConfirmation" xml:space="preserve">
+    <value>Do you really want to delete this car ?</value>
   </data>
   <data name="Edit" xml:space="preserve">
     <value>EDIT</value>

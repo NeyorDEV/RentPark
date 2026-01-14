@@ -118,33 +118,159 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="Add" xml:space="preserve">
-    <value>Add</value>
+    <value>Ajouter un véhicule</value>
   </data>
-  <data name="AlertAdd" xml:space="preserve">
-    <value>ACTION : A new user have been added with the form.</value>
+  <data name="Ajouter" xml:space="preserve">
+    <value>Ajouter</value>
   </data>
-  <data name="Confirmation" xml:space="preserve">
-    <value>Confirmation</value>
+  <data name="Annee" xml:space="preserve">
+    <value>Année</value>
   </data>
-  <data name="Delete" xml:space="preserve">
-    <value>Delete</value>
+  <data name="AnneeObligatoire" xml:space="preserve">
+    <value>L'année est obligatoire</value>
   </data>
-  <data name="Edit" xml:space="preserve">
-    <value>EDIT</value>
+  <data name="Automatique" xml:space="preserve">
+    <value>Automatique</value>
   </data>
-  <data name="PageSizeLabel" xml:space="preserve">
-    <value>Show per page :</value>
+  <data name="BoiteVitesse" xml:space="preserve">
+    <value>Boite de vitesse</value>
   </data>
-  <data name="Search" xml:space="preserve">
-    <value>Search...</value>
+  <data name="BoiteVitesseObligatoire" xml:space="preserve">
+    <value>Le type de boite est obligatoire</value>
   </data>
-  <data name="Title" xml:space="preserve">
-    <value>Account</value>
+  <data name="Categorie" xml:space="preserve">
+    <value>Catégorie</value>
   </data>
-  <data name="ConfirmDelete" xml:space="preserve">
-    <value>Do you really want to delete this user ?</value>
+  <data name="CategorieObligatoire" xml:space="preserve">
+    <value>La catégorie est obligatoire</value>
   </data>
-  <data name="Cancel" xml:space="preserve">
-    <value>Cancel</value>
+  <data name="CheminImage" xml:space="preserve">
+    <value>Chemin de l'image</value>
+  </data>
+  <data name="Couleur" xml:space="preserve">
+    <value>Couleur</value>
+  </data>
+  <data name="CouleurObligatoire" xml:space="preserve">
+    <value>La couleur est obligatoire</value>
+  </data>
+  <data name="DateAchat" xml:space="preserve">
+    <value>Date d'achat</value>
+  </data>
+  <data name="DateAchatObligatoire" xml:space="preserve">
+    <value>La date d'achat est obligatoire</value>
+  </data>
+  <data name="DernierControle" xml:space="preserve">
+    <value>Dernier contrôle technique</value>
+  </data>
+  <data name="DernierControleObligatoire" xml:space="preserve">
+    <value>La date du dernier contrôle est obligatoire</value>
+  </data>
+  <data name="Diesel" xml:space="preserve">
+    <value>Diesel</value>
+  </data>
+  <data name="Electrique" xml:space="preserve">
+    <value>Electrique</value>
+  </data>
+  <data name="Energie" xml:space="preserve">
+    <value>Énergie</value>
+  </data>
+  <data name="EnergieObligatoire" xml:space="preserve">
+    <value>Le type d'énergie est obligatoire</value>
+  </data>
+  <data name="Essence" xml:space="preserve">
+    <value>Essence</value>
+  </data>
+  <data name="Etat" xml:space="preserve">
+    <value>État</value>
+  </data>
+  <data name="EtatObligatoire" xml:space="preserve">
+    <value>L'état est obligatoire</value>
+  </data>
+  <data name="ExpirationControle" xml:space="preserve">
+    <value>Expiration contrôle technique</value>
+  </data>
+  <data name="ExpirationControleObligatoire" xml:space="preserve">
+    <value>La date d'expiration est obligatoire</value>
+  </data>
+  <data name="Hybride" xml:space="preserve">
+    <value>Hybride</value>
+  </data>
+  <data name="IdAssureur" xml:space="preserve">
+    <value>ID Assureur</value>
+  </data>
+  <data name="IdAssureurObligatoire" xml:space="preserve">
+    <value>L'ID assureur est obligatoire</value>
+  </data>
+  <data name="IdFournisseur" xml:space="preserve">
+    <value>ID Fournisseur</value>
+  </data>
+  <data name="IdFournisseurObligatoire" xml:space="preserve">
+    <value>L'ID fournisseur est obligatoire</value>
+  </data>
+  <data name="Integrale" xml:space="preserve">
+    <value>Intégrale</value>
+  </data>
+  <data name="Libre" xml:space="preserve">
+    <value>Libre</value>
+  </data>
+  <data name="Louee" xml:space="preserve">
+    <value>Louée</value>
+  </data>
+  <data name="Manuelle" xml:space="preserve">
+    <value>Manuelle</value>
+  </data>
+  <data name="Marque" xml:space="preserve">
+    <value>Marque</value>
+  </data>
+  <data name="MarqueObligatoire" xml:space="preserve">
+    <value>La marque est obligatoire</value>
+  </data>
+  <data name="NbPlace" xml:space="preserve">
+    <value>Nombre de places</value>
+  </data>
+  <data name="NbPlaceObligatoire" xml:space="preserve">
+    <value>Le nombre de places est obligatoire</value>
+  </data>
+  <data name="Nom" xml:space="preserve">
+    <value>Nom</value>
+  </data>
+  <data name="NomObligatoire" xml:space="preserve">
+    <value>Le nom est obligatoire</value>
+  </data>
+  <data name="numSerie" xml:space="preserve">
+    <value>Numéro de série</value>
+  </data>
+  <data name="numSerieObligatoire" xml:space="preserve">
+    <value>Le numéro de série est obligatoire</value>
+  </data>
+  <data name="Prix" xml:space="preserve">
+    <value>Prix</value>
+  </data>
+  <data name="PrixObligatoire" xml:space="preserve">
+    <value>Le prix est obligatoire</value>
+  </data>
+  <data name="Propulsion" xml:space="preserve">
+    <value>Propulsion</value>
+  </data>
+  <data name="Puissance" xml:space="preserve">
+    <value>Puissance</value>
+  </data>
+  <data name="PuissanceObligatoire" xml:space="preserve">
+    <value>La puissance est obligatoire</value>
+  </data>
+  <data name="Reparation" xml:space="preserve">
+    <value>Réparation</value>
+  </data>
+  <data name="Traction" xml:space="preserve">
+    <value>Traction</value>
+  </data>
+  <data name="Transmission" xml:space="preserve">
+    <value>Transmission</value>
+  </data>
+  <data name="TransmissionObligatoire" xml:space="preserve">
+    <value>La transmission est obligatoire</value>
+  </data>
+  <data name="Vendue" xml:space="preserve">
+    <value>Vendue</value>
   </data>
 </root>

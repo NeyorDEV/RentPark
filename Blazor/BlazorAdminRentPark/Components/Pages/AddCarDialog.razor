@@ -4,154 +4,154 @@
 
 <MudDialog>
     <TitleContent>
-        <MudText Typo="Typo.h5" Align="Align.Center" Style="font-weight: bold;">Ajouter un Véhicule</MudText>
+        <MudText Typo="Typo.h5" Align="Align.Center" Style="font-weight: bold;">@Localizer["Add"]</MudText>
     </TitleContent>
     <DialogContent>
         <MudForm @ref="_form" @bind-IsValid="_isValid">
             <MudStack Spacing="4" Class="pa-4">
                 @* Informations de base *@
                 <MudTextField @bind-Value="_vehiculeModel.NumSerie" 
-                              Label="Numéro de série"
+                              Label="@Localizer["numSerie"]"
                               Variant="Variant.Outlined"
                               Required="true"
-                              RequiredError="Le numéro de série est obligatoire" />
+                              RequiredError="@Localizer["numSerieObligatoire"]" />
 
                 <MudTextField @bind-Value="_vehiculeModel.Nom"
-                              Label="Nom"
+                              Label="@Localizer["Nom"]"
                               Variant="Variant.Outlined"
                               Required="true"
-                              RequiredError="Le nom est obligatoire" />
+                              RequiredError="@Localizer["NomObligatoire"]" />
 
                 <MudTextField @bind-Value="_vehiculeModel.Marque"
-                              Label="Marque"
+                              Label="@Localizer["Marque"]"
                               Variant="Variant.Outlined"
                               Required="true"
-                              RequiredError="La marque est obligatoire" />
+                              RequiredError="@Localizer["MarqueObligatoire"]" />
 
                 <MudTextField @bind-Value="_vehiculeModel.Annee"
-                              Label="Année"
+                              Label="@Localizer["Annee"]"
                               Variant="Variant.Outlined"
                               Required="true"
-                              RequiredError="L'année est obligatoire" />
+                              RequiredError="@Localizer["AnneeObligatoire"]" />
 
                 <MudTextField @bind-Value="_vehiculeModel.Couleur"
-                              Label="Couleur"
+                              Label="@Localizer["Couleur"]"
                               Variant="Variant.Outlined"
                               Required="true"
-                              RequiredError="La couleur est obligatoire" />
+                              RequiredError="@Localizer["CouleurObligatoire"]" />
 
                 @* Catégorie et caractéristiques *@
                 <MudTextField @bind-Value="_vehiculeModel.Categorie"
-                              Label="Catégorie"
+                              Label="@Localizer["Categorie"]"
                               Variant="Variant.Outlined"
                               Required="true"
-                              RequiredError="La catégorie est obligatoire" />
+                              RequiredError="@Localizer["CategorieObligatoire"]" />
 
                 <MudNumericField @bind-Value="_vehiculeModel.NbPlaces"
-                                 Label="Nombre de places"
+                                 Label="@Localizer["NbPlace"]"
                                  Variant="Variant.Outlined"
                                  Min="1"
                                  Required="true"
-                                 RequiredError="Le nombre de places est obligatoire" />
+                                 RequiredError="@Localizer["NbPlaceObligatoire"]" />
 
                 <MudSelect @bind-Value="_vehiculeModel.Energie"
-                           Label="Énergie"
+                           Label="@Localizer["Energie"]"
                            Variant="Variant.Outlined"
                            AnchorOrigin="Origin.BottomCenter"
                            Required="true"
-                           RequiredError="Le type d'énergie est obligatoire">
-                    <MudSelectItem Value="@("Hybride")">Hybride</MudSelectItem>
-                    <MudSelectItem Value="@("Électrique")">Électrique</MudSelectItem>
-                    <MudSelectItem Value="@("Essence")">Essence</MudSelectItem>
-                    <MudSelectItem Value="@("Diesel")">Diesel</MudSelectItem>
+                           RequiredError="@Localizer["EnergieObligatoire"]">
+                    <MudSelectItem Value="@("Hybride")">@Localizer["Hybride"]</MudSelectItem>
+                    <MudSelectItem Value="@("Électrique")">@Localizer["Electrique"]</MudSelectItem>
+                    <MudSelectItem Value="@("Essence")">@Localizer["Essence"]</MudSelectItem>
+                    <MudSelectItem Value="@("Diesel")">@Localizer["Diesel"]</MudSelectItem>
                 </MudSelect>
 
                 <MudSelect @bind-Value="_vehiculeModel.Transmission"
-                           Label="Transmission"
+                           Label="@Localizer["Transmission"]"
                            Variant="Variant.Outlined"
                            AnchorOrigin="Origin.BottomCenter"
                            Required="true"
-                           RequiredError="La transmission est obligatoire">
-                    <MudSelectItem Value="@("Propulsion")">Propulsion</MudSelectItem>
-                    <MudSelectItem Value="@("Traction")">Traction</MudSelectItem>
-                    <MudSelectItem Value="@("Intégrale")">Intégrale</MudSelectItem>
+                           RequiredError="@Localizer["TransmissionObligatoire"]">
+                    <MudSelectItem Value="@("Propulsion")">@Localizer["Propulsion"]</MudSelectItem>
+                    <MudSelectItem Value="@("Traction")">@Localizer["Traction"]</MudSelectItem>
+                    <MudSelectItem Value="@("Intégrale")">@Localizer["Integrale"]</MudSelectItem>
                 </MudSelect>
 
                 <MudSelect @bind-Value="_vehiculeModel.Boite"
-                           Label="Boite de vitesse"
+                           Label="@Localizer["BoiteVitesse"]"
                            Variant="Variant.Outlined"
                            AnchorOrigin="Origin.BottomCenter"
                            Required="true"
-                           RequiredError="Le type de boite est obligatoire">
-                    <MudSelectItem Value="@("Manuelle")">Manuelle</MudSelectItem>
-                    <MudSelectItem Value="@("Automatique")">Automatique</MudSelectItem>
+                           RequiredError="@Localizer["BoiteVitesseObligatoire"]">
+                    <MudSelectItem Value="@("Manuelle")">@Localizer["Manuelle"]</MudSelectItem>
+                    <MudSelectItem Value="@("Automatique")">@Localizer["Automatique"]</MudSelectItem>
                 </MudSelect>
 
                 <MudTextField @bind-Value="_vehiculeModel.Puissance"
-                              Label="Puissance"
+                              Label="@Localizer["Puissance"]"
                               Variant="Variant.Outlined"
                               Required="true"
-                              RequiredError="La puissance est obligatoire" />
+                              RequiredError="@Localizer["PuissanceObligatoire"]" />
 
                 @* État et Prix *@
                 <MudSelect @bind-Value="_vehiculeModel.Etat"
-                           Label="État"
+                           Label="@Localizer["Etat"]"
                            Variant="Variant.Outlined"
                            AnchorOrigin="Origin.BottomCenter"
                            Required="true"
-                           RequiredError="L'état est obligatoire">
-                    <MudSelectItem Value="@("Libre")">Libre</MudSelectItem>
-                    <MudSelectItem Value="@("Louée")">Louée</MudSelectItem>
-                    <MudSelectItem Value="@("Vendue")">Vendue</MudSelectItem>
-                    <MudSelectItem Value="@("Réparation")">Réparation</MudSelectItem>
+                           RequiredError="@Localizer["EtatObligatoire"]">
+                    <MudSelectItem Value="@("Libre")">@Localizer["Libre"]</MudSelectItem>
+                    <MudSelectItem Value="@("Louée")">@Localizer["Louee"]</MudSelectItem>
+                    <MudSelectItem Value="@("Vendue")">@Localizer["Vendue"]</MudSelectItem>
+                    <MudSelectItem Value="@("Réparation")">@Localizer["Reparation"]</MudSelectItem>
                 </MudSelect>
 
                 <MudNumericField @bind-Value="_vehiculeModel.Prix"
-                                 Label="Prix"
+                                 Label="@Localizer["Prix"]"
                                  Variant="Variant.Outlined"
                                  Adornment="Adornment.Start"
                                  AdornmentIcon="@Icons.Material.Filled.AttachMoney"
                                  Min="0"
                                  Required="true"
-                                 RequiredError="Le prix est obligatoire" />
+                                 RequiredError="@Localizer["PrixObligatoire"]" />
 
                 @* IDs *@
                 <MudNumericField @bind-Value="_vehiculeModel.IdAssureur"
-                                 Label="ID Assureur"
+                                 Label="@Localizer["IdAssureur"]"
                                  Variant="Variant.Outlined"
                                  Min="0"
                                  Required="true"
-                                 RequiredError="L'ID assureur est obligatoire" />
+                                 RequiredError="@Localizer["IdAssureurObligatoire"]" />
 
                 <MudNumericField @bind-Value="_vehiculeModel.IdFournisseur"
-                                 Label="ID Fournisseur"
+                                 Label="@Localizer["IdFournisseur"]"
                                  Variant="Variant.Outlined"
                                  Min="0"
                                  Required="true"
-                                 RequiredError="L'ID fournisseur est obligatoire" />
+                                 RequiredError="@Localizer["IdFournisseurObligatoire"]" />
 
                 <MudTextField @bind-Value="_vehiculeModel.ImagePath"
-                              Label="Chemin de l'image"
+                              Label="@Localizer["CheminImage"]"
                               Variant="Variant.Outlined" />
 
                 @* Dates *@
-                <MudDatePicker Label="Date d'achat"
+                <MudDatePicker Label="@Localizer["DateAchat"]"
                                @bind-Value="_vehiculeModel.DateAchat"
                                Variant="Variant.Outlined"
                                Required="true"
-                               RequiredError="La date d'achat est obligatoire" />
+                               RequiredError="@Localizer["DateAchatObligatoire"]" />
 
-                <MudDatePicker Label="Dernier contrôle technique"
+                <MudDatePicker Label="@Localizer["DernierControle"]"
                                @bind-Value="_vehiculeModel.DateDernierControleTech"
                                Variant="Variant.Outlined"
                                Required="true"
-                               RequiredError="La date du dernier contrôle est obligatoire" />
+                               RequiredError="@Localizer["DernierControleObligatoire"]" />
 
-                <MudDatePicker Label="Expiration contrôle technique"
+                <MudDatePicker Label="@Localizer["ExpirationControle"]"
                                @bind-Value="_vehiculeModel.DateExpirationControleTech"
                                Variant="Variant.Outlined"
                                Required="true"
-                               RequiredError="La date d'expiration est obligatoire" />
+                               RequiredError="@Localizer["ExpirationControleObligatoire"]" />
             </MudStack>
         </MudForm>
     </DialogContent>
@@ -162,7 +162,7 @@
                    FullWidth="true"
                    Style="max-width: 200px; margin: 0 auto 20px auto;"
                    Disabled="@(!_isValid)">
-            Ajouter
+            @Localizer["Ajouter"]
         </MudButton>
     </DialogActions>
 </MudDialog>

@@ -120,6 +120,12 @@
   <data name="Add" xml:space="preserve">
     <value>AJOUTER</value>
   </data>
+  <data name="AlertAdd" xml:space="preserve">
+    <value>ACTION : Un nouvel utilisateur a été ajouté via le formulaire.</value>
+  </data>
+  <data name="Confirmation" xml:space="preserve">
+    <value>Confirmation</value>
+  </data>
   <data name="Delete" xml:space="preserve">
     <value>SUPPRIMER</value>
   </data>
@@ -134,5 +140,11 @@
   </data>
   <data name="Title" xml:space="preserve">
     <value>Compte</value>
+  </data>
+  <data name="ConfirmDelete" xml:space="preserve">
+    <value>Voulez-vous vraiment supprimer cet utilisateur ?</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Annuler</value>
   </data>
 </root>

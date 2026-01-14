@@ -6,7 +6,7 @@
     <TitleContent>
         @* Titre dynamique *@
         <MudText Typo="Typo.h5" Align="Align.Center" Style="font-weight: bold;">
-            @(IsEditMode ? "Modifier un Utilisateur" : "Ajouter un Utilisateur")
+            @(IsEditMode ? @Localizer["Edit"] : @Localizer["Add"])
         </MudText>
     </TitleContent>
     <DialogContent>
@@ -15,30 +15,31 @@
 
                 @* Champ Username *@
                 <MudTextField @bind-Value="_userModel.Username"
-                              Label="Nom d'utilisateur"
+                              Label="@Localizer["Username"]"
                               Variant="Variant.Outlined"
                               Required="true"
-                              RequiredError="Le nom d'utilisateur est obligatoire" />
+                              RequiredError="@Localizer["UsernameObligatoire"]" />
 
                 @* Champ Password : Required est false si on est en mode édition *@
                 <MudTextField @bind-Value="_userModel.Password"
-                              Label="Mot de passe"
+                              Label="@Localizer["pass"]"
                               InputType="InputType.Password"
                               Variant="Variant.Outlined"
                               Required="@(!IsEditMode)"
-                              RequiredError="Le mot de passe est obligatoire"
-                              HelperText="@(IsEditMode ? "Laisser vide pour conserver le mot de passe actuel" : null)" />
+                              RequiredError="@Localizer["passObligatoire"]"
+                              HelperText="@(IsEditMode ? @Localizer["passInfo"] : null)" />
+
 
                 @* Champ Rôle *@
                 <MudSelect @bind-Value="_userModel.Role"
-                           Label="Rôle"
+                           Label="@Localizer["Role"]"
                            Variant="Variant.Outlined"
                            AnchorOrigin="Origin.BottomCenter"
                            Required="true"
-                           RequiredError="Le rôle est obligatoire">
-                    <MudSelectItem Value="@("admin")">Admin</MudSelectItem>
-                    <MudSelectItem Value="@("employe")">Employé</MudSelectItem>
-                    <MudSelectItem Value="@("client")">Client</MudSelectItem>
+                           RequiredError="@Localizer["RoleObligatoire"]">
+                    <MudSelectItem Value="@("admin")">@Localizer["Admin"]</MudSelectItem>
+                    <MudSelectItem Value="@("employe")">@Localizer["Employe"]</MudSelectItem>
+                    <MudSelectItem Value="@("client")">@Localizer["Client"]</MudSelectItem>
                 </MudSelect>
             </MudStack>
         </MudForm>
@@ -50,7 +51,9 @@
                    FullWidth="true"
                    Style="max-width: 200px; margin: 0 auto 20px auto;"
                    Disabled="@(!_isValid)">
-            @(IsEditMode ? "Modifier" : "Ajouter")
+
+            @(IsEditMode ? @Localizer["Modifier"] : @Localizer["Ajouter"])
+
         </MudButton>
     </DialogActions>
 </MudDialog>

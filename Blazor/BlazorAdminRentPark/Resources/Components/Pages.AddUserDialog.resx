@@ -118,33 +118,45 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="Add" xml:space="preserve">
-    <value>Add</value>
+    <value>Ajouter un Utilisateur</value>
   </data>
-  <data name="AlertAdd" xml:space="preserve">
-    <value>ACTION : A new user have been added with the form.</value>
+  <data name="Admin" xml:space="preserve">
+    <value>Admin</value>
   </data>
-  <data name="Confirmation" xml:space="preserve">
-    <value>Confirmation</value>
+  <data name="Ajouter" xml:space="preserve">
+    <value>Ajouter</value>
   </data>
-  <data name="Delete" xml:space="preserve">
-    <value>Delete</value>
+  <data name="Client" xml:space="preserve">
+    <value>Client</value>
   </data>
   <data name="Edit" xml:space="preserve">
-    <value>EDIT</value>
+    <value>Modifier un utilisateur</value>
   </data>
-  <data name="PageSizeLabel" xml:space="preserve">
-    <value>Show per page :</value>
+  <data name="Employe" xml:space="preserve">
+    <value>Employé</value>
   </data>
-  <data name="Search" xml:space="preserve">
-    <value>Search...</value>
+  <data name="Modifier" xml:space="preserve">
+    <value>Modifier</value>
   </data>
-  <data name="Title" xml:space="preserve">
-    <value>Account</value>
+  <data name="pass" xml:space="preserve">
+    <value>Mot de passe</value>
   </data>
-  <data name="ConfirmDelete" xml:space="preserve">
-    <value>Do you really want to delete this user ?</value>
+  <data name="passInfo" xml:space="preserve">
+    <value>Laisser vide pour conserver le mot de passe actuel</value>
   </data>
-  <data name="Cancel" xml:space="preserve">
-    <value>Cancel</value>
+  <data name="passObligatoire" xml:space="preserve">
+    <value>Le mot de passe est obligatoire</value>
+  </data>
+  <data name="Role" xml:space="preserve">
+    <value>Rôle</value>
+  </data>
+  <data name="RoleObligatoire" xml:space="preserve">
+    <value>Le rôle est obligatoire</value>
+  </data>
+  <data name="Username" xml:space="preserve">
+    <value>Nom d'utilisateur</value>
+  </data>
+  <data name="UsernameObligatoire" xml:space="preserve">
+    <value>Le nom d'utilisateur est obligatoire</value>
   </data>
 </root>

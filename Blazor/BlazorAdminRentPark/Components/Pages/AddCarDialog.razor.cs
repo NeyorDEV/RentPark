@@ -1,13 +1,17 @@
+using BlazorAdminRentPark.Models; // Assurez-vous d'avoir ce using pour VehiculeModel
 using BlazorAdminRentPark.Services;
 using BlazorAdminRentPark.UiModels;
-using BlazorAdminRentPark.Models; // Assurez-vous d'avoir ce using pour VehiculeModel
 using Microsoft.AspNetCore.Components;
+using Microsoft.Extensions.Localization;
 using MudBlazor;
 
 namespace BlazorAdminRentPark.Components.Pages;
 
 public partial class AddCarDialog
 {
+    [Inject]
+    public IStringLocalizer<AddCarDialog> Localizer { get; set; } = default!;
+
     [Inject]
     private IVehiculeService VehiculeService { get; set; } = default!;
 
