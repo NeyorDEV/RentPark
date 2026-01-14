@@ -1,29 +1,38 @@
 ﻿@using Microsoft.Extensions.Localization
 @using MudBlazor
 
-<MudNavMenu Bordered="true" Class="mud-width-full py-4">
+@using Microsoft.Extensions.Localization
+@using MudBlazor
 
-    <MudNavLink Href="" Match="NavLinkMatch.All"
-                Icon="@Icons.Material.Filled.Home"
-                IconColor="Color.Primary"
-                Class="nav-item-custom">
-        <MudText Typo="Typo.button" Style="font-weight: 600;">@Localizer["Home"]</MudText>
-    </MudNavLink>
+<MudNavMenu Bordered="true" Class="mud-width-full py-4 d-flex flex-column h-100">
+    @* Conteneur pour les liens du haut *@
+    <div class="flex-grow-1">
+        <MudNavLink Href="" Match="NavLinkMatch.All"
+                    Icon="@Icons.Material.Filled.Home"
+                    IconColor="Color.Primary"
+                    Class="nav-item-custom">
+            <MudText Typo="Typo.button" Style="font-weight: 600;">@Localizer["Home"]</MudText>
+        </MudNavLink>
 
-    <MudNavLink Href="account"
-                Icon="@Icons.Material.Filled.Person"
-                IconColor="Color.Info"
-                Class="nav-item-custom">
-        <MudText Typo="Typo.button" Style="font-weight: 600;">@Localizer["Account"]</MudText>
-    </MudNavLink>
+        <MudNavLink Href="account"
+                    Icon="@Icons.Material.Filled.Person"
+                    IconColor="Color.Info"
+                    Class="nav-item-custom">
+            <MudText Typo="Typo.button" Style="font-weight: 600;">@Localizer["Account"]</MudText>
+        </MudNavLink>
 
-    <MudNavLink Href="cars"
-                Icon="@Icons.Material.Filled.CarRental"
-                IconColor="Color.Info"
-                Class="nav-item-custom">
-        <MudText Typo="Typo.button" Style="font-weight: 600;">@Localizer["Flotte"]</MudText>
-    </MudNavLink>
+        <MudNavLink Href="cars"
+                    Icon="@Icons.Material.Filled.CarRental"
+                    IconColor="Color.Info"
+                    Class="nav-item-custom">
+            <MudText Typo="Typo.button" Style="font-weight: 600;">@Localizer["Flotte"]</MudText>
+        </MudNavLink>
+    </div>
 
+    @* Le sélecteur sera poussé vers le bas grâce à mt-auto ou flex-grow sur le div précédent *@
+    <div class="mt-auto pa-4">
+        <CultureSelector />
+    </div>
 </MudNavMenu>
 
 @code {

@@ -129,7 +129,7 @@
   <data name="Delete" xml:space="preserve">
     <value>DELETE</value>
   </data>
-  <data name="DeleteConfirm" xml:space="preserve">
+  <data name="DeleteConfirmation" xml:space="preserve">
     <value>Do you really want to delete this car ?</value>
   </data>
   <data name="Edit" xml:space="preserve">
