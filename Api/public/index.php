@@ -427,6 +427,78 @@ $app->post('/add/users', function (Request $request, Response $response) use ($c
     }
 });
 
+// -----------------------------------------------------------------------
+// PUT /users/{id} - Modification d'un utilisateur
+// -----------------------------------------------------------------------
+$app->put('/users/{id}', function (Request $request, Response $response, $args) use ($conn) {
+
+    $userId = (int) $args['id'];
+    $data = $request->getParsedBody();
+
+    if (empty($data)) {
+        $response->getBody()->write(json_encode([
+            'error' => 'Aucune donnée envoyée'
+        ]));
+        return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
+    }
+
+    $fields = [];
+    $params = [':id' => [$userId, \PDO::PARAM_INT]];
+
+    // --- Username ---
+    if (!empty($data['username'])) {
+        $fields[] = 'username = :username';
+        $params[':username'] = [$data['username'], \PDO::PARAM_STR];
+    }
+
+    // --- Role ---
+    if (!empty($data['role'])) {
+        $fields[] = 'role = :role';
+        $params[':role'] = [$data['role'], \PDO::PARAM_STR];
+    }
+
+    // --- Mot de passe ---
+    if (!empty($data['password'])) {
+        $hashedPassword = password_hash($data['password'], PASSWORD_DEFAULT);
+        $fields[] = 'password = :password';
+        $params[':password'] = [$hashedPassword, \PDO::PARAM_STR];
+    }
+
+    if (empty($fields)) {
+        $response->getBody()->write(json_encode([
+            'error' => 'Aucun champ valide à mettre à jour'
+        ]));
+        return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
+    }
+
+    $sql = "UPDATE users SET " . implode(', ', $fields) . " WHERE id = :id";
+
+    try {
+        $conn->executeQuery($sql, $params);
+
+        $response->getBody()->write(json_encode([
+            'message' => 'Utilisateur mis à jour avec succès'
+        ]));
+
+        return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
+
+    } catch (\PDOException $e) {
+
+        if ($e->getCode() === '23000') {
+            $response->getBody()->write(json_encode([
+                'error' => 'Username déjà existant'
+            ]));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(409);
+        }
+
+        $response->getBody()->write(json_encode([
+            'error' => 'Erreur lors de la mise à jour : ' . $e->getMessage()
+        ]));
+
+        return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
+    }
+});
+
 
 // -------------------------------------------------------------------------------------------------
 
