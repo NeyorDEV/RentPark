@@ -26,7 +26,6 @@ builder.Host.UseSerilog((context, configuration) =>
 
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
-
 builder.Services.AddMudServices();
 
 builder.Services.AddHttpClient();
@@ -37,21 +36,34 @@ builder.Services.AddScoped<IDashboardService, DashboardService>();
 
 builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddBlazoredSessionStorage();
+
 builder.Services.AddAuthorizationCore();
-builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>();
+
+builder.Services.AddCascadingAuthenticationState();
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
+        options.Cookie.Name = "RentParkAuth";
         options.LoginPath = "/login";
-        options.ExpireTimeSpan = TimeSpan.FromMinutes(20);
+        options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
+        options.SlidingExpiration = true;
     });
+
 builder.Services.AddControllers();
 
 builder.Services.AddLocalization(opts => { opts.ResourcesPath = "Resources"; });
-
 builder.Services.Configure<RequestLocalizationOptions>(options =>
 {
+    var supportedCultures = new List<CultureInfo> 
+    { 
+        new CultureInfo("fr-FR"), 
+        new CultureInfo("en-US") 
+    };
+    
+    options.DefaultRequestCulture = new RequestCulture("fr-FR");
+    options.SupportedCultures = supportedCultures;
+    options.SupportedUICultures = supportedCultures;
     options.DefaultRequestCulture = new RequestCulture(new CultureInfo("fr-FR"));
     options.SupportedCultures = new List<CultureInfo> { new CultureInfo("fr-FR"), new CultureInfo("en-US") };
     options.SupportedUICultures = new List<CultureInfo> { new CultureInfo("fr-FR"), new CultureInfo("en-US") };
@@ -118,10 +130,16 @@ if (options?.Value != null)
 
 app.UseAntiforgery();
 
-app.MapStaticAssets();
+var locOptions = app.Services.GetService<IOptions<RequestLocalizationOptions>>();
+if (locOptions?.Value != null)
+{
+    app.UseRequestLocalization(locOptions.Value);
+}
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.MapControllers();
 
 app.MapControllers();
 
