@@ -34,5 +34,25 @@ namespace BlazorAdminRentPark.Services
 
             await _http.PostAsJsonAsync("http://localhost:8880/users", item);       
         }
+        
+        public async Task<LoginResponse?> LoginAsync(string username, string password)
+        {
+            try
+            {
+                var response = await _http.PostAsJsonAsync("http://localhost:8880/login", new { username, password });
+
+                if (response.IsSuccessStatusCode)
+                {
+                    return await response.Content.ReadFromJsonAsync<LoginResponse>();
+                }
+                
+                return null;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Erreur Login : {ex.Message}");
+                return null;
+            }
+        }
     }
 }

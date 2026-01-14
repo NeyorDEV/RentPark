@@ -1,0 +1,116 @@
+﻿@page "/login"
+@using BlazorAdminRentPark.Services
+@using Blazored.LocalStorage
+@using Microsoft.AspNetCore.Components.Authorization
+@inject AuthenticationStateProvider AuthStateProvider
+@inject ILocalStorageService LocalStorage
+@inject NavigationManager NavManager
+@inject ISnackbar Snackbar
+@inject IUserService UserService
+
+<MudContainer MaxWidth="MaxWidth.Small" Class="d-flex align-center justify-center mud-width-full" Style="height: 100vh;">
+    <MudPaper Elevation="25" Class="pa-8" Width="100%" MaxWidth="500px">
+        <MudForm @ref="form">
+            
+            <div class="d-flex justify-center mb-4">
+                <MudIcon Icon="@Icons.Material.Filled.Lock" Color="Color.Primary" Size="Size.Large" />
+            </div>
+
+            <MudText Typo="Typo.h4" Align="Align.Center" GutterBottom="true">Connexion</MudText>
+            <MudText Typo="Typo.body2" Align="Align.Center" Class="mb-4">Administration RentPark</MudText>
+
+            <MudTextField T="string" 
+                          @bind-Value="username" 
+                          Label="Identifiant" 
+                          Variant="Variant.Outlined" 
+                          Class="mb-3"
+                          Required="true"
+                          RequiredError="L'identifiant est obligatoire"/>
+
+            <MudTextField T="string" 
+                          @bind-Value="password" 
+                          Label="Mot de passe" 
+                          Variant="Variant.Outlined" 
+                          InputType="@PasswordInput" 
+                          Adornment="Adornment.End" 
+                          AdornmentIcon="@PasswordInputIcon" 
+                          OnAdornmentClick="TogglePasswordVisibility"
+                          Class="mb-6"
+                          Required="true"
+                          RequiredError="Le mot de passe est obligatoire"/>
+
+            <MudButton Variant="Variant.Filled" 
+                       Color="Color.Primary" 
+                       Size="Size.Large" 
+                       FullWidth="true" 
+                       OnClick="HandleLogin"
+                       Disabled="@_processing">
+                @if (_processing)
+                {
+                    <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true"/>
+                    <MudText Class="ms-2">Connexion...</MudText>
+                }
+                else
+                {
+                    <MudText>Se connecter</MudText>
+                }
+            </MudButton>
+
+        </MudForm>
+    </MudPaper>
+</MudContainer>
+
+@code {
+    private string username;
+    private string password;
+    private bool _processing = false;
+    
+    bool isShow;
+    InputType PasswordInput = InputType.Password;
+    string PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+    MudForm form;
+
+    void TogglePasswordVisibility()
+    {
+        @if (isShow)
+        {
+            isShow = false;
+            PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+            PasswordInput = InputType.Password;
+        }
+        else
+        {
+            isShow = true;
+            PasswordInputIcon = Icons.Material.Filled.Visibility;
+            PasswordInput = InputType.Text;
+        }
+    }
+
+    private async Task HandleLogin()
+    {
+        await form.Validate();
+        if (!form.IsValid) return;
+
+        _processing = true;
+        
+        var result = await UserService.LoginAsync(username, password);
+
+        if (result != null && result.Success)
+        {
+            await LocalStorage.SetItemAsync("authToken", result.Token);
+
+            ((CustomAuthStateProvider)AuthStateProvider).MarkUserAsAuthenticated(result.Token);
+
+            Snackbar.Add($"Bienvenue {result.Username} !", Severity.Success);
+
+            NavManager.NavigateTo("/");
+        }
+        else
+        {
+            string msg = result?.Message ?? "Identifiant ou mot de passe incorrect.";
+            Snackbar.Add(msg, Severity.Error);
+        }
+
+        _processing = false;
+    }
+}

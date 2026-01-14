@@ -1,5 +1,6 @@
 ﻿using BlazorAdminRentPark.Models;
 using BlazorAdminRentPark.Services;
+using System.Text.Json.Serialization;
 
 public class DashboardService : IDashboardService
 {
@@ -10,20 +11,20 @@ public class DashboardService : IDashboardService
 
     public async Task<int> GetTotalUsersAsync()
     {
-        // Utilisation d'un DTO pour extraire la valeur du JSON
         var response = await _http.GetFromJsonAsync<CountResponse>($"{BaseUrl}/total-users");
-        return response?.Count ?? 0;
+        return response?.total_users ?? 0;
     }
 
     public async Task<int> GetMonthlyRevenuesAsync()
     {
-        var response = await _http.GetFromJsonAsync<RevenueResponse>($"{BaseUrl}/revenus-mensuels");
-        return response?.Amount ?? 0;
+        var response = await _http.GetFromJsonAsync<RevenueResponse>($"{BaseUrl}/revenus-mensuel");
+        return response?.monthlyIncome ?? 0;
     }
 
-    public async Task<string> GetMostRentedCarImageAsync()
+    public async Task<CarDetails> GetMostRentedCarDetailsAsync()
     {
-        return await _http.GetStringAsync($"{BaseUrl}/voiture-plus-louee");
+        var response = await _http.GetFromJsonAsync<MostRentedCarResponse>($"{BaseUrl}/voiture-plus-louee");
+        return response?.Voiture;
     }
 
     public async Task<List<RappelItemModel>> GetRappelsAsync()
@@ -41,5 +42,25 @@ public class DashboardService : IDashboardService
 }
 
 // Modèles pour correspondre au format de votre API
-public class CountResponse { public int Count { get; set; } }
-public class RevenueResponse { public int Amount { get; set; } }
+public class CountResponse
+{
+    public int total_users { get; set; }
+}
+public class RevenueResponse 
+{ 
+    public int monthlyIncome { get; set; } 
+}
+
+public class MostRentedCarResponse
+{
+    [JsonPropertyName("voiture_plus_louee")]
+    public CarDetails Voiture { get; set; }
+}
+
+public class CarDetails
+{
+    public string Marque { get; set; }
+    public string Modele { get; set; }
+    public string ImagePath { get; set; }
+    public int nb_locations { get; set; }
+}

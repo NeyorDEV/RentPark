@@ -1,9 +1,14 @@
 ﻿@page "/"
 @using MudBlazor
 @using MAlign = MudBlazor.Align
+
 @using BlazorAdminRentPark.Models
 @using BlazorAdminRentPark.Services
 @inject IDashboardService DashboardService
+
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize]
+
 
 <MudContainer MaxWidth="MaxWidth.Large" Class="mt-8">
 
@@ -18,25 +23,37 @@
         <MudItem xs="12" md="4">
             <MudCard Elevation="3" Class="rounded-lg pa-4 d-flex flex-column align-center justify-center" Style="height: 100%;">
                 <MudText Typo="Typo.h6" Class="mb-4" Style="font-weight: bold;">Nombre d'utilisateurs</MudText>
-                <div style="position: relative;">
-                    @* Ici on affiche la valeur du modèle qui sera mise à jour *@
-                    <MudProgressCircular Color="Color.Warning" Value="@model.NombreUtilisateurs" Size="Size.Large" StrokeWidth="8" Style="height:120px; width:120px;" />
-                    <MudText Typo="Typo.h6" Style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-weight: bold;">
-                        @model.NombreUtilisateurs
+                <div style="position: relative; width: 140px; height: 140px;">
+                    @* Taille augmentée ici *@
+                    <MudProgressCircular Color="Color.Warning" Value="@model.total_users" Size="Size.Large" StrokeWidth="8" Style="height:140px; width:140px;" />
+                    <MudText Typo="Typo.body1" Style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-weight: bold; white-space: nowrap;">
+                        @model.total_users
                     </MudText>
                 </div>
             </MudCard>
         </MudItem>
 
-        @* Carte Voiture la plus louée (Image dynamique) *@
+        @* Carte Voiture la plus louée *@
         <MudItem xs="12" md="4">
             <MudCard Elevation="3" Class="rounded-lg pa-4 d-flex flex-column align-center justify-center" Style="height: 100%;">
-                <MudText Typo="Typo.h6" Class="mb-2" Style="font-weight: bold;">Voiture la plus louée</MudText>
-                @if (!string.IsNullOrEmpty(model.ImageVoiturePlusLouee))
+                <MudText Typo="Typo.h6" Class="mb-1" Style="font-weight: bold;">Voiture la plus louée</MudText>
+
+                @if (model.VoiturePlusLouee != null)
                 {
-                    <MudImage Src="@model.ImageVoiturePlusLouee" Alt="Top Car" Elevation="0" ObjectFit="ObjectFit.Contain" Height="80" Class="mb-2" />
+                    <MudText Typo="Typo.body1"><b>@model.VoiturePlusLouee.Marque</b></MudText>
+                    <MudText Typo="Typo.body2" Class="mb-2">@model.VoiturePlusLouee.Modele</MudText>
+
+                    @if (!string.IsNullOrEmpty(model.VoiturePlusLouee.ImagePath))
+                    {
+                        <MudImage Src="@model.VoiturePlusLouee.ImagePath" Alt="Top Car" Elevation="0" ObjectFit="ObjectFit.Contain" Height="80" Class="mb-2" />
+                    }
+
+                    <MudText Typo="Typo.caption">Louée @model.VoiturePlusLouee.nb_locations fois</MudText>
                 }
-                <MudProgressLinear Color="Color.Warning" Value="50" Class="my-2" />
+                else
+                {
+                    <MudProgressCircular Color="Color.Default" Indeterminate="true" Size="Size.Small" />
+                }
             </MudCard>
         </MudItem>
 
@@ -44,9 +61,10 @@
         <MudItem xs="12" md="4">
             <MudCard Elevation="3" Class="rounded-lg pa-4 d-flex flex-column align-center justify-center" Style="height: 100%;">
                 <MudText Typo="Typo.h6" Class="mb-4" Style="font-weight: bold;">Revenus mensuels</MudText>
-                <div style="position: relative;">
-                    <MudProgressCircular Color="Color.Warning" Value="15" Size="Size.Large" StrokeWidth="8" Style="height:120px; width:120px;" />
-                    <MudText Typo="Typo.h6" Style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-weight: bold;">
+                <div style="position: relative; width: 140px; height: 140px;">
+                    @* Taille augmentée ici *@
+                    <MudProgressCircular Color="Color.Warning" Value="15" Size="Size.Large" StrokeWidth="8" Style="height:140px; width:140px;" />
+                    <MudText Typo="Typo.body1" Style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-weight: bold; white-space: nowrap;">
                         @model.RevenusMensuels €
                     </MudText>
                 </div>
@@ -109,9 +127,9 @@
         // On lance les appels en parallèle de manière sécurisée
         var tasks = new List<Task>
         {
-            Task.Run(async () => { model.NombreUtilisateurs = await DashboardService.GetTotalUsersAsync(); await InvokeAsync(StateHasChanged); }),
+            Task.Run(async () => { model.total_users = await DashboardService.GetTotalUsersAsync(); await InvokeAsync(StateHasChanged); }),
             Task.Run(async () => { model.RevenusMensuels = await DashboardService.GetMonthlyRevenuesAsync(); await InvokeAsync(StateHasChanged); }),
-            Task.Run(async () => { model.ImageVoiturePlusLouee = await DashboardService.GetMostRentedCarImageAsync(); await InvokeAsync(StateHasChanged); }),
+            Task.Run(async () => { model.VoiturePlusLouee = await DashboardService.GetMostRentedCarDetailsAsync(); await InvokeAsync(StateHasChanged); }),
             Task.Run(async () => { model.Rappels = await DashboardService.GetRappelsAsync(); await InvokeAsync(StateHasChanged); }),
             Task.Run(async () => { model.Planning = await DashboardService.GetPlanningAsync(); await InvokeAsync(StateHasChanged); })
         };
