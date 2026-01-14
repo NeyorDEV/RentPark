@@ -46,6 +46,15 @@
                     <MudText Typo="Typo.body2">@car.Marque - @car.Categorie</MudText>
                     <MudText Typo="Typo.caption" Class="mb-4 d-block">Série: @car.NumSerie</MudText>
 
+                    
+                    <MudButton Variant="Variant.Filled"
+                               Color="Color.Info"
+                               FullWidth="true"
+                               Class="mb-2"
+                               OnClick="@(() => OpenEditCarDialog(car))">
+                        @Localizer["Edit"]
+                    </MudButton>
+                    
                     <MudButton Variant="Variant.Filled"
                                Color="Color.Error"
                                FullWidth="true"
@@ -53,13 +62,7 @@
                                OnClick="@(() => DeleteCar(car.NumSerie))">
                         @Localizer["Delete"]
                     </MudButton>
-
-                    <MudButton Variant="Variant.Filled"
-                               Style="background-color: #f44336; color: white;"
-                               FullWidth="true"
-                               OnClick="@(() => OpenEditCarDialog(car))">
-                        @Localizer["Edit"]
-                    </MudButton>
+                                        
                 </MudCard>
             </MudItem>
         }

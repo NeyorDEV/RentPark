@@ -34,7 +34,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 311,
-          "SelectedChildIndex": 4,
+          "SelectedChildIndex": 5,
           "Children": [
             {
               "$type": "Bookmark",
@@ -54,19 +54,6 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "AddUserDialog.razor",
-              "DocumentMoniker": "C:\\Users\\mylan\\Downloads\\2A\\sae_2a_rentpark\\Blazor\\BlazorAdminRentPark\\Components\\Pages\\AddUserDialog.razor",
-              "RelativeDocumentMoniker": "Components\\Pages\\AddUserDialog.razor",
-              "ToolTip": "C:\\Users\\mylan\\Downloads\\2A\\sae_2a_rentpark\\Blazor\\BlazorAdminRentPark\\Components\\Pages\\AddUserDialog.razor",
-              "RelativeToolTip": "Components\\Pages\\AddUserDialog.razor",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAAtAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-01-14T14:07:29.385Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
               "DocumentIndex": 1,
               "Title": "Pages.AddUserDialog.resx",
               "DocumentMoniker": "C:\\Users\\mylan\\Downloads\\2A\\sae_2a_rentpark\\Blazor\\BlazorAdminRentPark\\Resources\\Components\\Pages.AddUserDialog.resx",
@@ -74,7 +61,20 @@
               "ToolTip": "C:\\Users\\mylan\\Downloads\\2A\\sae_2a_rentpark\\Blazor\\BlazorAdminRentPark\\Resources\\Components\\Pages.AddUserDialog.resx",
               "RelativeToolTip": "Resources\\Components\\Pages.AddUserDialog.resx",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001005|",
-              "WhenOpened": "2026-01-14T14:06:34.47Z",
+              "WhenOpened": "2026-01-14T14:20:38.906Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "AddUserDialog.razor",
+              "DocumentMoniker": "C:\\Users\\mylan\\Downloads\\2A\\sae_2a_rentpark\\Blazor\\BlazorAdminRentPark\\Components\\Pages\\AddUserDialog.razor",
+              "RelativeDocumentMoniker": "Components\\Pages\\AddUserDialog.razor",
+              "ToolTip": "C:\\Users\\mylan\\Downloads\\2A\\sae_2a_rentpark\\Blazor\\BlazorAdminRentPark\\Components\\Pages\\AddUserDialog.razor",
+              "RelativeToolTip": "Components\\Pages\\AddUserDialog.razor",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAADkAAAAUAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-01-14T14:07:29.385Z",
               "EditorCaption": ""
             },
             {

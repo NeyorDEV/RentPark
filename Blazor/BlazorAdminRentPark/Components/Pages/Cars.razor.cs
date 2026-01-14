@@ -112,12 +112,26 @@ namespace BlazorAdminRentPark.Components.Pages
 
         protected async Task DeleteCar(string numSerie)
         {
-            await VehiculeService.Delete(numSerie);
-            // recharge la liste et ajuste la page si nécessaire
-            await LoadVehicules();
-            if (CurrentPage > PageCount)
-                CurrentPage = PageCount;
-            StateHasChanged();
+            // 1. Affichage de la boîte de dialogue de confirmation
+            bool? result = await DialogService.ShowMessageBox(
+                "Confirmation",
+                $"Voulez-vous vraiment supprimer le véhicule avec le numéro de série {numSerie} ?",
+                yesText: "Supprimer",
+                cancelText: "Annuler");
+
+            // 2. Si l'utilisateur confirme la suppression
+            if (result == true)
+            {
+                
+                await VehiculeService.Delete(numSerie);
+
+                await LoadVehicules();
+
+                if (CurrentPage > PageCount)
+                    CurrentPage = PageCount;
+
+                StateHasChanged();
+            }
         }
 
         protected async Task OpenEditCarDialog(VehiculeModel car)
