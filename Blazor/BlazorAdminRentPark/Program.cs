@@ -22,6 +22,10 @@ builder.Services.AddScoped<IClientService, ClientService>();
 builder.Services.AddScoped<IVehiculeService, VehiculeService>();
 builder.Services.AddScoped<IUserService, UserService>();
 
+
+builder.Services.AddScoped<IDashboardService, DashboardService>();
+
+builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddBlazoredSessionStorage();
 builder.Services.AddAuthorizationCore();
 builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>();

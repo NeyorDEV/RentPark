@@ -1,9 +1,15 @@
 ﻿@page "/"
 @using MudBlazor
 @using MAlign = MudBlazor.Align
+
+@using BlazorAdminRentPark.Models
+@using BlazorAdminRentPark.Services
+@inject IDashboardService DashboardService
+
 @using Microsoft.AspNetCore.Authorization
 @attribute [Authorize]
 @using System.Globalization
+
 
 <MudContainer MaxWidth="MaxWidth.Large" Class="mt-8">
 
@@ -14,15 +20,19 @@
         </MudText>
     </MudStack>
 
-    @* Section Statistiques (Graphiques Circulaires) *@
+    @* Section Statistiques *@
     <MudGrid Class="mb-8">
         @* Carte Utilisateurs *@
         <MudItem xs="12" md="4">
             <MudCard Elevation="3" Class="rounded-lg pa-4 d-flex flex-column align-center justify-center" Style="height: 100%;">
-                <MudText Typo="Typo.h6" Class="mb-4" Style="font-weight: bold;">@Localizer["UserNb"]</MudText>
-                <div style="position: relative;">
-                    <MudProgressCircular Color="Color.Warning" Value="75" Size="Size.Large" StrokeWidth="8" Style="height:120px; width:120px;" />
-                    <MudText Typo="Typo.h6" Style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-weight: bold;">75%</MudText>
+                <MudText Typo="Typo.h6" Class="mb-4" Style="font-weight: bold;">Nombre d'utilisateurs</MudText>
+                <div style="position: relative; width: 140px; height: 140px;">
+                    @* Taille augmentée ici *@
+                    <MudProgressCircular Color="Color.Warning" Value="@model.total_users" Size="Size.Large" StrokeWidth="8" Style="height:140px; width:140px;" />
+                    <MudText Typo="Typo.body1" Style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-weight: bold; white-space: nowrap;">
+                        @model.total_users
+                    </MudText>
+
                 </div>
             </MudCard>
         </MudItem>
@@ -30,54 +40,65 @@
         @* Carte Voiture la plus louée *@
         <MudItem xs="12" md="4">
             <MudCard Elevation="3" Class="rounded-lg pa-4 d-flex flex-column align-center justify-center" Style="height: 100%;">
-                <MudText Typo="Typo.h6" Class="mb-4" Style="font-weight: bold;">@Localizer["MostRented"]</MudText>
-                <div style="position: relative;">
-                    <MudProgressCircular Color="Color.Warning" Value="50" Size="Size.Large" StrokeWidth="8" Style="height:120px; width:120px;" />
-                    <MudText Typo="Typo.h6" Style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-weight: bold;">50%</MudText>
-                </div>
+                <MudText Typo="Typo.h6" Class="mb-1" Style="font-weight: bold;">Voiture la plus louée</MudText>
+
+                @if (model.VoiturePlusLouee != null)
+                {
+                    <MudText Typo="Typo.body1"><b>@model.VoiturePlusLouee.Marque</b></MudText>
+                    <MudText Typo="Typo.body2" Class="mb-2">@model.VoiturePlusLouee.Modele</MudText>
+
+                    @if (!string.IsNullOrEmpty(model.VoiturePlusLouee.ImagePath))
+                    {
+                        <MudImage Src="@model.VoiturePlusLouee.ImagePath" Alt="Top Car" Elevation="0" ObjectFit="ObjectFit.Contain" Height="80" Class="mb-2" />
+                    }
+
+                    <MudText Typo="Typo.caption">Louée @model.VoiturePlusLouee.nb_locations fois</MudText>
+                }
+                else
+                {
+                    <MudProgressCircular Color="Color.Default" Indeterminate="true" Size="Size.Small" />
+                }
             </MudCard>
         </MudItem>
 
         @* Carte Revenus mensuels *@
         <MudItem xs="12" md="4">
             <MudCard Elevation="3" Class="rounded-lg pa-4 d-flex flex-column align-center justify-center" Style="height: 100%;">
-                <MudText Typo="Typo.h6" Class="mb-4" Style="font-weight: bold;">@Localizer["Revenus"]</MudText>
-                <div style="position: relative;">
-                    <MudProgressCircular Color="Color.Warning" Value="15" Size="Size.Large" StrokeWidth="8" Style="height:120px; width:120px;" />
-                    <MudText Typo="Typo.h6" Style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-weight: bold;">15%</MudText>
+                <MudText Typo="Typo.h6" Class="mb-4" Style="font-weight: bold;">Revenus mensuels</MudText>
+                <div style="position: relative; width: 140px; height: 140px;">
+                    @* Taille augmentée ici *@
+                    <MudProgressCircular Color="Color.Warning" Value="15" Size="Size.Large" StrokeWidth="8" Style="height:140px; width:140px;" />
+                    <MudText Typo="Typo.body1" Style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-weight: bold; white-space: nowrap;">
+                        @model.RevenusMensuels €
+                    </MudText>
                 </div>
             </MudCard>
         </MudItem>
     </MudGrid>
 
-    @* Section Listes (Rappel et Planning) *@
+    @* Section Listes *@
     <MudGrid>
         @* Colonne Rappel *@
         <MudItem xs="12" md="6">
-            <MudCard Elevation="3" Class="rounded-lg">
-                <MudCardHeader>
-                    <CardHeaderContent>
-                        <MudText Typo="Typo.h6" Align="MAlign.Center" Style="font-weight: bold;">@Localizer["Rappel"]</MudText>
-                    </CardHeaderContent>
-                </MudCardHeader>
-                <MudCardContent Style="height: 300px; overflow-y: auto;">
-                    <MudStack Spacing="2">
-                        @* Liste des rappels factices *@
-                        <MudPaper Elevation="0" Class="pa-3 rounded" Style="background-color: #f2ebeb;">
-                            <MudText>Contrôle technique – BMW Série 4</MudText>
-                        </MudPaper>
-                        <MudPaper Elevation="0" Class="pa-3 rounded" Style="background-color: #f2ebeb;">
-                            <MudText>Vidange – Clio 3</MudText>
-                        </MudPaper>
-                        <MudPaper Elevation="0" Class="pa-3 rounded" Style="background-color: #f2ebeb;">
-                            <MudText>Assurance – Tesla Model 3</MudText>
-                        </MudPaper>
-                        <MudPaper Elevation="0" Class="pa-3 rounded" Style="background-color: #f2ebeb;">
-                            <MudText>Contrôle Pollution – Peugeot 208</MudText>
-                        </MudPaper>
-                        <MudPaper Elevation="0" Class="pa-3 rounded" Style="background-color: #f2ebeb;">
-                            <MudText>Révision – Audi A3</MudText>
-                        </MudPaper>
+            <MudCard Elevation="3" Class="rounded-lg pa-4" Style="background-color: white; color: black; min-height: 350px;">
+                <MudText Typo="Typo.h6" Class="mb-4 d-flex align-center justify-center" Style="font-weight: bold; color: black;">
+                    <MudIcon Icon="@Icons.Material.Filled.Notifications" Class="mr-2" /> Rappels
+                </MudText>
+
+                <MudCardContent Style="max-height: 400px; overflow-y: auto;" Class="pa-0">
+                    <MudStack Spacing="3">
+                        @foreach (var rappel in model.Rappels)
+                        {
+                            <MudPaper Elevation="0" Class="pa-4 rounded-lg d-flex align-center"
+                                      Style="background-color: #f5f5f5; border-left: 6px solid #ff9800;">
+                                <MudChip T="string" Variant="Variant.Filled" Color="Color.Default" Size="Size.Small"
+                                         Style="background-color: #e0e0e0; color: black; font-weight: bold;" Class="mr-4">
+                                    Alerte
+                                </MudChip>
+                                <MudText Style="color: #616161;" Class="mr-1">Contrôle technique – </MudText>
+                                <MudText Style="font-weight: bold; color: black;">@rappel.NomVehicule</MudText>
+                            </MudPaper>
+                        }
                     </MudStack>
                 </MudCardContent>
             </MudCard>
@@ -85,34 +106,56 @@
 
         @* Colonne Planning *@
         <MudItem xs="12" md="6">
-            <MudCard Elevation="3" Class="rounded-lg">
-                <MudCardHeader>
-                    <CardHeaderContent>
-                        <MudText Typo="Typo.h6" Align="MAlign.Center" Style="font-weight: bold;">@Localizer["Planning"]</MudText>
-                    </CardHeaderContent>
-                </MudCardHeader>
-                <MudCardContent Style="height: 300px; overflow-y: auto;">
-                    <MudStack Spacing="2">
-                        @* Liste du planning factice *@
-                        <MudPaper Elevation="0" Class="pa-3 rounded" Style="background-color: #f2ebeb;">
-                            <MudText>09:00 – Location Peugeot 208</MudText>
+            <MudCard Elevation="3" Class="rounded-lg pa-4" Style="background-color: white; color: black; min-height: 350px;">
+                <MudText Typo="Typo.h6" Class="mb-4 d-flex align-center justify-center" Style="font-weight: bold; color: black;">
+                    <MudIcon Icon="@Icons.Material.Filled.CalendarMonth" Class="mr-2" Color="Color.Default" /> Planning Proche
+                </MudText>
+
+                <MudStack Spacing="3">
+                    @foreach (var p in model.Planning)
+                    {
+                        @* Item Location (Début) *@
+                        <MudPaper Elevation="0" Class="pa-4 rounded-lg d-flex align-center"
+                                  Style="background-color: #f5f5f5; border-left: 6px solid #ff9800;">
+                            <MudChip T="string" Variant="Variant.Filled" Color="Color.Dark" Size="Size.Small"
+                                     Style="font-weight: bold;" Class="mr-4">
+                                @DateTime.Parse(p.DateDebut).ToString("dd/MM/yyyy")
+                            </MudChip>
+                            <MudText Style="font-weight: bold; color: black;">Location : @p.Marque @p.Modele</MudText>
                         </MudPaper>
-                        <MudPaper Elevation="0" Class="pa-3 rounded" Style="background-color: #f2ebeb;">
-                            <MudText>10:30 – Retour Tesla Model 3</MudText>
+
+                        @* Item Retour (Fin) *@
+                        <MudPaper Elevation="0" Class="pa-4 rounded-lg d-flex align-center"
+                                  Style="background-color: #f5f5f5; border-left: 6px solid #ff9800;">
+                            <MudChip T="string" Variant="Variant.Filled" Color="Color.Dark" Size="Size.Small"
+                                     Style="font-weight: bold;" Class="mr-4">
+                                @DateTime.Parse(p.DateFin).ToString("dd/MM/yyyy")
+                            </MudChip>
+                            <MudText Style="font-weight: bold; color: black;">Retour : @p.Marque @p.Modele</MudText>
                         </MudPaper>
-                        <MudPaper Elevation="0" Class="pa-3 rounded" Style="background-color: #f2ebeb;">
-                            <MudText>13:00 – Location BMW Série 4</MudText>
-                        </MudPaper>
-                        <MudPaper Elevation="0" Class="pa-3 rounded" Style="background-color: #f2ebeb;">
-                            <MudText>16:00 – Nettoyage Renault Twingo</MudText>
-                        </MudPaper>
-                        <MudPaper Elevation="0" Class="pa-3 rounded" Style="background-color: #f2ebeb;">
-                            <MudText>18:00 – Clôture caisse</MudText>
-                        </MudPaper>
-                    </MudStack>
-                </MudCardContent>
+                    }
+                </MudStack>
             </MudCard>
         </MudItem>
     </MudGrid>
 
 </MudContainer>
+
+@code {
+    private DashboardModel model = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        // On lance les appels en parallèle de manière sécurisée
+        var tasks = new List<Task>
+        {
+            Task.Run(async () => { model.total_users = await DashboardService.GetTotalUsersAsync(); await InvokeAsync(StateHasChanged); }),
+            Task.Run(async () => { model.RevenusMensuels = await DashboardService.GetMonthlyRevenuesAsync(); await InvokeAsync(StateHasChanged); }),
+            Task.Run(async () => { model.VoiturePlusLouee = await DashboardService.GetMostRentedCarDetailsAsync(); await InvokeAsync(StateHasChanged); }),
+            Task.Run(async () => { model.Rappels = await DashboardService.GetRappelsAsync(); await InvokeAsync(StateHasChanged); }),
+            Task.Run(async () => { model.Planning = await DashboardService.GetPlanningAsync(); await InvokeAsync(StateHasChanged); })
+        };
+
+        await Task.WhenAll(tasks); //
+    }
+}
