@@ -792,6 +792,49 @@ $app->post('/vehicule', function (Request $request, Response $response, $args) u
     }
 });
 
+// -----------------------------------------------------------------------
+// /stats/controle-technique-bientot-expire - GET
+// -----------------------------------------------------------------------
+$app->get('/stats/controle-technique-bientot-expire', function (
+    Request $request,
+    Response $response,
+    $args
+) use ($conn) {
+
+    $query = "
+        SELECT 
+            v.Marque,
+            v.Nom AS Modele,
+            v.DateExpirationControleTech
+        FROM Vehicule v
+        WHERE v.DateExpirationControleTech <= DATE_ADD(CURDATE(), INTERVAL 2 MONTH)
+        ORDER BY v.DateExpirationControleTech ASC
+    ";
+
+    try {
+        $conn->executeQuery($query);
+        $results = $conn->getResults();
+
+        $response->getBody()->write(json_encode([
+            'vehicules_controle_technique_bientot_expire' => $results
+        ]));
+
+        return $response
+            ->withHeader('Content-Type', 'application/json')
+            ->withStatus(200);
+
+    } catch (\Exception $e) {
+        $response->getBody()->write(json_encode([
+            'error' => 'Erreur lors de la récupération des contrôles techniques : ' . $e->getMessage()
+        ]));
+
+        return $response
+            ->withHeader('Content-Type', 'application/json')
+            ->withStatus(500);
+    }
+});
+
+
 $app->addRoutingMiddleware();
 
 $errorMiddleware = $app->addErrorMiddleware(true, true, true);
