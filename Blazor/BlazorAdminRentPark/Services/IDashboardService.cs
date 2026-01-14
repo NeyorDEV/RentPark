@@ -6,7 +6,7 @@ namespace BlazorAdminRentPark.Services
     {
         Task<int> GetTotalUsersAsync();
         Task<int> GetMonthlyRevenuesAsync();
-        Task<string> GetMostRentedCarImageAsync();
+        Task<CarDetails> GetMostRentedCarDetailsAsync();
         Task<List<RappelItemModel>> GetRappelsAsync();
         Task<List<PlanningItemModel>> GetPlanningAsync();
     }
