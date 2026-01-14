@@ -51,3 +51,7 @@ Pour lancer le serveur  placez vous dans le dépot avec un terminal et faites le
 
 3.Lancez le projet avec votre IDE (Visual Studio / Rider).
 
+## docBlazor
+
+vous trouverez la documentation liée à la partie blazor dans le répertoire docsBlazor
+
