@@ -1,15 +1,19 @@
-﻿using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
-using Microsoft.AspNetCore.Components.QuickGrid;
-using MudBlazor;
+﻿using BlazorAdminRentPark.Components.Layout;
 using BlazorAdminRentPark.Models;
 using BlazorAdminRentPark.Services;
+using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.QuickGrid;
+using Microsoft.AspNetCore.Components.Web;
+using Microsoft.Extensions.Localization;
+using MudBlazor;
 
 namespace BlazorAdminRentPark.Components.Pages
 {
     // L'héritage : ComponentBase est indispensable pour OnInitializedAsync et StateHasChanged
     public partial class Cars : ComponentBase
     {
+        [Inject]
+        public IStringLocalizer<Cars> Localizer { get; set; } = default!;
         [Inject] protected IVehiculeService VehiculeService { get; set; }
   
 
