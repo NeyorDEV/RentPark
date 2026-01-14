@@ -2,10 +2,7 @@
 @using MudBlazor
 @using Microsoft.AspNetCore.Components.Authorization
 @using BlazorAdminRentPark.Services
-@using Blazored.LocalStorage
-
 @inject AuthenticationStateProvider AuthStateProvider
-@inject ILocalStorageService LocalStorage
 @inject NavigationManager NavManager
 
 <MudThemeProvider />
@@ -54,9 +51,7 @@
 
     private async Task Logout()
     {
-        await LocalStorage.RemoveItemAsync("authToken");
-        
-        ((CustomAuthStateProvider)AuthStateProvider).MarkUserAsLoggedOut();
+        await ((CustomAuthStateProvider)AuthStateProvider).MarkUserAsLoggedOut();
         
         NavManager.NavigateTo("/login");
     }
