@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.QuickGrid;
 using Microsoft.Extensions.Localization;
 using MudBlazor;
+using Microsoft.Extensions.Logging;
 
 namespace BlazorAdminRentPark.Components.Pages;
 
@@ -17,6 +18,9 @@ public partial class Account
 
     [Inject]
     private IDialogService DialogService { get; set; } = default!;
+
+    [Inject]
+    private ILogger<Account> Logger { get; set; } = default!;
 
     private string _searchString = "";
     private int _currentPage = 1;
@@ -107,6 +111,8 @@ public partial class Account
 
         if (!result.Canceled)
         {
+            Logger.LogInformation("ACTION : Un nouvel utilisateur a été ajouté via le formulaire.");
+            
             await LoadUsers();
             StateHasChanged();
         }
@@ -114,18 +120,32 @@ public partial class Account
 
     protected async Task DeleteUser(int id)
     {
-        await UserService.Delete(id);
-        _users.RemoveAll(u => u.Id == id);
+        try
+        {
+            var userToDelete = _users.FirstOrDefault(u => u.Id == id);
+            string userInfos = userToDelete != null ? $"{userToDelete.Username} ({userToDelete.Role})" : "Inconnu";
 
-        if (_currentPage > PageCount)
-            _currentPage = PageCount;
+            Logger.LogInformation("ACTION : Demande de suppression de l'utilisateur ID {Id} - {UserInfos}", id, userInfos);
 
-        StateHasChanged();
+            await UserService.Delete(id);
+            
+            _users.RemoveAll(u => u.Id == id);
+
+            if (_currentPage > PageCount)
+                _currentPage = PageCount;
+
+            Logger.LogInformation("SUCCÈS : L'utilisateur ID {Id} a été supprimé correctement.", id);
+
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "ERREUR : Impossible de supprimer l'utilisateur ID {Id}", id);
+        }
     }
 
     protected void EditUser(int id)
     {
-        // TODO: Impl�menter la logique de modification
     }
 
     protected void OnPageChanged(int newPage)
@@ -144,5 +164,4 @@ public partial class Account
         _searchString = text;
         _currentPage = 1;
     }
-
 }
