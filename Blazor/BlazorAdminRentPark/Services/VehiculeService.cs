@@ -40,8 +40,8 @@ namespace BlazorAdminRentPark.Services
 
         public async Task Update(string numSerie, VehiculeModel vehicule)
         {
-            await _http.PutAsJsonAsync($"http://localhost:8880/voitures/{numSerie}", vehicule); // [cite: 7]
+            await _httpClient.PutAsJsonAsync($"http://localhost:8880/voitures/{numSerie}", vehicule); // [cite: 7]
         }
-
+        
     }
 }
