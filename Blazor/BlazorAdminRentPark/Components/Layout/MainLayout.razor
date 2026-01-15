@@ -4,7 +4,10 @@
 @using Microsoft.AspNetCore.Components.Authorization
 @using BlazorAdminRentPark.Services
 @inject AuthenticationStateProvider AuthStateProvider
-@inject NavigationManager NavManager
+@using Microsoft.Extensions.Localization
+@using MudBlazor
+@using Microsoft.AspNetCore.Components.Authorization
+@using BlazorAdminRentPark.Services
 
 <MudThemeProvider />
 <MudDialogProvider />
@@ -12,25 +15,19 @@
 <MudPopoverProvider />
 
 <MudLayout>
-
     <AuthorizeView>
         <Authorized>
-            
             <MudAppBar Elevation="1" Color="Color.Primary">
                 <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
-                
-                <MudText Typo="Typo.h6" Class="ml-3">@Localizer["Title"]</MudText>
+                <MudText Typo="Typo.h6" Class="ml-3">@Localizer["Title"]</MudText> [cite: 2]
                 <MudSpacer />
-                
                 <MudText Class="mr-4">@context.User.Identity?.Name</MudText>
-                
                 <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="Logout">@Localizer["Disconnect"]</MudButton>
             </MudAppBar>
 
             <MudDrawer @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2">
                 <NavMenu />
             </MudDrawer>
-            
         </Authorized>
     </AuthorizeView>
 
@@ -39,23 +36,5 @@
             @Body
         </MudContainer>
     </MudMainContent>
-
 </MudLayout>
 
-@code {
-
-    [Inject]
-    public IStringLocalizer<MainLayout> Localizer { get; set; } = default!;
-
-    bool _drawerOpen = true;
-
-    void DrawerToggle()
-    {
-        _drawerOpen = !_drawerOpen;
-    }
-
-    private void Logout()
-    {
-        NavManager.NavigateTo("/Account/Logout", forceLoad: true);
-    }
-}
