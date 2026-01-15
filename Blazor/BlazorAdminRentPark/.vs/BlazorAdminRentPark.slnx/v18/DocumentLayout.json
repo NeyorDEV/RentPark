@@ -3,60 +3,16 @@
   "WorkspaceRootPath": "C:\\Users\\cleme\\sae_2a_rentpark\\Blazor\\BlazorAdminRentPark\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{7A53A978-03C4-0DE4-E433-BDD6B52049B9}|BlazorAdminRentPark.csproj|c:\\users\\cleme\\sae_2a_rentpark\\blazor\\blazoradminrentpark\\components\\layout\\cultureselector.razor.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{7A53A978-03C4-0DE4-E433-BDD6B52049B9}|BlazorAdminRentPark.csproj|solutionrelative:components\\layout\\cultureselector.razor.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{7A53A978-03C4-0DE4-E433-BDD6B52049B9}|BlazorAdminRentPark.csproj|c:\\users\\cleme\\sae_2a_rentpark\\blazor\\blazoradminrentpark\\components\\layout\\cultureselector.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{7A53A978-03C4-0DE4-E433-BDD6B52049B9}|BlazorAdminRentPark.csproj|solutionrelative:components\\layout\\cultureselector.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{7A53A978-03C4-0DE4-E433-BDD6B52049B9}|BlazorAdminRentPark.csproj|c:\\users\\cleme\\sae_2a_rentpark\\blazor\\blazoradminrentpark\\components\\layout\\mainlayout.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{7A53A978-03C4-0DE4-E433-BDD6B52049B9}|BlazorAdminRentPark.csproj|solutionrelative:components\\layout\\mainlayout.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{7A53A978-03C4-0DE4-E433-BDD6B52049B9}|BlazorAdminRentPark.csproj|c:\\users\\cleme\\sae_2a_rentpark\\blazor\\blazoradminrentpark\\components\\layout\\mainlayout.razor.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{7A53A978-03C4-0DE4-E433-BDD6B52049B9}|BlazorAdminRentPark.csproj|solutionrelative:components\\layout\\mainlayout.razor.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{7A53A978-03C4-0DE4-E433-BDD6B52049B9}|BlazorAdminRentPark.csproj|c:\\users\\cleme\\sae_2a_rentpark\\blazor\\blazoradminrentpark\\components\\pages\\login.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{7A53A978-03C4-0DE4-E433-BDD6B52049B9}|BlazorAdminRentPark.csproj|solutionrelative:components\\pages\\login.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{7A53A978-03C4-0DE4-E433-BDD6B52049B9}|BlazorAdminRentPark.csproj|c:\\users\\cleme\\sae_2a_rentpark\\blazor\\blazoradminrentpark\\components\\layout\\navmenu.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
       "RelativeMoniker": "D:0:0:{7A53A978-03C4-0DE4-E433-BDD6B52049B9}|BlazorAdminRentPark.csproj|solutionrelative:components\\layout\\navmenu.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{7A53A978-03C4-0DE4-E433-BDD6B52049B9}|BlazorAdminRentPark.csproj|c:\\users\\cleme\\sae_2a_rentpark\\blazor\\blazoradminrentpark\\components\\pages\\cars.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{7A53A978-03C4-0DE4-E433-BDD6B52049B9}|BlazorAdminRentPark.csproj|solutionrelative:components\\pages\\cars.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+      "AbsoluteMoniker": "D:0:0:{7A53A978-03C4-0DE4-E433-BDD6B52049B9}|BlazorAdminRentPark.csproj|c:\\users\\cleme\\sae_2a_rentpark\\blazor\\blazoradminrentpark\\components\\layout\\navmenu.razor.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7A53A978-03C4-0DE4-E433-BDD6B52049B9}|BlazorAdminRentPark.csproj|solutionrelative:components\\layout\\navmenu.razor.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{7A53A978-03C4-0DE4-E433-BDD6B52049B9}|BlazorAdminRentPark.csproj|c:\\users\\cleme\\sae_2a_rentpark\\blazor\\blazoradminrentpark\\components\\pages\\account.razor.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{7A53A978-03C4-0DE4-E433-BDD6B52049B9}|BlazorAdminRentPark.csproj|solutionrelative:components\\pages\\account.razor.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{7A53A978-03C4-0DE4-E433-BDD6B52049B9}|BlazorAdminRentPark.csproj|c:\\users\\cleme\\sae_2a_rentpark\\blazor\\blazoradminrentpark\\components\\pages\\account.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{7A53A978-03C4-0DE4-E433-BDD6B52049B9}|BlazorAdminRentPark.csproj|solutionrelative:components\\pages\\account.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{7A53A978-03C4-0DE4-E433-BDD6B52049B9}|BlazorAdminRentPark.csproj|c:\\users\\cleme\\sae_2a_rentpark\\blazor\\blazoradminrentpark\\resources\\components\\pages.cars.resx||{81828910-B8B3-4D2B-99A3-067027C180C1}",
-      "RelativeMoniker": "D:0:0:{7A53A978-03C4-0DE4-E433-BDD6B52049B9}|BlazorAdminRentPark.csproj|solutionrelative:resources\\components\\pages.cars.resx||{81828910-B8B3-4D2B-99A3-067027C180C1}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{7A53A978-03C4-0DE4-E433-BDD6B52049B9}|BlazorAdminRentPark.csproj|c:\\users\\cleme\\sae_2a_rentpark\\blazor\\blazoradminrentpark\\components\\pages\\cars.razor.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{7A53A978-03C4-0DE4-E433-BDD6B52049B9}|BlazorAdminRentPark.csproj|solutionrelative:components\\pages\\cars.razor.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{7A53A978-03C4-0DE4-E433-BDD6B52049B9}|BlazorAdminRentPark.csproj|c:\\users\\cleme\\sae_2a_rentpark\\blazor\\blazoradminrentpark\\components\\app.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{7A53A978-03C4-0DE4-E433-BDD6B52049B9}|BlazorAdminRentPark.csproj|solutionrelative:components\\app.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{7A53A978-03C4-0DE4-E433-BDD6B52049B9}|BlazorAdminRentPark.csproj|c:\\users\\cleme\\sae_2a_rentpark\\blazor\\blazoradminrentpark\\components\\pages\\adduserdialog.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{7A53A978-03C4-0DE4-E433-BDD6B52049B9}|BlazorAdminRentPark.csproj|solutionrelative:components\\pages\\adduserdialog.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{7A53A978-03C4-0DE4-E433-BDD6B52049B9}|BlazorAdminRentPark.csproj|c:\\users\\cleme\\sae_2a_rentpark\\blazor\\blazoradminrentpark\\resources\\components\\pages.login.resx||{81828910-B8B3-4D2B-99A3-067027C180C1}",
-      "RelativeMoniker": "D:0:0:{7A53A978-03C4-0DE4-E433-BDD6B52049B9}|BlazorAdminRentPark.csproj|solutionrelative:resources\\components\\pages.login.resx||{81828910-B8B3-4D2B-99A3-067027C180C1}"
+      "AbsoluteMoniker": "D:0:0:{7A53A978-03C4-0DE4-E433-BDD6B52049B9}|BlazorAdminRentPark.csproj|c:\\users\\cleme\\sae_2a_rentpark\\blazor\\blazoradminrentpark\\components\\layout\\navmenu.razor.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}",
+      "RelativeMoniker": "D:0:0:{7A53A978-03C4-0DE4-E433-BDD6B52049B9}|BlazorAdminRentPark.csproj|solutionrelative:components\\layout\\navmenu.razor.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}"
     }
   ],
   "DocumentGroupContainers": [
@@ -66,7 +22,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 311,
-          "SelectedChildIndex": 4,
+          "SelectedChildIndex": 6,
           "Children": [
             {
               "$type": "Bookmark",
@@ -86,175 +42,42 @@
             },
             {
               "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "NavMenu.razor.css",
+              "DocumentMoniker": "C:\\Users\\cleme\\sae_2a_rentpark\\Blazor\\BlazorAdminRentPark\\Components\\Layout\\NavMenu.razor.css",
+              "RelativeDocumentMoniker": "Components\\Layout\\NavMenu.razor.css",
+              "ToolTip": "C:\\Users\\cleme\\sae_2a_rentpark\\Blazor\\BlazorAdminRentPark\\Components\\Layout\\NavMenu.razor.css",
+              "RelativeToolTip": "Components\\Layout\\NavMenu.razor.css",
+              "ViewState": "AgIAAAYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003000|",
+              "WhenOpened": "2026-01-15T07:24:23.173Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "NavMenu.razor.cs",
+              "DocumentMoniker": "C:\\Users\\cleme\\sae_2a_rentpark\\Blazor\\BlazorAdminRentPark\\Components\\Layout\\NavMenu.razor.cs",
+              "RelativeDocumentMoniker": "Components\\Layout\\NavMenu.razor.cs",
+              "ToolTip": "C:\\Users\\cleme\\sae_2a_rentpark\\Blazor\\BlazorAdminRentPark\\Components\\Layout\\NavMenu.razor.cs",
+              "RelativeToolTip": "Components\\Layout\\NavMenu.razor.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-15T07:23:27.95Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "CultureSelector.razor.cs",
-              "DocumentMoniker": "C:\\Users\\cleme\\sae_2a_rentpark\\Blazor\\BlazorAdminRentPark\\Components\\Layout\\CultureSelector.razor.cs",
-              "RelativeDocumentMoniker": "Components\\Layout\\CultureSelector.razor.cs",
-              "ToolTip": "C:\\Users\\cleme\\sae_2a_rentpark\\Blazor\\BlazorAdminRentPark\\Components\\Layout\\CultureSelector.razor.cs*",
-              "RelativeToolTip": "Components\\Layout\\CultureSelector.razor.cs*",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAACAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-15T07:15:24.274Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "MainLayout.razor.cs",
-              "DocumentMoniker": "C:\\Users\\cleme\\sae_2a_rentpark\\Blazor\\BlazorAdminRentPark\\Components\\Layout\\MainLayout.razor.cs",
-              "RelativeDocumentMoniker": "Components\\Layout\\MainLayout.razor.cs",
-              "ToolTip": "C:\\Users\\cleme\\sae_2a_rentpark\\Blazor\\BlazorAdminRentPark\\Components\\Layout\\MainLayout.razor.cs",
-              "RelativeToolTip": "Components\\Layout\\MainLayout.razor.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAAFAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-15T07:08:33.134Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "Login.razor",
-              "DocumentMoniker": "C:\\Users\\cleme\\sae_2a_rentpark\\Blazor\\BlazorAdminRentPark\\Components\\Pages\\Login.razor",
-              "RelativeDocumentMoniker": "Components\\Pages\\Login.razor",
-              "ToolTip": "C:\\Users\\cleme\\sae_2a_rentpark\\Blazor\\BlazorAdminRentPark\\Components\\Pages\\Login.razor",
-              "RelativeToolTip": "Components\\Pages\\Login.razor",
-              "ViewState": "AgIAAAkAAAAAAAAAAAAAABYAAABTAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-01-14T15:57:52.411Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 7,
-              "Title": "Account.razor.cs",
-              "DocumentMoniker": "C:\\Users\\cleme\\sae_2a_rentpark\\Blazor\\BlazorAdminRentPark\\Components\\Pages\\Account.razor.cs",
-              "RelativeDocumentMoniker": "Components\\Pages\\Account.razor.cs",
-              "ToolTip": "C:\\Users\\cleme\\sae_2a_rentpark\\Blazor\\BlazorAdminRentPark\\Components\\Pages\\Account.razor.cs",
-              "RelativeToolTip": "Components\\Pages\\Account.razor.cs",
-              "ViewState": "AgIAABAAAAAAAAAAAAApwBkAAAATAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-14T15:02:15.171Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 13,
-              "Title": "Pages.Login.resx",
-              "DocumentMoniker": "C:\\Users\\cleme\\sae_2a_rentpark\\Blazor\\BlazorAdminRentPark\\Resources\\Components\\Pages.Login.resx",
-              "RelativeDocumentMoniker": "Resources\\Components\\Pages.Login.resx",
-              "ToolTip": "C:\\Users\\cleme\\sae_2a_rentpark\\Blazor\\BlazorAdminRentPark\\Resources\\Components\\Pages.Login.resx",
-              "RelativeToolTip": "Resources\\Components\\Pages.Login.resx",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001005|",
-              "WhenOpened": "2026-01-14T13:29:37.858Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 10,
-              "Title": "Cars.razor.cs",
-              "DocumentMoniker": "C:\\Users\\cleme\\sae_2a_rentpark\\Blazor\\BlazorAdminRentPark\\Components\\Pages\\Cars.razor.cs",
-              "RelativeDocumentMoniker": "Components\\Pages\\Cars.razor.cs",
-              "ToolTip": "C:\\Users\\cleme\\sae_2a_rentpark\\Blazor\\BlazorAdminRentPark\\Components\\Pages\\Cars.razor.cs",
-              "RelativeToolTip": "Components\\Pages\\Cars.razor.cs",
-              "ViewState": "AgIAAGsAAAAAAAAAAAAswHkAAAA6AAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-14T12:50:58.525Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 5,
               "Title": "NavMenu.razor",
               "DocumentMoniker": "C:\\Users\\cleme\\sae_2a_rentpark\\Blazor\\BlazorAdminRentPark\\Components\\Layout\\NavMenu.razor",
               "RelativeDocumentMoniker": "Components\\Layout\\NavMenu.razor",
               "ToolTip": "C:\\Users\\cleme\\sae_2a_rentpark\\Blazor\\BlazorAdminRentPark\\Components\\Layout\\NavMenu.razor",
               "RelativeToolTip": "Components\\Layout\\NavMenu.razor",
-              "ViewState": "AgIAAAwAAAAAAAAAAAAwwBsAAAA0AAAAAAAAAA==",
+              "ViewState": "AgIAABgAAAAAAAAAAAAAAAIAAAAaAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
               "WhenOpened": "2026-01-14T15:39:28.698Z",
               "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 8,
-              "Title": "Account.razor",
-              "DocumentMoniker": "C:\\Users\\cleme\\sae_2a_rentpark\\Blazor\\BlazorAdminRentPark\\Components\\Pages\\Account.razor",
-              "RelativeDocumentMoniker": "Components\\Pages\\Account.razor",
-              "ToolTip": "C:\\Users\\cleme\\sae_2a_rentpark\\Blazor\\BlazorAdminRentPark\\Components\\Pages\\Account.razor",
-              "RelativeToolTip": "Components\\Pages\\Account.razor",
-              "ViewState": "AgIAACwAAAAAAAAAAAD4vzMAAAAOAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-01-14T12:36:22.576Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 6,
-              "Title": "Cars.razor",
-              "DocumentMoniker": "C:\\Users\\cleme\\sae_2a_rentpark\\Blazor\\BlazorAdminRentPark\\Components\\Pages\\Cars.razor",
-              "RelativeDocumentMoniker": "Components\\Pages\\Cars.razor",
-              "ToolTip": "C:\\Users\\cleme\\sae_2a_rentpark\\Blazor\\BlazorAdminRentPark\\Components\\Pages\\Cars.razor",
-              "RelativeToolTip": "Components\\Pages\\Cars.razor",
-              "ViewState": "AgIAABIAAAAAAAAAAAAAABAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-01-14T12:50:33.587Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "MainLayout.razor",
-              "DocumentMoniker": "C:\\Users\\cleme\\sae_2a_rentpark\\Blazor\\BlazorAdminRentPark\\Components\\Layout\\MainLayout.razor",
-              "RelativeDocumentMoniker": "Components\\Layout\\MainLayout.razor",
-              "ToolTip": "C:\\Users\\cleme\\sae_2a_rentpark\\Blazor\\BlazorAdminRentPark\\Components\\Layout\\MainLayout.razor*",
-              "RelativeToolTip": "Components\\Layout\\MainLayout.razor*",
-              "ViewState": "AgIAAAkAAAAAAAAAAAAAABoAAAAUAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-01-14T15:38:56.906Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 12,
-              "Title": "AddUserDialog.razor",
-              "DocumentMoniker": "C:\\Users\\cleme\\sae_2a_rentpark\\Blazor\\BlazorAdminRentPark\\Components\\Pages\\AddUserDialog.razor",
-              "RelativeDocumentMoniker": "Components\\Pages\\AddUserDialog.razor",
-              "ToolTip": "C:\\Users\\cleme\\sae_2a_rentpark\\Blazor\\BlazorAdminRentPark\\Components\\Pages\\AddUserDialog.razor",
-              "RelativeToolTip": "Components\\Pages\\AddUserDialog.razor",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABQAAAATAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-01-14T14:07:29.385Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "CultureSelector.razor",
-              "DocumentMoniker": "C:\\Users\\cleme\\sae_2a_rentpark\\Blazor\\BlazorAdminRentPark\\Components\\Layout\\CultureSelector.razor",
-              "RelativeDocumentMoniker": "Components\\Layout\\CultureSelector.razor",
-              "ToolTip": "C:\\Users\\cleme\\sae_2a_rentpark\\Blazor\\BlazorAdminRentPark\\Components\\Layout\\CultureSelector.razor",
-              "RelativeToolTip": "Components\\Layout\\CultureSelector.razor",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA8AAAAMAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-01-14T15:44:14.526Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 9,
-              "Title": "Pages.Cars.resx",
-              "DocumentMoniker": "C:\\Users\\cleme\\sae_2a_rentpark\\Blazor\\BlazorAdminRentPark\\Resources\\Components\\Pages.Cars.resx",
-              "RelativeDocumentMoniker": "Resources\\Components\\Pages.Cars.resx",
-              "ToolTip": "C:\\Users\\cleme\\sae_2a_rentpark\\Blazor\\BlazorAdminRentPark\\Resources\\Components\\Pages.Cars.resx",
-              "RelativeToolTip": "Resources\\Components\\Pages.Cars.resx",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001005|",
-              "WhenOpened": "2026-01-14T15:47:44.271Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 11,
-              "Title": "App.razor",
-              "DocumentMoniker": "C:\\Users\\cleme\\sae_2a_rentpark\\Blazor\\BlazorAdminRentPark\\Components\\App.razor",
-              "RelativeDocumentMoniker": "Components\\App.razor",
-              "ToolTip": "C:\\Users\\cleme\\sae_2a_rentpark\\Blazor\\BlazorAdminRentPark\\Components\\App.razor",
-              "RelativeToolTip": "Components\\App.razor",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-01-14T15:38:17.051Z"
             }
           ]
         }

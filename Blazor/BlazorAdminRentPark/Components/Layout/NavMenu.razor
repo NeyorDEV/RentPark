@@ -1,8 +1,6 @@
 ﻿@using Microsoft.Extensions.Localization
 @using MudBlazor
-
-@using Microsoft.Extensions.Localization
-@using MudBlazor
+@inherits MudComponentBase
 
 <MudNavMenu Bordered="true" Class="mud-width-full py-4 d-flex flex-column h-100">
     @* Conteneur pour les liens du haut *@
@@ -11,14 +9,14 @@
                     Icon="@Icons.Material.Filled.Home"
                     IconColor="Color.Primary"
                     Class="nav-item-custom">
-            <MudText Typo="Typo.button" Style="font-weight: 600;">@Localizer["Home"]</MudText>
+            [cite_start]<MudText Typo="Typo.button" Style="font-weight: 600;">@Localizer["Home"]</MudText> [cite: 2]
         </MudNavLink>
 
         <MudNavLink Href="account"
                     Icon="@Icons.Material.Filled.Person"
                     IconColor="Color.Primary"
                     Class="nav-item-custom">
-            <MudText Typo="Typo.button" Style="font-weight: 600;">@Localizer["Account"]</MudText>
+            [cite_start]<MudText Typo="Typo.button" Style="font-weight: 600;">@Localizer["Account"]</MudText> [cite: 3]
         </MudNavLink>
 
         <MudNavLink Href="cars"
@@ -26,29 +24,26 @@
                     IconColor="Color.Primary"
                     Class="nav-item-custom">
             <MudText Typo="Typo.button" Style="font-weight: 600;">@Localizer["Flotte"]</MudText>
-        </MudNavLink>
+            [cite_start]
+        </MudNavLink> [cite: 4]
     </div>
 
-    @* Le sélecteur sera poussé vers le bas grâce à mt-auto ou flex-grow sur le div précédent *@
+    @* Le sélecteur sera poussé vers le bas *@
     <div class="mt-auto pa-4">
         <CultureSelector />
     </div>
 </MudNavMenu>
 
-@code {
-
-    [Inject]
-    public IStringLocalizer<NavMenu> Localizer { get; set; } = default!;
-}
-
 <style>
     .nav-item-custom {
         margin: 4px 8px;
-        border-radius: 8px;
+        [cite_start]border-radius: 8px;
+        [cite: 6]
     }
 
     .mud-nav-link.active {
         background-color: var(--mud-palette-primary-hover) !important;
-        color: var(--mud-palette-primary) !important;
+        [cite_start]color: var(--mud-palette-primary) !important;
+        [cite: 7]
     }
 </style>
