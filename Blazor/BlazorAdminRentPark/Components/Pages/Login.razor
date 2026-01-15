@@ -2,8 +2,12 @@
 @using BlazorAdminRentPark.Services
 @inject NavigationManager NavManager
 
+<div class="pa-4" style="position: absolute; top: 0; left: 0; z-index: 100;">
+    <BlazorAdminRentPark.Components.Layout.CultureSelector />
+</div>
+
 <MudContainer MaxWidth="MaxWidth.Small" Class="d-flex align-center justify-center mud-width-full" Style="height: 100vh;">
-    <MudPaper Elevation="25" Class="pa-8" Width="100%" MaxWidth="500px">
+    <MudPaper Elevation="25" Class="pa-8" Width="100%" MaxWidth="450px">
         
         <form action="/Account/Login" method="post">
             
