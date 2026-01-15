@@ -8,8 +8,23 @@ using Microsoft.AspNetCore.Localization;
 using Microsoft.Extensions.Options;
 using MudBlazor.Services;
 using System.Globalization;
+using Serilog;
+using Serilog.Events;
+
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Host.UseSerilog((context, configuration) =>
+    configuration
+        .ReadFrom.Configuration(context.Configuration)
+        .Enrich.FromLogContext()
+        .MinimumLevel.Information()
+        .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+        .MinimumLevel.Override("System", LogEventLevel.Warning)
+        .MinimumLevel.Override("Microsoft.Hosting.Lifetime", LogEventLevel.Information)
+        .WriteTo.Console()
+        .WriteTo.File("logs/log-.txt", rollingInterval: RollingInterval.Day));
+
 
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
@@ -54,6 +69,48 @@ builder.Services.Configure<RequestLocalizationOptions>(options =>
 });
 
 var app = builder.Build();
+
+app.UseSerilogRequestLogging(options =>
+{
+    options.EnrichDiagnosticContext = (diagnosticContext, httpContext) =>
+    {
+        var user = httpContext.User?.Identity?.Name ?? "Anonyme";
+        diagnosticContext.Set("UserName", user);
+    };
+
+    options.GetLevel = (httpContext, elapsed, ex) =>
+    {
+        if (ex != null || httpContext.Response.StatusCode >= 500)
+            return LogEventLevel.Error;
+
+        var path = httpContext.Request.Path.Value?.ToLower();
+        if (path == null) return LogEventLevel.Information;
+
+        if (path.StartsWith("/_blazor") || 
+            path.StartsWith("/_content") || 
+            path.StartsWith("/lib") ||
+            path.EndsWith(".css") || 
+            path.EndsWith(".js") || 
+            path.EndsWith(".png") || 
+            path.EndsWith(".ico") || 
+            path.EndsWith(".woff2"))
+        {
+            return LogEventLevel.Debug;
+        }
+
+        if (httpContext.Request.Method != "GET")
+        {
+            return LogEventLevel.Information;
+        }
+
+        if (httpContext.Response.StatusCode == 302 || httpContext.Response.StatusCode == 304)
+        {
+            return LogEventLevel.Debug; 
+        }
+
+        return LogEventLevel.Information;
+    };
+});
 
 
 if (!app.Environment.IsDevelopment())

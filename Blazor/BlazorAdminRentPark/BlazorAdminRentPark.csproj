@@ -21,4 +21,8 @@
     <PackageReference Include="Serilog.Sinks.File" Version="8.0.0-dev-02318" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="logs\" />
+  </ItemGroup>
+
 </Project>

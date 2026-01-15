@@ -1,0 +1,9 @@
+Notre partie administration avec Blazor va permettre à notre client de consulter un tableau de bord où il va pouvoir voir son chiffre d'affaires et d'autres informations essentielles à son entreprise. 
+
+Pour accéder à l'application, il va devoir se connecter. 
+
+Nous proposons sur l'application une version française et anglaise. 
+
+Il va pouvoir gérer les utilisateurs de son site en les supprimant, les ajoutant et modifier leur nom d'utilisateur, leur mot de passe ou encore leur rôle. 
+
+Il va pouvoir accéder à sa flotte de véhicules, il va pouvoir les supprimer, (les ajouter et les modifier en cours d'implémentation)

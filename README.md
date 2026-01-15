@@ -18,7 +18,7 @@
 
 nous avons mis une conception initiale de là où nous en sommes dans le projet avec une conception moyenne qui ne respecte pas les principes SOLID mais qui était celle demandée par les professeurs de PHP, la 2e conception est une version améliorée avec un maximum de respect des principes SOLID et l'intégration des webservices qui permettent de mieux respecter ces principes
 
-## Connection à distance
+## Connection à distance / Besoin pour Blazor
 
 Ouvrez 2 terminaux et faites les deux commandes suivantes en modifiant votre nom d'utilisateur uca.
 
@@ -26,13 +26,22 @@ Ouvrez 2 terminaux et faites les deux commandes suivantes en modifiant votre nom
 
 ```ssh -L 3307:londres.uca.local:3306 [VotreNomUtilisateur]@ssh.iut-clermont.uca.fr```
 
-## API
+## API / Besoin pour Blazor
 
 Pour lancer l'API placez vous dans le dépot avec un terminal et faites les commandes suivantes :
 
 ```cd Api/public/```
 
 ```php -S localhost:8880```
+
+
+## Serveur pour les images / Besoin pour Blazor
+
+Pour lancer le serveur  placez vous dans le dépot avec un terminal et faites les commandes suivantes :
+
+```cd siteSAE2A```
+
+```php -S localhost:9990```
 
 ## Blazor
 
@@ -41,4 +50,8 @@ Pour lancer l'API placez vous dans le dépot avec un terminal et faites les comm
 2.Ouvrez la solution sae_2a_rentpark/Blazor/BlazorAdminRentPark/BlazorAdminRentPark.slnx.
 
 3.Lancez le projet avec votre IDE (Visual Studio / Rider).
+
+## docBlazor
+
+vous trouverez la documentation liée à la partie blazor dans le répertoire docsBlazor
 
