@@ -8,7 +8,7 @@
 <div class="main-content">
     <div class="header-container"> 
         <h1>Flotte Automobile</h1>
-        {% if role == 'admin' %}
+        {% if role == 'admin' or role == 'employe' %}
             <a href="#addModal" class="add-btn-main">
                 <i class="fa-solid fa-plus"></i> Ajouter un véhicule
             </a>
@@ -48,7 +48,7 @@
                             <span class="badge">{{ row.Puissance|e }} cv</span>
                         </div>
                         
-                        {% if role == 'admin' %}
+                        {% if role == 'admin' or role == 'employe' %}
                         <div class="actions-admin" onclick="event.stopPropagation();">
                             <a href="#editModal-{{ row.voiture|e }}" class="btn-icon-glass edit">
                                 <i class="fa-solid fa-pen"></i>
@@ -64,7 +64,7 @@
                 </div>
 
                 {# Modales de modification #}
-                {% if role == 'admin' %}
+                {% if role == 'admin' or role == 'employe' %}
                 <div id="editModal-{{ row.voiture|e }}" class="modal" onclick="event.stopPropagation();">
                     <div class="modal-content glass-container">
                             <a href="#" class="close">&times;</a>
@@ -106,7 +106,7 @@
 </div>
 
 {# Modale d'ajout #}
-{% if role == 'admin' %}
+{% if role == 'admin' or role == 'employe' %}
 {# MODALE D'AJOUT #}
 <div id="addModal" class="modal">
     <div class="modal-content glass-container">

@@ -455,8 +455,13 @@ public function cars(array $dVueEreur)
         $role = $this->userGateway->getRole($username);
         Validation::val_connection($username, $password, $savepass, $dVueErreur);
 
+        session_regenerate_id(true);
+        
+
         $_SESSION['username'] = $username;
         $_SESSION['role'] = $role;
+
+        
 
 
         if (!empty($dVueErreur)) {

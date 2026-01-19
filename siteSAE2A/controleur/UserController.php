@@ -5,6 +5,7 @@ use modele\VehicleGateway;
 use modele\UserGateway;
 use GuzzleHttp\Client;
 use config\Validation;
+use modele\User;
 
 class UserController
 {
@@ -50,7 +51,7 @@ class UserController
                     break;
                 default:
                     $dVueEreur[] = "Action inconnue";
-                    $this->afficherVue('home', $dVueEreur, $results = null, 'admin');
+                    $this->afficherVue('home', $dVueEreur, $results = null, 'user');
                     break;
             }
 
@@ -85,7 +86,7 @@ class UserController
             header("Location: /siteSAE2A/connection");
             exit;
         }
-        $this->afficherVue('inscription', $dVueEreur, $results = null, 'admin');
+        $this->afficherVue('inscription', $dVueEreur, $results = null, 'user');
 
     }
 
@@ -101,7 +102,7 @@ class UserController
 
         if (!empty($dVueErreur)) {
             $dVueErreur[] = "erreur dans l'inscription";
-            $this->afficherVue('erreur', $dVueErreur, $results = null, 'admin');
+            $this->afficherVue('erreur', $dVueErreur, $results = null, 'user');
         }
 
         $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
@@ -128,7 +129,7 @@ class UserController
             header("Location: /siteSAE2A/voitures");
             exit;
         }
-        $this->afficherVue('connection', $dVueEreur, $results = null, 'admin');
+        $this->afficherVue('connection', $dVueEreur, $results = null, 'user');
 
     }
 
@@ -141,12 +142,16 @@ class UserController
         $role = $this->userGateway->getRole($username);
         Validation::val_connection($username, $password, $savepass, $dVueErreur);
 
+
+        session_regenerate_id(true);
         $_SESSION['username'] = $username;
         $_SESSION['role'] = $role;
 
+        
+
 
         if (!empty($dVueErreur)) {
-            $this->afficherVue('erreur', $dVueErreur, $results = null, 'admin');
+            $this->afficherVue('erreur', $dVueErreur, $results = null, 'user');
             exit;
         }
 

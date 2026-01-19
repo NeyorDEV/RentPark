@@ -62,6 +62,13 @@ class FrontControleur
                 'connection'
                 
             ];
+
+            $employeRoutes = [
+                'listeVoitures',
+                'listeReservation',
+                'listeUtilisateur'
+                
+            ];
         
             if (in_array($action, $publicRoutes)) {
                 $controleur = new UserController();
@@ -75,6 +82,15 @@ class FrontControleur
         
                 $controleur = new UserController();
             }
+            elseif (in_array($action, $employeRoutes)) {
+
+                if ($role !== 'employe') {
+                    header('HTTP/1.1 403 Forbidden');
+                    exit('Accès refusé');
+                }
+            
+                $controleur = new EmployeControleur();
+            }      
             else {
                 // TOUT LE RESTE = ADMIN
                 $controleur = new AdminControleur();
