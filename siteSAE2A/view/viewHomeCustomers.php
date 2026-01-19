@@ -37,7 +37,7 @@
         <li><a href="/siteSAE2A/dashboard"><i class="fa-solid fa-dashboard"></i>Tableau de bord</a></li>
         <li><a href="/siteSAE2A/planning"><i class="fa-solid fa-file-signature"></i> Contrats</a></li>
         <li><a href="/siteSAE2A/reservation"><i class="fa-solid fa-calendar-days"></i> Réservations</a></li>
-        <li><a href="#"><i class="fa-solid fa-user"></i> Utilisateurs</a></li>
+        <li><a href="/siteSAE2A/utilisateurs"><i class="fa-solid fa-user"></i> Utilisateurs</a></li>
         <li><a href="/siteSAE2A/parametres"><i class="fa-solid fa-gear"></i> Paramètres</a></li>
     </ul>
 </aside>

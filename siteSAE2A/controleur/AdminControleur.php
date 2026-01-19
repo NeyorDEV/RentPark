@@ -20,6 +20,12 @@ class AdminControleur
 
     public function __construct()
     {
+        if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
+            http_response_code(403);
+            header('Location: /siteSAE2A/connection');
+            exit;
+        }
+        
         global $rep, $vues, $user, $pass, $dsn, $action;
 
         $dVueEreur = [];

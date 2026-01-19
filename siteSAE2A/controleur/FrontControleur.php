@@ -2,6 +2,9 @@
 namespace controleur;
 
 use AltoRouter;
+use controleur\AdminControleur;
+use controleur\UserController;
+
 
 class FrontControleur
 {
@@ -14,7 +17,7 @@ class FrontControleur
     {
         global $rep, $vues,$action; 
 
-        $role = $_SESSION['role'] ?? 'admin';
+        $role = $_SESSION['role'] ?? 'user';
 
        
         $router = new AltoRouter();
@@ -42,12 +45,43 @@ class FrontControleur
         $router->map('GET|POST', '/planning', 'affichePlanning');
         
         $match = $router->match();
-        if (!$match) { echo "404"; die; }
         if ($match) {
-            $action=$match['target'];
-            
-            $controleur = new AdminControleur();
-        }  
+            $action = $match['target'];
+        
+            // ROUTES PUBLIQUES (User par défaut)
+            $publicRoutes = [
+                'homeCustomers',
+                'cars',
+                'afficheConnection',
+                'afficheInscription'
+            ];
+        
+            // ROUTES USER CONNECTÉ
+            $userRoutes = [
+                'homeCustomers',
+                'connection'
+                
+            ];
+        
+            if (in_array($action, $publicRoutes)) {
+                $controleur = new UserController();
+            }
+            elseif (in_array($action, $userRoutes)) {
+        
+                if (!isset($_SESSION['username'])) {
+                    header('Location: /siteSAE2A/connection');
+                    exit;
+                }
+        
+                $controleur = new UserController();
+            }
+            else {
+                // TOUT LE RESTE = ADMIN
+                $controleur = new AdminControleur();
+            }
+        
+            $controleur->$action();
+        }
 
          
     }  
