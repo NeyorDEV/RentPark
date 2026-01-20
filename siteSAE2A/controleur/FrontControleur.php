@@ -53,7 +53,8 @@ class FrontControleur
                 'homeCustomers',
                 'cars',
                 'afficheConnection',
-                'afficheInscription'
+                'afficheInscription',
+                'deconnecter'
             ];
         
             // ROUTES USER CONNECTÉ
@@ -66,36 +67,53 @@ class FrontControleur
             $employeRoutes = [
                 'listeVoitures',
                 'listeReservation',
-                'listeUtilisateur'
+                'listeUtilisateur',
+                'affichePlanning',
+                'afficheParametres'
                 
             ];
         
-            if (in_array($action, $publicRoutes)) {
-                $controleur = new UserController();
+            if ($role === 'admin') {
+                $controleur = new AdminControleur();
             }
-            elseif (in_array($action, $userRoutes)) {
-        
-                if (!isset($_SESSION['username'])) {
-                    header('Location: /siteSAE2A/connection');
-                    exit;
-                }
-        
-                $controleur = new UserController();
-            }
+            /**
+             * EMPLOYÉ
+             */
             elseif (in_array($action, $employeRoutes)) {
-
+    
                 if ($role !== 'employe') {
                     header('HTTP/1.1 403 Forbidden');
                     exit('Accès refusé');
                 }
-            
+    
                 $controleur = new EmployeControleur();
-            }      
-            else {
-                // TOUT LE RESTE = ADMIN
-                $controleur = new AdminControleur();
             }
-        
+            /**
+             * USER CONNECTÉ
+             */
+            elseif (in_array($action, $userRoutes)) {
+    
+                if (!isset($_SESSION['username'])) {
+                    header('Location: /siteSAE2A/connection');
+                    exit;
+                }
+    
+                $controleur = new UserController();
+            }
+            /**
+             * PUBLIC
+             */
+            elseif (in_array($action, $publicRoutes)) {
+                $controleur = new UserController();
+            }
+            /**
+             * LE RESTE → REFUS
+             */
+            else {
+                header('HTTP/1.1 403 Forbidden');
+                exit('Accès refusé');
+            }
+    
             $controleur->$action();
         }
 

@@ -44,11 +44,17 @@ class EmployeControleur
                 case "afficheConnection":
                     $this->afficheConnection($dVueErreur);
                     break;
+                case "affichePlanning":
+                    $this->affichePlanning($dVueErreur);
+                    break;
                 case "listeVoitures":
                     $this->listeVoitures($dVueErreur);
                     break;
                 case 'deconnecter':
                     $this->deconnecter();
+                    break;
+                case 'afficheParametres':
+                    $this->afficheParametres($dVueErreur);
                     break;
                 case 'cars':
                         $this->cars($dVueErreur);
@@ -64,7 +70,7 @@ class EmployeControleur
                     break;
                 default:
                     $dVueEreur[] = "Action inconnue";
-                    $this->afficherVue('home', $dVueEreur, $results = null, 'admin');
+                    $this->afficherVue('homeCustomers', $dVueEreur, $results = null, 'admin');
                     break;
             }
 
@@ -598,6 +604,68 @@ private function afficherVue(string $vueKey, array $dVueEreur, ?array $results =
 
         $this->rechercherReservation();
         exit;
+    }
+
+    public function afficheParametres(array $dVueEreur)
+    {
+        
+        $this->afficherVue('parametres', $dVueEreur, $results = null, 'employe');
+    }
+
+    public function deconnecter(): void
+    {
+        session_unset();
+        session_destroy();
+        header("Location: /siteSAE2A/connection");
+        exit;
+    }
+
+    public function affichePlanning(array $dVueEreur)
+    {
+                // ===== Récupération des contrats du mois (aujourd’hui + futur) =====
+        $contracts = $this->reservationGateway->getMonthlyPlanning();
+
+        // ===== Génération du calendrier =====
+        $calendar = [];
+
+        $start = new \DateTime('first day of this month');
+        $end   = new \DateTime('last day of this month');
+        $today = (new \DateTime())->format('Y-m-d');
+
+        // Initialisation des jours du mois
+        for ($d = clone $start; $d <= $end; $d->modify('+1 day')) {
+            $date = $d->format('Y-m-d');
+
+            $calendar[$date] = [
+                'label'   => $d->format('d'),
+                'isToday' => ($date === $today),
+                'events'  => []
+            ];
+        }
+
+        // Ajout des événements (départs / retours)
+        foreach ($contracts as $c) {
+
+            if (isset($calendar[$c['DateDebut']])) {
+                $calendar[$c['DateDebut']]['events'][] = [
+                    'type'  => 'depart',
+                    'label' => 'Départ ' . $c['Marque'] . ' ' . $c['Nom']
+                ];
+            }
+
+            if (isset($calendar[$c['DateFin']])) {
+                $calendar[$c['DateFin']]['events'][] = [
+                    'type'  => 'retour',
+                    'label' => 'Retour ' . $c['Marque'] . ' ' . $c['Nom']
+                ];
+            }
+        }
+
+        // Envoi à la vue
+        $results['calendar'] = $calendar;
+
+
+        $this->afficherVue('planning', $dVueEreur, $results, 'admin');
     }
 
 

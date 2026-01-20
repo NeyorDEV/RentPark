@@ -94,7 +94,7 @@ class AdminControleur
                     break;
                 default:
                     $dVueEreur[] = "Action inconnue";
-                    $this->afficherVue('flotte', $dVueEreur, $results = null, 'admin');
+                    $this->afficherVue('homeCustomers', $dVueEreur, $results = null, 'admin');
                     break;
             }
 

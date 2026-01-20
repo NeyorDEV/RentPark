@@ -51,7 +51,7 @@ class UserController
                     break;
                 default:
                     $dVueEreur[] = "Action inconnue";
-                    $this->afficherVue('home', $dVueEreur, $results = null, 'user');
+                    $this->afficherVue('homeCustomers', $dVueEreur, $results = null, 'user');
                     break;
             }
 
@@ -88,6 +88,14 @@ class UserController
         }
         $this->afficherVue('inscription', $dVueEreur, $results = null, 'user');
 
+    }
+
+    public function deconnecter(): void
+    {
+        session_unset();
+        session_destroy();
+        header("Location: /siteSAE2A/connection");
+        exit;
     }
 
     public function inscription(array $dVueErreur)
