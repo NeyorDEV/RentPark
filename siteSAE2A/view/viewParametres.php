@@ -36,7 +36,9 @@ if (file_exists($settingsFile)) {
 <nav>
     <ul class="menu">
         <li><a href="/siteSAE2A/home"><i class="fa-solid fa-house"></i> Accueil</a></li>
-        <li><a href="/siteSAE2A/dashboard"><i class="fa-solid fa-chart-line"></i> Tableau de bord</a></li>
+        <?php if ($role === 'admin') : ?>
+            <li><a href="/siteSAE2A/dashboard"><i class="fa-solid fa-chart-line"></i> Tableau de bord</a></li>
+        <?php endif; ?>
         <li><a href="/sitesae2A/voitures"><i class="fa-solid fa-car"></i> Flotte Automobile</a></li>
         <li><a href="/siteSAE2A/planning"><i class="fa-solid fa-file-contract"></i> Contrats</a></li>
         <li><a href="/siteSAE2A/reservation"><i class="fa-solid fa-calendar-check"></i> Réservation</a></li>
