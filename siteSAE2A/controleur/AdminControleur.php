@@ -294,37 +294,70 @@ public function cars(array $dVueEreur)
 
     public function affichePlanning(array $dVueEreur)
     {
-                // ===== Récupération des contrats du mois (aujourd’hui + futur) =====
+        // 🔹 1. Récupération du mois depuis l’URL
+        $month = isset($_GET['month']) ? (int)$_GET['month'] : (int)date('m');
+        $year  = isset($_GET['year'])  ? (int)$_GET['year']  : (int)date('Y');
+    
+        $month = max(1, min(12, $month)); // sécurité
+    
+        // 🔹 2. Calcul mois précédent / suivant
+        $prevMonth = $month - 1;
+        $prevYear  = $year;
+        $nextMonth = $month + 1;
+        $nextYear  = $year;
+    
+        if ($prevMonth < 1) {
+            $prevMonth = 12;
+            $prevYear--;
+        }
+        if ($nextMonth > 12) {
+            $nextMonth = 1;
+            $nextYear++;
+        }
+    
+        // 🔹 3. Libellé du mois
+        $formatter = new \IntlDateFormatter(
+            'fr_FR',
+            \IntlDateFormatter::NONE,
+            \IntlDateFormatter::NONE
+        );
+        
+        $formatter->setPattern('MMMM yyyy');
+        
+        $dateObj = new \DateTime("$year-$month-01");
+        $currentMonthLabel = ucfirst($formatter->format($dateObj));
+        
+        
+    
+        // 🔹 4. Récupération des contrats (inchangé)
         $contracts = $this->reservationGateway->getMonthlyPlanning();
-
-        // ===== Génération du calendrier =====
+    
+        // 🔹 5. Génération du calendrier du mois demandé
         $calendar = [];
-
-        $start = new \DateTime('first day of this month');
-        $end   = new \DateTime('last day of this month');
-        $today = (new \DateTime())->format('Y-m-d');
-
-        // Initialisation des jours du mois
-        for ($d = clone $start; $d <= $end; $d->modify('+1 day')) {
-            $date = $d->format('Y-m-d');
-
+        $today = date('Y-m-d');
+    
+        $daysInMonth = cal_days_in_month(CAL_GREGORIAN, $month, $year);
+    
+        for ($day = 1; $day <= $daysInMonth; $day++) {
+            $date = sprintf('%04d-%02d-%02d', $year, $month, $day);
+    
             $calendar[$date] = [
-                'label'   => $d->format('d'),
+                'label'   => $day,
                 'isToday' => ($date === $today),
                 'events'  => []
             ];
         }
-
-        // Ajout des événements (départs / retours)
+    
+        // 🔹 6. Ajout des événements
         foreach ($contracts as $c) {
-
+    
             if (isset($calendar[$c['DateDebut']])) {
                 $calendar[$c['DateDebut']]['events'][] = [
                     'type'  => 'depart',
                     'label' => 'Départ ' . $c['Marque'] . ' ' . $c['Nom']
                 ];
             }
-
+    
             if (isset($calendar[$c['DateFin']])) {
                 $calendar[$c['DateFin']]['events'][] = [
                     'type'  => 'retour',
@@ -332,13 +365,20 @@ public function cars(array $dVueEreur)
                 ];
             }
         }
-
-        // Envoi à la vue
-        $results['calendar'] = $calendar;
-
-
+    
+        // 🔹 7. Envoi à la vue
+        $results = [
+            'calendar' => $calendar,
+            'prevMonth' => $prevMonth,
+            'prevYear' => $prevYear,
+            'nextMonth' => $nextMonth,
+            'nextYear' => $nextYear,
+            'currentMonthLabel' => $currentMonthLabel
+        ];
+    
         $this->afficherVue('planning', $dVueEreur, $results, 'admin');
     }
+    
 
     private function ajouterVoiture(array $dVueEreur)
     {

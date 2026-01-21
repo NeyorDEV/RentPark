@@ -41,6 +41,18 @@
 <div class="main-content">
     <div class="header-container">
         <h1>Planning Mensuel</h1>
+        <div class="month-navigation">
+    <a href="?month=<?= $results['prevMonth'] ?>&year=<?= $results['prevYear'] ?>">
+        ← Mois précédent
+    </a>
+
+    <strong><?= htmlspecialchars($results['currentMonthLabel']) ?></strong>
+
+    <a href="?month=<?= $results['nextMonth'] ?>&year=<?= $results['nextYear'] ?>">
+        Mois suivant →
+    </a>
+</div>
+
     </div>
 
     <div class="planning-card">
