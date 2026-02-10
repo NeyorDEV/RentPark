@@ -46,7 +46,7 @@ $isAdmin = ($role === 'admin');
 </nav>
 
 <div class="main-content">
-    <h1>Réservations</h1>
+    <h1>Contrats</h1>
 
   <header class="topbar">
     <div class="toolbar">

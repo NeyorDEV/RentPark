@@ -143,10 +143,16 @@
     border-radius: 25px;
     width: 90%;
     max-width: 450px;
+
+    /* 🔥 LA CLÉ */
+    max-height: 80vh;        /* Taille max du modal */
+    overflow-y: auto;        /* Scroll interne */
+
     position: relative;
     box-shadow: 0 20px 60px rgba(0,0,0,0.2);
     text-align: center;
 }
+
 
 .close {
     position: absolute;

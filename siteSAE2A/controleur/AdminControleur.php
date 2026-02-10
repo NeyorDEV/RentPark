@@ -381,41 +381,92 @@ public function cars(array $dVueEreur)
     
 
     private function ajouterVoiture(array $dVueEreur)
-    {
-
+{
+    try {
+        // ===============================
+        // 1. Upload image (comme avant)
+        // ===============================
         $imagePath = '';
+
         if (isset($_FILES['image']) && $_FILES['image']['error'] === 0) {
             $nomTemp = $_FILES['image']['tmp_name'];
             $nomFichier = uniqid() . '_' . basename($_FILES['image']['name']);
             $dossier = __DIR__ . '/../html/icons/' . $nomFichier;
 
-        if (move_uploaded_file($nomTemp, $dossier)) {
-                $imagePath = 'html/icons/' . $nomFichier; 
+            if (move_uploaded_file($nomTemp, $dossier)) {
+                $imagePath = 'html/icons/' . $nomFichier;
             }
         }
 
-        $modele = $_POST['modele'] ?? '';
-        $couleur = $_POST['couleur'] ?? '';
-        $puissance = $_POST['puissance'] ?? '';
+        // ===============================
+        // 2. Construction payload API
+        // ===============================
+        $payload = [
+            'NumSerie' => $_POST['NumSerie'] ?? null,
+            'Energie' => $_POST['Energie'] ?? null,
+            'NbPlaces' => $_POST['NbPlaces'] ?? null,
+            'Categorie' => $_POST['Categorie'] ?? null,
+            'Transmission' => $_POST['Transmission'] ?? 'Traction',
+            'Boite' => $_POST['Boite'] ?? 'Manuelle',
+            'Etat' => $_POST['Etat'] ?? 'Libre',
+            'Puissance' => $_POST['Puissance'] ?? null,
+            'DateAchat' => $_POST['DateAchat'] ?? null,
+            'DateExpirationControleTech' => $_POST['DateExpirationControleTech'] ?? null,
+            'DateDernierControleTech' => $_POST['DateDernierControleTech'] ?? null,
+            'Marque' => $_POST['Marque'] ?? null,
+            'Nom' => $_POST['Nom'] ?? null,
+            'Annee' => $_POST['Annee'] ?? null,
+            'IdAssureur' => (int) ($_POST['IdAssureur'] ?? 0),
+            'IdFournisseur' => (int) ($_POST['IdFournisseur'] ?? 0),
+            'ImagePath' => $imagePath,
+            'Couleur' => $_POST['Couleur'] ?? null,
+            'Prix' => $_POST['Prix'] ?? null
+        ];
 
+        // ===============================
+        // 3. Appel API POST /vehicule
+        // ===============================
+        $response = $this->apiClient->post('vehicule', [
+            'json' => $payload
+        ]);
 
-        Validation::val_voiture($modele, $couleur, $puissance, $dVueEreur);
-
-        if (empty($dVueEreur)) {
-            $this->gateway->add($modele, $couleur, $puissance, $imagePath);
-            header("Location: /sitesae2A/voitures");
+        // ===============================
+        // 4. Succès → redirection
+        // ===============================
+        if ($response->getStatusCode() === 201) {
+            header("Location: /siteSAE2A/voitures");
             exit;
         }
 
-        $results = $this->gateway->getAll();
-        $this->afficherVue('flotte', $dVueEreur, $results, 'admin');
+    } catch (RequestException $e) {
+
+        // ===============================
+        // 5. Gestion erreurs API
+        // ===============================
+        if ($e->hasResponse()) {
+            $apiError = json_decode(
+                $e->getResponse()->getBody()->getContents(),
+                true
+            );
+
+            $dVueEreur[] = $apiError['error'] ?? 'Erreur API inconnue.';
+        } else {
+            $dVueEreur[] = "Impossible de contacter l’API.";
+        }
     }
+
+    // ===============================
+    // 6. Retour vue avec erreurs
+    // ===============================
+    $this->afficherVue('flotte', $dVueEreur, [], 'admin');
+}
+
 
     private function supprimerVoiture(array $dVueEreur)
     {
         $id = ($_POST['NumSerie'] ?? -1);
         try {
-            $this->apiClient->delete("/voitures/$id");
+            $this->apiClient->delete("/delete/voitures/$id");
         } catch (RequestException $e) {
             $dVueEreur[] = "Erreur lors de la suppression via l’API.";
         }
