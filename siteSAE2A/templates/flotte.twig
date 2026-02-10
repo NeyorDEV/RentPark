@@ -50,7 +50,7 @@
                         
                         {% if role == 'admin' or role == 'employe' %}
                         <div class="actions-admin" onclick="event.stopPropagation();">
-                            <a href="#editModal-{{ row.voiture|e }}" class="btn-icon-glass edit">
+                            <a href="#editModal-{{ row.NumSerie|e }}" class="btn-icon-glass edit">
                                 <i class="fa-solid fa-pen"></i>
                             </a>
                             <form method="POST" action="/siteSAE2A/voitures" onsubmit="return confirm('Supprimer ce véhicule ?');" style="display:inline;">
@@ -65,38 +65,111 @@
 
                 {# Modales de modification #}
                 {% if role == 'admin' or role == 'employe' %}
-                <div id="editModal-{{ row.voiture|e }}" class="modal" onclick="event.stopPropagation();">
+                <div id="editModal-{{ row.NumSerie|e }}" class="modal" onclick="event.stopPropagation();">
                     <div class="modal-content glass-container">
-                            <a href="#" class="close">&times;</a>
-                            <h2>Modifier le véhicule</h2>
-                            <form method="POST" action="/siteSAE2A/voitures" enctype="multipart/form-data">
-                                <input type="hidden" name="action" value="modifierVoiture">
-                                <input type="hidden" name="id" value="{{ row.voiture|e }}">
-                                
-                                <div class="form-group">
-                                    <label for="modele-{{ row.voiture|e }}">Modèle du véhicule</label>
-                                    <input type="text" id="modele-{{ row.voiture|e }}" name="modele" required value="{{ row.modele|e }}">
-                                </div>
-                                
-                                <div class="form-group">
-                                    <label for="puissance-{{ row.voiture|e }}">Puissance (en cv)</label>
-                                    <input type="number" id="puissance-{{ row.voiture|e }}" name="puissance" required value="{{ row.puissance|e }}">
-                                </div>
-                                
-                                <div class="form-group">
-                                    <label for="couleur-{{ row.voiture|e }}">Couleur</label>
-                                    <input type="text" id="couleur-{{ row.voiture|e }}" name="couleur" required value="{{ row.couleur|e }}">
-                                </div>
-                                
-                                <div class="form-group">
-                                    <label>Image actuelle ou nouvelle</label>
-                                    <input type="file" name="image" accept="image/*">
-                                </div>
-                                
-                                <button type="submit" class="save-btn">Mettre à jour</button>
-                            </form>
-                        </div>
+                        <a href="#" class="close">&times;</a>
+                        <h2>Modifier le véhicule</h2>
+                        <form method="POST" action="/siteSAE2A/voitures" enctype="multipart/form-data">
+                            <input type="hidden" name="action" value="modifierVoiture">
+                            <input type="hidden" name="NumSerie" value="{{ row.NumSerie|e }}">
+                            
+                            <div class="form-group">
+                                <label>Marque</label>
+                                <input type="text" name="Marque" required value="{{ row.Marque|e }}">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Nom du modèle</label>
+                                <input type="text" name="Nom" required value="{{ row.Nom|e }}">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Année</label>
+                                <input type="number" name="Annee" min="1990" max="2026" required value="{{ row.Annee|e }}">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Énergie</label>
+                                <input type="text" name="Energie" required value="{{ row.Energie|e }}">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Puissance (ch)</label>
+                                <input type="number" name="Puissance" min="50" max="1000" required value="{{ row.Puissance|e }}">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Nombre de places</label>
+                                <input type="number" name="NbPlaces" min="2" max="9" required value="{{ row.NbPlaces|e }}">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Catégorie</label>
+                                <input type="text" name="Categorie" required value="{{ row.Categorie|e }}">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Transmission</label>
+                                <input type="text" name="Transmission" required value="{{ row.Transmission|e }}">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Boîte</label>
+                                <input type="text" name="Boite" required value="{{ row.Boite|e }}">
+                            </div>
+
+                            <div class="form-group">
+                                <label>État</label>
+                                <input type="text" name="Etat" required value="{{ row.Etat|e }}">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Date d'achat</label>
+                                <input type="date" name="DateAchat" required value="{{ row.DateAchat|e }}">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Date dernier contrôle technique</label>
+                                <input type="date" name="DateDernierControleTech" value="{{ row.DateDernierControleTech|e }}">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Date expiration contrôle technique</label>
+                                <input type="date" name="DateExpirationControleTech" value="{{ row.DateExpirationControleTech|e }}">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Couleur</label>
+                                <input type="text" name="Couleur" value="{{ row.Couleur|e }}">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Prix (€)</label>
+                                <input type="number" step="0.01" name="Prix" min="100" max="100000" required value="{{ row.Prix|e }}">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Assureur (ID)</label>
+                                <input type="number" name="IdAssureur" required value="{{ row.IdAssureur|e }}">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Fournisseur (ID)</label>
+                                <input type="number" name="IdFournisseur" required value="{{ row.IdFournisseur|e }}">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Image actuelle ou nouvelle</label>
+                                {% if row.ImagePath %}
+                                    <p>Image actuelle : <img src="{{ row.ImagePath }}" alt="Photo véhicule" style="width:100px;"></p>
+                                {% endif %}
+                                <input type="file" name="ImagePath" accept="image/*">
+                            </div>
+
+                            <button type="submit" class="save-btn">Mettre à jour</button>
+                        </form>
                     </div>
+                </div>
                 {% endif %}
             {% endfor %}
         {% else %}
@@ -107,155 +180,110 @@
 
 {# Modale d'ajout #}
 {% if role == 'admin' or role == 'employe' %}
-{# MODALE D'AJOUT #}
 <div id="addModal" class="modal">
     <div class="modal-content glass-container">
         <a href="#" class="close">&times;</a>
         <h2>Nouveau véhicule</h2>
         <form method="POST" action="/siteSAE2A/voitures" enctype="multipart/form-data">
             <input type="hidden" name="action" value="ajouterVoiture">
-        
+
             <div class="form-group">
                 <label>Numéro de série</label>
                 <input type="text" name="NumSerie" required>
             </div>
-        
-            <!-- Marque -->
+
             <div class="form-group">
                 <label>Marque</label>
-                <select name="Marque" id="marque" required>
-                    <option value="">-- Marque --</option>
-                    <option value="Renault">Renault</option>
-                    <option value="Peugeot">Peugeot</option>
-                    <option value="Citroen">Citroën</option>
-                    <option value="Tesla">Tesla</option>
-                </select>
+                <input type="text" name="Marque" required>
             </div>
-        
-            <!-- Modèle -->
+
             <div class="form-group">
                 <label>Nom du modèle</label>
-                <select name="Nom" id="modele" required>
-                    <option value="">-- Modèle --</option>
-                </select>
-                <input type="text"
-                       name="NouveauModele"
-                       id="nouveauModele"
-                       placeholder="Nouveau modèle"
-                       style="display:none; margin-top:5px;">
+                <input type="text" name="Nom" required>
             </div>
-        
+
             <div class="form-group">
                 <label>Année</label>
                 <input type="number" name="Annee" min="1990" max="2026" required>
             </div>
-        
-            <!-- Énergie -->
+
             <div class="form-group">
                 <label>Énergie</label>
-                <select name="Energie" required>
-                    <option value="">-- Énergie --</option>
-                    <option value="Essence">Essence</option>
-                    <option value="Diesel">Diesel</option>
-                    <option value="Electrique">Électrique</option>
-                    <option value="Hybride">Hybride</option>
-                </select>
+                <input type="text" name="Energie" required>
             </div>
-        
+
             <div class="form-group">
                 <label>Puissance (ch)</label>
                 <input type="number" name="Puissance" min="50" max="1000">
             </div>
-        
+
             <div class="form-group">
                 <label>Nombre de places</label>
                 <input type="number" name="NbPlaces" min="2" max="9" required>
             </div>
-        
-            <!-- Catégorie -->
+
             <div class="form-group">
                 <label>Catégorie</label>
-                <select name="Categorie" required>
-                    <option value="">-- Catégorie --</option>
-                    <option value="Citadine">Citadine</option>
-                    <option value="Berline">Berline</option>
-                    <option value="SUV">SUV</option>
-                    <option value="Utilitaire">Utilitaire</option>
-                </select>
+                <input type="text" name="Categorie" required>
             </div>
-        
-            <!-- Transmission -->
+
             <div class="form-group">
                 <label>Transmission</label>
-                <select name="Transmission">
-                    <option value="Traction">Traction</option>
-                    <option value="Propulsion">Propulsion</option>
-                    <option value="Integrale">Intégrale</option>
-                </select>
+                <input type="text" name="Transmission" required>
             </div>
-        
-            <!-- Boîte -->
+
             <div class="form-group">
                 <label>Boîte</label>
-                <select name="Boite" required>
-                    <option value="Manuelle">Manuelle</option>
-                    <option value="Automatique">Automatique</option>
-                </select>
+                <input type="text" name="Boite" required>
             </div>
-        
-            <!-- État -->
+
             <div class="form-group">
                 <label>État</label>
-                <select name="Etat" required>
-                    <option value="Libre">Libre</option>
-                    <option value="Loué">Loué</option>
-                    <option value="Maintenance">Maintenance</option>
-                </select>
+                <input type="text" name="Etat" required>
             </div>
-        
+
             <div class="form-group">
                 <label>Date d'achat</label>
                 <input type="date" name="DateAchat" required>
             </div>
-        
+
             <div class="form-group">
                 <label>Date dernier contrôle technique</label>
                 <input type="date" name="DateDernierControleTech">
             </div>
-        
+
             <div class="form-group">
                 <label>Date expiration contrôle technique</label>
                 <input type="date" name="DateExpirationControleTech">
             </div>
-        
+
             <div class="form-group">
                 <label>Couleur</label>
                 <input type="text" name="Couleur">
             </div>
-        
+
             <div class="form-group">
                 <label>Prix (€)</label>
                 <input type="number" step="0.01" name="Prix" min="100" max="100000" required>
             </div>
-        
+
             <div class="form-group">
                 <label>Assureur (ID)</label>
                 <input type="number" name="IdAssureur" required>
             </div>
-        
+
             <div class="form-group">
                 <label>Fournisseur (ID)</label>
                 <input type="number" name="IdFournisseur" required>
             </div>
-        
+
             <div class="form-group">
                 <label>Photo du véhicule</label>
                 <input type="file" name="ImagePath" accept="image/*">
             </div>
-        
+
             <button type="submit" class="save-btn">Ajouter le véhicule</button>
         </form>
-               
     </div>
 </div>
 {% endif %}

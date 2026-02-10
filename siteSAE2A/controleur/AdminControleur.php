@@ -348,23 +348,41 @@ public function cars(array $dVueEreur)
             ];
         }
     
-        // 🔹 6. Ajout des événements
-        foreach ($contracts as $c) {
-    
-            if (isset($calendar[$c['DateDebut']])) {
-                $calendar[$c['DateDebut']]['events'][] = [
-                    'type'  => 'depart',
-                    'label' => 'Départ ' . $c['Marque'] . ' ' . $c['Nom']
-                ];
-            }
-    
-            if (isset($calendar[$c['DateFin']])) {
-                $calendar[$c['DateFin']]['events'][] = [
-                    'type'  => 'retour',
-                    'label' => 'Retour ' . $c['Marque'] . ' ' . $c['Nom']
-                ];
-            }
-        }
+                // 🔹 6. Ajout des événements
+                foreach ($contracts as $c) {
+
+                    $eventDepart = [
+                        'type' => 'depart',
+                        'label' => 'Départ ' . $c['Marque'] . ' ' . $c['Nom'],
+                        'idContrat' => $c['idContrat'] ?? null,
+                        'client' => $c['Client'] ?? 'Inconnu',
+                        'vehicule' => $c['Marque'] . ' ' . $c['Nom'], 
+                        'dateDebut' => $c['DateDebut'],
+                        'dateFin' => $c['DateFin'],
+                        'statut' => $c['Statut'] ?? 'Actif'
+                    ];
+                    
+                    $eventRetour = [
+                        'type' => 'retour',
+                        'label' => 'Retour ' . $c['Marque'] . ' ' . $c['Nom'],
+                        'idContrat' => $c['idContrat'] ?? null,
+                        'client' => $c['Client'] ?? 'Inconnu',
+                        'vehicule' => $c['Marque'] . ' ' . $c['Nom'],
+                        'dateDebut' => $c['DateDebut'],
+                        'dateFin' => $c['DateFin'],
+                        'statut' => $c['Statut'] ?? 'Actif'
+                    ];
+                    
+                
+                    if (isset($calendar[$c['DateDebut']])) {
+                        $calendar[$c['DateDebut']]['events'][] = $eventDepart;
+                    }
+                    if (isset($calendar[$c['DateFin']])) {
+                        $calendar[$c['DateFin']]['events'][] = $eventRetour;
+                    }
+                }
+                
+
     
         // 🔹 7. Envoi à la vue
         $results = [
@@ -475,23 +493,81 @@ public function cars(array $dVueEreur)
     }
 
     private function modifierVoiture(array $dVueEreur)
-    {
-        $id = (int) ($_POST['id'] ?? 0);
-        $modele = $_POST['modele'] ?? '';
-        $couleur = $_POST['couleur'] ?? '';
-        $puissance = $_POST['puissance'] ?? '';
-
-        Validation::val_voiture($modele, $couleur, $puissance, $dVueEreur);
-
-        if (empty($dVueEreur) && $id > 0) {
-
-            $this->gateway->update($id, $modele, $couleur, $puissance);
-            header("Location: /sitesae2A/voitures");
-            exit;
-        }
+{
+    $numSerie = $_POST['NumSerie'] ?? null;
+    if (!$numSerie) {
+        $dVueEreur[] = "Numéro de série manquant pour la modification.";
         $results = $this->gateway->getAll();
         $this->afficherVue('flotte', $dVueEreur, $results, 'admin');
+        return;
     }
+
+    // ===============================
+    // 1. Upload image si nouvelle
+    // ===============================
+    $imagePath = $_POST['ImagePath'] ?? ''; // chemin actuel
+    if (isset($_FILES['ImagePath']) && $_FILES['ImagePath']['error'] === 0) {
+        $nomTemp = $_FILES['ImagePath']['tmp_name'];
+        $nomFichier = uniqid() . '_' . basename($_FILES['ImagePath']['name']);
+        $dossier = __DIR__ . '/../html/icons/cars/' . $nomFichier;
+
+        if (move_uploaded_file($nomTemp, $dossier)) {
+            $imagePath = 'html/icons/cars/' . $nomFichier;
+        }
+    }
+
+    // ===============================
+    // 2. Préparer payload pour API
+    // ===============================
+    $payload = [
+        'NumSerie' => $_POST['NumSerie'] ?? null,
+        'Energie' => $_POST['Energie'] ?? null,
+        'NbPlaces' => $_POST['NbPlaces'] ?? null,
+        'Categorie' => $_POST['Categorie'] ?? null,
+        'Transmission' => $_POST['Transmission'] ?? 'Traction',
+        'Boite' => $_POST['Boite'] ?? 'Manuelle',
+        'Etat' => $_POST['Etat'] ?? 'Libre',
+        'Puissance' => $_POST['Puissance'] ?? null,
+        'DateAchat' => $_POST['DateAchat'] ?? null,
+        'DateExpirationControleTech' => $_POST['DateExpirationControleTech'] ?? null,
+        'DateDernierControleTech' => $_POST['DateDernierControleTech'] ?? null,
+        'Marque' => $_POST['Marque'] ?? null,
+        'Nom' => $_POST['Nom'] ?? null,
+        'Annee' => $_POST['Annee'] ?? null,
+        'IdAssureur' => (int) ($_POST['IdAssureur'] ?? 0),
+        'IdFournisseur' => (int) ($_POST['IdFournisseur'] ?? 0),
+        'ImagePath' => $imagePath,
+        'Couleur' => $_POST['Couleur'] ?? null,
+        'Prix' => $_POST['Prix'] ?? null
+    ];
+
+    // ===============================
+    // 3. Appel API PUT
+    // ===============================
+    try {
+        $response = $this->apiClient->put("voitures/{$numSerie}", [
+            'json' => $payload
+        ]);
+
+        if ($response->getStatusCode() === 200) {
+            header("Location: /siteSAE2A/voitures");
+            exit;
+        }
+
+    } catch (\GuzzleHttp\Exception\RequestException $e) {
+        if ($e->hasResponse()) {
+            $apiError = json_decode($e->getResponse()->getBody()->getContents(), true);
+            $dVueEreur[] = $apiError['error'] ?? "Erreur API inconnue.";
+        } else {
+            $dVueEreur[] = "Impossible de contacter l’API.";
+        }
+    }
+
+    $results = $this->gateway->getAll();
+    $this->afficherVue('flotte', $dVueEreur, $results, 'admin');
+}
+
+
 
     private function rechercherVoitures(array $dVueErreur = []): void
     {
@@ -587,7 +663,7 @@ public function cars(array $dVueEreur)
             return;
         }
 
-        // php
+        
         $cheminVue = realpath($rep . $vuePath);
         if ($cheminVue && file_exists($cheminVue)) {
             $resultsTwig = $results;

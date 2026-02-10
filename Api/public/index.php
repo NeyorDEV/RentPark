@@ -138,37 +138,47 @@ $app->put('/voitures/{numSerie}', function (Request $request, Response $response
     }
 
     $sql = "UPDATE Vehicule SET 
-                Nom = :nom, 
-                Marque = :marque, 
-                Energie = :energie, 
-                NbPlaces = :nbPlaces, 
-                Categorie = :categorie, 
-                Transmission = :transmission, 
-                Boite = :boite, 
-                Puissance = :puissance, 
-                Etat = :etat, 
-                Prix = :prix,
-                DateAchat = :dateAchat,
-                DateDernierControleTech = :dateDernierControle,
-                DateExpirationControleTech = :dateExpirationControle
-            WHERE NumSerie = :numSerie";
-
-    $params = [
-        ':nom'          => [$data['Nom'] ?? null, \PDO::PARAM_STR],
-        ':marque'       => [$data['Marque'] ?? null, \PDO::PARAM_STR],
-        ':energie'      => [$data['Energie'] ?? null, \PDO::PARAM_STR],
-        ':nbPlaces'     => [$data['NbPlaces'] ?? 0, \PDO::PARAM_INT],
-        ':categorie'    => [$data['Categorie'] ?? null, \PDO::PARAM_STR],
-        ':transmission' => [$data['Transmission'] ?? null, \PDO::PARAM_STR],
-        ':boite'        => [$data['Boite'] ?? null, \PDO::PARAM_STR],
-        ':puissance'    => [$data['Puissance'] ?? null, \PDO::PARAM_STR],
-        ':etat'         => [$data['Etat'] ?? null, \PDO::PARAM_STR],
-        ':prix'         => [$data['Prix'] ?? 0, \PDO::PARAM_STR], // ou PARAM_INT selon votre BDD
-        ':dateAchat'            => [$data['DateAchat'] ?? null, \PDO::PARAM_STR],
-        ':dateDernierControle'  => [$data['DateDernierControleTech'] ?? null, \PDO::PARAM_STR],
-        ':dateExpirationControle'=> [$data['DateExpirationControleTech'] ?? null, \PDO::PARAM_STR],
-        ':numSerie'     => [$numSerie, \PDO::PARAM_STR]
-    ];
+            Nom = :nom, 
+            Marque = :marque, 
+            Annee = :annee,
+            Energie = :energie, 
+            NbPlaces = :nbPlaces, 
+            Categorie = :categorie, 
+            Transmission = :transmission, 
+            Boite = :boite, 
+            Puissance = :puissance, 
+            Etat = :etat, 
+            Prix = :prix,
+            DateAchat = :dateAchat,
+            DateDernierControleTech = :dateDernierControle,
+            DateExpirationControleTech = :dateExpirationControle,
+            Couleur = :couleur,
+            ImagePath = :imagePath,
+            IdAssureur = :idAssureur,
+            IdFournisseur = :idFournisseur
+        WHERE NumSerie = :numSerie";
+        $params = [
+            ':nom'          => [$data['Nom'] ?? null, \PDO::PARAM_STR],
+            ':marque'       => [$data['Marque'] ?? null, \PDO::PARAM_STR],
+            ':annee'        => [$data['Annee'] ?? null, \PDO::PARAM_INT],
+            ':energie'      => [$data['Energie'] ?? null, \PDO::PARAM_STR],
+            ':nbPlaces'     => [$data['NbPlaces'] ?? 0, \PDO::PARAM_INT],
+            ':categorie'    => [$data['Categorie'] ?? null, \PDO::PARAM_STR],
+            ':transmission' => [$data['Transmission'] ?? null, \PDO::PARAM_STR],
+            ':boite'        => [$data['Boite'] ?? null, \PDO::PARAM_STR],
+            ':puissance'    => [$data['Puissance'] ?? null, \PDO::PARAM_STR],
+            ':etat'         => [$data['Etat'] ?? null, \PDO::PARAM_STR],
+            ':prix'         => [$data['Prix'] ?? 0, \PDO::PARAM_STR],
+            ':dateAchat'            => [$data['DateAchat'] ?? null, \PDO::PARAM_STR],
+            ':dateDernierControle'  => [$data['DateDernierControleTech'] ?? null, \PDO::PARAM_STR],
+            ':dateExpirationControle'=> [$data['DateExpirationControleTech'] ?? null, \PDO::PARAM_STR],
+            ':couleur'      => [$data['Couleur'] ?? null, \PDO::PARAM_STR],
+            ':imagePath'    => [$data['ImagePath'] ?? null, \PDO::PARAM_STR],
+            ':idAssureur'   => [$data['IdAssureur'] ?? 0, \PDO::PARAM_INT],
+            ':idFournisseur'=> [$data['IdFournisseur'] ?? 0, \PDO::PARAM_INT],
+            ':numSerie'     => [$numSerie, \PDO::PARAM_STR]
+        ];
+        
 
     try {
         $conn->executeQuery($sql, $params);

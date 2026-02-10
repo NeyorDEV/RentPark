@@ -60,7 +60,6 @@ class FrontControleur
         
             // ROUTES USER CONNECTÉ
             $userRoutes = [
-                'homeCustomers',
                 'connection'
                 
             ];
@@ -95,7 +94,7 @@ class FrontControleur
             elseif (in_array($action, $userRoutes)) {
     
                 if (!isset($_SESSION['username'])) {
-                    header('Location: /siteSAE2A/connection');
+                    header('Location: /siteSAE2A/home');
                     exit;
                 }
     
