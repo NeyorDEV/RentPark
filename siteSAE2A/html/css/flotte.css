@@ -191,3 +191,55 @@
 /* Responsive */
 @media (max-width: 1200px) { .voiture-grid-container { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 600px) { .voiture-grid-container { grid-template-columns: 1fr; } }
+
+
+.vehicle-preview-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    backdrop-filter: blur(6px);
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.vehicle-preview-card {
+    background: rgba(255,255,255,0.1);
+    backdrop-filter: blur(15px);
+    border-radius: 25px;
+    padding: 30px;
+    width: 500px;
+    max-width: 90%;
+    text-align: center;
+    color: white;
+    position: relative;
+    animation: zoomIn 0.3s ease;
+}
+
+.vehicle-preview-card img {
+    width: 100%;
+    border-radius: 20px;
+    margin-bottom: 20px;
+}
+
+.vehicle-info h2 {
+    margin-bottom: 10px;
+}
+
+.vehicle-info p {
+    margin: 5px 0;
+}
+
+.close-preview {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 30px;
+    cursor: pointer;
+}
+
+@keyframes zoomIn {
+    from { transform: scale(0.8); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}

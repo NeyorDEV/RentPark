@@ -50,19 +50,14 @@ class Validation
             $puissance = (int)$puissance;
         }
     }
-    public static function val_user(string &$username, string &$password, string &$confirm, string &$role, array &$errors)
+    public static function val_user(string &$username, string &$password, string &$role, array &$errors)
     {
         $username = trim($username ?? '');
         $password = trim($password ?? '');
-        $confirm  = trim($confirm ?? '');
         $role     = trim($role ?? '');
 
-        if ($username === '' || $password === '' || $confirm === '' || $role === '') {
+        if ($username === '' || $password === '' || $role === '') {
             $errors[] = "Tous les champs sont requis.";
-        }
-
-        if ($password !== $confirm) {
-            $errors[] = "Les mots de passe ne correspondent pas.";
         }
 
         if (!in_array($role, ['admin', 'employe', 'client'])) {

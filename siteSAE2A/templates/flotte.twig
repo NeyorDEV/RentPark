@@ -40,7 +40,18 @@
             {% for row in results %}
                 <div class="rectangle-card" onclick="location.href='/siteSAE2A/voiture/{{ row.voiture|e }}'">
                     <img src="{{ row.ImagePath is not empty ? row.ImagePath|e : 'html/icons/voiture.png' }}" 
-                         alt="{{ row.Nom|e }}" class="bg-img">
+                    alt="{{ row.Nom|e }}" 
+                    class="bg-img"
+                    onclick="openPreview(
+                        '{{ row.ImagePath is not empty ? row.ImagePath|e : 'html/icons/voiture.png' }}',
+                        '{{ row.Nom|e('js') }}',
+                        '{{ row.Marque|e('js') }}',
+                        '{{ row.Annee|e('js') }}',
+                        '{{ row.Puissance|e('js') }}',
+                        '{{ row.Prix|e('js') }}'
+                    ); event.stopPropagation();">
+
+
 
                     <div class="info-glass">
                         <h2>{{ row.Nom|e }}</h2>
@@ -160,11 +171,20 @@
 
                             <div class="form-group">
                                 <label>Image actuelle ou nouvelle</label>
+                            
                                 {% if row.ImagePath %}
-                                    <p>Image actuelle : <img src="{{ row.ImagePath }}" alt="Photo véhicule" style="width:100px;"></p>
+                                    <p>
+                                        Image actuelle :
+                                        <img src="{{ row.ImagePath }}" alt="Photo véhicule" style="width:100px;">
+                                    </p>
+                            
+                                    <!-- 🔥 IMPORTANT -->
+                                    <input type="hidden" name="ImagePath" value="{{ row.ImagePath }}">
                                 {% endif %}
+                            
                                 <input type="file" name="ImagePath" accept="image/*">
                             </div>
+                            
 
                             <button type="submit" class="save-btn">Mettre à jour</button>
                         </form>
@@ -287,4 +307,44 @@
     </div>
 </div>
 {% endif %}
+
+<div id="vehiclePreviewModal" class="vehicle-preview-modal" onclick="closePreview()">
+
+    <div class="vehicle-preview-card" onclick="event.stopPropagation();">
+        
+        <span class="close-preview" onclick="closePreview()">&times;</span>
+
+        <img id="previewImage" src="" alt="Aperçu véhicule">
+
+        <div class="vehicle-info">
+            <h2 id="previewName"></h2>
+            <p><strong>Marque :</strong> <span id="previewBrand"></span></p>
+            <p><strong>Année :</strong> <span id="previewYear"></span></p>
+            <p><strong>Puissance :</strong> <span id="previewPower"></span> ch</p>
+            <p><strong>Prix :</strong> <span id="previewPrice"></span> €</p>
+        </div>
+
+    </div>
+</div>
+
+
+<script>
+function openPreview(image, name, brand, year, power, price) {
+    document.getElementById("previewImage").src = image;
+    document.getElementById("previewName").textContent = name;
+    document.getElementById("previewBrand").textContent = brand;
+    document.getElementById("previewYear").textContent = year;
+    document.getElementById("previewPower").textContent = power;
+    document.getElementById("previewPrice").textContent = price;
+
+    document.getElementById("vehiclePreviewModal").style.display = "flex";
+}
+
+function closePreview() {
+    document.getElementById("vehiclePreviewModal").style.display = "none";
+}
+</script>
+
+
+
 {% endblock %}

@@ -97,9 +97,6 @@
                     <input type="password" name="password" placeholder="Mot de passe" required>
                 </div>
                 <div class="form-group">
-                    <input type="password" name="confirm" placeholder="Confirmer mot de passe" required>
-                </div>
-                <div class="form-group">
                     <input type="text" name="role" placeholder="Rôle (admin/user)" required>
                 </div>
                 <button type="submit" class="save-btn">Créer le compte</button>

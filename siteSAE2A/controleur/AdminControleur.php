@@ -106,6 +106,7 @@ class AdminControleur
         exit(0);
     }
 
+    // récup par API mais systeme de recherche  à faire avec API ou à adapter 
     public function listeVoitures(array $dVueEreur)
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -224,8 +225,9 @@ class AdminControleur
 
     }
 
-    // --- Dans AdminControleur.php, méthode cars() ---
 
+
+    // utilise API mais à revoir pour faire les filtres directement en API ou à adapter selon les besoins
 public function cars(array $dVueEreur)
 {
     // 1. Récupération des filtres depuis l'URL (GET)
@@ -292,6 +294,7 @@ public function cars(array $dVueEreur)
         $this->afficherVue('parametres', $dVueEreur, $results = null, 'admin');
     }
 
+    // à faire avec API
     public function affichePlanning(array $dVueEreur)
     {
         // 🔹 1. Récupération du mois depuis l’URL
@@ -398,12 +401,11 @@ public function cars(array $dVueEreur)
     }
     
 
+    // utilise API 
     private function ajouterVoiture(array $dVueEreur)
 {
     try {
-        // ===============================
-        // 1. Upload image (comme avant)
-        // ===============================
+
         $imagePath = '';
 
         if (isset($_FILES['image']) && $_FILES['image']['error'] === 0) {
@@ -480,6 +482,7 @@ public function cars(array $dVueEreur)
 }
 
 
+    // utilise API
     private function supprimerVoiture(array $dVueEreur)
     {
         $id = ($_POST['NumSerie'] ?? -1);
@@ -563,7 +566,7 @@ public function cars(array $dVueEreur)
         }
     }
 
-    $results = $this->gateway->getAll();
+    $results = $this->apiClient->get("voitures");
     $this->afficherVue('flotte', $dVueEreur, $results, 'admin');
 }
 
@@ -574,7 +577,7 @@ public function cars(array $dVueEreur)
         $motCle = trim($_GET['q'] ?? '');
 
         if ($motCle === '') {
-            $results = $this->gateway->getAll();
+            $results = $this->apiClient->get("voitures");
             
         } else {
             $results = $this->gateway->rechercherVoitures($motCle);
@@ -692,6 +695,8 @@ public function cars(array $dVueEreur)
         $this->afficherVue('user', $dVueErreur, $results, 'admin');
     }
 
+
+    // ok utilise API
     private function supprimerUtilisateur(array $dVueEreur)
     {
         $id = (int) ($_POST['id'] ?? -1);
@@ -716,23 +721,29 @@ public function cars(array $dVueEreur)
     }
 
 
+    // ok utilise API
     private function ajouterUtilisateur(array $dVueEreur)
     {
         $username = $_POST['username'] ?? '';
         $password = $_POST['password'] ?? '';
-        $confirm = $_POST['confirm'] ?? '';
         $role = $_POST['role'] ?? '';
 
-        Validation::val_user($username, $password, $confirm, $role, $dVueEreur);
+        Validation::val_user($username, $password,  $role, $dVueEreur);
 
         if (empty($dVueEreur)) {
-            $this->userGateway->addUser($username, $password, $role);
+            $this->apiClient->post("/add/users", [
+                'form_params' => [
+                    'username' => $username,
+                    'password' => $password,
+                    'role'     => $role
+                ]
+            ]);            
             header("Location: /siteSAE2A/utilisateurs");
             exit;
 
         }
 
-        $results = $this->userGateway->getAllUser();
+        $results = $this->apiClient->get("users");
         $this->afficherVue('user', $dVueEreur, $results);
     }
 
