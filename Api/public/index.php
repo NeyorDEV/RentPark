@@ -433,6 +433,7 @@ $app->get('/contrat', function (Request $request, Response $response, $args) use
     return $response->withHeader('Content-Type', 'application/json');
 });
 
+
 // POST : Ajouter un contrat
 $app->post('/modif/contrat', function (Request $request, Response $response, $args) use ($conn) {
     

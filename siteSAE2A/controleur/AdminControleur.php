@@ -1027,7 +1027,7 @@ public function cars(array $dVueEreur)
 
             if ($idClient) {
                 // --- ÉTAPE 2 : Créer le contrat via l'API ---
-                $responseContrat = $this->apiClient->post('contrat', [
+                $responseContrat = $this->apiClient->post('modif/contrat', [
                     'json' => [
                         'DateDebut'  => $dateDebut,
                         'DateFin'    => $dateFin,
