@@ -242,7 +242,7 @@ public function cars(array $dVueEreur)
 
     // 2. Appel de l'API
     try {
-        $response = $this->apiClient->get('vehicules');
+        $response = $this->apiClient->get('voitures');
         $results = json_decode($response->getBody()->getContents(), true);
     } catch (RequestException $e) {
         $dVueEreur[] = "Impossible de récupérer les véhicules depuis l’API.";

@@ -55,7 +55,8 @@ class FrontControleur
                 'cars',
                 'afficheConnection',
                 'afficheInscription',
-                'deconnecter'
+                'deconnecter',
+                'reservationForm'
             ];
         
             // ROUTES USER CONNECTÉ
