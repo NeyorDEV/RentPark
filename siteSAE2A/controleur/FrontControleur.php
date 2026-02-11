@@ -56,7 +56,9 @@ class FrontControleur
                 'afficheConnection',
                 'afficheInscription',
                 'deconnecter',
-                'reservationForm'
+                'reservationForm',
+                'afficheRecapitulatif',
+                'finaliserReservation'
             ];
         
             // ROUTES USER CONNECTÉ

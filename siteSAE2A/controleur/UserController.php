@@ -49,6 +49,15 @@ class UserController
                 case 'homeCustomers':
                     $this->homeCustomers($dVueErreur);
                     break;
+                case 'reservationForm':
+                    $this->reservationForm($dVueErreur);
+                    break;
+                case 'afficheRecapitulatif':
+                    $this->afficheRecapitulatif($dVueErreur);
+                    break;
+                case 'finaliserReservation':
+                    $this->finaliserReservation($dVueErreur);
+                    break;
                 default:
                     $dVueEreur[] = "Action inconnue";
                     $this->afficherVue('homeCustomers', $dVueEreur, $results = null, 'user');
@@ -214,8 +223,96 @@ class UserController
     }
 
     $this->afficherVue('cars', $dVueEreur, $results, 'user');
-}
+    }
 
+    public function reservationForm(array $dVueEreur){
+         $this->afficherVue('reservationForm', $dVueEreur, $results = null, 'user');
+    }
+
+    public function afficheRecapitulatif(array $dVueEreur)
+    {
+        $this->afficherVue('recapitulatif', $dVueEreur, $results = null, 'user');
+    }
+
+    function finaliserReservation(array &$dVueEreur) 
+    {
+        try {
+            $nom = $_POST['nom'] ?? null;
+            $prenom = $_POST['prenom'] ?? null;
+            $email = $_POST['email'] ?? null;
+            $tel = $_POST['numTel'] ?? null;
+            $permis = $_POST['numPermis'] ?? null;
+            $dateNaiss = $_POST['datenaiss'] ?? null;
+            $nationalite = $_POST['nationalite'] ?? null;
+
+            // 2. Récupération des données de base de la réservation
+            $numSerie = $_POST['num_serie'] ?? null;
+            $dateDebut = $_POST['date_debut'] ?? null;
+            $dateFin = $_POST['date_fin'] ?? null;
+
+            // On SELECT le véhicule par son NumSerie pour garantir l'exactitude des données
+            $responseVehicule = $this->apiClient->get("voitures/$numSerie"); 
+            $vehicule = json_decode($responseVehicule->getBody()->getContents(), true);
+
+            if (!$vehicule) {
+                throw new \Exception("Véhicule introuvable pour le contrat.");
+            }
+            
+            try {
+                // --- ÉTAPE 1 : Créer le client via l'API ---
+                $responseClient = $this->apiClient->post('client', [
+                    'json' => [
+                        'Nom' => $nom,
+                        'Prenom' => $prenom,
+                        'Email' => $email,
+                        'NumTel' => $tel,
+                        'NumPermis' => $permis,
+                        'DateNaiss' => $dateNaiss,
+                        'Nationalite' => $nationalite
+                    ]
+                ]);
+                } catch (RequestException $e) {
+                if ($e->hasResponse()) {
+                    // CECI VA AFFICHER L'ERREUR PHP RÉELLE DE L'API
+                    echo $e->getResponse()->getBody()->getContents(); 
+                    die(); 
+            }
+            }
+
+            $dataClient = json_decode($responseClient->getBody()->getContents(), true);
+            $idClient = $dataClient['idClient'] ?? null;
+
+            if ($idClient) {
+                // --- ÉTAPE 2 : Créer le contrat via l'API ---
+                $responseContrat = $this->apiClient->post('modif/contrat', [
+                    'json' => [
+                        'DateDebut'  => $dateDebut,
+                        'DateFin'    => $dateFin,
+                        'Statut'     => 'EnCoursValidation',
+                        'IdClient'   => (int)$idClient,
+                        'EtatAvant'  => 5,
+                        'IdVehicule' => $numSerie,
+                        'Marque'     => $vehicule['Marque'], 
+                        'NomModele'  => $vehicule['Nom'],    
+                        'AnneeModele'=> $vehicule['Annee']   
+                    ]
+                ]);
+
+                $dataContrat = json_decode($responseContrat->getBody()->getContents(), true);
+
+                if (isset($dataContrat['message']) && $dataContrat['message'] === 'Contrat créé avec succès') {
+                    $this->afficherVue('confirmationSucces', $dVueEreur, null, 'user');
+                }
+            }
+
+        } catch (RequestException $e) {
+            $dVueEreur[] = "Erreur API : " . $e->getMessage();
+            $this->afficherVue('recapitulatif', $dVueEreur, null, 'user');
+        } catch (\Exception $e) {
+            $dVueEreur[] = "Erreur technique : " . $e->getMessage();
+            $this->afficherVue('recapitulatif', $dVueEreur, null, 'user');
+        }
+    }
 
     private function afficherVue(string $vueKey, array $dVueEreur, ?array $results = null, string $role = 'user')
     {
