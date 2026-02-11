@@ -72,7 +72,6 @@ class UserController
         exit(0);
     }
 
-
     public function homeCustomers(array $dVueEreur)
     {
 
