@@ -56,7 +56,7 @@ fun DashboardScreen() {
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text("Tableau de bord") },
+                title = { Text("Tableau de bord" )},
                 navigationIcon = { Text("retour") }
             )
         }
@@ -83,7 +83,7 @@ fun DashboardScreen() {
                         verticalArrangement = Arrangement.Top,
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Text(text = card.title)
+                        Text(text = card.title, fontSize = 20.sp, fontWeight = FontWeight.Bold)
                         Spacer(modifier = Modifier.height(16.dp))
                         if (card.items.size == 1) {
                             CircularIndicator(number = card.items.first())

@@ -25,7 +25,6 @@ class MainActivity : ComponentActivity() {
         // Supprime les bordures système pour un look "Full Screen" (Optionnel)
         // WindowCompat.setDecorFitsSystemWindows(window, false)
 
-
         setContent {
 
             // On applique le thème de l'application
@@ -33,7 +32,7 @@ class MainActivity : ComponentActivity() {
                 // Surface occupe tout l'écran
                 Surface(color = MaterialTheme.colorScheme.background) {
                     // On appelle la fonction Composable de ton design
-                    RentParkScreen()
+                    DashboardScreen()
                 }
             }
         }
