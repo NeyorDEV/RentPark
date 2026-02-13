@@ -33,6 +33,7 @@ class MainActivity : ComponentActivity() {
                 Surface(color = MaterialTheme.colorScheme.background) {
                     // On appelle la fonction Composable de ton design
                     DashboardScreen()
+                    //RentParkScreen()
                 }
             }
         }

@@ -7,6 +7,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
@@ -25,6 +26,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
+import com.example.rentparkkotlin.ui.homeCustomer.RentParkScreen
 
 // Modèle simple pour les cartes du dashboard
 data class DashboardCard(val title: String, val items: List<String> = emptyList())
@@ -36,17 +38,6 @@ fun DashboardScreen() {
     // Exemple de contenu
     val cards = listOf(
         DashboardCard("Nombre d'utilisateurs", listOf("11")),
-        DashboardCard("Nombre d'utilisateurs", listOf("11")),
-        DashboardCard("Nombre d'utilisateurs", listOf("11")),
-        DashboardCard("Nombre d'utilisateurs", listOf("11")),
-        DashboardCard("Nombre d'utilisateurs", listOf("11")),
-        DashboardCard("Nombre d'utilisateurs", listOf("11")),
-        DashboardCard("Nombre d'utilisateurs", listOf("11")),
-        DashboardCard("Nombre d'utilisateurs", listOf("11")),
-        DashboardCard("Nombre d'utilisateurs", listOf("11")),
-        DashboardCard("Nombre d'utilisateurs", listOf("11")),
-        DashboardCard("Nombre d'utilisateurs", listOf("11")),
-        DashboardCard("Nombre d'utilisateurs", listOf("11")),
         DashboardCard("Voiture la plus louée", listOf("BMW Série 3", "Louée 1 fois")),
         DashboardCard("Revenus mensuels", listOf("360 000€")),
         DashboardCard("Rappels", listOf("Contrôle technique – BMW Série 3", "Contrôle technique – BMW Série 3")),
@@ -57,7 +48,6 @@ fun DashboardScreen() {
         topBar = {
             CenterAlignedTopAppBar(
                 title = { Text("Tableau de bord" )},
-                navigationIcon = { Text("retour") }
             )
         }
     ) { innerPadding ->
