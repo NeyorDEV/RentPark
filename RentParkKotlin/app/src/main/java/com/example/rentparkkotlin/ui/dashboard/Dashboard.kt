@@ -1,5 +1,8 @@
 package com.example.rentparkkotlin.ui.dashboard
 
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -15,6 +18,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -76,7 +81,7 @@ fun DashboardScreen() {
                         Text(text = card.title, fontSize = 20.sp, fontWeight = FontWeight.Bold)
                         Spacer(modifier = Modifier.height(16.dp))
                         if (card.items.size == 1) {
-                            CircularIndicator(number = card.items.first())
+                            CircularIndicatorAnimated(number = card.items.first())
                         } else {
                             card.items.forEach { itemText ->
                                 Text(text = itemText)
@@ -91,23 +96,37 @@ fun DashboardScreen() {
 }
 
 @Composable
-fun CircularIndicator(
+fun CircularIndicatorAnimated(
     number: String,
     size: Int = 200,
     color: Color = Color(0xFFFF5722),
-    strokeWidth: Float = 4f
+    strokeWidth: Float = 6f,
+    duration: Int = 1500  // durée de l'animation en ms
 ) {
+    // Animatable pour contrôler le pourcentage du cercle
+    val progress = remember { Animatable(0f) }
+
+    // Lancer l'animation au composable
+    LaunchedEffect(Unit) {
+        progress.animateTo(
+            targetValue = 1f,
+            animationSpec = tween(durationMillis = duration, easing = LinearEasing)
+        )
+    }
+
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier.size(size.dp)
     ) {
         Canvas(modifier = Modifier.fillMaxSize()) {
-            val radius = size - strokeWidth  // pour que le contour ne soit pas coupé
+            val radius = (size / 2f) - (strokeWidth / 2f)
 
-            // Cercle uniquement en contour
-            drawCircle(
+            // Cercle “progressif” : on utilise sweepAngle en degrés
+            drawArc(
                 color = color,
-                radius = radius,
+                startAngle = -90f,
+                sweepAngle = 360f * progress.value, // animation du cercle
+                useCenter = false,
                 style = Stroke(width = strokeWidth)
             )
         }
@@ -115,8 +134,8 @@ fun CircularIndicator(
         // Texte centré
         Text(
             text = number,
-            fontSize = (size / 6).sp,
-            fontWeight = FontWeight.Bold
+            fontSize = (size/8f).sp,
+            fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
         )
     }
 }
