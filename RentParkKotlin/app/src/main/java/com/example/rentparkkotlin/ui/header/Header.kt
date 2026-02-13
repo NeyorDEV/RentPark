@@ -30,7 +30,7 @@ fun TitlePart(title: String) {
         .fillMaxWidth()) {
         Box(modifier = Modifier
             .fillMaxWidth()
-            ,contentAlignment = Alignment.CenterB){
+            ,contentAlignment = Alignment.Center){
             Text(text = title)
         }
     }

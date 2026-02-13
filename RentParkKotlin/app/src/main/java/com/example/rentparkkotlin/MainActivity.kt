@@ -25,6 +25,7 @@ class MainActivity : ComponentActivity() {
         // Supprime les bordures système pour un look "Full Screen" (Optionnel)
         // WindowCompat.setDecorFitsSystemWindows(window, false)
 
+
         setContent {
 
             // On applique le thème de l'application
