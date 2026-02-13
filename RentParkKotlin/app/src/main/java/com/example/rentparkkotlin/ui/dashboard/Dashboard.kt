@@ -40,25 +40,36 @@ data class DashboardCard(val title: String, val items: List<String> = emptyList(
 @Composable
 fun DashboardScreen() {
 
-    // Exemple de contenu
     val cards = listOf(
         DashboardCard("Nombre d'utilisateurs", listOf("11")),
         DashboardCard("Voiture la plus louée", listOf("BMW Série 3", "Louée 1 fois")),
         DashboardCard("Revenus mensuels", listOf("360 000€")),
-        DashboardCard("Rappels", listOf("Contrôle technique – BMW Série 3", "Contrôle technique – BMW Série 3")),
-        DashboardCard("Planning Proche", listOf("13/02/2026 – Location : BMW Série 3", "14/02/2026 – Retour : BMW Série 3"))
+        DashboardCard(
+            "Rappels",
+            listOf(
+                "Contrôle technique – BMW Série 3",
+                "Assurance – BMW Série 3",
+                "Vidange – BMW Série 3",
+                "Pneus – BMW Série 3"
+            )
+        ),
+        DashboardCard(
+            "Planning Proche",
+            listOf(
+                "13/02/2026 – Location : BMW Série 3",
+                "14/02/2026 – Retour : BMW Série 3",
+                "15/02/2026 – Location : Audi A3"
+            )
+        )
     )
 
     Scaffold(
-        topBar = {
-            CenterAlignedTopAppBar(
-                title = { Text("Tableau de bord" )},
-            )
-        }
+        topBar = { CenterAlignedTopAppBar(title = { Text("Tableau de bord") }) }
     ) { innerPadding ->
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
+                .padding(top = 30.dp)
                 .padding(innerPadding)
                 .padding(horizontal = 30.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -66,7 +77,9 @@ fun DashboardScreen() {
         ) {
             items(cards) { card ->
                 Card(
-                    modifier = Modifier.size(300.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(min = 150.dp),
                     shape = RoundedCornerShape(16.dp),
                     elevation = CardDefaults.cardElevation(8.dp)
                 ) {
@@ -78,22 +91,63 @@ fun DashboardScreen() {
                         verticalArrangement = Arrangement.Top,
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Text(text = card.title, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                        Text(
+                            text = card.title,
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold
+                        )
                         Spacer(modifier = Modifier.height(16.dp))
-                        if (card.items.size == 1) {
-                            CircularIndicatorAnimated(number = card.items.first())
-                        } else {
-                            card.items.forEach { itemText ->
-                                Text(text = itemText)
+
+                        when {
+                            card.items.size == 1 -> {
+                                CircularIndicatorAnimated(number = card.items.first())
+                            }
+
+                            // Seules certaines cartes utilisent la LazyColumn interne
+                            card.title in listOf("Rappels", "Planning Proche") -> {
+                                Box(
+                                    modifier = Modifier
+                                        .heightIn(max = 100.dp)
+                                ) {
+                                    LazyColumn(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                                    ) {
+                                        items(card.items) { item ->
+                                            Text(
+                                                text = item,
+                                                fontSize = 16.sp,
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .background(
+                                                        Color(0xFFFFF3E0),
+                                                        shape = RoundedCornerShape(8.dp)
+                                                    )
+                                                    .padding(8.dp)
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+
+                            else -> {
+                                // Carte simple avec plusieurs items
+                                card.items.forEach { item ->
+                                    Text(
+                                        text = item,
+                                        fontSize = 16.sp
+                                    )
+                                }
                             }
                         }
                     }
                 }
-
             }
         }
     }
 }
+
+
 
 @Composable
 fun CircularIndicatorAnimated(
