@@ -32,6 +32,12 @@ class MainActivity : ComponentActivity() {
                 // Surface occupe tout l'écran
                 Surface(color = MaterialTheme.colorScheme.background) {
                     // On appelle la fonction Composable de ton design
+
+                    // ALBAN EST PAS CONTENT SI ON CASSE alors svp
+                    // on ajoute son appel de méthode mais on casse pas celle des autres
+                    // juste besoin de rajouter votre appel de méthode ici
+                    // et on met l'autre en commentaire
+                    // merci bisous du Grand H
                     DashboardScreen()
                     //RentParkScreen()
                 }
