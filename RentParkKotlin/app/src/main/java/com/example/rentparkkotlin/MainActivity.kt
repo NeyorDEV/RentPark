@@ -15,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.rentparkkotlin.ui.homeCustomer.RentParkHomeScreen
+import com.example.rentparkkotlin.ui.userPage.UserManagementScreen
 
 import com.example.rentparkkotlin.ui.theme.RentParkKotlinTheme
 
@@ -41,8 +42,8 @@ class MainActivity : ComponentActivity() {
                     // Et nique la police ainsi que les noirs, les arabes, les rebeux, les tismeys, les étrangers, les boubacars, les jeunes négriers et mamadou noel
 
                     //DashboardScreen()
-                    RentParkHomeScreen()
-
+                    //RentParkHomeScreen()
+                    UserManagementScreen()
                 }
             }
         }
