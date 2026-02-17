@@ -13,12 +13,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.rentparkkotlin.R
 
+val MaPoliceCustom = FontFamily(
+    Font(R.font.fortnite, FontWeight.Normal),
+    Font(R.font.fortnite, FontWeight.Bold)
+)
 @Composable
-fun RentParkScreen() {
+fun RentParkHomeScreen() {
     Box(modifier = Modifier.fillMaxSize().background(Color.Black)) {
 
         // --- 1. Image de fond (Voiture) avec dégradé noir ---
@@ -70,7 +77,9 @@ fun RentParkScreen() {
             Text(
                 text = "RENTPARK",
                 fontSize = 48.sp,
-                fontWeight = FontWeight.ExtraBold,
+                fontFamily = MaPoliceCustom,
+                fontWeight = FontWeight.Bold,
+
                 color = Color.White,
                 modifier = Modifier.padding(bottom = 40.dp)
             )

@@ -33,7 +33,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
-import com.example.rentparkkotlin.ui.homeCustomer.RentParkScreen
+import com.example.rentparkkotlin.ui.homeCustomer.RentParkHomeScreen
 
 // Modèle simple pour les cartes du dashboard
 data class DashboardCard(val title: String, val items: List<String> = emptyList())

@@ -14,7 +14,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.rentparkkotlin.ui.homeCustomer.RentParkScreen
+import com.example.rentparkkotlin.ui.homeCustomer.RentParkHomeScreen
+import com.example.rentparkkotlin.ui.userPage.UserManagementScreen
 
 import com.example.rentparkkotlin.ui.theme.RentParkKotlinTheme
 
@@ -38,8 +39,11 @@ class MainActivity : ComponentActivity() {
                     // juste besoin de rajouter votre appel de méthode ici
                     // et on met l'autre en commentaire
                     // merci bisous du Grand H
-                    DashboardScreen()
-                    //RentParkScreen()
+                    // Et nique la police ainsi que les noirs, les arabes, les rebeux, les tismeys, les étrangers, les boubacars, les jeunes négriers et mamadou noel
+
+                    //DashboardScreen()
+                    //RentParkHomeScreen()
+                    UserManagementScreen()
                 }
             }
         }
