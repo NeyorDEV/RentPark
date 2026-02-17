@@ -5,6 +5,7 @@ import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -22,6 +23,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -64,7 +66,25 @@ fun DashboardScreen() {
     )
 
     Scaffold(
-        topBar = { CenterAlignedTopAppBar(title = { Text("Tableau de bord") }) }
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = {
+                    Text(
+                        "Tableau de bord",
+                        fontSize = 40.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                },
+                // On utilise clip pour arrondir les bords (ici le bas)
+                // et colors pour rendre le fond de base transparent
+                modifier = Modifier
+                    .clip(RoundedCornerShape(bottomStart = 30.dp, bottomEnd = 30.dp))
+                    .shadow(1.dp,RoundedCornerShape(bottomStart = 30.dp, bottomEnd = 30.dp)),
+                colors = androidx.compose.material3.TopAppBarDefaults.centerAlignedTopAppBarColors(
+                    containerColor = Color.Transparent
+                )
+            )
+        }
     ) { innerPadding ->
         LazyColumn(
             modifier = Modifier
@@ -86,7 +106,7 @@ fun DashboardScreen() {
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
-                            .background(Color.White.copy(alpha = 0.9f))
+                            .background(Color.White.copy(alpha = 0.7f))
                             .padding(16.dp),
                         verticalArrangement = Arrangement.Top,
                         horizontalAlignment = Alignment.CenterHorizontally
