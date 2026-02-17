@@ -39,11 +39,11 @@ class MainActivity : ComponentActivity() {
                     // juste besoin de rajouter votre appel de méthode ici
                     // et on met l'autre en commentaire
                     // merci bisous du Grand H
-                    // Et nique la police ainsi que les noirs, les arabes, les rebeux, les tismeys, les étrangers, les boubacars, les jeunes négriers et mamadou noel
+                    // alors ...
 
                     //DashboardScreen()
                     //RentParkHomeScreen()
-                    UserManagementScreen()
+                    //UserManagementScreen()
                 }
             }
         }
