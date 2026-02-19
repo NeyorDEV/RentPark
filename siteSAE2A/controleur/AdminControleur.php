@@ -573,22 +573,27 @@ public function cars(array $dVueEreur)
 
 
     private function rechercherVoitures(array $dVueErreur = []): void
-    {
-        $motCle = trim($_GET['q'] ?? '');
+{
+    $motCle = trim($_GET['q'] ?? '');
 
-        if ($motCle === '') {
-            $results = $this->apiClient->get("voitures");
-            
-        } else {
-            $results = $this->gateway->rechercherVoitures($motCle);
-
-            if (empty($results)) {
-                $dVueErreur[] = "Aucune voiture trouvée pour \"$motCle\".";
-            }
+    try {
+        $url = 'voitures';
+        if ($motCle !== '') {
+            $url .= '?nom=' . urlencode($motCle);
         }
-        
-        $this->afficherVue('flotte', $dVueErreur, $results, 'admin');
+        $response = $this->apiClient->get($url);
+        $results = json_decode($response->getBody()->getContents(), true);
+
+        if (empty($results)) {
+            $dVueErreur[] = "Aucune voiture trouvée pour \"$motCle\".";
+        }
+    } catch (\Exception $e) {
+        $dVueErreur[] = "Erreur lors de la recherche via l’API : " . $e->getMessage();
+        $results = [];
     }
+
+    $this->afficherVue('flotte', $dVueErreur, $results, 'admin');
+}
 
 
     public function inscription(array $dVueErreur)

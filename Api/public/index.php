@@ -25,9 +25,19 @@ $app->addBodyParsingMiddleware();
 
 // GET : Liste toutes les voitures
 $app->get('/voitures', function (Request $request, Response $response, $args) use ($conn) {
-    $conn->executeQuery("SELECT * FROM Vehicule");
-    $vehicules = $conn->getResults();
-    $response->getBody()->write(json_encode($vehicules));
+    $params = $request->getQueryParams();
+    $sql = "SELECT * FROM Vehicule";
+    $queryParams = [];
+
+    if (!empty($params['nom'])) {
+        $sql .= " WHERE Nom LIKE :nom";
+        $queryParams[':nom'] = ['%' . $params['nom'] . '%', \PDO::PARAM_STR];
+    }
+
+    $conn->executeQuery($sql, $queryParams);
+    $result = $conn->getResults();
+
+    $response->getBody()->write(json_encode($result));
     return $response->withHeader('Content-Type', 'application/json');
 });
 
