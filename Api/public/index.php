@@ -390,44 +390,83 @@ $app->post('/client', function (Request $request, Response $response, $args) use
     
     $data = $request->getParsedBody();
 
-    // Validation des champs
+    // Validation des champs obligatoires
     if (empty($data['Nom']) || empty($data['Prenom']) || empty($data['Email']) || empty($data['NumPermis'])) {
-        $response->getBody()->write(json_encode([
-            'error' => 'Les champs Nom, Prenom, Email et NumPermis sont obligatoires.'
-        ]));
+        $response->getBody()->write(json_encode(['error' => 'Champs obligatoires manquants.']));
         return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
     }
 
-    $sql = "INSERT INTO Client (Nom, Prenom, Email, NumTel, NumPermis, DateNaiss, Nationalite) 
-            VALUES (:nom, :prenom, :email, :numTel, :numPermis, :dateNaiss, :nationalite)";
-
-    $params = [
-        ':nom'         => [$data['Nom'], \PDO::PARAM_STR],
-        ':prenom'      => [$data['Prenom'], \PDO::PARAM_STR],
-        ':email'       => [$data['Email'], \PDO::PARAM_STR],
-        ':numTel'      => [$data['NumTel'] ?? null, \PDO::PARAM_STR],
-        ':numPermis'   => [$data['NumPermis'], \PDO::PARAM_STR],
-        ':dateNaiss'   => [$data['DateNaiss'] ?? null, \PDO::PARAM_STR],
-        ':nationalite' => [$data['Nationalite'] ?? null, \PDO::PARAM_STR]
-    ];
-
     try {
-        $conn->executeQuery($sql, $params);
-        
-        // On récupère l'ID du client qui vient d'être créé pour pouvoir l'utiliser pour le contrat
-        $idClient = $conn->getLastInsertId(); 
+        // --- ÉTAPE A : Vérifier si l'email OU le permis existe déjà ---
+        $checkSql = "SELECT idClient FROM Client WHERE Email = :email OR NumPermis = :numPermis LIMIT 1";
+        $stmt = $conn->prepare($checkSql);
+        $stmt->execute([
+            ':email'     => $data['Email'],
+            ':numPermis' => $data['NumPermis']
+        ]);
+        $existingClient = $stmt->fetch();
+
+        if ($existingClient) {
+            // --- ÉTAPE B : UPDATE (Le client existe via Email ou Permis) ---
+            $idClient = $existingClient['idClient'];
+            
+            // Note : On met aussi à jour l'Email et le Permis au cas où l'un des deux aurait changé 
+            // par rapport à l'autre identifiant trouvé.
+            $sql = "UPDATE Client SET 
+                        Nom = :nom, 
+                        Prenom = :prenom, 
+                        Email = :email,
+                        NumTel = :numTel, 
+                        NumPermis = :numPermis, 
+                        DateNaiss = :dateNaiss, 
+                        Nationalite = :nationalite 
+                    WHERE idClient = :id";
+            
+            $params = [
+                ':nom'         => [$data['Nom'], \PDO::PARAM_STR],
+                ':prenom'      => [$data['Prenom'], \PDO::PARAM_STR],
+                ':email'       => [$data['Email'], \PDO::PARAM_STR],
+                ':numTel'      => [$data['NumTel'] ?? null, \PDO::PARAM_STR],
+                ':numPermis'   => [$data['NumPermis'], \PDO::PARAM_STR],
+                ':dateNaiss'   => [$data['DateNaiss'] ?? null, \PDO::PARAM_STR],
+                ':nationalite' => [$data['Nationalite'] ?? null, \PDO::PARAM_STR],
+                ':id'          => [$idClient, \PDO::PARAM_INT]
+            ];
+            
+            $conn->executeQuery($sql, $params);
+            $message = 'Client existant (Email ou Permis reconnu) mis à jour avec succès';
+            $status = 200;
+
+        } else {
+            // --- ÉTAPE C : INSERT (Aucune correspondance trouvée) ---
+            $sql = "INSERT INTO Client (Nom, Prenom, Email, NumTel, NumPermis, DateNaiss, Nationalite) 
+                    VALUES (:nom, :prenom, :email, :numTel, :numPermis, :dateNaiss, :nationalite)";
+            
+            $params = [
+                ':nom'         => [$data['Nom'], \PDO::PARAM_STR],
+                ':prenom'      => [$data['Prenom'], \PDO::PARAM_STR],
+                ':email'       => [$data['Email'], \PDO::PARAM_STR],
+                ':numTel'      => [$data['NumTel'] ?? null, \PDO::PARAM_STR],
+                ':numPermis'   => [$data['NumPermis'], \PDO::PARAM_STR],
+                ':dateNaiss'   => [$data['DateNaiss'] ?? null, \PDO::PARAM_STR],
+                ':nationalite' => [$data['Nationalite'] ?? null, \PDO::PARAM_STR]
+            ];
+            
+            $conn->executeQuery($sql, $params);
+            $idClient = $conn->getLastInsertId();
+            $message = 'Nouveau client créé avec succès';
+            $status = 201;
+        }
 
         $response->getBody()->write(json_encode([
-            'message'  => 'Client créé avec succès',
+            'message'  => $message,
             'idClient' => $idClient
         ]));
 
-        return $response->withHeader('Content-Type', 'application/json')->withStatus(201);
+        return $response->withHeader('Content-Type', 'application/json')->withStatus($status);
 
     } catch (\Exception $e) {
-        $response->getBody()->write(json_encode([
-            'error' => 'Erreur lors de la création du client : ' . $e->getMessage()
-        ]));
+        $response->getBody()->write(json_encode(['error' => 'Erreur technique : ' . $e->getMessage()]));
         return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
     }
 });
