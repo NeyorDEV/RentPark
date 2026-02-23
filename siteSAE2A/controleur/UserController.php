@@ -233,7 +233,7 @@ class UserController
         $this->afficherVue('recapitulatif', $dVueEreur, $results = null, 'user');
     }
 
-    function finaliserReservation(array &$dVueEreur) 
+    public function finaliserReservation(array &$dVueEreur) 
     {
         try {
             $nom = $_POST['nom'] ?? null;
@@ -272,10 +272,10 @@ class UserController
                 ]);
                 } catch (RequestException $e) {
                 if ($e->hasResponse()) {
-                    // CECI VA AFFICHER L'ERREUR PHP RÉELLE DE L'API
-                    echo $e->getResponse()->getBody()->getContents(); 
-                    die(); 
-            }
+                    $dVueEreur[] = $e->getResponse()->getBody()->getContents();
+                    $this->afficherVue('reservationForm', $dVueEreur, null, 'user');
+                    return;
+                }
             }
 
             $dataClient = json_decode($responseClient->getBody()->getContents(), true);
@@ -301,15 +301,21 @@ class UserController
 
                 if (isset($dataContrat['message']) && $dataContrat['message'] === 'Contrat créé avec succès') {
                     $this->afficherVue('confirmationSucces', $dVueEreur, null, 'user');
+                } else {
+                    $dVueEreur[] = "Erreur lors de la création du contrat";
+                    $this->afficherVue('confirmationSucces', $dVueEreur, null, 'user');
                 }
+            } else {
+                $dVueEreur[] = "Erreur lors de la création du client";
+                $this->afficherVue('confirmationSucces', $dVueEreur, null, 'user');
             }
 
         } catch (RequestException $e) {
             $dVueEreur[] = "Erreur API : " . $e->getMessage();
-            $this->afficherVue('recapitulatif', $dVueEreur, null, 'user');
+            $this->afficherVue('reservationForm', $dVueEreur, null, 'user');
         } catch (\Exception $e) {
             $dVueEreur[] = "Erreur technique : " . $e->getMessage();
-            $this->afficherVue('recapitulatif', $dVueEreur, null, 'user');
+            $this->afficherVue('reservationForm', $dVueEreur, null, 'user');
         }
     }
 
