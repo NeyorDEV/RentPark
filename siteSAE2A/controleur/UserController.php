@@ -310,6 +310,7 @@ class UserController
                 $this->afficherVue('confirmationSucces', $dVueEreur, null, 'user');
             }
 
+            
         } catch (RequestException $e) {
             $dVueEreur[] = "Erreur API : " . $e->getMessage();
             $this->afficherVue('reservationForm', $dVueEreur, null, 'user');
