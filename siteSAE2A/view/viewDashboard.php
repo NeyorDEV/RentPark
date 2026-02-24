@@ -86,7 +86,7 @@
             </section>
 
             <section class="card large-card planning-card">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div id="rappel">
                     <h2><i class="fa-solid fa-bell"></i> Rappels</h2>
                     <a href="#addRappelModal" class="add-btn-main"
                         style="text-decoration: none; font-size: 0.9em; padding: 5px 10px;">

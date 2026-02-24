@@ -307,3 +307,31 @@
 .dark-theme input[type="date"]::-webkit-calendar-picker-indicator {
   filter: invert(1);
 }
+
+.add-btn-main {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: linear-gradient(135deg, var(--rentpark-orange) 0%, #ff7e4d 100%);
+  color: white;
+  padding: 12px 25px;
+  border-radius: 50px;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 0.95rem;
+  box-shadow: 0 4px 15px rgba(255, 90, 25, 0.3);
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.add-btn-main:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 8px 25px rgba(255, 90, 25, 0.4);
+}
+
+#rappel {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 50%;
+}
