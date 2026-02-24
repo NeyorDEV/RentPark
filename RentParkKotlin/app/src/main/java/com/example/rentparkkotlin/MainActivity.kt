@@ -14,6 +14,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.example.rentparkkotlin.ui.carsPage.CarListScreen
 import com.example.rentparkkotlin.ui.homeCustomer.RentParkHomeScreen
 import com.example.rentparkkotlin.ui.userPage.UserManagementScreen
 
@@ -44,6 +45,7 @@ class MainActivity : ComponentActivity() {
                     //DashboardScreen()
                     //RentParkHomeScreen()
                     //UserManagementScreen()
+                    CarListScreen()
                 }
             }
         }

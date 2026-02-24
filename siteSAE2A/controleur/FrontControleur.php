@@ -64,7 +64,7 @@ class FrontControleur
             // ROUTES USER CONNECTÉ
             $userRoutes = [
                 'connection'
-                
+    
             ];
 
             $employeRoutes = [
