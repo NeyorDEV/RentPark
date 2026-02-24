@@ -100,65 +100,75 @@ $isAdmin = ($role === 'admin');
       </div>
   <?php endif; ?>
 
-  <div class="reservation">
-      <?php if (!empty($results)) : ?>
-          <?php foreach ($results as $row) : ?>
-              <div class="rectangle">
-                  <p>
-                      Reservation n°<?= htmlspecialchars($row['idContrat']) ?><br>
-                      Client : <?= htmlspecialchars($row['IdClient']) ?><br>
-                      Vehicule : <?= htmlspecialchars($row['idVehicule']) ?><br>
-                      Debut : <?= htmlspecialchars($row['DateDebut']) ?><br>
-                      Fin : <?= htmlspecialchars($row['DateFin']) ?><br>
-                  </p>
+                <div class="reservation">
+    <?php if (!empty($results)) : ?>
+        <?php foreach ($results as $row) : ?>
+            <div class="rectangle">
+                <p>
+                    <b>Reservation n°<?= htmlspecialchars($row['idContrat']) ?></b><br>
+                    Client : <?= htmlspecialchars($row['IdClient']) ?><br>
+                    Vehicule : <?= htmlspecialchars($row['idVehicule']) ?><br>
+                    Debut : <?= htmlspecialchars($row['DateDebut']) ?><br>
+                    Fin : <?= htmlspecialchars($row['DateFin']) ?><br>
+                </p>
 
-          <div class="actions">
-            <button type="button" class="edit-btn" onclick="location.hash='editModal-<?= htmlspecialchars($row['idContrat']) ?>'">Modifier</button>
+                <div class="actions">
+                    <button type="button" class="edit-btn" onclick="location.hash='editModal-<?= htmlspecialchars($row['idContrat']) ?>'">Modifier</button>
 
-            <form method="POST" action ="/siteSAE2A/reservation" onsubmit="return confirm('Supprimer ce contrat ?');" style="display:inline-block;">
-              <input type="hidden" name="action" value="supprimerReservation">
-              <input type="hidden" name="id" value="<?= htmlspecialchars($row['idContrat']) ?>">
-              <button type="submit"  class="delete-btn">Supprimer</button>
-            </form>
-          </div>
-
-      
-          <div id="editModal-<?= htmlspecialchars($row['idContrat']) ?>" class="modal">
-            <div class="modal-content">
-              <a href="#" class="close">×</a>
-              <h2>Modifier la réservation</h2>
-              <form method="POST" action="/siteSAE2A/reservation">
-                <input type="hidden" name="action" value="modifierReservation">
-                <input type="hidden" name="id" value="<?= htmlspecialchars($row['idContrat']) ?>">
-
-                <label>Véhicule (VIN)<br>
-                  <input type="text" name="Vehicule" required value="<?= htmlspecialchars($row['idVehicule']) ?>">
-                </label><br><br>
-
-                <label>Client (ID)<br>
-                  <input type="number" name="Client" required value="<?= htmlspecialchars($row['IdClient']) ?>">
-                </label><br><br>
-
-                <label>Début<br>
-                  <input type="date" name="DateDebut" required value="<?= htmlspecialchars($row['DateDebut']) ?>">
-                </label><br><br>
-
-                <label>Fin<br>
-                  <input type="date" name="DateFin" required value="<?= htmlspecialchars($row['DateFin']) ?>">
-                </label><br><br>
-
-                <button type="submit">Enregistrer</button>
-              </form>
+                    <form method="POST" action="/siteSAE2A/reservation" onsubmit="return confirm('Supprimer ce contrat ?');" style="display:inline-block;">
+                        <input type="hidden" name="action" value="supprimerReservation">
+                        <input type="hidden" name="id" value="<?= htmlspecialchars($row['idContrat']) ?>">
+                        <button type="submit" class="delete-btn">Supprimer</button>
+                    </form>
+                </div>
             </div>
-          </div>
-              </div>
-          <?php endforeach; ?>
-      <?php else : ?>
-          <div class="rectangle">
-              <p>Aucune réservation trouvée</p>
-          </div>
-      <?php endif; ?>
-  </div>
+            <?php endforeach; ?>
+    <?php else : ?>
+        <div class="rectangle">
+            <p>Aucune réservation trouvée</p>
+        </div>
+    <?php endif; ?>
+</div>
+
+<?php if (!empty($results)) : ?>
+    <?php foreach ($results as $row) : ?>
+        <div id="editModal-<?= htmlspecialchars($row['idContrat']) ?>" class="modal">
+            <div class="modal-content">
+                <a href="#" class="close">×</a>
+                <h2>Modifier la réservation</h2>
+                <form method="POST" action="/siteSAE2A/reservation">
+                    <input type="hidden" name="action" value="modifierReservation">
+                    <input type="hidden" name="id" value="<?= htmlspecialchars($row['idContrat']) ?>">
+
+                    <label>Véhicule (VIN)<br>
+                        <input type="text" name="Vehicule" required value="<?= htmlspecialchars($row['idVehicule']) ?>">
+                    </label><br><br>
+
+                    <label>Client (ID)<br>
+                        <input type="number" name="Client" required value="<?= htmlspecialchars($row['IdClient']) ?>">
+                    </label><br><br>
+
+                    <div style="display: flex; gap: 10px;">
+                        <div style="flex: 1;">
+                            <label>Début<br>
+                                <input type="date" name="DateDebut" required value="<?= htmlspecialchars($row['DateDebut']) ?>">
+                            </label>
+                        </div>
+                        <div style="flex: 1;">
+                            <label>Fin<br>
+                                <input type="date" name="DateFin" required value="<?= htmlspecialchars($row['DateFin']) ?>">
+                            </label>
+                        </div>
+                    </div><br>
+
+                    <button type="submit">Enregistrer les modifications</button>
+                </form>
+            </div>
+        </div>
+    <?php endforeach; ?>
+<?php endif; ?>
+
+
 
 
   <div id="addReservationModal" class="modal">
