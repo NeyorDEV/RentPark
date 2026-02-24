@@ -40,44 +40,6 @@ $app->get('/voitures', function (Request $request, Response $response, $args) us
     return $response->withHeader('Content-Type', 'application/json');
 });
 
-<<<<<<< HEAD
-=======
-$app->get('/voituresForReservation', function (Request $request, Response $response, $args) use ($conn) {
-    $params = $request->getQueryParams();
-    $dateDebut = $params['date_depart'] ?? null;
-    $dateFin = $params['date_retour'] ?? null;
-
-    $queryParams = [];
-    
-    // Requête de base
-    $sql = "SELECT * FROM Vehicule v WHERE 1=1";
-
-    // Si les dates sont fournies, on exclut les véhicules déjà loués
-    if ($dateDebut && $dateFin) {
-        $sql .= " AND v.NumSerie NOT IN (
-            SELECT IdVehicule 
-            FROM Contrat 
-            WHERE NOT (DateFin < :date_depart OR DateDebut > :date_fin)
-        )";
-        $queryParams[':date_depart'] = [$dateDebut, \PDO::PARAM_STR];
-        $queryParams[':date_fin'] = [$dateFin, \PDO::PARAM_STR];
-    }
-
-    // Filtre par nom existant
-    if (!empty($params['nom'])) {
-        $sql .= " AND v.Nom LIKE :nom";
-        $queryParams[':nom'] = ['%' . $params['nom'] . '%', \PDO::PARAM_STR];
-    }
-
-    $conn->executeQuery($sql, $queryParams);
-    $result = $conn->getResults();
-
-    $response->getBody()->write(json_encode($result));
-    return $response->withHeader('Content-Type', 'application/json');
-});
-
-// GET : Une voiture par son numéro de série
->>>>>>> 39c0e0635b1a72dad7a77da611b07ecdd12f39af
 $app->get('/voitures/{numSerie}', function (Request $request, Response $response, $args) use ($conn) {
     $numSerie = (string) $args['numSerie'];
 
