@@ -33,7 +33,6 @@ $app->get('/voitures', function (Request $request, Response $response, $args) us
         $sql .= " WHERE Nom LIKE :nom";
         $queryParams[':nom'] = ['%' . $params['nom'] . '%', \PDO::PARAM_STR];
     }
-
     $conn->executeQuery($sql, $queryParams);
     $result = $conn->getResults();
 
@@ -41,7 +40,6 @@ $app->get('/voitures', function (Request $request, Response $response, $args) us
     return $response->withHeader('Content-Type', 'application/json');
 });
 
-// GET : Une voiture par son numéro de série
 $app->get('/voitures/{numSerie}', function (Request $request, Response $response, $args) use ($conn) {
     $numSerie = (string) $args['numSerie'];
 

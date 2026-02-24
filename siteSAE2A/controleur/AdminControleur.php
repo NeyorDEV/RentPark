@@ -15,7 +15,7 @@ class AdminControleur
     private UserGateway $userGateway;
     private ReservationGateway $reservationGateway;
 
-    // test pour l'API
+    // test pour l'API3
     private Client $apiClient;
 
     public function __construct()
@@ -105,7 +105,6 @@ class AdminControleur
 
         exit(0);
     }
-
     // récup par API mais systeme de recherche  à faire avec API ou à adapter 
     public function listeVoitures(array $dVueEreur)
     {
@@ -611,15 +610,22 @@ class AdminControleur
     {
         $motCle = trim($_GET['q'] ?? '');
 
-        if ($motCle === '') {
-            $results = $this->apiClient->get("voitures");
-
-        } else {
-            $results = $this->gateway->rechercherVoitures($motCle);
+        try {
+            if ($motCle === '') {
+                $response = $this->apiClient->get("voitures");
+            } else {   
+                $response = $this->apiClient->get("voitures", [
+                    'query' => ['nom' => $motCle]
+                ]);
+            }
+            $results = json_decode($response->getBody()->getContents(), true);
 
             if (empty($results)) {
                 $dVueErreur[] = "Aucune voiture trouvée pour \"$motCle\".";
             }
+        } catch (\Exception $e) {
+            $dVueErreur[] = "Erreur lors de la recherche via l’API : " . $e->getMessage();
+            $results = [];
         }
 
         $this->afficherVue('flotte', $dVueErreur, $results, 'admin');
