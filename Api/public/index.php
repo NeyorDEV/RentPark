@@ -49,7 +49,7 @@ $app->get('/voitures/{numSerie}', function (Request $request, Response $response
         "SELECT * FROM Vehicule WHERE NumSerie = :numSerie",
         [':numSerie' => [$numSerie, \PDO::PARAM_STR]]
     );
-    
+
     $result = $conn->getResults();
 
     if (empty($result)) {
@@ -64,7 +64,7 @@ $app->get('/voitures/{numSerie}', function (Request $request, Response $response
 
 // POST : Ajouter un véhicule
 $app->post('/vehicule', function (Request $request, Response $response, $args) use ($conn) {
-    
+
     $data = $request->getParsedBody();
 
     if (empty($data['NumSerie'])) {
@@ -89,31 +89,31 @@ $app->post('/vehicule', function (Request $request, Response $response, $args) u
         ':energie' => [$data['Energie'], \PDO::PARAM_STR],
         ':nbPlaces' => [$data['NbPlaces'], \PDO::PARAM_STR],
         ':categorie' => [$data['Categorie'], \PDO::PARAM_STR],
-        
+
         ':transmission' => [$data['Transmission'] ?? 'Traction', \PDO::PARAM_STR],
         ':boite' => [$data['Boite'] ?? 'Manuelle', \PDO::PARAM_STR],
         ':etat' => [$data['Etat'] ?? 'Libre', \PDO::PARAM_STR],
-        
+
         ':puissance' => [$data['Puissance'], \PDO::PARAM_STR],
         ':dateAchat' => [$data['DateAchat'], \PDO::PARAM_STR],
         ':dateExpiration' => [$data['DateExpirationControleTech'], \PDO::PARAM_STR],
         ':dateDernierControle' => [$data['DateDernierControleTech'], \PDO::PARAM_STR],
-        
+
         ':marque' => [$data['Marque'], \PDO::PARAM_STR],
         ':nom' => [$data['Nom'], \PDO::PARAM_STR],
         ':annee' => [$data['Annee'], \PDO::PARAM_STR],
         ':idAssureur' => [$data['IdAssureur'], \PDO::PARAM_INT],
         ':idFournisseur' => [$data['IdFournisseur'], \PDO::PARAM_INT],
-        
+
         ':imagePath' => [$data['ImagePath'] ?? '', \PDO::PARAM_STR],
-        
+
         ':couleur' => [$data['Couleur'] ?? null, \PDO::PARAM_STR],
         ':prix' => [$data['Prix'] ?? null, \PDO::PARAM_STR]
     ];
 
     try {
         $conn->executeQuery($sql, $params);
-        
+
         $response->getBody()->write(json_encode([
             'message' => 'Véhicule ajouté avec succès',
             'NumSerie' => $data['NumSerie']
@@ -169,28 +169,28 @@ $app->put('/voitures/{numSerie}', function (Request $request, Response $response
             IdAssureur = :idAssureur,
             IdFournisseur = :idFournisseur
         WHERE NumSerie = :numSerie";
-        $params = [
-            ':nom'          => [$data['Nom'] ?? null, \PDO::PARAM_STR],
-            ':marque'       => [$data['Marque'] ?? null, \PDO::PARAM_STR],
-            ':annee'        => [$data['Annee'] ?? null, \PDO::PARAM_INT],
-            ':energie'      => [$data['Energie'] ?? null, \PDO::PARAM_STR],
-            ':nbPlaces'     => [$data['NbPlaces'] ?? 0, \PDO::PARAM_INT],
-            ':categorie'    => [$data['Categorie'] ?? null, \PDO::PARAM_STR],
-            ':transmission' => [$data['Transmission'] ?? null, \PDO::PARAM_STR],
-            ':boite'        => [$data['Boite'] ?? null, \PDO::PARAM_STR],
-            ':puissance'    => [$data['Puissance'] ?? null, \PDO::PARAM_STR],
-            ':etat'         => [$data['Etat'] ?? null, \PDO::PARAM_STR],
-            ':prix'         => [$data['Prix'] ?? 0, \PDO::PARAM_STR],
-            ':dateAchat'            => [$data['DateAchat'] ?? null, \PDO::PARAM_STR],
-            ':dateDernierControle'  => [$data['DateDernierControleTech'] ?? null, \PDO::PARAM_STR],
-            ':dateExpirationControle'=> [$data['DateExpirationControleTech'] ?? null, \PDO::PARAM_STR],
-            ':couleur'      => [$data['Couleur'] ?? null, \PDO::PARAM_STR],
-            ':imagePath'    => [$data['ImagePath'] ?? null, \PDO::PARAM_STR],
-            ':idAssureur'   => [$data['IdAssureur'] ?? 0, \PDO::PARAM_INT],
-            ':idFournisseur'=> [$data['IdFournisseur'] ?? 0, \PDO::PARAM_INT],
-            ':numSerie'     => [$numSerie, \PDO::PARAM_STR]
-        ];
-        
+    $params = [
+        ':nom' => [$data['Nom'] ?? null, \PDO::PARAM_STR],
+        ':marque' => [$data['Marque'] ?? null, \PDO::PARAM_STR],
+        ':annee' => [$data['Annee'] ?? null, \PDO::PARAM_INT],
+        ':energie' => [$data['Energie'] ?? null, \PDO::PARAM_STR],
+        ':nbPlaces' => [$data['NbPlaces'] ?? 0, \PDO::PARAM_INT],
+        ':categorie' => [$data['Categorie'] ?? null, \PDO::PARAM_STR],
+        ':transmission' => [$data['Transmission'] ?? null, \PDO::PARAM_STR],
+        ':boite' => [$data['Boite'] ?? null, \PDO::PARAM_STR],
+        ':puissance' => [$data['Puissance'] ?? null, \PDO::PARAM_STR],
+        ':etat' => [$data['Etat'] ?? null, \PDO::PARAM_STR],
+        ':prix' => [$data['Prix'] ?? 0, \PDO::PARAM_STR],
+        ':dateAchat' => [$data['DateAchat'] ?? null, \PDO::PARAM_STR],
+        ':dateDernierControle' => [$data['DateDernierControleTech'] ?? null, \PDO::PARAM_STR],
+        ':dateExpirationControle' => [$data['DateExpirationControleTech'] ?? null, \PDO::PARAM_STR],
+        ':couleur' => [$data['Couleur'] ?? null, \PDO::PARAM_STR],
+        ':imagePath' => [$data['ImagePath'] ?? null, \PDO::PARAM_STR],
+        ':idAssureur' => [$data['IdAssureur'] ?? 0, \PDO::PARAM_INT],
+        ':idFournisseur' => [$data['IdFournisseur'] ?? 0, \PDO::PARAM_INT],
+        ':numSerie' => [$numSerie, \PDO::PARAM_STR]
+    ];
+
 
     try {
         $conn->executeQuery($sql, $params);
@@ -251,7 +251,7 @@ $app->delete('/delete/voitures/{numSerie}', function ($request, $response, $args
 
 // POST : Ajouter un véhicule
 $app->post('/add/vehicule', function (Request $request, Response $response, $args) use ($conn) {
-    
+
     $data = $request->getParsedBody();
 
     if (empty($data['NumSerie'])) {
@@ -276,31 +276,31 @@ $app->post('/add/vehicule', function (Request $request, Response $response, $arg
         ':energie' => [$data['Energie'], \PDO::PARAM_STR],
         ':nbPlaces' => [$data['NbPlaces'], \PDO::PARAM_STR],
         ':categorie' => [$data['Categorie'], \PDO::PARAM_STR],
-        
+
         ':transmission' => [$data['Transmission'] ?? 'Traction', \PDO::PARAM_STR],
         ':boite' => [$data['Boite'] ?? 'Manuelle', \PDO::PARAM_STR],
         ':etat' => [$data['Etat'] ?? 'Libre', \PDO::PARAM_STR],
-        
+
         ':puissance' => [$data['Puissance'], \PDO::PARAM_STR],
         ':dateAchat' => [$data['DateAchat'], \PDO::PARAM_STR],
         ':dateExpiration' => [$data['DateExpirationControleTech'], \PDO::PARAM_STR],
         ':dateDernierControle' => [$data['DateDernierControleTech'], \PDO::PARAM_STR],
-        
+
         ':marque' => [$data['Marque'], \PDO::PARAM_STR],
         ':nom' => [$data['Nom'], \PDO::PARAM_STR],
         ':annee' => [$data['Annee'], \PDO::PARAM_STR],
         ':idAssureur' => [$data['IdAssureur'], \PDO::PARAM_INT],
         ':idFournisseur' => [$data['IdFournisseur'], \PDO::PARAM_INT],
-        
+
         ':imagePath' => [$data['ImagePath'] ?? '', \PDO::PARAM_STR],
-        
+
         ':couleur' => [$data['Couleur'] ?? null, \PDO::PARAM_STR],
         ':prix' => [$data['Prix'] ?? null, \PDO::PARAM_STR]
     ];
 
     try {
         $conn->executeQuery($sql, $params);
-        
+
         $response->getBody()->write(json_encode([
             'message' => 'Véhicule ajouté avec succès',
             'NumSerie' => $data['NumSerie']
@@ -340,7 +340,7 @@ $app->get('/client', function (Request $request, Response $response, $args) use 
 
 // POST : Ajouter un client
 $app->post('/modif/client', function (Request $request, Response $response, $args) use ($conn) {
-    
+
     $data = $request->getParsedBody();
 
     // Validation des champs
@@ -355,23 +355,23 @@ $app->post('/modif/client', function (Request $request, Response $response, $arg
             VALUES (:nom, :prenom, :email, :numTel, :numPermis, :dateNaiss, :nationalite)";
 
     $params = [
-        ':nom'         => [$data['Nom'], \PDO::PARAM_STR],
-        ':prenom'      => [$data['Prenom'], \PDO::PARAM_STR],
-        ':email'       => [$data['Email'], \PDO::PARAM_STR],
-        ':numTel'      => [$data['NumTel'] ?? null, \PDO::PARAM_STR],
-        ':numPermis'   => [$data['NumPermis'], \PDO::PARAM_STR],
-        ':dateNaiss'   => [$data['DateNaiss'] ?? null, \PDO::PARAM_STR],
+        ':nom' => [$data['Nom'], \PDO::PARAM_STR],
+        ':prenom' => [$data['Prenom'], \PDO::PARAM_STR],
+        ':email' => [$data['Email'], \PDO::PARAM_STR],
+        ':numTel' => [$data['NumTel'] ?? null, \PDO::PARAM_STR],
+        ':numPermis' => [$data['NumPermis'], \PDO::PARAM_STR],
+        ':dateNaiss' => [$data['DateNaiss'] ?? null, \PDO::PARAM_STR],
         ':nationalite' => [$data['Nationalite'] ?? null, \PDO::PARAM_STR]
     ];
 
     try {
         $conn->executeQuery($sql, $params);
-        
+
         // On récupère l'ID du client qui vient d'être créé pour pouvoir l'utiliser pour le contrat
-        $idClient = $conn->getLastInsertId(); 
+        $idClient = $conn->getLastInsertId();
 
         $response->getBody()->write(json_encode([
-            'message'  => 'Client créé avec succès',
+            'message' => 'Client créé avec succès',
             'idClient' => $idClient
         ]));
 
@@ -387,7 +387,7 @@ $app->post('/modif/client', function (Request $request, Response $response, $arg
 
 // POST : Ajouter un client
 $app->post('/client', function (Request $request, Response $response, $args) use ($conn) {
-    
+
     $data = $request->getParsedBody();
 
     // Validation des champs obligatoires
@@ -401,7 +401,7 @@ $app->post('/client', function (Request $request, Response $response, $args) use
         $checkSql = "SELECT idClient FROM Client WHERE Email = :email OR NumPermis = :numPermis LIMIT 1";
         $stmt = $conn->prepare($checkSql);
         $stmt->execute([
-            ':email'     => $data['Email'],
+            ':email' => $data['Email'],
             ':numPermis' => $data['NumPermis']
         ]);
         $existingClient = $stmt->fetch();
@@ -409,7 +409,7 @@ $app->post('/client', function (Request $request, Response $response, $args) use
         if ($existingClient) {
             // --- ÉTAPE B : UPDATE (Le client existe via Email ou Permis) ---
             $idClient = $existingClient['idClient'];
-            
+
             // Note : On met aussi à jour l'Email et le Permis au cas où l'un des deux aurait changé 
             // par rapport à l'autre identifiant trouvé.
             $sql = "UPDATE Client SET 
@@ -421,18 +421,18 @@ $app->post('/client', function (Request $request, Response $response, $args) use
                         DateNaiss = :dateNaiss, 
                         Nationalite = :nationalite 
                     WHERE idClient = :id";
-            
+
             $params = [
-                ':nom'         => [$data['Nom'], \PDO::PARAM_STR],
-                ':prenom'      => [$data['Prenom'], \PDO::PARAM_STR],
-                ':email'       => [$data['Email'], \PDO::PARAM_STR],
-                ':numTel'      => [$data['NumTel'] ?? null, \PDO::PARAM_STR],
-                ':numPermis'   => [$data['NumPermis'], \PDO::PARAM_STR],
-                ':dateNaiss'   => [$data['DateNaiss'] ?? null, \PDO::PARAM_STR],
+                ':nom' => [$data['Nom'], \PDO::PARAM_STR],
+                ':prenom' => [$data['Prenom'], \PDO::PARAM_STR],
+                ':email' => [$data['Email'], \PDO::PARAM_STR],
+                ':numTel' => [$data['NumTel'] ?? null, \PDO::PARAM_STR],
+                ':numPermis' => [$data['NumPermis'], \PDO::PARAM_STR],
+                ':dateNaiss' => [$data['DateNaiss'] ?? null, \PDO::PARAM_STR],
                 ':nationalite' => [$data['Nationalite'] ?? null, \PDO::PARAM_STR],
-                ':id'          => [$idClient, \PDO::PARAM_INT]
+                ':id' => [$idClient, \PDO::PARAM_INT]
             ];
-            
+
             $conn->executeQuery($sql, $params);
             $message = 'Client existant (Email ou Permis reconnu) mis à jour avec succès';
             $status = 200;
@@ -441,17 +441,17 @@ $app->post('/client', function (Request $request, Response $response, $args) use
             // --- ÉTAPE C : INSERT (Aucune correspondance trouvée) ---
             $sql = "INSERT INTO Client (Nom, Prenom, Email, NumTel, NumPermis, DateNaiss, Nationalite) 
                     VALUES (:nom, :prenom, :email, :numTel, :numPermis, :dateNaiss, :nationalite)";
-            
+
             $params = [
-                ':nom'         => [$data['Nom'], \PDO::PARAM_STR],
-                ':prenom'      => [$data['Prenom'], \PDO::PARAM_STR],
-                ':email'       => [$data['Email'], \PDO::PARAM_STR],
-                ':numTel'      => [$data['NumTel'] ?? null, \PDO::PARAM_STR],
-                ':numPermis'   => [$data['NumPermis'], \PDO::PARAM_STR],
-                ':dateNaiss'   => [$data['DateNaiss'] ?? null, \PDO::PARAM_STR],
+                ':nom' => [$data['Nom'], \PDO::PARAM_STR],
+                ':prenom' => [$data['Prenom'], \PDO::PARAM_STR],
+                ':email' => [$data['Email'], \PDO::PARAM_STR],
+                ':numTel' => [$data['NumTel'] ?? null, \PDO::PARAM_STR],
+                ':numPermis' => [$data['NumPermis'], \PDO::PARAM_STR],
+                ':dateNaiss' => [$data['DateNaiss'] ?? null, \PDO::PARAM_STR],
                 ':nationalite' => [$data['Nationalite'] ?? null, \PDO::PARAM_STR]
             ];
-            
+
             $conn->executeQuery($sql, $params);
             $idClient = $conn->getLastInsertId();
             $message = 'Nouveau client créé avec succès';
@@ -459,7 +459,7 @@ $app->post('/client', function (Request $request, Response $response, $args) use
         }
 
         $response->getBody()->write(json_encode([
-            'message'  => $message,
+            'message' => $message,
             'idClient' => $idClient
         ]));
 
@@ -487,7 +487,7 @@ $app->get('/contrat', function (Request $request, Response $response, $args) use
 
 // POST : Ajouter un contrat
 $app->post('/modif/contrat', function (Request $request, Response $response, $args) use ($conn) {
-    
+
     $data = $request->getParsedBody();
 
     if (empty($data['DateDebut']) || empty($data['DateFin'])) {
@@ -507,7 +507,7 @@ $app->post('/modif/contrat', function (Request $request, Response $response, $ar
         ':idClient' => [$data['IdClient'] ?? null, \PDO::PARAM_INT],
         ':etatAvant' => [$data['EtatAvant'] ?? null, \PDO::PARAM_INT],
         ':etatApres' => [$data['EtatApres'] ?? null, \PDO::PARAM_INT],
-        ':idVehicule' => [$data['IdVehicule'] ?? null, \PDO::PARAM_STR], 
+        ':idVehicule' => [$data['IdVehicule'] ?? null, \PDO::PARAM_STR],
         ':marque' => [$data['Marque'] ?? null, \PDO::PARAM_STR],
         ':nomModele' => [$data['NomModele'] ?? null, \PDO::PARAM_STR],
         ':anneeModele' => [$data['AnneeModele'] ?? null, \PDO::PARAM_STR]
@@ -515,7 +515,7 @@ $app->post('/modif/contrat', function (Request $request, Response $response, $ar
 
     try {
         $conn->executeQuery($sql, $params);
-        
+
         $response->getBody()->write(json_encode([
             'message' => 'Contrat créé avec succès'
         ]));
@@ -541,7 +541,7 @@ $app->delete('/contrat/{idContrat}', function (Request $request, Response $respo
             'error' => 'ID invalide'
         ]));
         return $response->withHeader('Content-Type', 'application/json')
-                        ->withStatus(400);
+            ->withStatus(400);
     }
 
     // 2️⃣ Vérifier si l'utilisateur existe
@@ -557,7 +557,7 @@ $app->delete('/contrat/{idContrat}', function (Request $request, Response $respo
             'error' => 'Contrat non trouvé'
         ]));
         return $response->withHeader('Content-Type', 'application/json')
-                        ->withStatus(404);
+            ->withStatus(404);
     }
 
     // 3️⃣ Suppression
@@ -572,7 +572,7 @@ $app->delete('/contrat/{idContrat}', function (Request $request, Response $respo
     ]));
 
     return $response->withHeader('Content-Type', 'application/json')
-                    ->withStatus(200);
+        ->withStatus(200);
 });
 
 // PATCH : Mettre à jour la date de fin d'un contrat
@@ -596,7 +596,7 @@ $app->patch('/contrat/{id}', function (Request $request, Response $response, $ar
         $stmt->execute($checkParams);
 
         $checkResult = $stmt->fetch(\PDO::FETCH_ASSOC);
-        
+
         if (!$checkResult) {
             $response->getBody()->write(json_encode(['error' => 'Contrat non trouvé.']));
             return $response->withHeader('Content-Type', 'application/json')->withStatus(404);
@@ -606,9 +606,9 @@ $app->patch('/contrat/{id}', function (Request $request, Response $response, $ar
             $response->getBody()->write(json_encode(['error' => 'Impossible de modifier la date de fin d\'un contrat terminé.']));
             return $response->withHeader('Content-Type', 'application/json')->withStatus(403);
         }
-        
+
         $sql = "UPDATE Contrat SET DateFin = :dateFin WHERE idContrat = :id";
-        
+
         $params = [
             'dateFin' => $data['DateFin'],
             'id' => $id
@@ -616,7 +616,7 @@ $app->patch('/contrat/{id}', function (Request $request, Response $response, $ar
 
         $updateStmt = $conn->prepare($sql);
         $updateStmt->execute($params);
-        
+
         $response->getBody()->write(json_encode([
             'message' => 'Date de fin du contrat mise à jour avec succès'
         ]));
@@ -655,7 +655,7 @@ $app->delete('/users/{id}', function (Request $request, Response $response, arra
             'error' => 'ID invalide'
         ]));
         return $response->withHeader('Content-Type', 'application/json')
-                        ->withStatus(400);
+            ->withStatus(400);
     }
 
     // 2️⃣ Vérifier si l'utilisateur existe
@@ -671,7 +671,7 @@ $app->delete('/users/{id}', function (Request $request, Response $response, arra
             'error' => 'Utilisateur non trouvé'
         ]));
         return $response->withHeader('Content-Type', 'application/json')
-                        ->withStatus(404);
+            ->withStatus(404);
     }
 
     // 3️⃣ Suppression
@@ -686,7 +686,7 @@ $app->delete('/users/{id}', function (Request $request, Response $response, arra
     ]));
 
     return $response->withHeader('Content-Type', 'application/json')
-                    ->withStatus(200);
+        ->withStatus(200);
 });
 
 // POST : Ajouter un utilisateur
@@ -696,7 +696,7 @@ $app->post('/add/users', function (Request $request, Response $response) use ($c
 
     $username = $data['username'] ?? null;
     $password = $data['password'] ?? null;
-    $role     = $data['role'] ?? 'client';
+    $role = $data['role'] ?? 'client';
 
     if (!$username || !$password) {
         $response->getBody()->write(json_encode([
@@ -714,7 +714,7 @@ $app->post('/add/users', function (Request $request, Response $response) use ($c
             [
                 ':username' => [$username, \PDO::PARAM_STR],
                 ':password' => [$hashedPassword, \PDO::PARAM_STR],
-                ':role'     => [$role, \PDO::PARAM_STR]
+                ':role' => [$role, \PDO::PARAM_STR]
             ]
         );
 
@@ -845,7 +845,7 @@ $app->get('/stats/contrats-prochains', function (Request $request, Response $res
             'error' => 'Erreur lors de la récupération des contrats : ' . $e->getMessage()
         ]));
         return $response->withHeader('Content-Type', 'application/json')
-                        ->withStatus(500);
+            ->withStatus(500);
     }
 });
 
@@ -858,7 +858,7 @@ $app->get('/stats/total-users', function (Request $request, Response $response, 
         $conn->executeQuery($query);
         $result = $conn->getResults();
 
-        $total = isset($result[0]['totalUsers']) ? (int)$result[0]['totalUsers'] : 0;
+        $total = isset($result[0]['totalUsers']) ? (int) $result[0]['totalUsers'] : 0;
 
         $response->getBody()->write(json_encode([
             'total_users' => $total
@@ -871,7 +871,7 @@ $app->get('/stats/total-users', function (Request $request, Response $response, 
             'error' => 'Erreur lors du comptage des utilisateurs : ' . $e->getMessage()
         ]));
         return $response->withHeader('Content-Type', 'application/json')
-                        ->withStatus(500);
+            ->withStatus(500);
     }
 });
 
@@ -913,7 +913,7 @@ $app->get('/stats/voiture-plus-louee', function (Request $request, Response $res
             'error' => 'Erreur lors de la récupération de la voiture la plus louée : ' . $e->getMessage()
         ]));
         return $response->withHeader('Content-Type', 'application/json')
-                        ->withStatus(500);
+            ->withStatus(500);
     }
 });
 
@@ -949,7 +949,7 @@ $app->get('/stats/planning-mensuel', function (Request $request, Response $respo
             'error' => 'Erreur lors de la récupération du planning : ' . $e->getMessage()
         ]));
         return $response->withHeader('Content-Type', 'application/json')
-                        ->withStatus(500);
+            ->withStatus(500);
     }
 });
 
@@ -975,7 +975,7 @@ $app->get('/stats/revenus-mensuel', function (Request $request, Response $respon
 
         $total = 0.0;
         if (!empty($results) && $results[0]['total'] !== null) {
-            $total = (float)$results[0]['total'];
+            $total = (float) $results[0]['total'];
         }
 
         $response->getBody()->write(json_encode([
@@ -1001,11 +1001,7 @@ $app->get('/stats/revenus-mensuel', function (Request $request, Response $respon
 });
 
 // GET : Véhicules avec contrôle technique bientôt expiré
-$app->get('/stats/controle-technique-bientot-expire', function (
-    Request $request,
-    Response $response,
-    $args
-) use ($conn) {
+$app->get('/stats/controle-technique-bientot-expire', function (Request $request, Response $response, $args) use ($conn) {
 
     $query = "
         SELECT 
@@ -1060,7 +1056,7 @@ $app->post('/login', function (Request $request, Response $response, $args) use 
         "SELECT * FROM users WHERE username = :username",
         [':username' => [$username, \PDO::PARAM_STR]]
     );
-    
+
     $users = $conn->getResults();
 
     if (empty($users)) {
@@ -1071,7 +1067,7 @@ $app->post('/login', function (Request $request, Response $response, $args) use 
     $user = $users[0];
 
     if (password_verify($password, $user['password'])) {
-        
+
         $payload = [
             "success" => true,
             "token" => bin2hex(random_bytes(16)),
@@ -1087,6 +1083,54 @@ $app->post('/login', function (Request $request, Response $response, $args) use 
         return $response->withHeader('Content-Type', 'application/json')->withStatus(401);
     }
 });
+
+
+// -----------------------------------------------------------------------
+// SECTION : RAPPELS
+// -----------------------------------------------------------------------
+
+// GET : Liste des rappels personnalisés
+$app->get('/rappels', function (Request $request, Response $response, $args) use ($conn) {
+    $conn->executeQuery("SELECT * FROM Rappel ORDER BY Date ASC");
+    $rappels = $conn->getResults();
+
+    $response->getBody()->write(json_encode($rappels));
+    return $response->withHeader('Content-Type', 'application/json');
+});
+
+// POST : Ajouter un rappel personnalisé
+$app->post('/rappel', function (Request $request, Response $response, $args) use ($conn) {
+    $data = $request->getParsedBody();
+
+    if (empty($data['Titre']) || empty($data['Description']) || empty($data['Date'])) {
+        $response->getBody()->write(json_encode([
+            'error' => 'Les champs Titre, Description et Date sont obligatoires.'
+        ]));
+        return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
+    }
+
+    $sql = "INSERT INTO Rappel (Titre, Description, Date) VALUES (:titre, :description, :date)";
+    $params = [
+        ':titre' => [$data['Titre'], \PDO::PARAM_STR],
+        ':description' => [$data['Description'], \PDO::PARAM_STR],
+        ':date' => [$data['Date'], \PDO::PARAM_STR]
+    ];
+
+    try {
+        $conn->executeQuery($sql, $params);
+        $response->getBody()->write(json_encode([
+            'message' => 'Rappel ajouté avec succès'
+        ]));
+        return $response->withHeader('Content-Type', 'application/json')->withStatus(201);
+    } catch (\Exception $e) {
+        $response->getBody()->write(json_encode([
+            'error' => 'Erreur lors de l\'ajout du rappel : ' . $e->getMessage()
+        ]));
+        return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
+    }
+});
+
+
 
 // -----------------------------------------------------------------------
 // LANCEMENT DE L'APPLICATION

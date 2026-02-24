@@ -1,122 +1,337 @@
 /* GRILLE ET CARTES */
 .dashboard-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    grid-gap: 60px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-gap: 60px;
 }
 
 .card {
-    background: #fff;
-    border-radius: 15px;
-    padding: 25px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+  background: #fff;
+  border-radius: 15px;
+  padding: 25px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-.large-card { grid-column: span 1.5; min-height: 350px; }
+.large-card {
+  grid-column: span 1.5;
+  min-height: 350px;
+}
 
 /* LES "JOLIES BOX" (Listes Planning/Rappels) */
-.scrollable-list { width: 100%; overflow-y: auto; max-height: 250px; padding-right: 5px; }
-
-.list-item {
-    background: #f9f9f9;
-    padding: 15px;
-    border-radius: 12px;
-    margin-bottom: 12px;
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    font-size: 0.9rem;
-    border-left: 5px solid var(--rentpark-orange);
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+.scrollable-list {
+  width: 100%;
+  overflow-y: auto;
+  max-height: 250px;
+  padding-right: 5px;
 }
 
-.date-tag, .badge {
-    background: #eee;
-    padding: 5px 10px;
-    border-radius: 6px;
-    font-weight: 700;
-    font-size: 0.8rem;
+.list-item {
+  background: #f9f9f9;
+  padding: 15px;
+  border-radius: 12px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  font-size: 0.9rem;
+  border-left: 5px solid var(--rentpark-orange);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.date-tag,
+.badge {
+  background: #eee;
+  padding: 5px 10px;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 0.8rem;
 }
 
 /* --- Limiter la taille de l'image du véhicule le plus loué --- */
 .best-car-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 15px;
-    width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  width: 100%;
 }
 
 .best-car-container .image-wrapper {
-    width: 100%;
-    max-width: 200px; /* Largeur max de l'image */
-    height: 120px;    /* Hauteur fixe pour harmoniser */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    overflow: hidden;
-    border-radius: 12px;
-    background: rgba(0, 0, 0, 0.02); /* Fond léger si l'image est transparente */
+  width: 100%;
+  max-width: 200px; /* Largeur max de l'image */
+  height: 120px; /* Hauteur fixe pour harmoniser */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.02); /* Fond léger si l'image est transparente */
 }
 
 .best-car-container .image-wrapper img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain; /* L'image s'adapte sans être coupée ni déformée */
-    transition: transform 0.3s ease;
+  width: 100%;
+  height: 100%;
+  object-fit: contain; /* L'image s'adapte sans être coupée ni déformée */
+  transition: transform 0.3s ease;
 }
 
 .best-car-container:hover img {
-    transform: scale(1.1); /* Petit effet de zoom au survol */
+  transform: scale(1.1); /* Petit effet de zoom au survol */
 }
 
 /* Ajustement des infos pour que ce soit bien centré */
 .best-car-container .info {
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
 }
 
 /* GRAPHIQUES CIRCULAIRES ANIMÉS */
 @property --value {
-    syntax: '<number>';
-    inherits: false;
-    initial-value: 0;
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 0;
 }
 
 .circle-chart {
-    --value: 0;
-    width: 140px; height: 140px;
-    border-radius: 50%;
-    background: radial-gradient(circle, white 55%, transparent 56%),
-                conic-gradient(var(--rentpark-orange) calc(var(--value) * 1%), #eee 0);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 1.3rem; font-weight: 700;
-    animation: fill-circle 1.5s ease-out forwards;
+  --value: 0;
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, white 55%, transparent 56%),
+    conic-gradient(var(--rentpark-orange) calc(var(--value) * 1%), #eee 0);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  font-weight: 700;
+  animation: fill-circle 1.5s ease-out forwards;
 }
 
 @keyframes fill-circle {
-    from { --value: 0; }
-    to { --value: var(--final-value); }
+  from {
+    --value: 0;
+  }
+  to {
+    --value: var(--final-value);
+  }
 }
 
 /* ALIGNEMENT 3 EN HAUT / 2 EN BAS */
 @media (min-width: 1201px) {
-    .large-card:nth-of-type(4) { grid-column: 1 / 2; width: 145%; }
-    .large-card:nth-of-type(5) { grid-column: 2 / 4; width: 72%; margin-left: auto; }
+  .large-card:nth-of-type(4) {
+    grid-column: 1 / 2;
+    width: 145%;
+  }
+  .large-card:nth-of-type(5) {
+    grid-column: 2 / 4;
+    width: 72%;
+    margin-left: auto;
+  }
 }
 
 /* DARK THEME SPECIFIQUE DASHBOARD */
-.dark-theme .card { background-color: #1e1e1e; }
-.dark-theme .list-item { background-color: #2a2a2a; border-left-color: var(--rentpark-orange-dark); }
-.dark-theme .list-item p { color: #e8e8e8; }
-.dark-theme .date-tag, .dark-theme .badge { background-color: #333; color: #fff; border: 1px solid #444; }
+.dark-theme .card {
+  background-color: #1e1e1e;
+}
+.dark-theme .list-item {
+  background-color: #2a2a2a;
+  border-left-color: var(--rentpark-orange-dark);
+}
+.dark-theme .list-item p {
+  color: #e8e8e8;
+}
+.dark-theme .date-tag,
+.dark-theme .badge {
+  background-color: #333;
+  color: #fff;
+  border: 1px solid #444;
+}
 
 .dark-theme .circle-chart {
-    background: radial-gradient(circle, #1e1e1e 55%, transparent 56%),
-                conic-gradient(var(--rentpark-orange-dark) calc(var(--value) * 1%), #333 0);
+  background:
+    radial-gradient(circle, #1e1e1e 55%, transparent 56%),
+    conic-gradient(var(--rentpark-orange-dark) calc(var(--value) * 1%), #333 0);
+}
+
+/* =========================================
+   MODALE (Ajout de Rappel)
+   ========================================= */
+
+/* Le fond semi-transparent qui prend tout l'écran */
+.modal {
+  display: none; /* Caché par défaut */
+  position: fixed;
+  z-index: 9999;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px); /* Petit effet de flou en arrière-plan */
+}
+
+/* Affichage de la modale au clic sur le lien */
+.modal:target {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* La boite blanche centrale */
+.modal-content {
+  background: #fff;
+  padding: 35px;
+  border-radius: 15px; /* Même arrondi que tes .card */
+  width: 90%;
+  max-width: 450px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  position: relative;
+  animation: modalFadeIn 0.3s ease forwards;
+}
+
+/* Animation d'apparition fluide */
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Bouton de fermeture (X) */
+.modal .close {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  font-size: 28px;
+  font-weight: bold;
+  text-decoration: none;
+  color: #888;
+  transition: color 0.2s;
+}
+
+.modal .close:hover {
+  color: #111;
+}
+
+.modal-content h2 {
+  margin-top: 0;
+  margin-bottom: 25px;
+  font-size: 1.6rem;
+  color: #333;
+}
+
+/* Champs du formulaire */
+.form-group input {
+  width: 100%;
+  padding: 12px 15px;
+  margin-bottom: 18px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+  box-sizing: border-box;
+  transition: all 0.3s ease;
+}
+
+.form-group input:focus {
+  border-color: var(--rentpark-orange, #f39c12);
+  box-shadow: 0 0 0 3px rgba(243, 156, 18, 0.15);
+  outline: none;
+}
+
+/* Bouton d'enregistrement */
+.save-btn {
+  background: var(--rentpark-orange, #f39c12);
+  color: white;
+  border: none;
+  padding: 14px 20px;
+  border-radius: 8px;
+  font-size: 1.05rem;
+  font-weight: bold;
+  cursor: pointer;
+  width: 100%;
+  transition:
+    opacity 0.3s ease,
+    transform 0.1s ease;
+}
+
+.save-btn:hover {
+  opacity: 0.9;
+}
+
+.save-btn:active {
+  transform: scale(0.98);
+}
+
+/* =========================================
+   DARK THEME - MODALE SPECIFIQUE
+   ========================================= */
+.dark-theme .modal-content {
+  background-color: #1e1e1e;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+}
+
+.dark-theme .modal-content h2 {
+  color: #e8e8e8;
+}
+
+.dark-theme .modal .close {
+  color: #aaa;
+}
+
+.dark-theme .modal .close:hover {
+  color: #fff;
+}
+
+.dark-theme .form-group input {
+  background-color: #2a2a2a;
+  border-color: #444;
+  color: #fff;
+}
+
+.dark-theme .form-group input:focus {
+  border-color: var(--rentpark-orange-dark, #e67e22);
+  box-shadow: 0 0 0 3px rgba(230, 126, 34, 0.2);
+}
+
+/* Assure que l'icône calendrier des inputs date reste visible en dark mode sur certains navigateurs */
+.dark-theme input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+}
+
+.add-btn-main {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: linear-gradient(135deg, var(--rentpark-orange) 0%, #ff7e4d 100%);
+  color: white;
+  padding: 12px 25px;
+  border-radius: 50px;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 0.95rem;
+  box-shadow: 0 4px 15px rgba(255, 90, 25, 0.3);
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.add-btn-main:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 8px 25px rgba(255, 90, 25, 0.4);
+}
+
+#rappel {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 50%;
 }
