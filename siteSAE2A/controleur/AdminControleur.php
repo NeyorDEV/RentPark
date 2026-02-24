@@ -269,7 +269,7 @@ class AdminControleur
 
         // 2. Appel de l'API
         try {
-            $response = $this->apiClient->get('voitures');
+            $response = $this->apiClient->get('voituresForReservation');
             $results = json_decode($response->getBody()->getContents(), true);
         } catch (RequestException $e) {
             $dVueEreur[] = "Impossible de récupérer les véhicules depuis l’API.";
