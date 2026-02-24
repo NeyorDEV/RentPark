@@ -27,8 +27,8 @@ $totalTTC = $nbJours * $prixJournalier;
 <div class="page-container">
     <div class="devis-section">
         <h2>Votre Devis</h2>
-        <p><strong>Véhicule (N° Série) :</strong> <span><?php echo htmlspecialchars($numSerie); ?></span></p>
-        <p><strong>Période :</strong> <span>Du <?php echo htmlspecialchars($date_depart); ?> au <?php echo htmlspecialchars($date_retour); ?></span></p>
+        <p><strong>Véhicule (N° Série) :</strong> <span><?php echo htmlspecialchars($numSerie ?? ''); ?></span></p>
+        <p><strong>Période :</strong> <span>Du <?php echo htmlspecialchars($date_depart ?? ''); ?> au <?php echo htmlspecialchars($date_retour ?? ''); ?></span></p>
         <p><strong>Durée :</strong> <span><?php echo $nbJours; ?> jour(s)</span></p>
         <hr>
         <div class="total-container">
@@ -40,9 +40,9 @@ $totalTTC = $nbJours * $prixJournalier;
     <div class="form-section">
         <h2>Informations de réservation</h2>
         <form action="/siteSAE2A/recapitulatif" method="POST">
-            <input type="hidden" name="num_serie" value="<?php echo htmlspecialchars($numSerie); ?>">
-            <input type="hidden" name="date_debut" value="<?php echo htmlspecialchars($date_depart); ?>">
-            <input type="hidden" name="date_fin" value="<?php echo htmlspecialchars($date_retour); ?>">
+            <input type="hidden" name="num_serie" value="<?php echo htmlspecialchars($numSerie ?? ''); ?>">
+            <input type="hidden" name="date_debut" value="<?php echo htmlspecialchars($date_depart ?? ''); ?>">
+            <input type="hidden" name="date_fin" value="<?php echo htmlspecialchars($date_retour ?? ''); ?>">
             <input type="hidden" name="prix_total" value="<?php echo $totalTTC; ?>">
 
             <div class="form-row">
@@ -95,5 +95,28 @@ $totalTTC = $nbJours * $prixJournalier;
     </div>
 </div>
 
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const inputDateNaiss = document.querySelector('input[name="datenaiss"]');
+    
+    // 1. Calculer la date maximum autorisée (Aujourd'hui - 18 ans)
+    const today = new Date();
+    const maxDate = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate());
+    
+    // Conversion au format YYYY-MM-DD pour l'attribut HTML
+    const formattedMaxDate = maxDate.toISOString().split('T')[0];
+    
+    // 2. Appliquer la restriction visuelle (calendrier grisé)
+    inputDateNaiss.setAttribute('max', formattedMaxDate);
+
+    // 3. Sécurité supplémentaire : Vérification à la saisie manuelle
+    inputDateNaiss.addEventListener('blur', function() {
+        if (this.value > formattedMaxDate) {
+            alert("Vous devez avoir au moins 18 ans pour réserver un véhicule.");
+            this.value = ""; // Réinitialise le champ
+        }
+    });
+});
+</script>
 </body>
 </html>

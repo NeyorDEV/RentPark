@@ -249,6 +249,27 @@ class UserController
             $dateDebut = $_POST['date_debut'] ?? null;
             $dateFin = $_POST['date_fin'] ?? null;
 
+            // --- NOUVELLES VÉRIFICATIONS ---
+            // 1. Vérification de l'âge (18 ans minimum)
+            $dateN = new \DateTime($dateNaiss);
+            $aujourdhui = new \DateTime();
+            $age = $aujourdhui->diff($dateN)->y;
+            if ($age < 18) {
+                throw new \Exception("Vous devez avoir au moins 18 ans pour réserver.");
+            }
+
+            // 2. Vérification des dates de réservation
+            $debut = new \DateTime($dateDebut);
+            $fin = new \DateTime($dateFin);
+            $now = new \DateTime('today'); // Minuit aujourd'hui
+
+            if ($debut < $now) {
+                throw new \Exception("La date de départ ne peut pas être dans le passé.");
+            }
+            if ($fin < $debut) {
+                throw new \Exception("La date de retour doit être égale ou supérieure à la date de départ.");
+            }
+
             // On SELECT le véhicule par son NumSerie pour garantir l'exactitude des données
             $responseVehicule = $this->apiClient->get("voitures/$numSerie"); 
             $vehicule = json_decode($responseVehicule->getBody()->getContents(), true);

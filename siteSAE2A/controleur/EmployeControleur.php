@@ -68,6 +68,12 @@ class EmployeControleur
                 case 'homeCustomers':
                     $this->homeCustomers($dVueErreur);
                     break;
+                case 'finaliserReservation':
+                    $this->finaliserReservation($dVueErreur);
+                    break;
+                case 'afficheRecapitulatif':
+                    $this->afficheRecapitulatif($dVueErreur);
+                    break;
                 default:
                     $dVueEreur[] = "Action inconnue";
                     $this->afficherVue('homeCustomers', $dVueEreur, $results = null, 'admin');
@@ -735,6 +741,119 @@ private function afficherVue(string $vueKey, array $dVueEreur, ?array $results =
 
         $results = $this->reservationGateway->searchReservations('idContrat', '', 'en-cours');
         $this->afficherVue('reservation', [], $results, 'admin');
+    }
+
+    public function finaliserReservation(array &$dVueEreur) 
+    {
+        try {
+            $nom = $_POST['nom'] ?? null;
+            $prenom = $_POST['prenom'] ?? null;
+            $email = $_POST['email'] ?? null;
+            $tel = $_POST['numTel'] ?? null;
+            $permis = $_POST['numPermis'] ?? null;
+            $dateNaiss = $_POST['datenaiss'] ?? null;
+            $nationalite = $_POST['nationalite'] ?? null;
+
+            // 2. Récupération des données de base de la réservation
+            $numSerie = $_POST['num_serie'] ?? null;
+            $dateDebut = $_POST['date_debut'] ?? null;
+            $dateFin = $_POST['date_fin'] ?? null;
+
+            // --- NOUVELLES VÉRIFICATIONS ---
+            // 1. Vérification de l'âge (18 ans minimum)
+            $dateN = new \DateTime($dateNaiss);
+            $aujourdhui = new \DateTime();
+            $age = $aujourdhui->diff($dateN)->y;
+            if ($age < 18) {
+                throw new \Exception("Vous devez avoir au moins 18 ans pour réserver.");
+            }
+
+            // 2. Vérification des dates de réservation
+            $debut = new \DateTime($dateDebut);
+            $fin = new \DateTime($dateFin);
+            $now = new \DateTime('today'); // Minuit aujourd'hui
+
+            if ($debut < $now) {
+                throw new \Exception("La date de départ ne peut pas être dans le passé.");
+            }
+            if ($fin < $debut) {
+                throw new \Exception("La date de retour doit être égale ou supérieure à la date de départ.");
+            }
+
+            // On SELECT le véhicule par son NumSerie pour garantir l'exactitude des données
+            $responseVehicule = $this->apiClient->get("voitures/$numSerie"); 
+            $vehicule = json_decode($responseVehicule->getBody()->getContents(), true);
+
+            if (!$vehicule) {
+                throw new \Exception("Véhicule introuvable pour le contrat.");
+            }
+            
+            try {
+                // --- ÉTAPE 1 : Créer le client via l'API ---
+                $responseClient = $this->apiClient->post('client', [
+                    'json' => [
+                        'Nom' => $nom,
+                        'Prenom' => $prenom,
+                        'Email' => $email,
+                        'NumTel' => $tel,
+                        'NumPermis' => $permis,
+                        'DateNaiss' => $dateNaiss,
+                        'Nationalite' => $nationalite
+                    ]
+                ]);
+                } catch (RequestException $e) {
+                if ($e->hasResponse()) {
+                    $dVueEreur[] = $e->getResponse()->getBody()->getContents();
+                    $this->afficherVue('reservationForm', $dVueEreur, null, 'user');
+                    return;
+                }
+            }
+
+            $dataClient = json_decode($responseClient->getBody()->getContents(), true);
+            $idClient = $dataClient['idClient'] ?? null;
+
+            if ($idClient) {
+                // --- ÉTAPE 2 : Créer le contrat via l'API ---
+                $responseContrat = $this->apiClient->post('modif/contrat', [
+                    'json' => [
+                        'DateDebut'  => $dateDebut,
+                        'DateFin'    => $dateFin,
+                        'Statut'     => 'EnCoursValidation',
+                        'IdClient'   => (int)$idClient,
+                        'EtatAvant'  => 5,
+                        'IdVehicule' => $numSerie,
+                        'Marque'     => $vehicule['Marque'], 
+                        'NomModele'  => $vehicule['Nom'],    
+                        'AnneeModele'=> $vehicule['Annee']   
+                    ]
+                ]);
+
+                $dataContrat = json_decode($responseContrat->getBody()->getContents(), true);
+
+                if (isset($dataContrat['message']) && $dataContrat['message'] === 'Contrat créé avec succès') {
+                    $this->afficherVue('confirmationSucces', $dVueEreur, null, 'user');
+                } else {
+                    $dVueEreur[] = "Erreur lors de la création du contrat";
+                    $this->afficherVue('confirmationSucces', $dVueEreur, null, 'user');
+                }
+            } else {
+                $dVueEreur[] = "Erreur lors de la création du client";
+                $this->afficherVue('confirmationSucces', $dVueEreur, null, 'user');
+            }
+
+            
+        } catch (RequestException $e) {
+            $dVueEreur[] = "Erreur API : " . $e->getMessage();
+            $this->afficherVue('reservationForm', $dVueEreur, null, 'user');
+        } catch (\Exception $e) {
+            $dVueEreur[] = "Erreur technique : " . $e->getMessage();
+            $this->afficherVue('reservationForm', $dVueEreur, null, 'user');
+        }
+    }
+
+    public function afficheRecapitulatif(array $dVueEreur)
+    {
+        $this->afficherVue('recapitulatif', $dVueEreur, $results = null, 'user');
     }
 
 }
