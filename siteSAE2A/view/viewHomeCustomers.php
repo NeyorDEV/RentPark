@@ -88,6 +88,50 @@ function toggleMenu() {
     document.getElementById("sidebar").classList.toggle("open");
 }
 </script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const dateDepart = document.getElementById('date_depart');
+    const dateRetour = document.getElementById('date_retour');
+    const form = document.querySelector('.search-box');
 
+    // 1. Définir la date minimale (Aujourd'hui) pour le départ
+    const today = new Date().toISOString().split('T')[0];
+    dateDepart.setAttribute('min', today);
+    dateRetour.setAttribute('min', today);
+
+    // 2. Quand la date de départ change, on met à jour le minimum de la date de retour
+    dateDepart.addEventListener('change', function() {
+        if (dateDepart.value) {
+            // Le retour doit être au minimum le même jour (ou le lendemain selon votre choix)
+            dateRetour.setAttribute('min', dateDepart.value);
+            
+            // Si la date de retour actuelle est avant la nouvelle date de départ, on la réinitialise
+            if (dateRetour.value && dateRetour.value < dateDepart.value) {
+                dateRetour.value = dateDepart.value;
+            }
+        }
+    });
+
+    // 3. Sécurité supplémentaire lors de la soumission du formulaire
+    form.addEventListener('submit', function(e) {
+        const start = new Date(dateDepart.value);
+        const end = new Date(dateRetour.value);
+        const now = new Date();
+        now.setHours(0,0,0,0); // On ne compare que la date, pas l'heure
+
+        if (start < now) {
+            alert("La date de départ ne peut pas être dans le passé.");
+            e.preventDefault();
+        } else if (end < start) {
+            alert("La date de retour doit être après la date de départ.");
+            e.preventDefault();
+        }
+    });
+});
+
+function toggleMenu() {
+    document.getElementById("sidebar").classList.toggle("open");
+}
+</script>
 </body>
 </html>
