@@ -1,18 +1,148 @@
 package com.example.rentparkkotlin.ui.settings
 
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.runtime.Composable
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+
+val AppOrange = Color(0xFFE35D33)
+val LightGreyBackground = Color(0xFFF7F7F7)
+val ButtonGrey = Color(0xFF9E9E9E)
 
 @Composable
-fun SettingsScreen(){
+fun SettingsPage() {
+    var isDarkMode by remember { mutableStateOf(false) }
+    var notificationsEnabled by remember { mutableStateOf(false) }
 
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.White)
+            .padding(24.dp)
+    ) {
+        Text(
+            text = "Paramètres",
+            fontSize = 32.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color.DarkGray
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+        Box(
+            modifier = Modifier
+                .width(100.dp)
+                .height(3.dp)
+                .background(AppOrange)
+        )
+
+        Spacer(modifier = Modifier.height(40.dp))
+
+        Text(
+            text = "Mode d'affichage",
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Bold
+        )
+        Text(
+            text = "Choisissez entre le mode clair et le mode sombre :",
+            color = Color.Gray,
+            fontSize = 14.sp,
+            modifier = Modifier.padding(vertical = 8.dp)
+        )
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            ModeButton(
+                text = "Mode Clair",
+                icon = "☀️",
+                isSelected = !isDarkMode,
+                modifier = Modifier.weight(1f),
+                onClick = { isDarkMode = false }
+            )
+            ModeButton(
+                text = "Mode Sombre",
+                icon = "🌙",
+                isSelected = isDarkMode,
+                modifier = Modifier.weight(1f),
+                onClick = { isDarkMode = true }
+            )
+        }
+
+        Spacer(modifier = Modifier.height(32.dp))
+        Divider(color = Color.LightGray.copy(alpha = 0.5f))
+        Spacer(modifier = Modifier.height(32.dp))
+
+        Text(
+            text = "Notifications",
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Bold
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(LightGreyBackground, RoundedCornerShape(16.dp))
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                text = "Recevoir les alertes de maintenance par email",
+                modifier = Modifier.weight(1f),
+                color = Color.DarkGray
+            )
+
+            Button(
+                onClick = { notificationsEnabled = !notificationsEnabled },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = if (notificationsEnabled) AppOrange else ButtonGrey
+                ),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Text(
+                    text = if (notificationsEnabled) "Activé" else "Désactivé",
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+        }
+    }
 }
 
 @Composable
-fun itemSetting(){
-    LazyRow(modifier = Modifier.fillMaxSize()) {
-
+fun ModeButton(
+    text: String,
+    icon: String,
+    isSelected: Boolean,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
+) {
+    OutlinedButton(
+        onClick = onClick,
+        modifier = modifier.height(56.dp),
+        shape = RoundedCornerShape(12.dp),
+        border = BorderStroke(
+            width = if (isSelected) 2.dp else 1.dp,
+            color = if (isSelected) Color.Black else Color.Gray
+        ),
+        colors = ButtonDefaults.outlinedButtonColors(
+            contentColor = Color.Black
+        )
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(icon)
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(text = text, fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal)
+        }
     }
 }
