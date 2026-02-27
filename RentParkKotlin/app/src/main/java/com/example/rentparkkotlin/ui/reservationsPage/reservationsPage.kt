@@ -1,8 +1,10 @@
 package com.example.rentparkkotlin.ui.reservationsPage
 
+import android.R
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -51,6 +53,7 @@ fun ContratsScreen() {
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
+            .background(Color(0xFF0F0F0F))
     ) {
         // Titre
         Text(
