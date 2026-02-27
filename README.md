@@ -61,5 +61,7 @@ Pour accèder à l'api pour la faire tourner on ne peut pas faire tourner le sit
 
 php -S 0.0.0.0:8880 
 
-Le reste est configuré dans android pour le moment 
+Le reste est configuré dans android pour le moment
+
+Pareil pour le serveur photo vous devez le lancer en 0.0.0.0:9990
 
