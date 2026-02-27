@@ -17,6 +17,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.example.rentparkkotlin.ui.carsPage.CarListScreen
 import com.example.rentparkkotlin.ui.homeCustomer.RentParkHomeScreen
 import com.example.rentparkkotlin.ui.userPage.UserManagementScreen
+import com.example.rentparkkotlin.ui.settings.SettingsPage
 
 import com.example.rentparkkotlin.ui.theme.RentParkKotlinTheme
 
@@ -45,7 +46,8 @@ class MainActivity : ComponentActivity() {
                     //DashboardScreen()
                     //RentParkHomeScreen()
                     //UserManagementScreen()
-                    CarListScreen()
+                    //CarListScreen()
+                    SettingsPage()
                 }
             }
         }
