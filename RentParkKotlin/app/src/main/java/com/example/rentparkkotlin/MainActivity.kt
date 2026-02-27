@@ -12,42 +12,41 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.rentparkkotlin.ui.carsPage.CarListScreen
 import com.example.rentparkkotlin.ui.homeCustomer.RentParkHomeScreen
-import com.example.rentparkkotlin.ui.reservationsPage.ContratsScreen
 import com.example.rentparkkotlin.ui.userPage.UserManagementScreen
+import com.example.rentparkkotlin.ui.settings.SettingsPage
 
 import com.example.rentparkkotlin.ui.theme.RentParkKotlinTheme
+import com.example.rentparkkotlin.ui.theme.ThemePrefs
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Supprime les bordures système pour un look "Full Screen" (Optionnel)
-        // WindowCompat.setDecorFitsSystemWindows(window, false)
+        val themePrefs = ThemePrefs(this)
 
         setContent {
+            var isDarkMode by remember { mutableStateOf(themePrefs.getDarkMode()) }
 
-            // On applique le thème de l'application
-            MaterialTheme {
-                // Surface occupe tout l'écran
-                Surface(color = MaterialTheme.colorScheme.background) {
-                    // On appelle la fonction Composable de ton design
-
-                    // ALBAN EST PAS CONTENT SI ON CASSE alors svp
-                    // on ajoute son appel de méthode mais on casse pas celle des autres
-                    // juste besoin de rajouter votre appel de méthode ici
-                    // et on met l'autre en commentaire
-                    // merci bisous du Grand H
-                    // alors ...
-
-                    //DashboardScreen()
-                    //RentParkHomeScreen()
-                    //UserManagementScreen()
-                    //CarListScreen()
-                    ContratsScreen()
+            RentParkKotlinTheme(darkTheme = isDarkMode) {
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
+                    SettingsPage(
+                        isDarkMode = isDarkMode,
+                        onThemeChange = { newValue ->
+                            isDarkMode = newValue
+                            themePrefs.saveDarkMode(newValue)
+                        }
+                    )
                 }
             }
         }

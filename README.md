@@ -55,3 +55,13 @@ Pour lancer le serveur  placez vous dans le dépot avec un terminal et faites le
 
 vous trouverez la documentation liée à la partie blazor dans le répertoire docsBlazor
 
+## doc Android
+
+Pour accèder à l'api pour la faire tourner on ne peut pas faire tourner le site en meme temps que l'android en localhost pour le moment solutions ouvrir un terminal sous 
+
+php -S 0.0.0.0:8880 
+
+Le reste est configuré dans android pour le moment
+
+Pareil pour le serveur photo vous devez le lancer en 0.0.0.0:9990
+

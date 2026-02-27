@@ -2,7 +2,6 @@ package com.example.rentparkkotlin.ui.settings
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
@@ -15,25 +14,25 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 val AppOrange = Color(0xFFE35D33)
-val LightGreyBackground = Color(0xFFF7F7F7)
 val ButtonGrey = Color(0xFF9E9E9E)
 
 @Composable
-fun SettingsPage() {
-    var isDarkMode by remember { mutableStateOf(false) }
+fun SettingsPage(
+    isDarkMode: Boolean,
+    onThemeChange: (Boolean) -> Unit
+) {
     var notificationsEnabled by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.White)
             .padding(24.dp)
     ) {
         Text(
             text = "Paramètres",
             fontSize = 32.sp,
             fontWeight = FontWeight.Bold,
-            color = Color.DarkGray
+            color = MaterialTheme.colorScheme.onBackground
         )
         Spacer(modifier = Modifier.height(4.dp))
         Box(
@@ -48,7 +47,8 @@ fun SettingsPage() {
         Text(
             text = "Mode d'affichage",
             fontSize = 18.sp,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onBackground
         )
         Text(
             text = "Choisissez entre le mode clair et le mode sombre :",
@@ -66,14 +66,14 @@ fun SettingsPage() {
                 icon = "☀️",
                 isSelected = !isDarkMode,
                 modifier = Modifier.weight(1f),
-                onClick = { isDarkMode = false }
+                onClick = { onThemeChange(false) }
             )
             ModeButton(
                 text = "Mode Sombre",
                 icon = "🌙",
                 isSelected = isDarkMode,
                 modifier = Modifier.weight(1f),
-                onClick = { isDarkMode = true }
+                onClick = { onThemeChange(true) }
             )
         }
 
@@ -84,14 +84,15 @@ fun SettingsPage() {
         Text(
             text = "Notifications",
             fontSize = 18.sp,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onBackground
         )
         Spacer(modifier = Modifier.height(16.dp))
 
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(LightGreyBackground, RoundedCornerShape(16.dp))
+                .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(16.dp))
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
@@ -99,7 +100,7 @@ fun SettingsPage() {
             Text(
                 text = "Recevoir les alertes de maintenance par email",
                 modifier = Modifier.weight(1f),
-                color = Color.DarkGray
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
             Button(
@@ -133,10 +134,10 @@ fun ModeButton(
         shape = RoundedCornerShape(12.dp),
         border = BorderStroke(
             width = if (isSelected) 2.dp else 1.dp,
-            color = if (isSelected) Color.Black else Color.Gray
+            color = if (isSelected) MaterialTheme.colorScheme.onBackground else Color.Gray
         ),
         colors = ButtonDefaults.outlinedButtonColors(
-            contentColor = Color.Black
+            contentColor = MaterialTheme.colorScheme.onBackground
         )
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
