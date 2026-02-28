@@ -52,7 +52,11 @@ fun ContratsScreen() {
         ))
     }
 
-    // État pour afficher/masquer le formulaire
+    // États pour la suppression
+    var showDeleteDialog by remember { mutableStateOf(false) }
+    var reservationToDelete by remember { mutableStateOf<Reservation?>(null) }
+
+    // État pour afficher/masquer le formulaire d'ajout
     var showSheet by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState()
 
@@ -71,19 +75,57 @@ fun ContratsScreen() {
             textAlign = TextAlign.Center
         )
 
-        // On passe l'action d'ouverture au header
         FilterHeader(onAddClick = { showSheet = true })
 
         Spacer(modifier = Modifier.height(32.dp))
 
         LazyColumn(verticalArrangement = Arrangement.spacedBy(16.dp)) {
             items(reservations) { res ->
-                ReservationCard(res)
+                ReservationCard(
+                    reservation = res,
+                    onDeleteRequest = {
+                        reservationToDelete = res
+                        showDeleteDialog = true
+                    }
+                )
             }
         }
     }
 
-    // --- 3. LE FORMULAIRE (BOTTOM SHEET) ---
+    // --- DIALOGUE DE CONFIRMATION DE SUPPRESSION ---
+    if (showDeleteDialog && reservationToDelete != null) {
+        AlertDialog(
+            onDismissRequest = { showDeleteDialog = false },
+            containerColor = Color(0xFF1A1A1A),
+            title = {
+                Text("Confirmer la suppression", color = Color.White, fontSize = 18.sp)
+            },
+            text = {
+                Text(
+                    "Voulez-vous vraiment supprimer la réservation n°${reservationToDelete?.id} ?",
+                    color = Color.LightGray
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        reservations = reservations.filter { it.id != reservationToDelete?.id }
+                        showDeleteDialog = false
+                        reservationToDelete = null
+                    }
+                ) {
+                    Text("Supprimer", color = Color(0xFFCB4335), fontWeight = FontWeight.Bold)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDeleteDialog = false }) {
+                    Text("Annuler", color = Color.White)
+                }
+            }
+        )
+    }
+
+    // --- LE FORMULAIRE (BOTTOM SHEET) ---
     if (showSheet) {
         ModalBottomSheet(
             onDismissRequest = { showSheet = false },
@@ -102,7 +144,7 @@ fun ContratsScreen() {
     }
 }
 
-// --- 4. COMPOSANTS DE L'INTERFACE ---
+// --- 3. COMPOSANTS DE L'INTERFACE ---
 
 @Composable
 fun FilterHeader(onAddClick: () -> Unit) {
@@ -125,7 +167,7 @@ fun FilterHeader(onAddClick: () -> Unit) {
             Icon(Icons.Default.Search, contentDescription = null, tint = Color(0xFFE67E22))
 
             Button(
-                onClick = onAddClick, // Action déclenchée ici
+                onClick = onAddClick,
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF7DCEA0)),
                 contentPadding = PaddingValues(horizontal = 16.dp),
                 shape = RoundedCornerShape(20.dp),
@@ -199,13 +241,12 @@ fun CustomTextField(value: String, onValueChange: (String) -> Unit, label: Strin
         label = { Text(label, color = Color.Gray) },
         modifier = Modifier.fillMaxWidth(),
         textStyle = androidx.compose.ui.text.TextStyle(color = Color.White),
-
         shape = RoundedCornerShape(12.dp)
     )
 }
 
 @Composable
-fun ReservationCard(reservation: Reservation) {
+fun ReservationCard(reservation: Reservation, onDeleteRequest: () -> Unit) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = Color(0xFF181818)),
@@ -224,8 +265,8 @@ fun ReservationCard(reservation: Reservation) {
                 InfoLabel("Période", "${reservation.debut} au ${reservation.fin}")
             }
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                ActionButton("Modifier", Color(0xFFEBF5FB), Color(0xFF2E86C1))
-                ActionButton("Supprimer", Color(0xFFFDEDEC), Color(0xFFCB4335))
+                ActionButton("Modifier", Color(0xFFEBF5FB), Color(0xFF2E86C1), onClick = { /* TODO */ })
+                ActionButton("Supprimer", Color(0xFFFDEDEC), Color(0xFFCB4335), onClick = onDeleteRequest)
             }
         }
     }
@@ -237,9 +278,9 @@ fun InfoLabel(label: String, value: String) {
 }
 
 @Composable
-fun ActionButton(text: String, bgColor: Color, textColor: Color) {
+fun ActionButton(text: String, bgColor: Color, textColor: Color, onClick: () -> Unit) {
     Button(
-        onClick = { },
+        onClick = onClick,
         colors = ButtonDefaults.buttonColors(containerColor = bgColor),
         shape = RoundedCornerShape(8.dp),
         contentPadding = PaddingValues(horizontal = 12.dp),
