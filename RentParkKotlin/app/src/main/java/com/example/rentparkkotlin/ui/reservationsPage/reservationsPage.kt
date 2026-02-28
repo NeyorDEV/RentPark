@@ -1,6 +1,5 @@
 package com.example.rentparkkotlin.ui.reservationsPage
 
-import android.R
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -12,7 +11,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -21,7 +20,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-// 1. Modèle de données
+// --- 1. MODÈLE DE DONNÉES ---
 data class Reservation(
     val id: Int,
     val clientId: Int,
@@ -34,7 +33,6 @@ class ContratsActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            // Fond Noir Pur
             Surface(modifier = Modifier.fillMaxSize(), color = Color.Black) {
                 ContratsScreen()
             }
@@ -42,49 +40,74 @@ class ContratsActivity : ComponentActivity() {
     }
 }
 
+// --- 2. ÉCRAN PRINCIPAL ---
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ContratsScreen() {
-    val reservations = listOf(
-        Reservation(36, 50, "TEST22335564", "2026-02-27", "2026-03-01"),
-        Reservation(38, 44, "TEST22335564", "2026-02-27", "2026-02-28")
-    )
+    // État de la liste des réservations
+    var reservations by remember {
+        mutableStateOf(listOf(
+            Reservation(36, 50, "TEST22335564", "2026-02-27", "2026-03-01"),
+            Reservation(38, 44, "TEST22335564", "2026-02-27", "2026-02-28")
+        ))
+    }
+
+    // État pour afficher/masquer le formulaire
+    var showSheet by remember { mutableStateOf(false) }
+    val sheetState = rememberModalBottomSheetState()
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
             .background(Color(0xFF0F0F0F))
+            .padding(16.dp)
     ) {
-        // Titre
         Text(
             text = "Contrats",
             color = Color.White,
             fontSize = 32.sp,
             fontWeight = FontWeight.Bold,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 32.dp),
+            modifier = Modifier.fillMaxWidth().padding(vertical = 32.dp),
             textAlign = TextAlign.Center
         )
 
-        // Barre de recherche (fond gris très sombre pour contraster avec le noir)
-        FilterHeader()
+        // On passe l'action d'ouverture au header
+        FilterHeader(onAddClick = { showSheet = true })
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        // Liste des cartes
         LazyColumn(verticalArrangement = Arrangement.spacedBy(16.dp)) {
             items(reservations) { res ->
                 ReservationCard(res)
             }
         }
     }
+
+    // --- 3. LE FORMULAIRE (BOTTOM SHEET) ---
+    if (showSheet) {
+        ModalBottomSheet(
+            onDismissRequest = { showSheet = false },
+            sheetState = sheetState,
+            containerColor = Color(0xFF151515),
+            dragHandle = { BottomSheetDefaults.DragHandle(color = Color.Gray) }
+        ) {
+            AddReservationForm(
+                onDismiss = { showSheet = false },
+                onSave = { newRes ->
+                    reservations = reservations + newRes
+                    showSheet = false
+                }
+            )
+        }
+    }
 }
 
+// --- 4. COMPOSANTS DE L'INTERFACE ---
+
 @Composable
-fun FilterHeader() {
+fun FilterHeader(onAddClick: () -> Unit) {
     Surface(
-        color = Color(0xFF151515), // Gris très foncé pour la barre
+        color = Color(0xFF151515),
         shape = RoundedCornerShape(50),
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -93,24 +116,16 @@ fun FilterHeader() {
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Text("RECHERCHER PAR :", color = Color.White, fontSize = 10.sp, fontWeight = FontWeight.ExtraBold)
+            Text("RECHERCHER :", color = Color.White, fontSize = 10.sp, fontWeight = FontWeight.ExtraBold)
 
-            Surface(color = Color(0xFF222222), shape = RoundedCornerShape(8.dp)) {
-                Text("ID", color = Color.White, modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp), fontSize = 12.sp)
-            }
-
-            Surface(
-                color = Color(0xFF222222),
-                shape = RoundedCornerShape(8.dp),
-                modifier = Modifier.weight(1f)
-            ) {
+            Surface(color = Color(0xFF222222), shape = RoundedCornerShape(8.dp), modifier = Modifier.weight(1f)) {
                 Text("Rechercher...", color = Color.Gray, modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp), fontSize = 12.sp)
             }
 
             Icon(Icons.Default.Search, contentDescription = null, tint = Color(0xFFE67E22))
 
             Button(
-                onClick = { /* Ajouter */ },
+                onClick = onAddClick, // Action déclenchée ici
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF7DCEA0)),
                 contentPadding = PaddingValues(horizontal = 16.dp),
                 shape = RoundedCornerShape(20.dp),
@@ -123,32 +138,92 @@ fun FilterHeader() {
 }
 
 @Composable
+fun AddReservationForm(onDismiss: () -> Unit, onSave: (Reservation) -> Unit) {
+    var clientId by remember { mutableStateOf("") }
+    var vehiculeId by remember { mutableStateOf("") }
+    var debut by remember { mutableStateOf("") }
+    var fin by remember { mutableStateOf("") }
+
+    Column(
+        modifier = Modifier.padding(24.dp).navigationBarsPadding(),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        Text("Nouvelle Réservation", color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+
+        CustomTextField(value = clientId, onValueChange = { clientId = it }, label = "ID Client")
+        CustomTextField(value = vehiculeId, onValueChange = { vehiculeId = it }, label = "Véhicule (Immatriculation)")
+
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Box(modifier = Modifier.weight(1f)) {
+                CustomTextField(value = debut, onValueChange = { debut = it }, label = "Début (AAAA-MM-JJ)")
+            }
+            Box(modifier = Modifier.weight(1f)) {
+                CustomTextField(value = fin, onValueChange = { fin = it }, label = "Fin (AAAA-MM-JJ)")
+            }
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            OutlinedButton(
+                onClick = onDismiss,
+                modifier = Modifier.weight(1f),
+                border = androidx.compose.foundation.BorderStroke(1.dp, Color.Gray),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Text("Annuler", color = Color.White)
+            }
+            Button(
+                onClick = {
+                    if (clientId.isNotEmpty() && vehiculeId.isNotEmpty()) {
+                        onSave(Reservation((100..999).random(), clientId.toIntOrNull() ?: 0, vehiculeId, debut, fin))
+                    }
+                },
+                modifier = Modifier.weight(1f),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF7DCEA0)),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Text("Confirmer", color = Color.Black, fontWeight = FontWeight.Bold)
+            }
+        }
+        Spacer(modifier = Modifier.height(24.dp))
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CustomTextField(value: String, onValueChange: (String) -> Unit, label: String) {
+    OutlinedTextField(
+        value = value,
+        onValueChange = onValueChange,
+        label = { Text(label, color = Color.Gray) },
+        modifier = Modifier.fillMaxWidth(),
+        textStyle = androidx.compose.ui.text.TextStyle(color = Color.White),
+
+        shape = RoundedCornerShape(12.dp)
+    )
+}
+
+@Composable
 fun ReservationCard(reservation: Reservation) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF181818)), // Gris foncé pour les cartes
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF181818)),
         shape = RoundedCornerShape(20.dp)
     ) {
         Row(
-            modifier = Modifier.padding(24.dp),
+            modifier = Modifier.padding(20.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = "Reservation n°${reservation.id}",
-                    color = Color(0xFFE67E22), // Orange
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 18.sp
-                )
-                Spacer(modifier = Modifier.height(12.dp))
+                Text("Reservation n°${reservation.id}", color = Color(0xFFE67E22), fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                Spacer(modifier = Modifier.height(8.dp))
                 InfoLabel("Client", reservation.clientId.toString())
-                InfoLabel("Vehicule", reservation.vehiculeId)
-                InfoLabel("Debut", reservation.debut)
-                InfoLabel("Fin", reservation.fin)
+                InfoLabel("Véhicule", reservation.vehiculeId)
+                InfoLabel("Période", "${reservation.debut} au ${reservation.fin}")
             }
-
-            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 ActionButton("Modifier", Color(0xFFEBF5FB), Color(0xFF2E86C1))
                 ActionButton("Supprimer", Color(0xFFFDEDEC), Color(0xFFCB4335))
             }
@@ -158,23 +233,18 @@ fun ReservationCard(reservation: Reservation) {
 
 @Composable
 fun InfoLabel(label: String, value: String) {
-    Text(
-        text = "$label : $value",
-        color = Color.White,
-        fontSize = 14.sp,
-        modifier = Modifier.padding(vertical = 2.dp)
-    )
+    Text("$label : $value", color = Color.LightGray, fontSize = 13.sp)
 }
 
 @Composable
 fun ActionButton(text: String, bgColor: Color, textColor: Color) {
     Button(
-        onClick = { /* Action */ },
+        onClick = { },
         colors = ButtonDefaults.buttonColors(containerColor = bgColor),
-        shape = RoundedCornerShape(10.dp),
-        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 0.dp),
-        modifier = Modifier.width(115.dp).height(40.dp)
+        shape = RoundedCornerShape(8.dp),
+        contentPadding = PaddingValues(horizontal = 12.dp),
+        modifier = Modifier.width(100.dp).height(32.dp)
     ) {
-        Text(text = text, color = textColor, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+        Text(text, color = textColor, fontSize = 12.sp, fontWeight = FontWeight.Bold)
     }
 }
