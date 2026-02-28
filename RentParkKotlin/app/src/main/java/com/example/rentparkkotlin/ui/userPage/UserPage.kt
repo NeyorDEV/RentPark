@@ -24,6 +24,7 @@ val AccentOrange = Color(0xFFE97451)
 val DarkBackground = Color(0xFF0F0F0F)
 val SurfaceColor = Color(0xFF1A1A1A)
 val CardColor = Color(0xFF1E1E1E)
+val DeleteRed = Color(0xFFEF5350)
 
 // --- MODÈLE ---
 data class User(
@@ -44,6 +45,8 @@ fun UserManagementScreen() {
 
     var showAddDialog by remember { mutableStateOf(false) }
     var userToEdit by remember { mutableStateOf<User?>(null) }
+    // État pour gérer l'utilisateur en cours de suppression
+    var userToDelete by remember { mutableStateOf<User?>(null) }
 
     Column(
         modifier = Modifier
@@ -91,7 +94,7 @@ fun UserManagementScreen() {
                         UserListItem(
                             user = user,
                             onEditClick = { userToEdit = user },
-                            onDeleteClick = { users.remove(user) }
+                            onDeleteClick = { userToDelete = user } // Ouvre le dialogue de confirmation
                         )
                         HorizontalDivider(color = Color.White.copy(alpha = 0.05f))
                     }
@@ -129,9 +132,21 @@ fun UserManagementScreen() {
             }
         )
     }
+
+    // Dialogue de Confirmation de Suppression
+    userToDelete?.let { user ->
+        DeleteConfirmationDialog(
+            username = user.username,
+            onDismiss = { userToDelete = null },
+            onConfirm = {
+                users.remove(user)
+                userToDelete = null
+            }
+        )
+    }
 }
 
-// --- COMPOSANT DE FORMULAIRE (Réutilisable) ---
+// --- COMPOSANT DE FORMULAIRE ---
 @Composable
 fun UserFormDialog(
     title: String,
@@ -142,7 +157,7 @@ fun UserFormDialog(
 ) {
     var name by remember { mutableStateOf(initialUser?.username ?: "") }
     var role by remember { mutableStateOf(initialUser?.role ?: "") }
-    var mdp by remember { mutableStateOf("") } // Le mot de passe reste vide par défaut
+    var mdp by remember { mutableStateOf("") }
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -179,6 +194,36 @@ fun UserFormDialog(
                 enabled = name.isNotBlank() && role.isNotBlank()
             ) {
                 Text(confirmLabel, color = AccentOrange, fontWeight = FontWeight.Bold)
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("ANNULER", color = Color.Gray)
+            }
+        }
+    )
+}
+
+// --- NOUVEAU : DIALOGUE DE SUPPRESSION ---
+@Composable
+fun DeleteConfirmationDialog(
+    username: String,
+    onDismiss: () -> Unit,
+    onConfirm: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        containerColor = CardColor,
+        title = { Text("Confirmer la suppression", color = Color.White) },
+        text = {
+            Text(
+                "Voulez-vous vraiment supprimer l'utilisateur $username ? Cette action est définitive.",
+                color = Color.LightGray
+            )
+        },
+        confirmButton = {
+            TextButton(onClick = onConfirm) {
+                Text("SUPPRIMER", color = DeleteRed, fontWeight = FontWeight.Bold)
             }
         },
         dismissButton = {
