@@ -40,13 +40,14 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    SettingsPage(
-                        isDarkMode = isDarkMode,
-                        onThemeChange = { newValue ->
-                            isDarkMode = newValue
-                            themePrefs.saveDarkMode(newValue)
-                        }
-                    )
+                    //SettingsPage(
+                    //    isDarkMode = isDarkMode,
+                    //    onThemeChange = { newValue ->
+                    //        isDarkMode = newValue
+                    //        themePrefs.saveDarkMode(newValue)
+                    //    }
+                    //)
+                    UserManagementScreen()
                 }
             }
         }
