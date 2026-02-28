@@ -14,19 +14,24 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
 
-// Couleurs (gardées de ton code original)
+// --- COULEURS ---
 val AccentOrange = Color(0xFFE97451)
+val DarkBackground = Color(0xFF0F0F0F)
+val SurfaceColor = Color(0xFF1A1A1A)
+val CardColor = Color(0xFF1E1E1E)
 
+// --- MODÈLE ---
 data class User(
     val username: String,
     val role: String
 )
 
+// --- ÉCRAN PRINCIPAL ---
 @Composable
 fun UserManagementScreen() {
     val users = remember {
@@ -37,14 +42,16 @@ fun UserManagementScreen() {
         )
     }
 
-    var showDialog by remember { mutableStateOf(false) }
+    var showAddDialog by remember { mutableStateOf(false) }
+    var userToEdit by remember { mutableStateOf<User?>(null) }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF0F0F0F))
+            .background(DarkBackground)
             .padding(16.dp)
     ) {
+        // Header
         Row(
             modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -53,7 +60,7 @@ fun UserManagementScreen() {
             Text("Utilisateurs", color = Color.White, fontSize = 22.sp, fontWeight = FontWeight.Bold)
 
             Button(
-                onClick = { showDialog = true }, // Ouvre le formulaire
+                onClick = { showAddDialog = true },
                 colors = ButtonDefaults.buttonColors(containerColor = AccentOrange),
                 shape = RoundedCornerShape(8.dp)
             ) {
@@ -63,13 +70,14 @@ fun UserManagementScreen() {
             }
         }
 
+        // Liste des utilisateurs
         Surface(
             modifier = Modifier.fillMaxWidth(),
-            color = Color(0xFF1A1A1A),
+            color = SurfaceColor,
             shape = RoundedCornerShape(12.dp)
         ) {
             Column(modifier = Modifier.padding(horizontal = 12.dp)) {
-                // En-tête (Username / Rôle / Actions)
+                // Table Header
                 Row(modifier = Modifier.padding(vertical = 12.dp)) {
                     Text("NOM", Modifier.weight(1.2f), color = AccentOrange, fontSize = 11.sp, fontWeight = FontWeight.Bold)
                     Text("RÔLE", Modifier.weight(1f), color = AccentOrange, fontSize = 11.sp, fontWeight = FontWeight.Bold)
@@ -80,7 +88,11 @@ fun UserManagementScreen() {
 
                 LazyColumn {
                     items(users) { user ->
-                        UserListItem(user)
+                        UserListItem(
+                            user = user,
+                            onEditClick = { userToEdit = user },
+                            onDeleteClick = { users.remove(user) }
+                        )
                         HorizontalDivider(color = Color.White.copy(alpha = 0.05f))
                     }
                 }
@@ -88,60 +100,85 @@ fun UserManagementScreen() {
         }
     }
 
-    if (showDialog) {
-        AddUserForm(
-            onDismiss = { showDialog = false },
-            onUserAdded = { newUser ->
+    // Dialogue d'Ajout
+    if (showAddDialog) {
+        UserFormDialog(
+            title = "Nouvel Utilisateur",
+            confirmLabel = "AJOUTER",
+            onDismiss = { showAddDialog = false },
+            onConfirm = { newUser ->
                 users.add(newUser)
-                showDialog = false
+                showAddDialog = false
+            }
+        )
+    }
+
+    // Dialogue de Modification
+    userToEdit?.let { user ->
+        UserFormDialog(
+            title = "Modifier l'utilisateur",
+            confirmLabel = "ENREGISTRER",
+            initialUser = user,
+            onDismiss = { userToEdit = null },
+            onConfirm = { updatedUser ->
+                val index = users.indexOf(user)
+                if (index != -1) {
+                    users[index] = updatedUser
+                }
+                userToEdit = null
             }
         )
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+// --- COMPOSANT DE FORMULAIRE (Réutilisable) ---
 @Composable
-fun AddUserForm(onDismiss: () -> Unit, onUserAdded: (User) -> Unit) {
-    var name by remember { mutableStateOf("") }
-    var role by remember { mutableStateOf("") }
-    var mdp by remember { mutableStateOf("") }
+fun UserFormDialog(
+    title: String,
+    confirmLabel: String,
+    initialUser: User? = null,
+    onDismiss: () -> Unit,
+    onConfirm: (User) -> Unit
+) {
+    var name by remember { mutableStateOf(initialUser?.username ?: "") }
+    var role by remember { mutableStateOf(initialUser?.role ?: "") }
+    var mdp by remember { mutableStateOf("") } // Le mot de passe reste vide par défaut
+
     AlertDialog(
         onDismissRequest = onDismiss,
-        containerColor = Color(0xFF1E1E1E),
-        title = {
-            Text("Nouvel Utilisateur", color = Color.White, fontSize = 18.sp)
-        },
+        containerColor = CardColor,
+        title = { Text(title, color = Color.White, fontSize = 18.sp) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 OutlinedTextField(
                     value = name,
                     onValueChange = { name = it },
                     label = { Text("Nom d'utilisateur", color = Color.Gray) },
-                    textStyle = androidx.compose.ui.text.TextStyle(color = Color.White),
-
+                    textStyle = TextStyle(color = Color.White),
+                    singleLine = true
                 )
                 OutlinedTextField(
                     value = mdp,
                     onValueChange = { mdp = it },
-                    label = { Text("Mot de passe", color = Color.Gray) },
-                    textStyle = androidx.compose.ui.text.TextStyle(color = Color.White),
-                    )
-
+                    label = { Text(if (initialUser == null) "Mot de passe" else "Nouveau mdp (optionnel)", color = Color.Gray) },
+                    textStyle = TextStyle(color = Color.White),
+                    singleLine = true
+                )
                 OutlinedTextField(
                     value = role,
                     onValueChange = { role = it },
                     label = { Text("Rôle (admin, employe...)", color = Color.Gray) },
-                    textStyle = androidx.compose.ui.text.TextStyle(color = Color.White),
-
+                    textStyle = TextStyle(color = Color.White),
+                    singleLine = true
                 )
             }
         },
         confirmButton = {
             TextButton(
-                onClick = { if(name.isNotBlank()) onUserAdded(User(name, role)) },
+                onClick = { onConfirm(User(name, role)) },
                 enabled = name.isNotBlank() && role.isNotBlank()
             ) {
-                Text("AJOUTER", color = AccentOrange, fontWeight = FontWeight.Bold)
+                Text(confirmLabel, color = AccentOrange, fontWeight = FontWeight.Bold)
             }
         },
         dismissButton = {
@@ -152,22 +189,33 @@ fun AddUserForm(onDismiss: () -> Unit, onUserAdded: (User) -> Unit) {
     )
 }
 
+// --- COMPOSANT DE LIGNE ---
 @Composable
-fun UserListItem(user: User) {
+fun UserListItem(
+    user: User,
+    onEditClick: () -> Unit,
+    onDeleteClick: () -> Unit
+) {
     Row(
         modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(user.username, Modifier.weight(1.2f), color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.Medium)
+
         Box(Modifier.weight(1f)) {
             Surface(color = Color(0xFF2A2A2A), shape = RoundedCornerShape(4.dp)) {
                 Text(user.role, Modifier.padding(horizontal = 8.dp, vertical = 2.dp), color = Color.LightGray, fontSize = 11.sp)
             }
         }
+
         Row(modifier = Modifier.weight(0.6f), horizontalArrangement = Arrangement.End) {
-            Icon(Icons.Default.Edit, null, tint = Color.Gray, modifier = Modifier.size(18.dp))
-            Spacer(Modifier.width(12.dp))
-            Icon(Icons.Default.Delete, null, tint = Color.Gray, modifier = Modifier.size(18.dp))
+            IconButton(onClick = onEditClick, modifier = Modifier.size(24.dp)) {
+                Icon(Icons.Default.Edit, null, tint = Color.Gray, modifier = Modifier.size(18.dp))
+            }
+            Spacer(Modifier.width(8.dp))
+            IconButton(onClick = onDeleteClick, modifier = Modifier.size(24.dp)) {
+                Icon(Icons.Default.Delete, null, tint = Color.Gray, modifier = Modifier.size(18.dp))
+            }
         }
     }
 }
