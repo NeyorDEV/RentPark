@@ -1,5 +1,7 @@
 package com.example.rentparkkotlin.ui.planning
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -19,11 +21,25 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.text.style.TextAlign
+import com.example.rentparkkotlin.ui.theme.Orange
+import java.time.YearMonth
+import java.time.format.TextStyle
+import java.util.Locale
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PlanningScreen() {
     var showModal by remember { mutableStateOf(false) }
+
+    var currentYearMonth by remember { mutableStateOf(YearMonth.now()) }
+
+    val monthTitle = remember(currentYearMonth) {
+        val monthName = currentYearMonth.month.getDisplayName(TextStyle.FULL, Locale.FRANCE)
+            .replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
+        "$monthName ${currentYearMonth.year}"
+    }
 
     Scaffold(
         topBar = {
@@ -47,11 +63,13 @@ fun PlanningScreen() {
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                TextButton(onClick = { }) {
+                TextButton(onClick = { currentYearMonth = currentYearMonth.minusMonths(1) }) {
                     Text("← Précédent", color = Color.Gray)
                 }
-                Text("Janvier 2024", fontWeight = FontWeight.Bold, fontSize = 18.sp)
-                TextButton(onClick = { }) {
+
+                Text(monthTitle, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+
+                TextButton(onClick = { currentYearMonth = currentYearMonth.plusMonths(1) }) {
                     Text("Suivant →", color = Color.Gray)
                 }
             }
@@ -63,12 +81,14 @@ fun PlanningScreen() {
                 colors = CardDefaults.cardColors(containerColor = Color.White),
                 shape = RoundedCornerShape(12.dp)
             ) {
+                val daysInMonth = currentYearMonth.lengthOfMonth()
+
                 LazyVerticalGrid(
                     columns = GridCells.Fixed(7),
                     modifier = Modifier.padding(8.dp),
                     contentPadding = PaddingValues(4.dp)
                 ) {
-                    items((1..31).toList()) { day ->
+                    items((1..daysInMonth).toList()) { day ->
                         DayCell(day = day, onClick = { showModal = true })
                     }
                 }
@@ -88,29 +108,44 @@ fun DayCell(day: Int, onClick: () -> Unit) {
             .aspectRatio(0.4f)
             .padding(2.dp)
             .background(Color(0xFFF9F9F9), RoundedCornerShape(4.dp))
-            .clickable { onClick() }
             .padding(4.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(text = day.toString(), fontSize = 12.sp, fontWeight = FontWeight.Medium)
 
+        Spacer(modifier = Modifier.height(8.dp))
 
-        Row(horizontalArrangement = Arrangement.spacedBy(2.dp)) {
-            EventBadge(letter = "D", color = Color(0xFFFFA500))
-            EventBadge(letter = "R", color = Color(0xFF0000FF))
+        Column(
+            verticalArrangement = Arrangement.spacedBy(4.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            EventBadge(letter = "D", color = Orange, onClick = onClick)
+            EventBadge(letter = "R", color = Color.Blue, onClick = onClick)
         }
     }
 }
 
 @Composable
-fun EventBadge(letter: String, color: Color) {
+fun EventBadge(
+    letter: String,
+    color: Color,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     Box(
-        modifier = Modifier
-            .size(18.dp)
-            .background(color, CircleShape),
+        modifier = modifier
+            .sizeIn(maxWidth = 24.dp, maxHeight = 24.dp)
+            .aspectRatio(1f)
+            .background(color, CircleShape)
+            .clickable(onClick = onClick),
         contentAlignment = Alignment.Center
     ) {
-        Text(letter, color = Color.White, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+        Text(
+            text = letter,
+            color = Color.White,
+            fontSize = 10.sp,
+            fontWeight = FontWeight.Bold
+        )
     }
 }
 
