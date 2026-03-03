@@ -3,264 +3,305 @@
    ========================================================================== */
 
 .topbar {
-    width: 100%;
-    margin-bottom: 30px;
-    display: flex;
-    justify-content: center;
+  width: 100%;
+  margin-bottom: 30px;
+  display: flex;
+  justify-content: center;
 }
 
 .toolbar {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 15px;
-    background: rgba(255, 255, 255, 0.9);
-    padding: 12px 25px;
-    border-radius: 50px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.3);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 15px;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 12px 25px;
+  border-radius: 50px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .topbar-form {
-    display: flex;
-    align-items: center;
-    gap: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .topbar-form input[type="search"] {
-    border: 1px solid #ddd;
-    padding: 8px 15px;
-    border-radius: 20px;
-    outline: none;
-    transition: 0.3s;
+  border: 1px solid #ddd;
+  padding: 8px 15px;
+  border-radius: 20px;
+  outline: none;
+  transition: 0.3s;
 }
 
 .topbar-form select {
-    padding: 7px 12px;
-    border-radius: 15px;
-    border: 1px solid #ddd;
-    background: white;
-    cursor: pointer;
+  padding: 7px 12px;
+  border-radius: 15px;
+  border: 1px solid #ddd;
+  background: white;
+  cursor: pointer;
 }
 
 .lbl {
-    font-size: 0.8rem;
-    font-weight: 700;
-    color: #666;
-    text-transform: uppercase;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #666;
+  text-transform: uppercase;
 }
 
 .icon-btn {
-    background: var(--rentpark-orange);
-    border: none;
-    width: 35px;
-    height: 35px;
-    border-radius: 50%;
-    cursor: pointer;
-    color: white;
-    transition: 0.3s;
+  background: var(--rentpark-orange);
+  border: none;
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  cursor: pointer;
+  color: white;
+  transition: 0.3s;
 }
 
 .add-btn {
-    background: #2ecc71;
-    color: white;
-    padding: 10px 20px;
-    border-radius: 20px;
-    text-decoration: none;
-    font-weight: bold;
-    font-size: 0.9rem;
-    transition: 0.3s;
+  background: #2ecc71;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 20px;
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 0.9rem;
+  transition: 0.3s;
 }
 
-.add-btn:hover { background: #27ae60; transform: scale(1.05); }
+.add-btn:hover {
+  background: #27ae60;
+  transform: scale(1.05);
+}
 
 /* ==========================================================================
    2. LISTE DES RÉSERVATIONS (GLASSMorphism)
    ========================================================================== */
 
 .reservation {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    padding: 10px;
-    box-sizing: border-box;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 10px;
+  box-sizing: border-box;
 }
 
 .rectangle {
-    width: 100%;
-    background: rgba(255, 255, 255, 0.8);
-    backdrop-filter: blur(12px);
-    border-radius: 20px;
-    padding: 25px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.05);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    box-sizing: border-box;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(12px);
+  border-radius: 20px;
+  padding: 25px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-sizing: border-box;
 }
 
 .rectangle p {
-    margin: 0;
-    line-height: 1.8;
-    color: #444;
-    font-size: 1rem;
+  margin: 0;
+  line-height: 1.8;
+  color: #444;
+  font-size: 1rem;
 }
 
 .rectangle p b {
-    color: var(--rentpark-orange);
+  color: var(--rentpark-orange);
 }
 
-.rectangle:last-child { border-bottom: none; }
-.rectangle:hover { background: rgba(255, 255, 255, 0.4); border-radius: 15px; }
-
+.rectangle:last-child {
+  border-bottom: none;
+}
+.rectangle:hover {
+  background: rgba(255, 255, 255, 0.4);
+  border-radius: 15px;
+}
 
 .actions {
-    display: flex;
-    gap: 12px;
+  display: flex;
+  gap: 12px;
 }
 
-.edit-btn, .delete-btn {
-    padding: 10px 20px;
-    border-radius: 12px;
-    border: none;
-    font-weight: 600;
-    cursor: pointer;
-    transition: 0.3s;
+.edit-btn,
+.delete-btn {
+  padding: 10px 20px;
+  border-radius: 12px;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
 }
 
-.edit-btn { background: #e3f2fd; color: #1976d2; }
-.delete-btn { background: #ffebee; color: #c62828; }
+.edit-btn {
+  background: #e3f2fd;
+  color: #1976d2;
+}
+.delete-btn {
+  background: #ffebee;
+  color: #c62828;
+}
 
-.edit-btn:hover { background: #007bff; color: white; }
-.delete-btn:hover { background: #ff4d4f; color: white; }
+.edit-btn:hover {
+  background: #007bff;
+  color: white;
+}
+.delete-btn:hover {
+  background: #ff4d4f;
+  color: white;
+}
 
 /* ==========================================================================
    3. MODALES (CORRECTIF Z-INDEX)
    ========================================================================== */
 
 .modal {
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background: rgba(0,0,0,0.6);
-    backdrop-filter: blur(8px);
-    z-index: 9999;
-    display: none;
-    justify-content: center;
-    align-items: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  z-index: 9999;
+  display: none;
+  justify-content: center;
+  align-items: center;
 }
 
-.modal:target { display: flex; }
+.modal:target {
+  display: flex;
+}
 
 .modal-content {
-    background: white;
-    padding: 35px;
-    border-radius: 25px;
-    width: 450px;
-    position: relative;
+  background: white;
+  padding: 35px;
+  border-radius: 25px;
+  width: 450px;
+  position: relative;
 }
 
-.modal-content h2 { margin-top: 0; color: var(--rentpark-orange); }
+.modal-content h2 {
+  margin-top: 0;
+  color: var(--rentpark-orange);
+}
 
 .modal-content label {
-    font-weight: 700;
-    font-size: 0.9rem;
-    color: #555;
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: #555;
 }
 
 .modal-content input {
-    width: 100%;
-    padding: 10px;
-    margin-top: 5px;
-    border: 1px solid #ddd;
-    border-radius: 10px;
-    box-sizing: border-box;
+  width: 100%;
+  padding: 10px;
+  margin-top: 5px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  box-sizing: border-box;
 }
 
 .modal-content button[type="submit"] {
-    width: 100%;
-    padding: 12px;
-    background: var(--rentpark-orange);
-    color: white;
-    border: none;
-    border-radius: 12px;
-    font-weight: bold;
-    cursor: pointer;
-    margin-top: 10px;
+  width: 100%;
+  padding: 12px;
+  background: var(--rentpark-orange);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 10px;
 }
 
 .close {
-    position: absolute;
-    top: 15px; right: 20px;
-    font-size: 30px;
-    text-decoration: none;
-    color: #aaa;
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  font-size: 30px;
+  text-decoration: none;
+  color: #aaa;
 }
 
 /* ==========================================================================
    4. MODE SOMBRE (DARK THEME)
    ========================================================================== */
 .dark-theme .toolbar {
-    background: rgba(30, 30, 30, 0.7) !important;
-    border-color: rgba(255, 255, 255, 0.1) !important;
+  background: rgba(30, 30, 30, 0.7) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
 }
 
-
-.dark-theme .topbar-form input, .dark-theme .topbar-form select { background: #222; color: white; border-color: #444; }
-.dark-theme .lbl { color: #bbb; }
+.dark-theme .topbar-form input,
+.dark-theme .topbar-form select {
+  background: #222;
+  color: white;
+  border-color: #444;
+}
+.dark-theme .lbl {
+  color: #bbb;
+}
 
 .dark-theme .rectangle {
-    background: rgba(40, 40, 40, 0.6) !important;
-    border-color: rgba(255, 255, 255, 0.08) !important;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  background: rgba(40, 40, 40, 0.6) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 }
 .dark-theme .rectangle p {
-    color: #ddd;
+  color: #ddd;
 }
-.dark-theme .rectangle:hover { background: rgba(255, 255, 255, 0.05); }
+.dark-theme .rectangle:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
 
-.dark-theme .topbar-form input, 
+.dark-theme .topbar-form input,
 .dark-theme .topbar-form select {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    color: white;
-    border-radius: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
+  border-radius: 10px;
 }
 
 .dark-theme .modal-content {
-    background: #1e1e1e !important;
-    border: 1px solid #333;
-    color: white;
+  background: #1e1e1e !important;
+  border: 1px solid #333;
+  color: white;
 }
-.dark-theme .modal-content input { background: #333; border-color: #444; color: white; }
-
+.dark-theme .modal-content input {
+  background: #333;
+  border-color: #444;
+  color: white;
+}
 
 /* Style du bouton loupe FontAwesome */
 .icon-btn {
-    background: none;       /* Supprime le fond orange */
-    border: none;           /* Supprime la bordure */
-    color: var(--rentpark-orange); /* Utilise ton orange variable */
-    font-size: 1.2rem;      /* Taille de l'icône */
-    cursor: pointer;
-    padding: 5px 10px;
-    transition: transform 0.2s ease, color 0.2s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  background: none; /* Supprime le fond orange */
+  border: none; /* Supprime la bordure */
+  color: var(--rentpark-orange); /* Utilise ton orange variable */
+  font-size: 1.2rem; /* Taille de l'icône */
+  cursor: pointer;
+  padding: 5px 10px;
+  transition:
+    transform 0.2s ease,
+    color 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* Effet au survol */
 .icon-btn:hover {
-    transform: scale(1.2);  /* Légère animation de grossissement */
-    color: var(--rentpark-orange-dark);
+  transform: scale(1.2); /* Légère animation de grossissement */
+  color: var(--rentpark-orange-dark);
 }
 
 /* Adaptation Mode Sombre */
 .dark-theme .icon-btn {
-    color: var(--rentpark-orange-dark);
+  color: var(--rentpark-orange-dark);
 }
 
 /* ==========================================================================
@@ -268,58 +309,73 @@
    ========================================================================== */
 
 .dark-theme .topbar-form select {
-    background-color: #222 !important; /* Fond gris très foncé */
-    color: #ffffff !important;         /* Texte bien blanc */
-    border: 1px solid #444;            /* Bordure subtile */
-    border-radius: 10px;
-    padding: 8px;
-    cursor: pointer;
+  background-color: #222 !important; /* Fond gris très foncé */
+  color: #ffffff !important; /* Texte bien blanc */
+  border: 1px solid #444; /* Bordure subtile */
+  border-radius: 10px;
+  padding: 8px;
+  cursor: pointer;
 }
 
 /* Style spécifique pour les options à l'intérieur du menu */
 .dark-theme .topbar-form select option {
-    background-color: #222;
-    color: #ffffff;
+  background-color: #222;
+  color: #ffffff;
 }
 
 /* Harmonisation de l'input de recherche en mode sombre */
 .dark-theme .topbar-form input {
-    background-color: #222 !important;
-    color: #ffffff !important;
-    border: 1px solid #444;
+  background-color: #222 !important;
+  color: #ffffff !important;
+  border: 1px solid #444;
 }
 
 /* Style du bouton "Appliquer" ou loupe en mode sombre */
 .dark-theme .submit-search-btn {
-    border-color: var(--rentpark-orange-dark);
-    color: var(--rentpark-orange-dark);
+  border-color: var(--rentpark-orange-dark);
+  color: var(--rentpark-orange-dark);
 }
 
 /* --- Harmonisation des arrondis pour les listes déroulantes --- */
 .topbar-form select {
-    border-radius: 15px; /* On s'assure que la base est bien arrondie */
-    border: 1px solid rgba(0, 0, 0, 0.1);
-    outline: none; /* Supprime le contour bleu/carré par défaut du navigateur */
-    transition: all 0.3s ease;
-    appearance: none; /* Supprime le style natif OS pour mieux contrôler l'aspect */
-    background-image: url('data:image/svg+xml;charset=US-ASCII,<svg%20xmlns%3D"http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg"%20width%3D"292.4"%20height%3D"292.4"><path%20fill%3D"%23ff5a19"%20d%3D"M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z"%2F><%2Fsvg>');
-    background-repeat: no-repeat;
-    background-position: right 10px top 50%;
-    background-size: 12px auto;
-    padding-right: 30px;
+  border-radius: 15px; /* On s'assure que la base est bien arrondie */
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  outline: none; /* Supprime le contour bleu/carré par défaut du navigateur */
+  transition: all 0.3s ease;
+  appearance: none; /* Supprime le style natif OS pour mieux contrôler l'aspect */
+  background-image: url('data:image/svg+xml;charset=US-ASCII,<svg%20xmlns%3D"http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg"%20width%3D"292.4"%20height%3D"292.4"><path%20fill%3D"%23ff5a19"%20d%3D"M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z"%2F><%2Fsvg>');
+  background-repeat: no-repeat;
+  background-position: right 10px top 50%;
+  background-size: 12px auto;
+  padding-right: 30px;
 }
 
 /* Le correctif pour éviter le détourage carré au hover/focus */
-.topbar-form select:hover, 
+.topbar-form select:hover,
 .topbar-form select:focus {
-    border-color: var(--rentpark-orange);
-    box-shadow: 0 0 0 3px rgba(255, 90, 25, 0.1); /* Halo arrondi au lieu d'un détourage sec */
-    background-color: #fff;
+  border-color: var(--rentpark-orange);
+  box-shadow: 0 0 0 3px rgba(255, 90, 25, 0.1); /* Halo arrondi au lieu d'un détourage sec */
+  background-color: #fff;
 }
 
 /* Adaptation Mode Sombre */
 .dark-theme .topbar-form select:hover,
 .dark-theme .topbar-form select:focus {
-    background-color: #2a2a2a !important;
-    box-shadow: 0 0 0 3px rgba(255, 152, 0, 0.2);
+  background-color: #2a2a2a !important;
+  box-shadow: 0 0 0 3px rgba(255, 152, 0, 0.2);
+}
+
+.accept-btn {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+.accept-btn:hover {
+  background-color: #218838;
 }

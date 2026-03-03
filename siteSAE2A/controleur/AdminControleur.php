@@ -613,7 +613,7 @@ class AdminControleur
         try {
             if ($motCle === '') {
                 $response = $this->apiClient->get("voitures");
-            } else {   
+            } else {
                 $response = $this->apiClient->get("voitures", [
                     'query' => ['nom' => $motCle]
                 ]);
@@ -825,133 +825,190 @@ class AdminControleur
 
 
     // ---------------------------| Reservations |-----------------------------------------------------------
-    private function rechercherReservation(): void
+    private function rechercherReservation(array &$dVueEreur = []): void
     {
         $champ = $_GET['champ'] ?? 'idContrat';
         $q = trim($_GET['q'] ?? '');
         $filtre = $_GET['filtre'] ?? 'en-cours';
 
-        // whitelist des champs autorisé
-        $allowed = ['idContrat' => 'idContrat', 'Vehicule' => 'Vehicule', 'Client' => 'Client'];
-        if (!isset($allowed[$champ])) {
-            $champ = 'idContrat';
+        $results = [];
+        try {
+            $response = $this->apiClient->get('contrat');
+            $allContrats = json_decode($response->getBody()->getContents(), true) ?? [];
+
+            $today = date('Y-m-d');
+
+            $filtered = array_filter($allContrats, function ($c) use ($champ, $q, $filtre, $today) {
+
+                $match = false;
+                switch ($filtre) {
+                    case 'a-valider':
+                        $match = (isset($c['Statut']) && $c['Statut'] === 'EnCoursValidation');
+                        break;
+                    case 'a-venir':
+                        $match = ($c['DateDebut'] > $today);
+                        break;
+                    case 'passees':
+                        $match = ($c['DateFin'] < $today);
+                        break;
+                    case 'toutes':
+                        $match = true;
+                        break;
+                    case 'en-cours':
+                    default:
+                        $match = ($c['DateDebut'] <= $today && $c['DateFin'] >= $today);
+                        break;
+                }
+                if (!$match)
+                    return false;
+
+                if ($q !== '') {
+                    $idContrat = $c['idContrat'] ?? $c['IdContrat'] ?? '';
+                    $idClient = $c['IdClient'] ?? $c['idClient'] ?? '';
+                    $idVehicule = $c['IdVehicule'] ?? $c['idVehicule'] ?? '';
+
+                    if ($champ === 'idContrat' && (string) $idContrat !== $q)
+                        return false;
+                    if ($champ === 'Client' && (string) $idClient !== $q)
+                        return false;
+                    if ($champ === 'Vehicule' && stripos((string) $idVehicule, $q) === false)
+                        return false;
+                }
+                return true;
+            });
+
+            foreach ($filtered as $c) {
+                $results[] = [
+                    'idContrat' => $c['idContrat'] ?? $c['IdContrat'] ?? null,
+                    'IdClient' => $c['IdClient'] ?? $c['idClient'] ?? null,
+                    'idVehicule' => $c['IdVehicule'] ?? $c['idVehicule'] ?? null,
+                    'DateDebut' => $c['DateDebut'] ?? null,
+                    'DateFin' => $c['DateFin'] ?? null,
+                    'Statut' => $c['Statut'] ?? null
+                ];
+            }
+
+        } catch (RequestException $e) {
+            $dVueEreur[] = "Impossible de récupérer les contrats via l'API.";
         }
 
-        $results = $this->reservationGateway->searchReservations($champ, $q, $filtre);
-
-        $this->afficherVue('reservation', [], $results, 'admin');
+        $this->afficherVue('reservation', $dVueEreur, $results, 'admin');
     }
-    private function ajouterReservation(array $post): void
+
+    private function ajouterReservation(array $post, array &$dVueErreur): void
     {
         $vehicule = trim($post['Vehicule'] ?? '');
         $client = (int) ($post['Client'] ?? 0);
         $dateDebut = trim($post['DateDebut'] ?? '');
         $dateFin = trim($post['DateFin'] ?? '');
 
-        $err = [];
-
-        if ($vehicule === '')
-            $err[] = "Le véhicule (VIN) est obligatoire.";
-        if ($client <= 0)
-            $err[] = "Le client (ID) doit être un entier positif.";
-        if ($dateDebut === '')
-            $err[] = "La date de début est obligatoire.";
-        if ($dateFin === '')
-            $err[] = "La date de fin est obligatoire.";
-
-        $d1 = \DateTime::createFromFormat('Y-m-d', $dateDebut) ?: null;
-        $d2 = \DateTime::createFromFormat('Y-m-d', $dateFin) ?: null;
-        if (!$d1 || !$d2) {
-            $err[] = "Format de date invalide (attendu : AAAA-MM-JJ).";
-        } elseif ($d1 > $d2) {
-            $err[] = "La date de début doit être antérieure ou égale à la date de fin.";
+        try {
+            $this->apiClient->post('modif/contrat', [
+                'json' => [
+                    'DateDebut' => $dateDebut,
+                    'DateFin' => $dateFin,
+                    'IdVehicule' => $vehicule,
+                    'IdClient' => $client,
+                    'Statut' => 'EnCoursValidation'
+                ]
+            ]);
+        } catch (RequestException $e) {
+            $dVueErreur[] = "Erreur lors de l'ajout via l'API.";
         }
-        if (empty($err)) {
-            try {
-                $this->reservationGateway->insertReservation($vehicule, $client, $dateDebut, $dateFin);
-            } catch (\PDOException $e) {
-                $err[] = "Erreur base de données : " . $e->getMessage();
-            }
-        }
-        $this->rechercherReservation();
+
+        $this->rechercherReservation($dVueErreur);
     }
-    private function modifierReservation(array $post): void
+
+    private function modifierReservation(array $post, array &$dVueErreur): void
     {
         $id = (int) ($post['id'] ?? 0);
-        $vehicule = trim($post['Vehicule'] ?? '');
-        $client = (int) ($post['Client'] ?? 0);
-        $dateDebut = trim($post['DateDebut'] ?? '');
-        $dateFin = trim($post['DateFin'] ?? '');
 
-        $err = [];
-
-        if ($id <= 0)
-            $err[] = "Identifiant de contrat invalide.";
-        if ($vehicule === '')
-            $err[] = "Le véhicule (VIN) est obligatoire.";
-        if ($client <= 0)
-            $err[] = "Le client (ID) doit être un entier positif.";
-        if ($dateDebut === '')
-            $err[] = "La date de début est obligatoire.";
-        if ($dateFin === '')
-            $err[] = "La date de fin est obligatoire.";
-
-        $d1 = \DateTime::createFromFormat('Y-m-d', $dateDebut) ?: null;
-        $d2 = \DateTime::createFromFormat('Y-m-d', $dateFin) ?: null;
-        if (!$d1 || !$d2) {
-            $err[] = "Format de date invalide (attendu : AAAA-MM-JJ).";
-        } elseif ($d1 > $d2) {
-            $err[] = "La date de début doit être antérieure ou égale à la date de fin.";
+        try {
+            $this->apiClient->put("contrat/{$id}", [
+                'json' => [
+                    'DateDebut' => trim($post['DateDebut'] ?? ''),
+                    'DateFin' => trim($post['DateFin'] ?? ''),
+                    'Vehicule' => trim($post['Vehicule'] ?? ''),
+                    'Client' => (int) ($post['Client'] ?? 0)
+                ]
+            ]);
+            header('Location: /siteSAE2A/reservation');
+            exit;
+        } catch (RequestException $e) {
+            $dVueErreur[] = "Erreur lors de la modification via l'API.";
         }
-        if (empty($err)) {
-            try {
-                $this->reservationGateway->update($id, $vehicule, $client, $dateDebut, $dateFin);
-                header('Location: /siteSAE2A/reservation');
-                exit;
-            } catch (\PDOException $e) {
-                $err[] = "Erreur base de données : " . $e->getMessage();
-            }
-        }
-        $this->rechercherReservation();
+
+        $this->rechercherReservation($dVueErreur);
     }
-    private function supprimerReservation(array $dVueEreur)
+
+    private function supprimerReservation(array &$dVueErreur): void
     {
         $id = (int) ($_POST['id'] ?? -1);
-        if ($id >= 0) {
-            $this->reservationGateway->delete($id);
+
+        if ($id > 0) {
+            try {
+                $this->apiClient->delete("contrat/{$id}");
+            } catch (RequestException $e) {
+                $dVueErreur[] = "Erreur lors de la suppression via l'API.";
+            }
         } else {
-            $dVueErreur[] = "Cette réservation n'existe pas, impossible de la supprimer .";
+            $dVueErreur[] = "ID invalide pour la suppression.";
         }
 
-        $this->rechercherReservation();
-        exit;
+        $this->rechercherReservation($dVueErreur);
     }
-    public function listeReservation(array $dVueEreur)
+
+    public function listeReservation(array &$dVueErreur)
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $sousAction = $_POST['action'] ?? '';
 
             switch ($sousAction) {
                 case 'ajouterReservation':
-                    $this->ajouterReservation($_POST);
+                    $this->ajouterReservation($_POST, $dVueErreur);
                     break;
                 case 'modifierReservation':
-                    $this->modifierReservation($_POST);
+                    $this->modifierReservation($_POST, $dVueErreur);
                     break;
                 case 'supprimerReservation':
-                    $this->supprimerReservation($dVueEreur);
+                    $this->supprimerReservation($dVueErreur);
+                    break;
+                case 'changerStatut':
+                    $this->changerStatutReservation($_POST, $dVueErreur);
                     break;
             }
             exit;
         }
+
         $sousAction = $_GET['action'] ?? '';
         if ($sousAction === 'rechercherReservation') {
-            $this->rechercherReservation();
+            $this->rechercherReservation($dVueErreur);
             return;
         }
 
-        $results = $this->reservationGateway->searchReservations('idContrat', '', 'en-cours');
-        $this->afficherVue('reservation', [], $results, 'admin');
+        $this->rechercherReservation($dVueErreur);
+    }
+
+    private function changerStatutReservation(array $post, array &$dVueErreur): void
+    {
+        $id = (int) ($post['id'] ?? 0);
+        $nouveauStatut = trim($post['nouveauStatut'] ?? '');
+
+        if ($id > 0 && in_array($nouveauStatut, ['Validé', 'Annulé'])) {
+            try {
+                $this->apiClient->patch("contrat/{$id}/statut", [
+                    'json' => [
+                        'Statut' => $nouveauStatut
+                    ]
+                ]);
+            } catch (RequestException $e) {
+                $dVueErreur[] = "Erreur lors du changement de statut via l'API.";
+            }
+        } else {
+            $dVueErreur[] = "Données invalides pour le changement de statut.";
+        }
+
+        $this->rechercherReservation($dVueErreur);
     }
     // ------------------------------------------------------------------------------------------------------
     private function modifierUtilisateur(array $dVueEreur)

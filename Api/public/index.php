@@ -1129,6 +1129,68 @@ $app->post('/rappel', function (Request $request, Response $response, $args) use
 });
 
 
+$app->put('/contrat/{id}', function (Request $request, Response $response, $args) use ($conn) {
+    $id = (int) $args['id'];
+    $data = $request->getParsedBody();
+
+    if (empty($data['DateDebut']) || empty($data['DateFin']) || empty($data['Vehicule']) || empty($data['Client'])) {
+        $response->getBody()->write(json_encode(['error' => 'Champs obligatoires manquants']));
+        return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
+    }
+
+    $sql = "UPDATE Contrat SET DateDebut = :dateDebut, DateFin = :dateFin, IdVehicule = :vehicule, IdClient = :client WHERE idContrat = :id";
+    $params = [
+        ':dateDebut' => [$data['DateDebut'], \PDO::PARAM_STR],
+        ':dateFin' => [$data['DateFin'], \PDO::PARAM_STR],
+        ':vehicule' => [$data['Vehicule'], \PDO::PARAM_STR],
+        ':client' => [$data['Client'], \PDO::PARAM_INT],
+        ':id' => [$id, \PDO::PARAM_INT]
+    ];
+
+    try {
+        $conn->executeQuery($sql, $params);
+        $response->getBody()->write(json_encode(['message' => 'Contrat mis à jour avec succès']));
+        return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
+    } catch (\Exception $e) {
+        $response->getBody()->write(json_encode(['error' => 'Erreur : ' . $e->getMessage()]));
+        return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
+    }
+});
+
+$app->patch('/contrat/{id}/statut', function (Request $request, Response $response, $args) use ($conn) {
+    $id = $args['id'];
+    $data = $request->getParsedBody();
+
+    if (empty($data['Statut'])) {
+        $response->getBody()->write(json_encode(['error' => 'Le champ Statut est obligatoire.']));
+        return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
+    }
+
+    $sql = "UPDATE Contrat SET Statut = :statut WHERE idContrat = :id";
+    $params = [
+        'statut' => $data['Statut'],
+        'id' => $id
+    ];
+
+    try {
+        $stmt = $conn->prepare($sql);
+        $stmt->execute($params);
+
+        $response->getBody()->write(json_encode([
+            'message' => 'Statut du contrat mis à jour avec succès'
+        ]));
+
+        return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
+
+    } catch (\Exception $e) {
+        $response->getBody()->write(json_encode([
+            'error' => 'Erreur lors de la mise à jour : ' . $e->getMessage()
+        ]));
+        return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
+    }
+});
+
+
 
 // -----------------------------------------------------------------------
 // LANCEMENT DE L'APPLICATION
