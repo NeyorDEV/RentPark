@@ -142,7 +142,7 @@ class UserController
             }
 
 
-            header("Location: /siteSAE2A/voitures");
+            header("Location: /siteSAE2A/home");
             exit;
         }
         $this->afficherVue('connection', $dVueEreur, $results = null, 'user');
