@@ -2,126 +2,96 @@
 namespace controleur;
 
 use AltoRouter;
+// Pas besoin de "use" si les classes sont dans le même namespace "controleur"
+// mais on les laisse par sécurité si ton autoloader est strict.
 use controleur\AdminControleur;
 use controleur\UserController;
+
 
 
 class FrontControleur
 {
     public function __construct()
     {
-        session_start();
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
     }
 
     public function run()
     {
-        global $rep, $vues,$action; 
-
+  
+     
+        // On récupère le rôle. 'visitor' est plus propre que 'user' par défaut.
         $role = $_SESSION['role'] ?? 'user';
 
-       
         $router = new AltoRouter();
         $router->setBasePath('/siteSAE2A'); 
 
+        // --- MAPPING DES ROUTES ---
+        // Format : Method, Route, Target (Action)
         
-        $router->map('GET|POST', '/index.php', 'homeCustomers');
-        $router->map('GET|POST', '/voitures', 'listeVoitures');
-        $router->map('GET|POST', '/home', 'homeCustomers');    
-
-        $router->map('GET|POST', '/reservation', 'listeReservation');
-        
-       
-        $router->map('GET|POST', '/utilisateurs', 'listeUtilisateur');
-
-        $router->map('GET|POST', '/inscription', 'afficheInscription');
+        // Routes Authentification
         $router->map('GET|POST', '/connection', 'afficheConnection');
-        $router->map('GET|POST', '/deconnection', 'deconnecter');
-        $router->map('GET|POST', '/dashboard', 'afficheDashboard');
-        $router->map('GET|POST', '/homeCustomers', 'homeCustomers');// a voir
-        $router->map('GET|POST', '/cars', 'cars'); // suite au home, la recherche de vehicule pour réserver
-        $router->map('GET|POST', '/reservationForm', 'reservationForm');
-        $router->map('GET|POST', '/recapitulatif', 'afficheRecapitulatif');
-        $router->map('GET|POST', '/parametres', 'afficheParametres');
-        $router->map('GET|POST', '/finaliserReservation', 'finaliserReservation');
-        $router->map('GET|POST', '/planning', 'affichePlanning');
-        
-        $match = $router->match();
-        if ($match) {
-            $action = $match['target'];
-        
-            // ROUTES PUBLIQUES (User par défaut)
-            $publicRoutes = [
-                'homeCustomers',
-                'cars',
-                'afficheConnection',
-                'afficheInscription',
-                'deconnecter',
-                'reservationForm',
-                'afficheRecapitulatif',
-                'finaliserReservation'
-            ];
-        
-            // ROUTES USER CONNECTÉ
-            $userRoutes = [
-                'connection'
-    
-            ];
+        $router->map('GET|POST', '/inscription', 'afficheInscription');
+        $router->map('GET',      '/deconnection', 'deconnecter');
 
-            $employeRoutes = [
-                'listeVoitures',
-                'listeReservation',
-                'listeUtilisateur',
-                'affichePlanning',
-                'afficheParametres'
-                
-            ];
+        // Routes Admin (Gestion)
+        $router->map('GET|POST', '/dashboard',    'afficheDashboard');
+        $router->map('GET|POST', '/voitures',     'listeVoitures');
+        $router->map('GET|POST', '/reservation',  'listeReservation');
+        $router->map('GET|POST', '/utilisateurs', 'listeUtilisateur');
+        $router->map('GET|POST', '/planning',     'affichePlanning');
+        $router->map('GET|POST', '/parametres',   'afficheParametres');
+
+        // Routes Client / Public
+        $router->map('GET',      '/',                    'homeCustomers');
+        $router->map('GET',      '/home',                'homeCustomers');
+        $router->map('GET',      '/cars',                'cars');
+        $router->map('GET|POST', '/reservationForm',     'reservationForm');
+        $router->map('GET|POST', '/recapitulatif',       'afficheRecapitulatif');
+        $router->map('GET|POST', '/finaliserReservation','finaliserReservation');
         
-            if ($role === 'admin') {
-                $controleur = new AdminControleur();
-            }
-            /**
-             * EMPLOYÉ
-             */
-            elseif (in_array($action, $employeRoutes)) {
-    
-                if ($role !== 'employe') {
-                    header('HTTP/1.1 403 Forbidden');
-                    exit('Accès refusé');
-                }
-    
-                $controleur = new EmployeControleur();
-            }
-            /**
-             * USER CONNECTÉ
-             */
-            elseif (in_array($action, $userRoutes)) {
-    
-                if (!isset($_SESSION['username'])) {
-                    header('Location: /siteSAE2A/home');
-                    exit;
-                }
-    
-                $controleur = new UserController();
-            }
-            /**
-             * PUBLIC
-             */
-            elseif (in_array($action, $publicRoutes)) {
-                $controleur = new UserController();
-            }
-            /**
-             * LE RESTE → REFUS
-             */
-            else {
-                header('HTTP/1.1 403 Forbidden');
-                exit('Accès refusé');
-            }
-    
-            $controleur->$action();
+        // ... mapping ...
+
+$match = $router->match();
+if ($match) {
+    $action = $match['target'];
+    $dVueErreur = [];
+
+    // Liste des routes réservées UNIQUEMENT à l'admin
+    $adminRoutes = [
+        'listeVoitures', 'listeReservation', 'listeUtilisateur', 
+        'affichePlanning', 'afficheDashboard', 'afficheParametres'
+    ];
+
+    // --- LOGIQUE DE SÉCURITÉ ---
+
+    if (in_array($action, $adminRoutes)) {
+        // Cas 1 : Route Admin -> Vérification stricte
+        if ($role !== 'admin') {
+            header('Location: /siteSAE2A/connection');
+            exit;
         }
+        $controleur = new AdminControleur();
+    } 
+    else {
+        // Cas 2 : Route Public -> Tout le monde a le droit !
+        // L'admin peut voir les voitures, le home, etc.
+        $controleur = new UserController();
+    }
 
-         
+    // --- EXÉCUTION ---
+    if (method_exists($controleur, $action)) {
+        $controleur->$action($dVueErreur); 
+    } else {
+        exit("Erreur : La méthode $action n'existe pas.");
+    }
+
+} else {
+    // Route non trouvée -> Accueil
+    $controleur = new UserController();
+    $controleur->homeCustomers([]);
+}
     }  
-}  
- 
-?>    
+}

@@ -11,7 +11,8 @@ use GuzzleHttp\Exception\RequestException;
 class AdminControleur
 {
     private Connection $connection;
-    private VehicleGateway $gateway;
+
+    private VehicleGateway $vehicleGateway;
     private UserGateway $userGateway;
     private ReservationGateway $reservationGateway;
 
@@ -19,141 +20,82 @@ class AdminControleur
     private Client $apiClient;
 
     public function __construct()
-    {
-        if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
-            http_response_code(403);
-            header('Location: /siteSAE2A/connection');
-            exit;
-        }
+{
+    global $user, $pass, $dsn;
+
+    try {
+        // Initialisation de la base de données locale
+        $this->connection = new \modele\Connection($dsn, $user, $pass);
         
-        global $rep, $vues, $user, $pass, $dsn, $action;
+        // Gateways spécifiques à l'administration
+        $this->vehicleGateway = new \modele\VehicleGateway($this->connection);
+        $this->userGateway = new \modele\UserGateway($this->connection);
+        $this->reservationGateway = new \modele\ReservationGateway($this->connection);
 
-        $dVueEreur = [];
+        // Configuration Guzzle (Version Admin avec Token obligatoire)
+        $this->apiClient = new \GuzzleHttp\Client([
+            'base_uri' => 'http://localhost:8880/api/',
+            'timeout'  => 5.0,
+            'headers'  => [
+                'X-Request-Id' => $_SERVER['REQUEST_ID'] ?? 'no-id',
+                'Authorization' => 'Bearer ' . ($_SESSION['token'] ?? ''),
+                'Accept'        => 'application/json'
+            ]
+        ]);
 
-        try {
-
-            $this->connection = new Connection($dsn, $user, $pass);
-
-            $this->gateway = new VehicleGateway($this->connection);
-            $this->userGateway = new UserGateway($this->connection);
-            $this->reservationGateway = new ReservationGateway($this->connection);
-
-            // test pour l'API
-            $this->apiClient = new Client([
-                'base_uri' => 'http://localhost:8880/',
-                'timeout' => 2.0
-            ]);
-
-
-            switch ($action) {
-                case "listeVoitures":
-                    $this->listeVoitures($dVueEreur);
-                    break;
-                case "afficheInscription":
-                    $this->afficheInscription($dVueEreur);
-                    break;
-                case "afficheDashboard":
-                    $this->afficheDashboard($dVueEreur);
-                    break;
-                case "affichePlanning":
-                        $this->affichePlanning($dVueEreur);
-                        break;
-                case "afficheConnection":
-                    $this->afficheConnection($dVueEreur);
-                    break;
-                case "rechercherVoitures":
-                    $this->rechercherVoitures($dVueEreur);
-                    break;
-
-                case "listeUtilisateur":
-                    $this->listeUtilisateur($dVueEreur);
-                    break;
-                case 'listeReservation':
-                    $this->listeReservation($dVueEreur);
-                    break;
-                case 'deconnecter':
-                    $this->deconnecter();
-                    break;
-                case 'homeCustomers':
-                    $this->homeCustomers($dVueEreur);
-                    break;
-                case 'cars':
-                    $this->cars($dVueEreur);
-                    break;
-                case 'reservationForm':
-                    $this->reservationForm($dVueEreur);
-                    break;
-                case 'afficheRecapitulatif':
-                    $this->afficheRecapitulatif($dVueEreur);
-                    break;
-                case 'afficheParametres':
-                    $this->afficheParametres($dVueEreur);
-                    break;
-                case 'finaliserReservation':
-                    $this->finaliserReservation($dVueEreur);
-                    break;
-                default:
-                    $dVueEreur[] = "Action inconnue";
-                    $this->afficherVue('homeCustomers', $dVueEreur, $results = null, 'admin');
-                    break;
-            }
-
-        } catch (\PDOException $e) {
-            $dVueEreur[] = "Erreur BDD : " . $e->getMessage();
-            $this->afficherVue('erreur', $dVueEreur, $results = null, 'admin');
-        }
-
-        exit(0);
+    } catch (\Exception $e) {
+        // Gestion d'erreur
     }
+}
 
     // récup par API mais systeme de recherche  à faire avec API ou à adapter 
     public function listeVoitures(array $dVueEreur)
-    {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $sousAction = $_POST['action'] ?? '';
+{
+    // --- GESTION DES ACTIONS (POST) ---
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $sousAction = $_POST['action'] ?? '';
 
+        try {
             switch ($sousAction) {
                 case 'ajouterVoiture':
                     $this->ajouterVoiture($dVueEreur);
                     break;
-
                 case 'supprimerVoiture':
                     $this->supprimerVoiture($dVueEreur);
                     break;
-
                 case 'modifierVoiture':
                     $this->modifierVoiture($dVueEreur);
                     break;
             }
-
-            header("Location: /siteSAE2A/voitures");
-            exit;
-        }
-
-
-        $sousAction = $_GET['action'] ?? '';
-        if ($sousAction === 'rechercherVoitures') {
-            $this->rechercherVoitures($dVueEreur);
-            return;
-        }
-
-
-        try {
-            $response = $this->apiClient->get('voitures');
-
-            $results = json_decode(
-                $response->getBody()->getContents(),
-                true
-            );
-
+            // Si pas d'erreur, on redirige pour éviter le renvoi du formulaire
+            if (empty($dVueEreur)) {
+                header("Location: /siteSAE2A/voitures");
+                exit;
+            }
         } catch (RequestException $e) {
-            $dVueEreur[] = "Impossible de récupérer les véhicules depuis l’API.";
-            $results = [];
+            $dVueEreur[] = "Action impossible : " . $this->getApiErrorMessage($e);
         }
-
-        $this->afficherVue('flotte', $dVueEreur, $results, 'admin');
-
     }
+
+    // --- AFFICHAGE DE LA LISTE (GET) ---
+    try {
+        // Appel GET /api/vehicules
+        $response = $this->apiClient->get('vehicules');
+        $body = json_decode($response->getBody()->getContents(), true);
+        
+        // On récupère la clé 'data' car l'API répond {"success":true, "data":[...]}
+        $results = $body['data'] ?? [];
+
+    } catch (RequestException $e) {
+        $dVueEreur[] = "Impossible de récupérer la flotte : " . $this->getApiErrorMessage($e);
+        $results = [];
+    }
+
+    $this->afficherVue('flotte', $dVueEreur, $results, 'admin');
+}
+
+
+
 
     // ajouter les vue erreur et les vérif 
 
@@ -161,14 +103,14 @@ class AdminControleur
     {
         $results = [
             "revenusMensuels"   => $this->reservationGateway->getMonthlyIncome(),
-            "voiturePlusLouee"  => $this->gateway->getMostRentedCar(),
+            "voiturePlusLouee"  => $this->vehicleGateway->getMostRentedCar(),
             "totalUsers"      => $this->userGateway->countUser()
         ];
 
         $alerts = [];
 
     // Contrôle technique < 2 mois
-    $vehiculesCT = $this->gateway->getVehiculesControleTechniqueBientotExpire();
+    $vehiculesCT = $this->vehicleGateway->getVehiculesControleTechniqueBientotExpire();
 
     foreach ($vehiculesCT as $v) {
         $alerts[] = [
@@ -242,7 +184,7 @@ public function cars(array $dVueEreur)
 
     // 2. Appel de l'API
     try {
-        $response = $this->apiClient->get('voitures');
+        $response = $this->apiClient->get('vehicules');
         $results = json_decode($response->getBody()->getContents(), true);
     } catch (RequestException $e) {
         $dVueEreur[] = "Impossible de récupérer les véhicules depuis l’API.";
@@ -446,7 +388,7 @@ public function cars(array $dVueEreur)
         // ===============================
         // 3. Appel API POST /vehicule
         // ===============================
-        $response = $this->apiClient->post('vehicule', [
+        $response = $this->apiClient->post('vehicules', [
             'json' => $payload
         ]);
 
@@ -487,7 +429,7 @@ public function cars(array $dVueEreur)
     {
         $id = ($_POST['NumSerie'] ?? -1);
         try {
-            $this->apiClient->delete("/delete/voitures/$id");
+            $this->apiClient->delete("vehicules/$id");
         } catch (RequestException $e) {
             $dVueEreur[] = "Erreur lors de la suppression via l’API.";
         }
@@ -548,7 +490,7 @@ public function cars(array $dVueEreur)
     // 3. Appel API PUT
     // ===============================
     try {
-        $response = $this->apiClient->put("voitures/{$numSerie}", [
+        $response = $this->apiClient->put("vehicules/{$numSerie}", [
             'json' => $payload
         ]);
 
@@ -566,7 +508,7 @@ public function cars(array $dVueEreur)
         }
     }
 
-    $results = $this->apiClient->get("voitures");
+    $results = $this->apiClient->get("vehicules");
     $this->afficherVue('flotte', $dVueEreur, $results, 'admin');
 }
 
@@ -618,33 +560,47 @@ public function cars(array $dVueEreur)
         $this->userGateway->login($user);
 
 
+
+
     }
 
-
-    public function connection(array $dVueErreur)
-    {
-        global $role;
-        $username = $_POST['username'] ?? '';
-        $password = $_POST['password'] ?? '';
-        $savepass = $this->userGateway->getHashPass($username, $password);
-        $role = $this->userGateway->getRole($username);
-        Validation::val_connection($username, $password, $savepass, $dVueErreur);
-
-        session_regenerate_id(true);
-        
-
-        $_SESSION['username'] = $username;
-        $_SESSION['role'] = $role;
-
-        
+    private function getApiErrorMessage(RequestException $e): string 
+{
+    if ($e->hasResponse()) {
+        $body = json_decode($e->getResponse()->getBody()->getContents(), true);
+        return $body['error'] ?? "Erreur serveur distante.";
+    }
+    return "Le serveur API ne répond pas.";
+}
 
 
-        if (!empty($dVueErreur)) {
-            $this->afficherVue('erreur', $dVueErreur, $results = null, 'admin');
+public function connection(array $dVueEreur)
+{
+    $username = $_POST['username'] ?? '';
+    $password = $_POST['password'] ?? '';
+
+    try {
+        $tempClient = new Client(['base_uri' => 'http://localhost:8880/']); // Accès public
+        $response = $tempClient->post('login', [
+            'json' => ['username' => $username, 'password' => $password]
+        ]);
+
+        $result = json_decode($response->getBody()->getContents(), true);
+
+        if (isset($result['success']) && $result['success']) {
+            $_SESSION['token']    = $result['data']['token'];
+            $_SESSION['username'] = $result['data']['username'];
+            $_SESSION['role']     = $result['data']['role'];
+            
+            session_write_close(); // On valide la session avant de partir
+            header("Location: /siteSAE2A/dashboard");
             exit;
         }
-
+    } catch (RequestException $e) {
+        $dVueEreur[] = "Identifiants invalides ou serveur API injoignable.";
+        $this->afficherVue('connection', $dVueEreur, null, 'admin');
     }
+}
 
     private function afficherVue(string $vueKey, array $dVueEreur, ?array $results = null, string $role="user")
     {
@@ -713,7 +669,7 @@ public function cars(array $dVueEreur)
 
         try {
             // Appel API DELETE
-            $this->apiClient->delete("users/$id");
+            $this->apiClient->delete("user/$id");
 
         } catch (RequestException $e) {
             $dVueEreur[] = "Erreur lors de la suppression via l’API.";
@@ -731,25 +687,41 @@ public function cars(array $dVueEreur)
     {
         $username = $_POST['username'] ?? '';
         $password = $_POST['password'] ?? '';
-        $role = $_POST['role'] ?? '';
+        $role     = $_POST['role'] ?? '';
 
-        Validation::val_user($username, $password,  $role, $dVueEreur);
+        // Validation côté front/controller
+        Validation::val_user($username, $password, $role, $dVueEreur);
 
         if (empty($dVueEreur)) {
-            $this->apiClient->post("/add/users", [
-                'form_params' => [
-                    'username' => $username,
-                    'password' => $password,
-                    'role'     => $role
-                ]
-            ]);            
-            header("Location: /siteSAE2A/utilisateurs");
-            exit;
+            try {
+                $this->apiClient->post("/user", [
+                    'form_params' => [
+                        'username' => $username,
+                        'password' => $password,
+                        'role'     => $role
+                    ]
+                ]);
 
+                // Redirection uniquement si ajout OK
+                header("Location: /siteSAE2A/utilisateurs");
+                exit;
+
+            } catch (\Exception $e) {
+                $dVueEreur[] = "Impossible de créer l'utilisateur : " . $e->getMessage();
+            }
         }
 
-        $results = $this->apiClient->get("users");
+        // Si erreurs de validation ou erreur API, on récupère la liste pour afficher
+        try {
+            $response = $this->apiClient->get("/user");
+            $results = json_decode($response->getBody()->getContents(), true);
+        } catch (\Exception $e) {
+            $results = [];
+            $dVueEreur[] = "Impossible de récupérer la liste des utilisateurs.";
+        }
+
         $this->afficherVue('user', $dVueEreur, $results);
+        exit; // On stoppe ici pour éviter tout envoi de header après
     }
 
     public function listeUtilisateur(array $dVueEreur)
@@ -772,8 +744,6 @@ public function cars(array $dVueEreur)
                     break;
 
             }
-
-
             header("Location: /siteSAE2A/utilisateurs");
             exit;
         }

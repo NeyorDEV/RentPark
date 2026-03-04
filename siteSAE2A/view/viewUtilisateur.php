@@ -34,6 +34,8 @@
     </ul>
 </nav>
 
+
+
 <main class="main-content">
     <div class="header-container">
         <h1>Gestion des Utilisateurs</h1>
@@ -51,6 +53,7 @@
                     <th>Username</th>
                     <th>Rôle</th>
                     <?php if ($role === 'admin') : ?>
+                
                         <th>Actions</th>
                     <?php endif; ?>
                 </tr>
@@ -97,7 +100,7 @@
                     <input type="password" name="password" placeholder="Mot de passe" required>
                 </div>
                 <div class="form-group">
-                    <input type="text" name="role" placeholder="Rôle (admin/user)" required>
+                    <input type="text" name="role" placeholder="Rôle (admin/employe/user)" required>
                 </div>
                 <button type="submit" class="save-btn">Créer le compte</button>
         </form>

@@ -60,7 +60,7 @@ class Validation
             $errors[] = "Tous les champs sont requis.";
         }
 
-        if (!in_array($role, ['admin', 'employe', 'client'])) {
+        if (!in_array($role, ['admin', 'employe', 'user'])) {
             $errors[] = "Rôle invalide.";
         }
 

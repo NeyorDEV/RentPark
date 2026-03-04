@@ -17,60 +17,33 @@ class UserController
     private Client $apiClient;
 
     public function __construct()
-    {
-        global $rep, $vues, $user, $pass, $dsn, $action;
+{
+    global $user, $pass, $dsn;
 
-        $dVueErreur = [];
+    try {
+        // Initialisation de la base de données locale
+        $this->connection = new \modele\Connection($dsn, $user, $pass);
+        $this->userGateway = new \modele\UserGateway($this->connection);
+        $this->gateway = new \modele\VehicleGateway($this->connection);
 
-        try {
-            $this->connection = new Connection($dsn, $user, $pass);
-            $this->gateway = new VehicleGateway($this->connection);
-            $this->userGateway = new UserGateway($this->connection);
+        // Configuration Guzzle
+        $options = [
+            'base_uri' => 'http://localhost:8880/',
+            'timeout'  => 5.0,
+            'headers'  => ['Accept' => 'application/json']
+        ];
 
-            $this->apiClient = new Client([
-                'base_uri' => 'http://localhost:8880/',
-                'timeout' => 2.0
-            ]);
-
-
-            switch ($action) {
-                case "afficheInscription":
-                    $this->afficheInscription($dVueErreur);
-                    break;
-                case "afficheConnection":
-                    $this->afficheConnection($dVueErreur);
-                    break;
-                case 'deconnecter':
-                    $this->deconnecter();
-                    break;
-                case 'cars':
-                        $this->cars($dVueErreur);
-                        break;
-                case 'homeCustomers':
-                    $this->homeCustomers($dVueErreur);
-                    break;
-                case 'reservationForm':
-                    $this->reservationForm($dVueErreur);
-                    break;
-                case 'afficheRecapitulatif':
-                    $this->afficheRecapitulatif($dVueErreur);
-                    break;
-                case 'finaliserReservation':
-                    $this->finaliserReservation($dVueErreur);
-                    break;
-                default:
-                    $dVueEreur[] = "Action inconnue";
-                    $this->afficherVue('homeCustomers', $dVueEreur, $results = null, 'user');
-                    break;
-            }
-
-        } catch (\PDOException $e) {
-            $dVueErreur[] = "Erreur BDD : " . $e->getMessage();
-            $this->afficherVue('erreur', $dVueErreur);
+        // On injecte le Token seulement s'il existe en session
+        if (isset($_SESSION['token'])) {
+            $options['headers']['Authorization'] = 'Bearer ' . $_SESSION['token'];
         }
 
-        exit(0);
+        $this->apiClient = new \GuzzleHttp\Client($options);
+
+    } catch (\Exception $e) {
+        // En cas d'erreur, on laisse filer pour ne pas bloquer le FrontControleur
     }
+}
 
     public function homeCustomers(array $dVueEreur)
     {
@@ -131,47 +104,17 @@ class UserController
     }
 
     public function afficheConnection(array $dVueEreur)
-    {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $sousAction = $_POST['action'] ?? '';
-
-            switch ($sousAction) {
-                case 'connection':
-                    $this->connection($dVueEreur);
-                    break;
-            }
-
-
-            header("Location: /siteSAE2A/voitures");
-            exit;
+{
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $sousAction = $_POST['action'] ?? '';
+        if ($sousAction === 'connection') {
+            $this->connection($dVueEreur);
+            // On ne met pas de header ici ! C'est la méthode connection() qui redirige si succès.
+            return; 
         }
-        $this->afficherVue('connection', $dVueEreur, $results = null, 'user');
-
     }
-
-    public function connection(array $dVueErreur)
-    {
-        global $role;
-        $username = $_POST['username'] ?? '';
-        $password = $_POST['password'] ?? '';
-        $savepass = $this->userGateway->getHashPass($username, $password);
-        $role = $this->userGateway->getRole($username);
-        Validation::val_connection($username, $password, $savepass, $dVueErreur);
-
-
-        session_regenerate_id(true);
-        $_SESSION['username'] = $username;
-        $_SESSION['role'] = $role;
-
-        
-
-
-        if (!empty($dVueErreur)) {
-            $this->afficherVue('erreur', $dVueErreur, $results = null, 'user');
-            exit;
-        }
-
-    }
+    $this->afficherVue('connection', $dVueEreur, null, 'user');
+}
 
     public function cars(array $dVueEreur)
 {
@@ -222,6 +165,57 @@ class UserController
     }
 
     $this->afficherVue('cars', $dVueEreur, $results, 'user');
+    }
+
+    public function connection(array $dVueErreur)
+    {
+        $username = $_POST['username'] ?? '';
+        $password = $_POST['password'] ?? '';
+
+        try {
+            // Appel à l'API Slim (route /login)
+            // On utilise $this->apiClient configuré dans le constructeur
+            $response = $this->apiClient->post('login', [
+                'json' => [
+                    'username' => $username,
+                    'password' => $password
+                ]
+            ]);
+
+            $res = json_decode($response->getBody()->getContents(), true);
+
+            
+
+            if (isset($res['success']) && $res['success'] == 1) {
+                // On descend dans l'arborescence : data -> user -> role
+                $userData = $res['data']['user'] ?? null;
+                $token    = $res['data']['token'] ?? null;
+            
+                if ($userData && isset($userData['role'])) {
+                    $_SESSION['token']    = $token;
+                    $_SESSION['role']     = strtolower($userData['role']); // Récupère "admin"
+                    $_SESSION['username'] = $userData['username'];
+            
+                    session_write_close(); 
+            
+                    // Redirection vers le bon endroit
+                    if ($_SESSION['role'] === 'admin') {
+                        header("Location: /siteSAE2A/dashboard");
+                    } else {
+                        header("Location: /siteSAE2A/home");
+                    }
+                    exit;
+                } else {
+                    $dVueErreur[] = "Erreur : Structure de rôle introuvable dans la réponse API.";
+                    $this->afficherVue('connection', $dVueErreur, null, 'user');
+                }
+            }
+
+        } catch (\GuzzleHttp\Exception\RequestException $e) {
+            // Si l'API renvoie une erreur (401, 404, etc.)
+            $dVueErreur[] = "Erreur de connexion : Identifiants incorrects ou serveur API injoignable.";
+            $this->afficherVue('connection', $dVueErreur, null, 'user');
+        }
     }
 
     public function reservationForm(array $dVueEreur){

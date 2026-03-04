@@ -152,28 +152,38 @@ class EmployeControleur
 
     }
 
-    public function connection(array $dVueErreur)
-    {
-        global $role;
-        $username = $_POST['username'] ?? '';
-        $password = $_POST['password'] ?? '';
-        $savepass = $this->userGateway->getHashPass($username, $password);
-        $role = $this->userGateway->getRole($username);
-        Validation::val_connection($username, $password, $savepass, $dVueErreur);
+    public function connection(array $dVueEreur)
+{
+    $username = $_POST['username'] ?? '';
+    $password = $_POST['password'] ?? '';
 
-        session_regenerate_id(true);
+    try {
+        // Appeler l'API pour se connecter (Route publique hors /api/)
+        // On utilise un client temporaire car on n'a pas encore de token
+        $tempClient = new Client(['base_uri' => 'http://localhost:8880/']);
+        $response = $tempClient->post('login', [
+            'json' => ['username' => $username, 'password' => $password]
+        ]);
 
-        $_SESSION['username'] = $username;
-        $_SESSION['role'] = $role;
-    
-    
+        $result = json_decode($response->getBody()->getContents(), true);
 
-        if (!empty($dVueErreur)) {
-            $this->afficherVue('erreur', $dVueErreur, $results = null, 'admin');
+        if ($result['success']) {
+            // ON SAUVEGARDE LE TOKEN ET LES INFOS
+            $_SESSION['token']    = $result['data']['token'];
+            $_SESSION['username'] = $result['data']['username'];
+            $_SESSION['role']     = $result['data']['role'];
+            
+            header("Location: /siteSAE2A/dashboard");
             exit;
         }
 
+    } catch (RequestException $e) {
+        $dVueEreur[] = "Connexion refusée : " . $this->getApiErrorMessage($e);
+        $this->afficherVue('erreur', $dVueEreur, null, 'admin');
+        exit;
     }
+}
+
 
     public function cars(array $dVueEreur)
 {
