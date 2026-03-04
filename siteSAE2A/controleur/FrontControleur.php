@@ -66,8 +66,11 @@ class FrontControleur
         
             // ROUTES USER CONNECTÉ
             $userRoutes = [
-                'connection'
-    
+                'connection',
+                'listeVoitures',    // Autorise l'accès aux véhicules
+                'listeReservation', // Autorise l'accès aux réservations/contrats
+                'afficheParametres', // Autorise l'accès aux paramètres
+                'affichePlanning'   // Autorise l'accès au planning si nécessaire
             ];
 
             $employeRoutes = [
