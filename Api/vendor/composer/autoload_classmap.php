@@ -6,5 +6,18 @@ $vendorDir = dirname(__DIR__);
 $baseDir = dirname($vendorDir);
 
 return array(
+    'App\\Config\\Connection' => $baseDir . '/Utilisateur/config/Connection.php',
+    'App\\DTO\\CreateUserDTO' => $baseDir . '/Utilisateur/DTO/CreateUserDTO.php',
+    'App\\DTO\\UpdateUserDTO' => $baseDir . '/Utilisateur/DTO/UpdateUserDTO.php',
+    'App\\DTO\\UserResponseDTO' => $baseDir . '/Utilisateur/DTO/UserResponseDTO.php',
+    'App\\Middleware\\JsonResponse' => $baseDir . '/Utilisateur/Middleware/JsonResponse.php',
+    'App\\Middleware\\RequestIdMiddleware' => $baseDir . '/Utilisateur/Middleware/RequestIdMiddleware.php',
+    'App\\Security\\AuthMiddleware' => $baseDir . '/Utilisateur/Security/AuthMiddleware.php',
+    'App\\Security\\JwtService' => $baseDir . '/Utilisateur/Security/JwtService.php',
+    'App\\Security\\RoleMiddleware' => $baseDir . '/Utilisateur/Security/RoleMiddleware.php',
+    'App\\UserController' => $baseDir . '/Utilisateur/Shared/UserController.php',
+    'App\\UserLinks' => $baseDir . '/Utilisateur/Shared/UserLinks.php',
+    'App\\UserRepository' => $baseDir . '/Utilisateur/Shared/UserRepository.php',
+    'App\\UserService' => $baseDir . '/Utilisateur/Shared/UserService.php',
     'Composer\\InstalledVersions' => $vendorDir . '/composer/InstalledVersions.php',
 );
