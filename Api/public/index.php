@@ -39,6 +39,7 @@ $app->get('/voituresForReservation', function (Request $request, Response $respo
             SELECT IdVehicule 
             FROM Contrat 
             WHERE NOT (DateFin < :date_depart OR DateDebut > :date_fin)
+            AND Statut <> 'Annulé'
         )";
         $queryParams[':date_depart'] = [$dateDebut, \PDO::PARAM_STR];
         $queryParams[':date_fin'] = [$dateFin, \PDO::PARAM_STR];
