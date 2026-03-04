@@ -31,6 +31,7 @@ $vues['parametres'] = 'view/viewParametres.php';
 $vues['reservationForm'] = 'view/viewReservationForm.php';
 $vues['confirmationSucces'] = 'view/confirmationSucces.php';
 $vues['planning'] = 'view/viewPlanning.php';
+$vues['erreur'] = 'view/erreur.php';
 
 
 
