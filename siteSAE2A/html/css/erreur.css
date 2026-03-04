@@ -1,0 +1,127 @@
+/* ==========================================================================
+   PAGE ERREUR - RENTPARK STYLE
+   ========================================================================== */
+
+.error-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: calc(100vh - 80px); /* Ajusté pour laisser de la place au menu si besoin */
+    padding: 20px;
+}
+
+.error-card {
+    background: #ffffff;
+    max-width: 650px;
+    width: 100%;
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    border-top: 6px solid var(--logout-red);
+    transition: all 0.3s ease;
+}
+
+/* Mode Sombre */
+.dark-theme .error-card {
+    background: #1a1a1a;
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.5);
+    border-top-color: var(--rentpark-orange);
+}
+
+.error-icon {
+    font-size: 4.5rem;
+    color: var(--logout-red);
+    margin-bottom: 25px;
+    animation: shake 0.5s ease-in-out;
+}
+
+.dark-theme .error-icon {
+    color: var(--rentpark-orange);
+}
+
+.error-card h1 {
+    font-size: 2rem;
+    margin-bottom: 15px;
+    font-weight: 700;
+}
+
+.error-msg-content {
+    background: #fff5f5;
+    padding: 20px;
+    border-radius: 12px;
+    margin: 20px 0;
+    color: #c0392b;
+    font-size: 1.1rem;
+    border-left: 5px solid var(--logout-red);
+}
+
+.dark-theme .error-msg-content {
+    background: rgba(231, 76, 60, 0.1);
+    color: #ff9a9a;
+}
+
+/* --- SECTION DEBUG --- */
+.debug-section {
+    margin-top: 30px;
+    border-top: 1px dashed #ccc;
+    padding-top: 20px;
+}
+
+.debug-btn {
+    background: none;
+    border: 1px solid #ddd;
+    color: #888;
+    padding: 8px 15px;
+    border-radius: 50px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: 0.3s;
+}
+
+.debug-btn:hover {
+    background: #eee;
+    color: #333;
+}
+
+.debug-console {
+    display: none; /* Masqué par défaut */
+    text-align: left;
+    background: #252525;
+    color: #00ff41; /* Vert Debug */
+    font-family: 'Consolas', 'Monaco', monospace;
+    padding: 20px;
+    border-radius: 10px;
+    margin-top: 15px;
+    font-size: 0.85rem;
+    overflow-x: auto;
+    max-height: 300px;
+    border: 2px solid #333;
+}
+
+/* --- BOUTON RETOUR --- */
+.btn-home {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    background-color: var(--rentpark-orange);
+    color: white !important;
+    padding: 14px 30px;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: 600;
+    margin-top: 20px;
+    transition: 0.3s;
+}
+
+.btn-home:hover {
+    background-color: var(--rentpark-orange-dark);
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(255, 90, 25, 0.4);
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-10px); }
+    75% { transform: translateX(10px); }
+}
