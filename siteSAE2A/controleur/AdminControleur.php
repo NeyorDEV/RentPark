@@ -64,9 +64,11 @@ class AdminControleur
                 case "rechercherVoitures":
                     $this->rechercherVoitures($dVueEreur);
                     break;
-
-                case "listeUtilisateur":
-                    $this->listeUtilisateur($dVueEreur);
+                case "listeUtilisateurs":
+                    $this->listeUtilisateurs($dVueEreur);
+                    break;
+                case "listeClients":
+                    $this->listeClients($dVueEreur);
                     break;
                 case 'listeReservation':
                     $this->listeReservation($dVueEreur);
@@ -735,7 +737,57 @@ class AdminControleur
 
         $this->afficherVue('user', $dVueErreur, $results, 'admin');
     }
+    private function rechercherClient(array $dVueErreur = []): void
+    {
+        //A faire
+        $motCle = trim($_GET['q'] ?? '');
 
+        if ($motCle === '') {
+            //A faire
+        } else {
+            // A faire
+
+            if (empty($results)) {
+                $dVueErreur[] = "Aucun utilisateur trouvée pour \"$motCle\".";
+            }
+        }
+
+        $this->afficherVue('client', $dVueErreur, $results, 'admin');
+    }
+    private function modifierClient(array $dVueEreur)
+    {
+        
+        $Nom = $_POST['nom'] ?? '';
+        $Prenom = $_POST['prenom'] ?? '';
+        $Email = $_POST['email'] ?? '';
+        $NumTel = $_POST['numTel'] ?? '';
+        $NumPermis = $_POST['numPermis'] ?? '';
+        $DateNaiss = $_POST['dateNaiss'] ?? '';
+        $Nationalite = $_POST['nationalite'] ?? '';
+        $IdClient = (int) ($_POST['idClient'] ?? -1);
+
+        //Validation::val_client($Nom, $Prenom, $Email, $NumTel, $NumPermis, $DateNaiss, $Nationalite, $IdClient, $dVueEreur);
+
+        if (empty($dVueEreur)) {
+            $this->apiClient->put("client/$IdClient", [
+                'json' => [
+                    'Nom' => $Nom,
+                    'Prenom' => $Prenom,
+                    'Email' => $Email,
+                    'NumTel' => $NumTel,
+                    'NumPermis' => $NumPermis,
+                    'DateNaiss' => $DateNaiss,
+                    'Nationalite' => $Nationalite
+                ]
+            ]);
+            
+            header("Location: /siteSAE2A/clients");
+            exit;
+        }
+        $response = $this->apiClient->get('clients');
+        $results = json_decode($response->getBody()->getContents(), true);
+        $this->afficherVue('client', $dVueEreur, $results, 'admin');
+    }
 
     // ok utilise API
     private function supprimerUtilisateur(array $dVueEreur)
@@ -785,10 +837,49 @@ class AdminControleur
         }
 
         $results = $this->apiClient->get("users");
+        $results = json_decode($results->getBody()->getContents(), true);
         $this->afficherVue('user', $dVueEreur, $results);
     }
 
-    public function listeUtilisateur(array $dVueEreur)
+    private function ajouterClient(array $dVueEreur)
+    {
+        $Nom = $_POST['nom'] ?? '';
+        $Prenom = $_POST['prenom'] ?? '';
+        $Email = $_POST['email'] ?? '';
+        $NumTel = $_POST['numTel'] ?? '';
+        $NumPermis = $_POST['numPermis'] ?? '';
+        $DateNaiss = $_POST['dateNaiss'] ?? '';
+        $Nationalite = $_POST['nationalite'] ?? '';
+        
+
+        //Validation::val_client($Nom, $Prenom, $Email, $NumTel, $NumPermis, $DateNaiss, $Nationalite, $IdClient, $dVueEreur);
+
+        if (empty($dVueEreur)) {
+            $this->apiClient->post("client", [
+                'json' => [
+                    'Nom' => $Nom,
+                    'Prenom' => $Prenom,
+                    'Email' => $Email,
+                    'NumTel' => $NumTel,
+                    'NumPermis' => $NumPermis,
+                    'DateNaiss' => $DateNaiss,
+                    'Nationalite' => $Nationalite
+                ]
+            ]);
+            header("Location: /siteSAE2A/clients");
+            exit;
+
+        }
+
+        $response = $this->apiClient->get('clients');
+        $results = json_decode($response->getBody()->getContents(), true);
+
+        $this->afficherVue('client', $dVueEreur, $results);
+    }
+
+    
+
+    public function listeUtilisateurs(array $dVueEreur)
     {
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -808,8 +899,6 @@ class AdminControleur
                     break;
 
             }
-
-
             header("Location: /siteSAE2A/utilisateurs");
             exit;
         }
@@ -823,6 +912,34 @@ class AdminControleur
         $this->afficherVue('user', $dVueEreur, $results, 'admin');
     }
 
+    public function listeClients(array $dVueEreur)
+    {
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $sousAction = $_POST['action'] ?? '';
+
+            switch ($sousAction) {
+                case 'ajouterClient':
+                    $this->ajouterClient($dVueEreur);
+                    break;
+                case 'modifierClient':
+                    $this->modifierClient($dVueEreur);
+                    break;
+
+            }
+            header("Location: /siteSAE2A/clients");
+            exit;
+        }
+
+        $sousAction = $_GET['action'] ?? '';
+        if ($sousAction === 'rechercherClient') {
+            $this->rechercherClient($dVueEreur);
+            return;
+        }
+        $response = $this->apiClient->get('clients');
+        $results = json_decode($response->getBody()->getContents(), true);
+        $this->afficherVue('client', $dVueEreur, $results, 'admin');
+    }
 
     // ---------------------------| Reservations |-----------------------------------------------------------
     private function rechercherReservation(array &$dVueEreur = []): void
@@ -1015,12 +1132,12 @@ class AdminControleur
     {
         $username = $_POST['username'] ?? '';
         $id = (int) ($_POST['id'] ?? -1);
+        $role= $_POST['role'] ?? '';
 
-
-
+        // faire de quoi changer le rôle pour le super admin mais pas pour les employés
         if (empty($dVueEreur)) {
-
-            $this->userGateway->update($username, $id);
+            
+            $this->userGateway->update($username, $id, );
             header("Location: /sitesae2A/utilisateurs");
             exit;
         }

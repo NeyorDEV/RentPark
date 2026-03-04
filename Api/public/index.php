@@ -362,12 +362,57 @@ $app->post('/add/vehicule', function (Request $request, Response $response, $arg
 // -----------------------------------------------------------------------
 
 // GET : Liste des clients
-$app->get('/client', function (Request $request, Response $response, $args) use ($conn) {
+$app->get('/clients', function (Request $request, Response $response, $args) use ($conn) {
     $conn->executeQuery("SELECT * FROM Client");
     $client = $conn->getResults();
 
     $response->getBody()->write(json_encode($client));
     return $response->withHeader('Content-Type', 'application/json');
+});
+
+// PUT : Modification d'un client
+$app->put('/client/{IdClient}', function (Request $request, Response $response, $args) use ($conn) {
+    $IdClient = (string) $args['IdClient'];
+    $data = $request->getParsedBody();
+
+    // Vérification basique des données (ajustez selon vos besoins)
+    if (empty($data)) {
+        $response->getBody()->write(json_encode(['error' => 'Aucune donnée envoyée']));
+        return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
+    }
+
+    $sql = "UPDATE Client SET 
+            Nom = :nom, 
+            Prenom = :prenom, 
+            Email = :email, 
+            NumTel = :numTel, 
+            NumPermis = :numPermis, 
+            DateNaiss = :dateNaiss, 
+            Nationalite = :nationalite
+        WHERE IdClient = :idClient";
+        $params = [
+        ':nom'         => [$data['Nom'], \PDO::PARAM_STR],
+        ':prenom'      => [$data['Prenom'], \PDO::PARAM_STR],
+        ':email'       => [$data['Email'], \PDO::PARAM_STR],
+        ':numTel'      => [$data['NumTel'] ?? null, \PDO::PARAM_STR],
+        ':numPermis'   => [$data['NumPermis'], \PDO::PARAM_STR],
+        ':dateNaiss'   => [$data['DateNaiss'] ?? null, \PDO::PARAM_STR],
+        ':nationalite' => [$data['Nationalite'] ?? null, \PDO::PARAM_STR],
+        ':idClient'    => [$IdClient, \PDO::PARAM_INT]
+    ];
+
+        
+
+    try {
+        $conn->executeQuery($sql, $params);
+        $response->getBody()->write(json_encode(['message' => 'Client mis à jour avec succès']));
+        return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
+    } catch (\Exception $e) {
+        $response->getBody()->write(json_encode([
+            'error' => 'Erreur lors de la mise à jour : ' . $e->getMessage()
+        ]));
+        return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
+    }
 });
 
 // POST : Ajouter un client
@@ -421,8 +466,7 @@ $app->post('/modif/client', function (Request $request, Response $response, $arg
 $app->post('/client', function (Request $request, Response $response, $args) use ($conn) {
 
     $data = $request->getParsedBody();
-
-    // Validation des champs obligatoires
+    // Validation des champs
     if (empty($data['Nom']) || empty($data['Prenom']) || empty($data['Email']) || empty($data['NumPermis'])) {
         $response->getBody()->write(json_encode(['error' => 'Champs obligatoires manquants.']));
         return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
@@ -667,9 +711,11 @@ $app->patch('/contrat/{id}', function (Request $request, Response $response, $ar
 // SECTION : UTILISATEURS (users)
 // -----------------------------------------------------------------------
 
-// GET : Liste des utilisateurs
+// GET : Liste des utilisateurs par role (optionnel)
 $app->get('/users', function (Request $request, Response $response, $args) use ($conn) {
+
     $conn->executeQuery("SELECT * FROM users");
+    
     $users = $conn->getResults();
 
     $response->getBody()->write(json_encode($users));

@@ -68,6 +68,8 @@ class Validation
         $username = filter_var($username, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
     }
 
+    
+
     public static function val_connection(string &$username, string &$password, ?string $savepass, array &$errors)
     {
         // Nettoyage et vérification de base
