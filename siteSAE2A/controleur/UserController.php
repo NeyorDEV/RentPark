@@ -1,5 +1,6 @@
 <?php
 namespace controleur;
+
 use modele\Connection;
 use modele\VehicleGateway;
 use modele\UserGateway;
@@ -9,18 +10,14 @@ use modele\User;
 
 class UserController
 {
-    private Connection $connection;
-    private VehicleGateway $gateway;
-
-    private UserGateway $userGateway;
-
-    private Client $apiClient;
+    protected Connection $connection;
+    protected VehicleGateway $gateway;
+    protected UserGateway $userGateway;
+    protected Client $apiClient;
 
     public function __construct()
     {
-        global $rep, $vues, $user, $pass, $dsn, $action;
-
-        $dVueErreur = [];
+        global $user, $pass, $dsn;
 
         try {
             $this->connection = new Connection($dsn, $user, $pass);
@@ -32,70 +29,28 @@ class UserController
                 'timeout' => 2.0
             ]);
 
-
-            switch ($action) {
-                case "afficheInscription":
-                    $this->afficheInscription($dVueErreur);
-                    break;
-                case "afficheConnection":
-                    $this->afficheConnection($dVueErreur);
-                    break;
-                case 'deconnecter':
-                    $this->deconnecter();
-                    break;
-                case 'cars':
-                        $this->cars($dVueErreur);
-                        break;
-                case 'homeCustomers':
-                    $this->homeCustomers($dVueErreur);
-                    break;
-                case 'reservationForm':
-                    $this->reservationForm($dVueErreur);
-                    break;
-                case 'afficheRecapitulatif':
-                    $this->afficheRecapitulatif($dVueErreur);
-                    break;
-                case 'finaliserReservation':
-                    $this->finaliserReservation($dVueErreur);
-                    break;
-                default:
-                    $dVueEreur[] = "Action inconnue";
-                    $this->afficherVue('homeCustomers', $dVueEreur, $results = null, 'user');
-                    break;
-            }
-
+            $this->gererActions();
         } catch (\PDOException $e) {
-            $dVueErreur[] = "Erreur BDD : " . $e->getMessage();
-            $this->afficherVue('erreur', $dVueErreur);
+            $this->afficherVue('erreur', ["Erreur BDD : " . $e->getMessage()]);
         }
+    }
 
+    protected function gererActions()
+    {
+        global $action;
+        $dVueErreur = [];
+
+        switch ($action) {
+            case "afficheInscription": $this->afficheInscription($dVueErreur); break;
+            case "afficheConnection": $this->afficheConnection($dVueErreur); break;
+            case 'deconnecter': $this->deconnecter(); break;
+            case 'cars': $this->cars($dVueErreur); break;
+            case 'homeCustomers': $this->homeCustomers($dVueErreur); break;
+            default:
+                $this->afficherVue('homeCustomers', ["Action inconnue"], null, 'user');
+                break;
+        }
         exit(0);
-    }
-
-    public function homeCustomers(array $dVueEreur)
-    {
-
-        $this->afficherVue('homeCustomers', $dVueEreur, $results = null, 'user');
-
-    }
-
-    public function afficheInscription(array $dVueEreur)
-    {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $sousAction = $_POST['action'] ?? '';
-
-            switch ($sousAction) {
-                case 'inscription':
-                    $this->inscription($dVueEreur);
-                    break;
-            }
-
-
-            header("Location: /siteSAE2A/connection");
-            exit;
-        }
-        $this->afficherVue('inscription', $dVueEreur, $results = null, 'user');
-
     }
 
     public function deconnecter(): void
@@ -106,6 +61,54 @@ class UserController
         exit;
     }
 
+    protected function afficherVue(string $vueKey, array $dVueEreur, ?array $results = null, string $role = 'user')
+    {
+        global $rep, $vues, $twig;
+        $roleSession = $_SESSION['role'] ?? $role;
+
+        if (!isset($vues[$vueKey])) {
+            echo "Vue '$vueKey' non définie.";
+            exit;
+        }
+
+        $vuePath = $vues[$vueKey];
+        if (str_ends_with($vuePath, '.twig')) {
+            echo $twig->render($vuePath, ['erreurs' => $dVueEreur, 'results' => $results, 'role' => $roleSession]);
+        } else {
+            $cheminVue = realpath($rep . $vuePath);
+            if ($cheminVue && file_exists($cheminVue)) {
+                $resultsTwig = $results;
+                require_once($cheminVue);
+            }
+        }
+    }
+
+    // Méthode commune ou classe hérité :
+
+    // Affiche la page d'accueil pour les clients
+    public function homeCustomers(array $dVueEreur)
+    {
+        $this->afficherVue('homeCustomers', $dVueEreur, $results = null, 'user');
+    }
+
+    // Affiche la page d'inscription et gère le formulaire d'inscription
+    public function afficheInscription(array $dVueEreur)
+    {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $sousAction = $_POST['action'] ?? '';
+
+            switch ($sousAction) {
+                case 'inscription':
+                    $this->inscription($dVueEreur);
+                    break;
+            }
+            header("Location: /siteSAE2A/connection");
+            exit;
+        }
+        $this->afficherVue('inscription', $dVueEreur, $results = null, 'user');
+    }
+
+    // Traite le formulaire d'inscription, valide les données et crée un nouvel utilisateur
     public function inscription(array $dVueErreur)
     {
         $username = $_POST['username'] ?? '';
@@ -113,23 +116,19 @@ class UserController
         $confirm = $_POST['confirm'] ?? '';
         $role = $_POST['role'] ?? '';
 
-
         Validation::val_user($username, $password, $confirm, $role, $dVueErreur);
 
         if (!empty($dVueErreur)) {
             $dVueErreur[] = "erreur dans l'inscription";
             $this->afficherVue('erreur', $dVueErreur, $results = null, 'user');
         }
-
         $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-
 
         $user = new User(null, $username, $hashedPassword, $role);
         $this->userGateway->login($user);
-
-
     }
 
+    // Affiche la page de connexion et gère le formulaire de connexion
     public function afficheConnection(array $dVueEreur)
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -141,14 +140,13 @@ class UserController
                     break;
             }
 
-
             header("Location: /siteSAE2A/voitures");
             exit;
         }
         $this->afficherVue('connection', $dVueEreur, $results = null, 'user');
-
     }
 
+    // Traite le formulaire de connexion, valide les données et connecte l'utilisateur
     public function connection(array $dVueErreur)
     {
         global $role;
@@ -163,76 +161,76 @@ class UserController
         $_SESSION['username'] = $username;
         $_SESSION['role'] = $role;
 
-        
-
-
         if (!empty($dVueErreur)) {
             $this->afficherVue('erreur', $dVueErreur, $results = null, 'user');
             exit;
         }
-
     }
 
+    // Affiche la liste des voitures disponibles pour la réservation, avec possibilité de filtrer les résultats
     public function cars(array $dVueEreur)
-{
-    // 1. Récupération des filtres depuis l'URL (GET)
-    $date_depart = $_GET['date_depart'] ?? null;
-    $date_retour = $_GET['date_retour'] ?? null;
-    $boite_filtre = $_GET['boite'] ?? null;
-    // AJOUT : Récupération du filtre énergie
-    $energie_filtre = $_GET['energie'] ?? null; 
-    
-    $prix_min = isset($_GET['prix_min']) && $_GET['prix_min'] !== '' ? (float)$_GET['prix_min'] : null;
-    $prix_max = isset($_GET['prix_max']) && $_GET['prix_max'] !== '' ? (float)$_GET['prix_max'] : null;
-
-    // 2. Appel de l'API
-    try {
-        $response = $this->apiClient->get('voituresForReservation');
-        $results = json_decode($response->getBody()->getContents(), true);
-    } catch (RequestException $e) {
-        $dVueEreur[] = "Impossible de récupérer les véhicules depuis l’API.";
-        $results = [];
-    }
-
-    // 3. Application des filtres PHP
-    if (!empty($results)) {
-        $results = array_filter($results, function($voiture) use ($boite_filtre, $energie_filtre, $prix_min, $prix_max) {
-            $match = true;
-            $prixVoiture = isset($voiture['Prix']) ? (float)$voiture['Prix'] : 0;
-
-            if ($boite_filtre && (!isset($voiture['Boite']) || $voiture['Boite'] !== $boite_filtre)) {
-                $match = false;
-            }
-            
-            // AJOUT : Logique de filtrage pour l'énergie
-            if ($match && $energie_filtre && (!isset($voiture['Energie']) || $voiture['Energie'] !== $energie_filtre)) {
-                $match = false;
-            }
-
-            if ($match && $prix_min !== null && $prixVoiture < $prix_min) {
-                $match = false;
-            }
-            if ($match && $prix_max !== null && $prixVoiture > $prix_max) {
-                $match = false;
-            }
-            return $match;
-        });
+    {
+        // 1. Récupération des filtres depuis l'URL (GET)
+        $date_depart = $_GET['date_depart'] ?? null;
+        $date_retour = $_GET['date_retour'] ?? null;
+        $boite_filtre = $_GET['boite'] ?? null;
+        // AJOUT : Récupération du filtre énergie
+        $energie_filtre = $_GET['energie'] ?? null; 
         
-        $results = array_values($results);
+        $prix_min = isset($_GET['prix_min']) && $_GET['prix_min'] !== '' ? (float)$_GET['prix_min'] : null;
+        $prix_max = isset($_GET['prix_max']) && $_GET['prix_max'] !== '' ? (float)$_GET['prix_max'] : null;
+
+        // 2. Appel de l'API
+        try {
+            $response = $this->apiClient->get('voituresForReservation');
+            $results = json_decode($response->getBody()->getContents(), true);
+        } catch (RequestException $e) {
+            $dVueEreur[] = "Impossible de récupérer les véhicules depuis l’API.";
+            $results = [];
+        }
+
+        // 3. Application des filtres PHP
+        if (!empty($results)) {
+            $results = array_filter($results, function($voiture) use ($boite_filtre, $energie_filtre, $prix_min, $prix_max) {
+                $match = true;
+                $prixVoiture = isset($voiture['Prix']) ? (float)$voiture['Prix'] : 0;
+
+                if ($boite_filtre && (!isset($voiture['Boite']) || $voiture['Boite'] !== $boite_filtre)) {
+                    $match = false;
+                }
+                
+                // AJOUT : Logique de filtrage pour l'énergie
+                if ($match && $energie_filtre && (!isset($voiture['Energie']) || $voiture['Energie'] !== $energie_filtre)) {
+                    $match = false;
+                }
+
+                if ($match && $prix_min !== null && $prixVoiture < $prix_min) {
+                    $match = false;
+                }
+                if ($match && $prix_max !== null && $prixVoiture > $prix_max) {
+                    $match = false;
+                }
+                return $match;
+            });
+
+            $results = array_values($results);
+        }
+
+        $this->afficherVue('cars', $dVueEreur, $results, 'user');
     }
 
-    $this->afficherVue('cars', $dVueEreur, $results, 'user');
-    }
-
+    // Affiche le formulaire de réservation pour une voiture sélectionnée, avec les détails de la voiture et les champs nécessaires pour finaliser la réservation
     public function reservationForm(array $dVueEreur){
          $this->afficherVue('reservationForm', $dVueEreur, $results = null, 'user');
     }
 
+    // Affiche un récapitulatif de la réservation avant de la finaliser, avec les détails de la voiture, les dates de réservation et les informations du client
     public function afficheRecapitulatif(array $dVueEreur)
     {
         $this->afficherVue('recapitulatif', $dVueEreur, $results = null, 'user');
     }
 
+    // Traite le formulaire de réservation, valide les données, crée un nouveau client et un nouveau contrat de location via l'API, et affiche une confirmation de réservation réussie ou des erreurs si la réservation échoue
     public function finaliserReservation(array &$dVueEreur) 
     {
         try {
@@ -338,22 +336,6 @@ class UserController
         } catch (\Exception $e) {
             $dVueEreur[] = "Erreur technique : " . $e->getMessage();
             $this->afficherVue('reservationForm', $dVueEreur, null, 'user');
-        }
-    }
-
-    private function afficherVue(string $vueKey, array $dVueEreur, ?array $results = null, string $role = 'user')
-    {
-        global $rep, $vues;
-        if (!isset($vues[$vueKey])) {
-            echo "Vue '$vueKey' non définie.";
-            exit;
-        }
-        $cheminVue = realpath($rep . $vues[$vueKey]);
-        if ($cheminVue && file_exists($cheminVue)) {
-            require_once($cheminVue); // NOSONAR
-        } else {
-            echo "Fichier de vue introuvable : " . ($rep . $vues[$vueKey]);
-            exit;
         }
     }
 }
