@@ -1192,7 +1192,7 @@ class AdminControleur
         exit;
     }
 
-    function finaliserReservation(array &$dVueEreur)
+    public function finaliserReservation(array &$dVueErreur) 
     {
         try {
             $nom = $_POST['nom'] ?? null;
@@ -1230,15 +1230,15 @@ class AdminControleur
             }
 
             // On SELECT le véhicule par son NumSerie pour garantir l'exactitude des données
-            $responseVehicule = $this->apiClient->get("voitures/$numSerie");
+            $responseVehicule = $this->apiClient->get("voitures/$numSerie"); 
             $vehicule = json_decode($responseVehicule->getBody()->getContents(), true);
 
             if (!$vehicule) {
                 throw new \Exception("Véhicule introuvable pour le contrat.");
             }
-
+            
+            // --- ÉTAPE 1 : Créer le client via l'API ---
             try {
-                // --- ÉTAPE 1 : Créer le client via l'API ---
                 $responseClient = $this->apiClient->post('client', [
                     'json' => [
                         'Nom' => $nom,
@@ -1252,10 +1252,21 @@ class AdminControleur
                 ]);
             } catch (RequestException $e) {
                 if ($e->hasResponse()) {
-                    // CECI VA AFFICHER L'ERREUR PHP RÉELLE DE L'API
-                    echo $e->getResponse()->getBody()->getContents();
-                    die();
+                    $body = $e->getResponse()->getBody()->getContents();
+                    $data = json_decode($body, true);
+
+                    if ($e->getResponse()->getStatusCode() === 409) {
+                        $dVueErreur[] = "Conflit d'identité : les informations saisies (Email ou Permis) sont déjà liées à un autre compte.";
+                        $dVueErreur[] = $data['message'] ?? "Erreur de doublon en base de données.";
+                    } else {
+                        $dVueErreur[] = "L'API a rencontré un problème lors du traitement.";
+                        $dVueErreur[] = $e->getMessage();
+                    }
+                } else {
+                    $dVueErreur[] = "Impossible de contacter le serveur distant.";
                 }
+                $this->afficherVue('erreur', $dVueErreur, null, 'user');
+                return;
             }
 
             $dataClient = json_decode($responseClient->getBody()->getContents(), true);
@@ -1265,31 +1276,38 @@ class AdminControleur
                 // --- ÉTAPE 2 : Créer le contrat via l'API ---
                 $responseContrat = $this->apiClient->post('modif/contrat', [
                     'json' => [
-                        'DateDebut' => $dateDebut,
-                        'DateFin' => $dateFin,
-                        'Statut' => 'EnCoursValidation',
-                        'IdClient' => (int) $idClient,
-                        'EtatAvant' => 5,
+                        'DateDebut'  => $dateDebut,
+                        'DateFin'    => $dateFin,
+                        'Statut'     => 'EnCoursValidation',
+                        'IdClient'   => (int)$idClient,
+                        'EtatAvant'  => 5,
                         'IdVehicule' => $numSerie,
-                        'Marque' => $vehicule['Marque'],
-                        'NomModele' => $vehicule['Nom'],
-                        'AnneeModele' => $vehicule['Annee']
+                        'Marque'     => $vehicule['Marque'], 
+                        'NomModele'  => $vehicule['Nom'],    
+                        'AnneeModele'=> $vehicule['Annee']   
                     ]
                 ]);
 
                 $dataContrat = json_decode($responseContrat->getBody()->getContents(), true);
 
                 if (isset($dataContrat['message']) && $dataContrat['message'] === 'Contrat créé avec succès') {
-                    $this->afficherVue('confirmationSucces', $dVueEreur, null, 'admin');
+                    $this->afficherVue('confirmationSucces', $dVueErreur, null, 'user');
+                } else {
+                    $dVueErreur[] = "Erreur lors de la création du contrat";
+                    $this->afficherVue('erreur', $dVueErreur, null, 'user');
                 }
+            } else {
+                $dVueErreur[] = "Erreur lors de la création du client";
+                $this->afficherVue('erreur', $dVueErreur, null, 'user');
             }
 
+            
         } catch (RequestException $e) {
-            $dVueEreur[] = "Erreur API : " . $e->getMessage();
-            $this->afficherVue('recapitulatif', $dVueEreur, null, 'admin');
+            $dVueErreur[] = "Erreur API : " . $e->getMessage();
+            $this->afficherVue('erreur', $dVueErreur, null, 'user');
         } catch (\Exception $e) {
-            $dVueEreur[] = "Erreur technique : " . $e->getMessage();
-            $this->afficherVue('recapitulatif', $dVueEreur, null, 'admin');
+            $dVueErreur[] = "Erreur technique : " . $e->getMessage();
+            $this->afficherVue('erreur', $dVueErreur, null, 'user');
         }
     }
 
