@@ -473,46 +473,47 @@ $app->post('/client', function (Request $request, Response $response, $args) use
     }
 
     try {
-        // --- ÉTAPE A : Vérifier si l'email OU le permis existe déjà ---
-        $checkSql = "SELECT idClient FROM Client WHERE Email = :email OR NumPermis = :numPermis LIMIT 1";
+        $email = $data['Email'];
+        $permis = $data['NumPermis'];
+
+        // 1. On cherche si l'un DES DEUX existe déjà
+        $checkSql = "SELECT idClient, Email, NumPermis FROM Client WHERE Email = :email OR NumPermis = :numPermis";
         $stmt = $conn->prepare($checkSql);
-        $stmt->execute([
-            ':email' => $data['Email'],
-            ':numPermis' => $data['NumPermis']
-        ]);
-        $existingClient = $stmt->fetch();
+        $stmt->execute([':email' => $email, ':numPermis' => $permis]);
+        $existingClients = $stmt->fetchAll(); // On récupère TOUS les clients qui matchent
 
-        if ($existingClient) {
-            // --- ÉTAPE B : UPDATE (Le client existe via Email ou Permis) ---
-            $idClient = $existingClient['idClient'];
+        if (count($existingClients) > 1) {
+            $resData = [
+                'error' => 'conflit_identite',
+                'message' => 'L\'adresse email et le numéro de permis sont déjà enregistrés sur deux comptes différents.'
+            ];
+            $response->getBody()->write(json_encode($resData));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(409); // 409 = Conflict
+        }
 
-            // Note : On met aussi à jour l'Email et le Permis au cas où l'un des deux aurait changé 
-            // par rapport à l'autre identifiant trouvé.
-            $sql = "UPDATE Client SET 
-                        Nom = :nom, 
-                        Prenom = :prenom, 
-                        Email = :email,
-                        NumTel = :numTel, 
-                        NumPermis = :numPermis, 
-                        DateNaiss = :dateNaiss, 
-                        Nationalite = :nationalite 
+        if (count($existingClients) === 1) {
+            $foundClient = $existingClients[0];
+            $idClient = $foundClient['idClient'];
+
+            // --- ÉTAPE B : UPDATE ---
+            $sql = "UPDATE Client SET Nom = :nom, Prenom = :prenom, Email = :email, NumTel = :numTel, 
+                    NumPermis = :numPermis, DateNaiss = :dateNaiss, Nationalite = :nationalite 
                     WHERE idClient = :id";
-
+            
             $params = [
                 ':nom' => [$data['Nom'], \PDO::PARAM_STR],
                 ':prenom' => [$data['Prenom'], \PDO::PARAM_STR],
-                ':email' => [$data['Email'], \PDO::PARAM_STR],
+                ':email' => [$email, \PDO::PARAM_STR],
                 ':numTel' => [$data['NumTel'] ?? null, \PDO::PARAM_STR],
-                ':numPermis' => [$data['NumPermis'], \PDO::PARAM_STR],
+                ':numPermis' => [$permis, \PDO::PARAM_STR],
                 ':dateNaiss' => [$data['DateNaiss'] ?? null, \PDO::PARAM_STR],
                 ':nationalite' => [$data['Nationalite'] ?? null, \PDO::PARAM_STR],
                 ':id' => [$idClient, \PDO::PARAM_INT]
             ];
 
             $conn->executeQuery($sql, $params);
-            $message = 'Client existant (Email ou Permis reconnu) mis à jour avec succès';
+            $message = 'Client mis à jour';
             $status = 200;
-
         } else {
             // --- ÉTAPE C : INSERT (Aucune correspondance trouvée) ---
             $sql = "INSERT INTO Client (Nom, Prenom, Email, NumTel, NumPermis, DateNaiss, Nationalite) 
