@@ -50,11 +50,11 @@
         <?php if($client): ?>
             <div class="left flex-column">
                 <a href="/siteSAE2A/utilisateurs" class="add-btn-main btn-left unselected">
-                    <i class="fa-solid fa-user-plus"></i> Utilisateurs
+                    <i class="fa-solid fa-exchange-alt"></i> Utilisateurs
                 </a>
                 <div style="height: 10px;"></div>
-                <a href="/siteSAE2A/clients" class="add-btn-main btn-left selected">
-                    <i class="fa-solid fa-user-plus"></i> Clients
+                <a  class="add-btn-main btn-left selected">
+                     Clients
                 </a>
             </div>
             <h1>Gestion des Clients</h1>
@@ -65,12 +65,12 @@
             <?php endif; ?>
         <?php else: ?>
             <div class="left flex-column">
-                <a href="/siteSAE2A/utilisateurs" class="add-btn-main btn-left selected">
-                    <i class="fa-solid fa-user-plus"></i> Utilisateurs
+                <a  class="add-btn-main btn-left selected">
+                    <i class="fa-solid"></i> Utilisateurs
                 </a>
                 <div style="height: 10px;"></div>
                 <a href="/siteSAE2A/clients" class="add-btn-main btn-left unselected">
-                    <i class="fa-solid fa-user-plus"></i> Clients
+                    <i class="fa-solid fa-exchange-alt"></i> Clients
                 </a>
             </div>
             <h1>Gestion des Utilisateurs</h1>

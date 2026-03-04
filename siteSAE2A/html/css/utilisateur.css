@@ -44,6 +44,7 @@
 .selected{
     background: linear-gradient(135deg, var(--rentpark-orange) 0%, #8b2e09 100%);
     color: lightgray;
+    justify-content : center;
 }
 
 .unselected:hover{
@@ -182,7 +183,7 @@
 .client-details p {
     margin: 0;
     font-size: 0.95rem;
-    color: white;
+    color: whitesmoke;
 }
 
 .close { position: absolute; top: 15px; right: 20px; font-size: 24px; text-decoration: none; color: #aaa; }
