@@ -31,7 +31,10 @@ class FrontControleur
         $router->map('GET|POST', '/reservation', 'listeReservation');
         
        
-        $router->map('GET|POST', '/utilisateurs', 'listeUtilisateur');
+        $router->map('GET|POST', '/utilisateurs', 'listeUtilisateurs');
+        $router->map('GET|POST', '/clients', 'listeClients');
+
+
 
         $router->map('GET|POST', '/inscription', 'afficheInscription');
         $router->map('GET|POST', '/connection', 'afficheConnection');
@@ -70,7 +73,8 @@ class FrontControleur
             $employeRoutes = [
                 'listeVoitures',
                 'listeReservation',
-                'listeUtilisateur',
+                'listeUtilisateurs',
+                'listeClients',
                 'affichePlanning',
                 'afficheParametres'
                 

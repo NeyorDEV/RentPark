@@ -57,11 +57,14 @@ class EmployeControleur
                     $this->afficheParametres($dVueErreur);
                     break;
                 case 'cars':
-                    $this->cars($dVueErreur);
-                    break;
-                case "listeUtilisateur":
-                    $this->listeUtilisateur($dVueErreur);
-                    break;
+                        $this->cars($dVueErreur);
+                        break;
+                case "listeClients":
+                            $this->listeClients($dVueErreur);
+                            break;
+                case "listeUtilisateurs":
+                            $this->listeUtilisateurs($dVueErreur);
+                            break;
                 case 'listeReservation':
                     $this->listeReservation($dVueErreur);
                     break;
@@ -366,6 +369,25 @@ class EmployeControleur
         $this->afficherVue('user', $dVueErreur, $results, 'admin');
     }
 
+    private function rechercherClient(array $dVueErreur = []): void
+    {
+        //A faire
+        $motCle = trim($_GET['q'] ?? '');
+
+        if ($motCle === '') {
+            //A faire
+        } else {
+            // A faire
+
+            if (empty($results)) {
+                $dVueErreur[] = "Aucun Client trouvée pour \"$motCle\".";
+            }
+        }
+
+        $this->afficherVue('client', $dVueErreur, $results, 'admin');
+    }
+
+
     private function supprimerUtilisateur(array $dVueEreur)
     {
         $id = (int) ($_POST['id'] ?? -1);
@@ -406,8 +428,43 @@ class EmployeControleur
 
         }
 
-        $results = $this->userGateway->getAllUser();
+        $response = $this->apiClient->get('users');
+        $results = json_decode($response->getBody()->getContents(), true);
         $this->afficherVue('user', $dVueEreur, $results);
+    }
+    private function ajouterClient(array $dVueEreur)
+    {
+        $Nom = $_POST['nom'] ?? '';
+        $Prenom = $_POST['prenom'] ?? '';
+        $Email = $_POST['email'] ?? '';
+        $NumTel = $_POST['numTel'] ?? '';
+        $NumPermis = $_POST['numPermis'] ?? '';
+        $DateNaiss = $_POST['dateNaiss'] ?? '';
+        $Nationalite = $_POST['nationalite'] ?? '';
+        
+
+        //Validation::val_client($Nom, $Prenom, $Email, $NumTel, $NumPermis, $DateNaiss, $Nationalite, $IdClient, $dVueEreur);
+
+        if (empty($dVueEreur)) {
+            $this->apiClient->post("client", [
+                'json' => [
+                    'Nom' => $Nom,
+                    'Prenom' => $Prenom,
+                    'Email' => $Email,
+                    'NumTel' => $NumTel,
+                    'NumPermis' => $NumPermis,
+                    'DateNaiss' => $DateNaiss,
+                    'Nationalite' => $Nationalite
+                ]
+            ]);
+            header("Location: /siteSAE2A/clients");
+            exit;
+
+        }
+
+        $response = $this->apiClient->get('clients');
+        $results = json_decode($response->getBody()->getContents(), true);
+        $this->afficherVue('client', $dVueEreur, $results);
     }
 
     private function modifierUtilisateur(array $dVueEreur)
@@ -427,7 +484,45 @@ class EmployeControleur
         $this->afficherVue('user', $dVueEreur, $results, 'admin');
     }
 
-    public function listeUtilisateur(array $dVueEreur)
+private function modifierClient(array $dVueEreur)
+    {
+        
+        $Nom = $_POST['nom'] ?? '';
+        $Prenom = $_POST['prenom'] ?? '';
+        $Email = $_POST['email'] ?? '';
+        $NumTel = $_POST['numTel'] ?? '';
+        $NumPermis = $_POST['numPermis'] ?? '';
+        $DateNaiss = $_POST['dateNaiss'] ?? '';
+        $Nationalite = $_POST['nationalite'] ?? '';
+        $IdClient = (int) ($_POST['idClient'] ?? -1);
+
+        //Validation::val_client($Nom, $Prenom, $Email, $NumTel, $NumPermis, $DateNaiss, $Nationalite, $IdClient, $dVueEreur);
+
+        if (empty($dVueEreur)) {
+            $this->apiClient->put("client/$IdClient", [
+                'json' => [
+                    'Nom' => $Nom,
+                    'Prenom' => $Prenom,
+                    'Email' => $Email,
+                    'NumTel' => $NumTel,
+                    'NumPermis' => $NumPermis,
+                    'DateNaiss' => $DateNaiss,
+                    'Nationalite' => $Nationalite
+                ]
+            ]);
+            
+            header("Location: /siteSAE2A/clients");
+            exit;
+        }
+        $response = $this->apiClient->get('clients');
+        $results = json_decode($response->getBody()->getContents(), true);
+        $this->afficherVue('client', $dVueEreur, $results, 'admin');
+    }
+
+
+
+    
+    public function listeUtilisateurs(array $dVueEreur)
     {
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -460,6 +555,34 @@ class EmployeControleur
         }
         $results = $this->userGateway->getAllUser();
         $this->afficherVue('user', $dVueEreur, $results, 'admin');
+    }
+    public function listeClients(array $dVueEreur)
+    {
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $sousAction = $_POST['action'] ?? '';
+
+            switch ($sousAction) {
+                case 'ajouterClient':
+                    $this->ajouterClient($dVueEreur);
+                    break;
+                case 'modifierClient':
+                    $this->modifierClient($dVueEreur);
+                    break;
+
+            }
+            header("Location: /siteSAE2A/clients");
+            exit;
+        }
+
+        $sousAction = $_GET['action'] ?? '';
+        if ($sousAction === 'rechercherClient') {
+            $this->rechercherClient($dVueEreur);
+            return;
+        }
+        $response = $this->apiClient->get('clients');
+        $results = json_decode($response->getBody()->getContents(), true);
+        $this->afficherVue('client', $dVueEreur, $results, 'admin');
     }
 
     public function listeVoitures(array $dVueEreur)

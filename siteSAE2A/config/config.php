@@ -19,6 +19,7 @@ $dsn = 'mysql:host=127.0.0.1;port=3307;dbname=dbaltixier1;charset=utf8';
 
 $vues['flotte']  = 'flotte.twig';
 $vues['user']  = 'view/viewUtilisateur.php';
+$vues['client']  = 'view/viewUtilisateur.php';
 $vues['erreur'] = 'view/viewErreur.php';
 $vues['reservation'] = 'view/viewReservation.php';
 $vues['inscription'] = 'view/viewInscription.php';
