@@ -83,7 +83,6 @@ class UserController
         }
     }
 
-    // Méthode commune ou classe hérité :
 
     // Affiche la page d'accueil pour les clients
     public function homeCustomers(array $dVueEreur)
