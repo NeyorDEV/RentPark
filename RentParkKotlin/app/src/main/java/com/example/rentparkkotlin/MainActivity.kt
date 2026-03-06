@@ -49,8 +49,9 @@ class MainActivity : ComponentActivity() {
                     //    }
                     //)
 
+                    CarListScreen()
                     //UserManagementScreen()
-                    ContratsScreen()
+                    //ContratsScreen()
                 }
             }
         }
