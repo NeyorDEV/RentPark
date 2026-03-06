@@ -5,6 +5,8 @@ import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -21,17 +23,34 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.text.style.TextAlign
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.rentparkkotlin.model.Contrat
 import com.example.rentparkkotlin.ui.theme.Orange
+import com.example.rentparkkotlin.viewmodel.PlanningViewModel
 import java.time.YearMonth
 import java.time.format.TextStyle
 import java.util.Locale
 
+// Classe pour stocker le contexte de la modale de liste
+data class DayListContext(
+    val title: String,
+    val events: List<Contrat>,
+    val color: Color,
+    val isDepart: Boolean
+)
+
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PlanningScreen() {
-    var showModal by remember { mutableStateOf(false) }
+fun PlanningScreen(planningViewModel: PlanningViewModel = viewModel()) {
+
+    val contrats by planningViewModel.contrats.collectAsState()
+
+    // État pour la modale listant les événements spécifiques (départs OU retours)
+    var selectedDayList by remember { mutableStateOf<DayListContext?>(null) }
+
+    // État pour la modale des détails complets d'un contrat
+    var selectedContrat by remember { mutableStateOf<Contrat?>(null) }
 
     var currentYearMonth by remember { mutableStateOf(YearMonth.now()) }
 
@@ -66,9 +85,7 @@ fun PlanningScreen() {
                 TextButton(onClick = { currentYearMonth = currentYearMonth.minusMonths(1) }) {
                     Text("← Précédent", color = Color.Gray)
                 }
-
                 Text(monthTitle, fontWeight = FontWeight.Bold, fontSize = 18.sp)
-
                 TextButton(onClick = { currentYearMonth = currentYearMonth.plusMonths(1) }) {
                     Text("Suivant →", color = Color.Gray)
                 }
@@ -89,20 +106,59 @@ fun PlanningScreen() {
                     contentPadding = PaddingValues(4.dp)
                 ) {
                     items((1..daysInMonth).toList()) { day ->
-                        DayCell(day = day, onClick = { showModal = true })
+                        val currentDateStr = String.format(Locale.US, "%04d-%02d-%02d",
+                            currentYearMonth.year, currentYearMonth.monthValue, day)
+
+                        // Filtre sécurisé avec ? == true pour éviter les crashs si dateDebut/Fin est null
+                        val contratsDepart = contrats.filter { it.dateDebut?.startsWith(currentDateStr) == true }
+                        val contratsRetour = contrats.filter { it.dateFin?.startsWith(currentDateStr) == true }
+
+                        DayCell(
+                            day = day,
+                            departs = contratsDepart,
+                            retours = contratsRetour,
+                            onDepartClick = {
+                                selectedDayList = DayListContext("Départs", contratsDepart, Orange, true)
+                            },
+                            onRetourClick = {
+                                selectedDayList = DayListContext("Retours", contratsRetour, Color.Blue, false)
+                            }
+                        )
                     }
                 }
             }
         }
     }
 
-    if (showModal) {
-        EventDetailModal(onDismiss = { showModal = false })
+    // 1. Modale intermédiaire : Liste filtrée (Départs OU Retours)
+    selectedDayList?.let { context ->
+        DayEventsListModal(
+            context = context,
+            onEventClick = { contrat ->
+                selectedDayList = null // On ferme la liste
+                selectedContrat = contrat // On ouvre les détails du contrat sélectionné
+            },
+            onDismiss = { selectedDayList = null }
+        )
+    }
+
+    // 2. Modale finale : Détails du contrat
+    selectedContrat?.let { contrat ->
+        EventDetailModal(
+            contrat = contrat,
+            onDismiss = { selectedContrat = null }
+        )
     }
 }
 
 @Composable
-fun DayCell(day: Int, onClick: () -> Unit) {
+fun DayCell(
+    day: Int,
+    departs: List<Contrat>,
+    retours: List<Contrat>,
+    onDepartClick: () -> Unit,
+    onRetourClick: () -> Unit
+) {
     Column(
         modifier = Modifier
             .aspectRatio(0.4f)
@@ -119,8 +175,15 @@ fun DayCell(day: Int, onClick: () -> Unit) {
             verticalArrangement = Arrangement.spacedBy(4.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            EventBadge(letter = "D", color = Orange, onClick = onClick)
-            EventBadge(letter = "R", color = Color.Blue, onClick = onClick)
+            // S'il y a au moins 1 départ, on affiche la pastille Orange "D" classique
+            if (departs.isNotEmpty()) {
+                EventBadge(letter = "D", color = Orange, onClick = onDepartClick)
+            }
+
+            // S'il y a au moins 1 retour, on affiche la pastille Bleue "R" classique
+            if (retours.isNotEmpty()) {
+                EventBadge(letter = "R", color = Color.Blue, onClick = onRetourClick)
+            }
         }
     }
 }
@@ -134,8 +197,7 @@ fun EventBadge(
 ) {
     Box(
         modifier = modifier
-            .sizeIn(maxWidth = 24.dp, maxHeight = 24.dp)
-            .aspectRatio(1f)
+            .size(28.dp) // On force une belle taille fixe (tu peux ajuster cette valeur)
             .background(color, CircleShape)
             .clickable(onClick = onClick),
         contentAlignment = Alignment.Center
@@ -143,14 +205,19 @@ fun EventBadge(
         Text(
             text = letter,
             color = Color.White,
-            fontSize = 10.sp,
+            fontSize = 12.sp, // J'ai remonté un peu la police pour que ce soit lisible
             fontWeight = FontWeight.Bold
         )
     }
 }
 
+// ---- MODALE POUR LISTER LES ÉVÈNEMENTS DU JOUR (Départs ou Retours) ---- //
 @Composable
-fun EventDetailModal(onDismiss: () -> Unit) {
+fun DayEventsListModal(
+    context: DayListContext,
+    onEventClick: (Contrat) -> Unit,
+    onDismiss: () -> Unit
+) {
     Dialog(onDismissRequest = onDismiss) {
         Card(
             modifier = Modifier.fillMaxWidth().padding(16.dp),
@@ -160,9 +227,66 @@ fun EventDetailModal(onDismiss: () -> Unit) {
             Column(modifier = Modifier.padding(20.dp)) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text("Détails de la réservation", fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                    Text("${context.title} du jour", fontWeight = FontWeight.Bold, fontSize = 18.sp, color = context.color)
+                    IconButton(onClick = onDismiss, modifier = Modifier.size(24.dp)) {
+                        Icon(Icons.Default.Close, contentDescription = "Fermer")
+                    }
+                }
+
+                HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp))
+
+                LazyColumn(
+                    modifier = Modifier.heightIn(max = 350.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(context.events) { contrat ->
+                        val typeLabel = if (context.isDepart) "Départ" else "Retour"
+
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(Color(0xFFF5F5F5), RoundedCornerShape(8.dp))
+                                .clickable { onEventClick(contrat) }
+                                .padding(12.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Box(
+                                modifier = Modifier.size(12.dp).background(context.color, CircleShape)
+                            )
+                            Spacer(modifier = Modifier.width(12.dp))
+                            Column {
+                                Text(text = typeLabel, fontWeight = FontWeight.Bold, color = context.color, fontSize = 14.sp)
+                                Text(text = "Contrat N°${contrat.idContrat}", fontSize = 14.sp)
+                            }
+                            Spacer(modifier = Modifier.weight(1f))
+                            Icon(Icons.Default.KeyboardArrowRight, contentDescription = "Voir détails", tint = Color.Gray)
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+// ---- MODALE EXISTANTE DES DÉTAILS ---- //
+@Composable
+fun EventDetailModal(contrat: Contrat, onDismiss: () -> Unit) {
+    Dialog(onDismissRequest = onDismiss) {
+        Card(
+            modifier = Modifier.fillMaxWidth().padding(16.dp),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = Color.White)
+        ) {
+            Column(modifier = Modifier.padding(20.dp)) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text("Détails réservation", fontWeight = FontWeight.Bold, fontSize = 18.sp)
                     IconButton(onClick = onDismiss, modifier = Modifier.size(24.dp)) {
                         Icon(Icons.Default.Close, contentDescription = "Fermer")
                     }
@@ -171,12 +295,12 @@ fun EventDetailModal(onDismiss: () -> Unit) {
                 HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp))
 
                 val details = listOf(
-                    "ID Contrat" to "12345",
-                    "Client" to "Jean Dupont",
-                    "Véhicule" to "Tesla Model 3",
-                    "Du" to "01/01/2024",
-                    "Au" to "05/01/2024",
-                    "Statut" to "Confirmé"
+                    "ID Contrat" to contrat.idContrat.toString(),
+                    "Client (ID)" to (contrat.idClient?.toString() ?: "N/A"),
+                    "Véhicule" to (contrat.idVehicule ?: "N/A"),
+                    "Du" to (contrat.dateDebut?.substringBefore(" ") ?: "N/A"),
+                    "Au" to (contrat.dateFin?.substringBefore(" ") ?: "N/A"),
+                    "Statut" to (contrat.statut ?: "N/A")
                 )
 
                 details.forEach { (label, value) ->
