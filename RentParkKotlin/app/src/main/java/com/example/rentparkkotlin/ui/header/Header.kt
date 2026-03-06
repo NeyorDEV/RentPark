@@ -28,7 +28,7 @@ import com.example.rentparkkotlin.ui.theme.Orange
 @Composable
 fun Header(Title: String){
     Column() {
-        Box(modifier = Modifier.fillMaxWidth().height(22.dp).background(color = Orange))
+        Box(modifier = Modifier.fillMaxWidth().height(25.dp).background(color = Orange))
 
         Row(modifier = Modifier
             .fillMaxWidth()
@@ -50,7 +50,7 @@ fun TitlePart(title: String) {
         verticalAlignment = Alignment.CenterVertically) {
         Box(modifier = Modifier
             .fillMaxWidth()){
-            Text(text = "Contrats",
+            Text(text = title,
                 color = Color.White,
                 fontSize = 40.sp,
                 fontWeight = FontWeight.Bold,

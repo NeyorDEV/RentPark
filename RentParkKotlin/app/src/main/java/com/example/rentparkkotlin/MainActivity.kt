@@ -58,10 +58,7 @@ class MainActivity : ComponentActivity() {
                     //)
 
                     //UserManagementScreen()
-                    Column() {
-                        Header("a")
-                        ContratsScreen()
-                    }
+                    ContratsScreen()
                 }
             }
         }
