@@ -57,7 +57,7 @@ class MainActivity : ComponentActivity() {
                     //    }
                     //)
 
-                    RentParkHomeScreen()
+                    ContratsScreen()
                 }
             }
         }

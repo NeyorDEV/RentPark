@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -26,38 +27,41 @@ import com.example.rentparkkotlin.ui.theme.Orange
 // Header commun à toutes les pages de rentpark (au moins les pages admin)
 
 @Composable
-fun Header(Title: String){
+fun Header(title: String) {
     Column() {
-        Box(modifier = Modifier.fillMaxWidth().height(25.dp).background(color = Orange))
+        Spacer(modifier = Modifier.fillMaxWidth().height(22.dp).background(color = Orange))
+        Surface(
+            color = BlackTheme,
+            shadowElevation = 4.dp // Ajoute une légère ombre pour décoller du contenu
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(64.dp), // Hauteur standard Android pour les TopBar
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // Section gauche : Menu
+                Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.CenterStart) {
+                    MenuBurger()
+                }
 
-        Row(modifier = Modifier
-            .fillMaxWidth()
-            .height(75.dp)
-            .background(color = BlackTheme)) {
-            MenuBurger();
-            TitlePart(Title);
+                // Section centrale : Titre (Réellement centré)
+                Box(modifier = Modifier.weight(3f), contentAlignment = Alignment.Center) {
+                    Text(
+                        text = title,
+                        color = Color.White,
+                        fontSize = 24.sp, // 35sp était trop gros, ça va tronquer sur les petits écrans
+                        fontWeight = FontWeight.ExtraBold,
+                        textAlign = TextAlign.Center
+                    )
+                }
+
+                // Section droite : Vide (pour équilibrer le titre au milieu)
+                Spacer(modifier = Modifier.weight(1f))
+            }
         }
     }
 
-
-}
-
-@Composable
-fun TitlePart(title: String) {
-    Row(modifier = Modifier
-        .fillMaxWidth()
-        .fillMaxHeight(),
-        verticalAlignment = Alignment.CenterVertically) {
-        Box(modifier = Modifier
-            .fillMaxWidth()){
-            Text(text = title,
-                color = Color.White,
-                fontSize = 35.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.fillMaxWidth().padding(end = 50.dp),
-                textAlign = TextAlign.Center)
-        }
-    }
 }
 
 @Preview(showBackground = true)

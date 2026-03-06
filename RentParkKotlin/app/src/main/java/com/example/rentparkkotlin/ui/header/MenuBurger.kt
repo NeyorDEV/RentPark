@@ -1,6 +1,7 @@
 package com.example.rentparkkotlin.ui.header
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -18,9 +19,16 @@ import androidx.compose.material3.*
 
 @Composable
 fun MenuBurger() {
-    Box(modifier = Modifier.size(75.dp)
-        ,contentAlignment = Alignment.Center){
-        Icon(Icons.Default.Menu, contentDescription = null, tint = Color.White, modifier = Modifier.size(60.dp))
+    IconButton(
+        onClick = { /* Action Menu */ },
+        modifier = Modifier.padding(start = 8.dp)
+    ) {
+        Icon(
+            imageVector = Icons.Default.Menu,
+            contentDescription = "Menu",
+            tint = Color.White,
+            modifier = Modifier.size(32.dp) // Taille beaucoup plus équilibrée
+        )
     }
 }
 
