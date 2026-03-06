@@ -31,7 +31,6 @@ import java.time.YearMonth
 import java.time.format.TextStyle
 import java.util.Locale
 
-// Classe pour stocker le contexte de la modale de liste
 data class DayListContext(
     val title: String,
     val events: List<Contrat>,
@@ -46,10 +45,8 @@ fun PlanningScreen(planningViewModel: PlanningViewModel = viewModel()) {
 
     val contrats by planningViewModel.contrats.collectAsState()
 
-    // État pour la modale listant les événements spécifiques (départs OU retours)
     var selectedDayList by remember { mutableStateOf<DayListContext?>(null) }
 
-    // État pour la modale des détails complets d'un contrat
     var selectedContrat by remember { mutableStateOf<Contrat?>(null) }
 
     var currentYearMonth by remember { mutableStateOf(YearMonth.now()) }
@@ -109,7 +106,6 @@ fun PlanningScreen(planningViewModel: PlanningViewModel = viewModel()) {
                         val currentDateStr = String.format(Locale.US, "%04d-%02d-%02d",
                             currentYearMonth.year, currentYearMonth.monthValue, day)
 
-                        // Filtre sécurisé avec ? == true pour éviter les crashs si dateDebut/Fin est null
                         val contratsDepart = contrats.filter { it.dateDebut?.startsWith(currentDateStr) == true }
                         val contratsRetour = contrats.filter { it.dateFin?.startsWith(currentDateStr) == true }
 
@@ -130,19 +126,17 @@ fun PlanningScreen(planningViewModel: PlanningViewModel = viewModel()) {
         }
     }
 
-    // 1. Modale intermédiaire : Liste filtrée (Départs OU Retours)
     selectedDayList?.let { context ->
         DayEventsListModal(
             context = context,
             onEventClick = { contrat ->
-                selectedDayList = null // On ferme la liste
-                selectedContrat = contrat // On ouvre les détails du contrat sélectionné
+                selectedDayList = null
+                selectedContrat = contrat
             },
             onDismiss = { selectedDayList = null }
         )
     }
 
-    // 2. Modale finale : Détails du contrat
     selectedContrat?.let { contrat ->
         EventDetailModal(
             contrat = contrat,
@@ -175,12 +169,10 @@ fun DayCell(
             verticalArrangement = Arrangement.spacedBy(4.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // S'il y a au moins 1 départ, on affiche la pastille Orange "D" classique
             if (departs.isNotEmpty()) {
                 EventBadge(letter = "D", color = Orange, onClick = onDepartClick)
             }
 
-            // S'il y a au moins 1 retour, on affiche la pastille Bleue "R" classique
             if (retours.isNotEmpty()) {
                 EventBadge(letter = "R", color = Color.Blue, onClick = onRetourClick)
             }
@@ -197,7 +189,7 @@ fun EventBadge(
 ) {
     Box(
         modifier = modifier
-            .size(28.dp) // On force une belle taille fixe (tu peux ajuster cette valeur)
+            .size(28.dp)
             .background(color, CircleShape)
             .clickable(onClick = onClick),
         contentAlignment = Alignment.Center
@@ -205,13 +197,12 @@ fun EventBadge(
         Text(
             text = letter,
             color = Color.White,
-            fontSize = 12.sp, // J'ai remonté un peu la police pour que ce soit lisible
+            fontSize = 12.sp,
             fontWeight = FontWeight.Bold
         )
     }
 }
 
-// ---- MODALE POUR LISTER LES ÉVÈNEMENTS DU JOUR (Départs ou Retours) ---- //
 @Composable
 fun DayEventsListModal(
     context: DayListContext,
@@ -271,7 +262,6 @@ fun DayEventsListModal(
     }
 }
 
-// ---- MODALE EXISTANTE DES DÉTAILS ---- //
 @Composable
 fun EventDetailModal(contrat: Contrat, onDismiss: () -> Unit) {
     Dialog(onDismissRequest = onDismiss) {
