@@ -11,10 +11,14 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material3.*
+
 
 // Menu burger pour la navigation dans l'application
 
@@ -22,26 +26,8 @@ import androidx.compose.ui.unit.dp
 fun MenuBurger() {
     Box(modifier = Modifier.size(75.dp)
         ,contentAlignment = Alignment.Center){
-        Column() {
-            Barre()
-            Spacer(Modifier.height(10.dp))
-            Barre()
-            Spacer(Modifier.height(10.dp))
-            Barre()
-        }
+        Icon(Icons.Default.Menu, contentDescription = null, tint = Color.White, modifier = Modifier.size(60.dp))
     }
-}
-
-@Composable
-fun Barre(){
-    Box(
-        modifier = Modifier
-            .size(50.dp, 8.dp)
-            .background(
-                color = Color.White,
-                shape = RoundedCornerShape(50.dp) // L'arrondi est appliqué ici
-            )
-    )
 }
 
 @Preview(showBackground = true)
