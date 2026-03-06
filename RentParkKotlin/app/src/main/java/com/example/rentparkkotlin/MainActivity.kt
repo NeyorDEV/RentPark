@@ -57,8 +57,15 @@ class MainActivity : ComponentActivity() {
                     //    }
                     //)
 
+<<<<<<< HEAD
                     //UserManagementScreen()
                     RentParkHomeScreen()
+=======
+                    CarListScreen()
+                    //UserManagementScreen()
+                    //ContratsScreen()
+
+>>>>>>> 36354d18ad7d72db36cab8ce7a80b943ff11b726
                 }
             }
         }
