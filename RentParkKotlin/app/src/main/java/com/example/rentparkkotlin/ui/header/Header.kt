@@ -1,5 +1,6 @@
 package com.example.rentparkkotlin.ui.header
 
+import android.R.attr.top
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,11 +17,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.rentparkkotlin.R
 import com.example.rentparkkotlin.ui.theme.BlackTheme
 import com.example.rentparkkotlin.ui.theme.Orange
 
@@ -50,9 +54,11 @@ fun Header(title: String) {
                     Text(
                         text = title,
                         color = Color.White,
-                        fontSize = 24.sp, // 35sp était trop gros, ça va tronquer sur les petits écrans
+                        fontFamily = MaPoliceCustom,
+                        fontSize = 35.sp, // 35sp était trop gros, ça va tronquer sur les petits écrans
                         fontWeight = FontWeight.ExtraBold,
-                        textAlign = TextAlign.Center
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(top = 6.dp)
                     )
                 }
 
@@ -61,8 +67,12 @@ fun Header(title: String) {
             }
         }
     }
-
 }
+
+val MaPoliceCustom = FontFamily(
+    Font(R.font.fortnite, FontWeight.Normal),
+    Font(R.font.fortnite, FontWeight.Bold)
+)
 
 @Preview(showBackground = true)
 @Composable
