@@ -350,6 +350,7 @@ class UserController
         }
         $cheminVue = realpath($rep . $vues[$vueKey]);
         if ($cheminVue && file_exists($cheminVue)) {
+            extract(['role' => $role]);
             require_once($cheminVue); // NOSONAR
         } else {
             echo "Fichier de vue introuvable : " . ($rep . $vues[$vueKey]);
