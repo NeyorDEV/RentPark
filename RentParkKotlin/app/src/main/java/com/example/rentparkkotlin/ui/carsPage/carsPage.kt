@@ -20,6 +20,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.rentparkkotlin.ui.header.Header
 
 // 1. Modèle de données
 data class Voiture(
@@ -50,8 +51,8 @@ fun CarListScreen() {
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFFF8F9FA))
-            .padding(16.dp)
     ) {
+        Header("Liste des voitures")
         // 1. Barre de Recherche
         Box(
             modifier = Modifier
