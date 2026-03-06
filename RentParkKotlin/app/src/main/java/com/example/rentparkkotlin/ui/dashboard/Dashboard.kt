@@ -33,6 +33,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
+import com.example.rentparkkotlin.ui.header.Header
 import com.example.rentparkkotlin.ui.homeCustomer.RentParkHomeScreen
 
 // Modèle simple pour les cartes du dashboard
@@ -67,23 +68,7 @@ fun DashboardScreen() {
 
     Scaffold(
         topBar = {
-            CenterAlignedTopAppBar(
-                title = {
-                    Text(
-                        "Tableau de bord",
-                        fontSize = 40.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                },
-                // On utilise clip pour arrondir les bords (ici le bas)
-                // et colors pour rendre le fond de base transparent
-                modifier = Modifier
-                    .clip(RoundedCornerShape(bottomStart = 30.dp, bottomEnd = 30.dp))
-                    .shadow(1.dp,RoundedCornerShape(bottomStart = 30.dp, bottomEnd = 30.dp)),
-                colors = androidx.compose.material3.TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = Color.Transparent
-                )
-            )
+            Header("Tableau de Bord")
         }
     ) { innerPadding ->
         LazyColumn(

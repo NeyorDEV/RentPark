@@ -57,8 +57,7 @@ class MainActivity : ComponentActivity() {
                     //    }
                     //)
 
-                    //UserManagementScreen()
-                    ContratsScreen()
+                    DashboardScreen()
                 }
             }
         }
