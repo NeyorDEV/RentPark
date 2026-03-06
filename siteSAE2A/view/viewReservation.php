@@ -53,7 +53,7 @@ $isAdmin = ($role === 'admin');
 
     <div class="main-content">
         <h1>Contrats</h1>
-
+                
         <header class="topbar">
             <div class="toolbar">
                 <form action="/siteSAE2A/reservation" method="get" role="search" class="topbar-form">
@@ -89,8 +89,7 @@ $isAdmin = ($role === 'admin');
                     <a href="#addReservationModal" class="add-btn">+ Ajouter</a>
                 <?php endif; ?>
             </div>
-        </header>
-
+        </header>       
         <?php if (!empty($dVueErreur)): ?>
             <div class="erreurs">
                 <ul>

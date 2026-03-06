@@ -66,14 +66,15 @@ class FrontControleur
         
             // ROUTES USER CONNECTÉ
             $userRoutes = [
-                'connection'
-    
+                'connection',
+                'afficheParametres',
+                'listeReservation'
             ];
 
             $employeRoutes = [
                 'listeVoitures',
-                'listeReservation',
-                'listeUtilisateurs',
+                
+                            'listeUtilisateurs',
                 'listeClients',
                 'affichePlanning',
                 'afficheParametres'

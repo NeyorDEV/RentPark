@@ -59,6 +59,9 @@ class UserController
                 case 'finaliserReservation':
                     $this->finaliserReservation($dVueErreur);
                     break;
+                case 'listeReservation':
+                    $this->listeReservation($dVueErreur);
+                    break;
                 default:
                     $dVueErreur[] = "Action inconnue";
                     $this->afficherVue('homeCustomers', $dVueErreur, $results = null, 'user');
@@ -359,6 +362,15 @@ class UserController
             $this->afficherVue('erreur', $dVueErreur, null, 'user');
         }
     }
+
+    public function listeReservation(array $dVueErreur = [])
+{
+    $reservationGateway = new \modele\ReservationGateway($this->connection);
+    $idClient = $_SESSION['idClient'] ?? 0; 
+    $filtre = $_GET['filtre'] ?? 'toutes';
+    $results = $reservationGateway->searchReservations('Client', (string)$idClient, $filtre);
+    $this->afficherVue('reservation', $dVueErreur, $results, 'user');
+}
 
     private function afficherVue(string $vueKey, array $dVueErreur, ?array $results = null, string $role = 'user')
     {

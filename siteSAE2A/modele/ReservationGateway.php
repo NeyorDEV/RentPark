@@ -6,7 +6,9 @@ class ReservationGateway {
 
     public function __construct(Connection $connection) {
         $this->connection = $connection;
-    }
+    }   
+
+    
     public function searchReservations(string $champ, string $q, string $filtre): array {
         $where  = [];
         $params = [];
@@ -38,6 +40,8 @@ class ReservationGateway {
         $this->connection->executeQuery($sql, $params);
         return $this->connection->getResults();
     }
+
+
     public function insertReservation(string $vehicule, int $client, string $dateDebut, string $dateFin): void {
         $sql = "INSERT INTO Contrat (DateDebut, DateFin, Vehicule, Client, EtatDesLieu)
                 VALUES (:d1, :d2, :veh, :cli, :etat)";
@@ -49,6 +53,8 @@ class ReservationGateway {
             ':etat' => ['neuf',     \PDO::PARAM_STR], 
         ]);
     }
+
+
     public function update(int $id, string $vehicule, int $client, string $dateDebut, string $dateFin): void {
         $sql = "UPDATE Contrat
                 SET DateDebut = :d1, DateFin = :d2, Vehicule = :veh, Client = :cli
@@ -96,48 +102,48 @@ class ReservationGateway {
     }
 
     public function getContractsForNextMonth(): array
-{
-    $query = "
-        SELECT 
-            c.DateDebut,
-            c.DateFin,
-            v.Marque,
-            v.Nom AS Modele
-        FROM Contrat c
-        JOIN Vehicule v ON c.IdVehicule = v.NumSerie
-        WHERE (c.DateDebut BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 1 MONTH))
-           OR (c.DateFin   BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 1 MONTH))
-        ORDER BY c.DateDebut ASC
-    ";
+    {
+        $query = "
+            SELECT 
+                c.DateDebut,
+                c.DateFin,
+                v.Marque,
+                v.Nom AS Modele
+            FROM Contrat c
+            JOIN Vehicule v ON c.IdVehicule = v.NumSerie
+            WHERE (c.DateDebut BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 1 MONTH))
+            OR (c.DateFin   BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 1 MONTH))
+            ORDER BY c.DateDebut ASC
+        ";
 
-    $this->connection->executeQuery($query);
-    $results = $this->connection->getResults();
+        $this->connection->executeQuery($query);
+        $results = $this->connection->getResults();
 
-    // Renvoie un tableau vide si rien trouvé
-    if (empty($results)) {
-        return [];
+        // Renvoie un tableau vide si rien trouvé
+        if (empty($results)) {
+            return [];
+        }
+
+        return $results;
     }
 
-    return $results;
-}
+    public function getMonthlyPlanning(): array
+    {
+        $sql = "
+            SELECT 
+                c.DateDebut,
+                c.DateFin,
+                v.Marque,
+                v.Nom
+            FROM Contrat c
+            JOIN Vehicule v ON v.NumSerie = c.IdVehicule
+            WHERE 
+                c.DateFin >= CURDATE()
+                AND c.DateDebut <= LAST_DAY(CURDATE())
+            ORDER BY c.DateDebut ASC
+        ";
 
-public function getMonthlyPlanning(): array
-{
-    $sql = "
-        SELECT 
-            c.DateDebut,
-            c.DateFin,
-            v.Marque,
-            v.Nom
-        FROM Contrat c
-        JOIN Vehicule v ON v.NumSerie = c.IdVehicule
-        WHERE 
-            c.DateFin >= CURDATE()
-            AND c.DateDebut <= LAST_DAY(CURDATE())
-        ORDER BY c.DateDebut ASC
-    ";
-
-    $this->connection->executeQuery($sql);
-    return $this->connection->getResults();
-}   
+        $this->connection->executeQuery($sql);
+        return $this->connection->getResults();
+    }   
 }
