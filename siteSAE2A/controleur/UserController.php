@@ -368,7 +368,7 @@ class UserController
     $reservationGateway = new \modele\ReservationGateway($this->connection);
     $idClient = $_SESSION['idClient'] ?? 0; 
     $filtre = $_GET['filtre'] ?? 'toutes';
-    $results = $reservationGateway->searchReservations('Client', (string)$idClient, $filtre);
+    $results = $reservationGateway->searchReservations('IdClient', (string)$idClient, $filtre);
     $this->afficherVue('reservation', $dVueErreur, $results, 'user');
 }
 

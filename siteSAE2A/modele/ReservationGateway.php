@@ -8,7 +8,7 @@ class ReservationGateway {
         $this->connection = $connection;
     }   
 
-    
+
     public function searchReservations(string $champ, string $q, string $filtre): array {
         $where  = [];
         $params = [];
@@ -23,7 +23,7 @@ class ReservationGateway {
 
         // recherche
         if ($q !== '') { // id de contrat ou de client
-            if ($champ === 'idContrat' || $champ === 'Client') {
+            if ($champ === 'idContrat' || $champ === 'IdClient') {
                 $where[] = "$champ = :qnum";
                 $params[':qnum'] = [ (int)$q, \PDO::PARAM_INT ];
             } else { // Vehicule (VIN)
