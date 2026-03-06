@@ -21,7 +21,6 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun MenuBurger() {
     Box(modifier = Modifier.size(75.dp)
-        .background(Color.Gray)
         ,contentAlignment = Alignment.Center){
         Column() {
             Barre()
@@ -37,9 +36,9 @@ fun MenuBurger() {
 fun Barre(){
     Box(
         modifier = Modifier
-            .size(55.dp, 8.dp)
+            .size(50.dp, 8.dp)
             .background(
-                color = Color.Black,
+                color = Color.White,
                 shape = RoundedCornerShape(50.dp) // L'arrondi est appliqué ici
             )
     )
