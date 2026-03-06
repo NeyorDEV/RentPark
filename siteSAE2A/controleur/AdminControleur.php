@@ -741,6 +741,7 @@ class AdminControleur
     {
         //A faire
         $motCle = trim($_GET['q'] ?? '');
+        $results = [];
 
         if ($motCle === '') {
             //A faire

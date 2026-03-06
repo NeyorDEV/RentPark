@@ -4,6 +4,7 @@ use modele\Connection;
 use modele\VehicleGateway;
 use modele\UserGateway;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\RequestException;
 use config\Validation;
 use modele\User;
 
@@ -57,6 +58,9 @@ class UserController
                     break;
                 case 'finaliserReservation':
                     $this->finaliserReservation($dVueErreur);
+                    break;
+                case 'listeReservation':
+                    $this->listeReservation($dVueErreur);
                     break;
                 default:
                     $dVueErreur[] = "Action inconnue";
@@ -358,6 +362,15 @@ class UserController
             $this->afficherVue('erreur', $dVueErreur, null, 'user');
         }
     }
+
+    public function listeReservation(array $dVueErreur = [])
+{
+    $reservationGateway = new \modele\ReservationGateway($this->connection);
+    $idClient = $_SESSION['idClient'] ?? 0; 
+    $filtre = $_GET['filtre'] ?? 'toutes';
+    $results = $reservationGateway->searchReservations('IdClient', (string)$idClient, $filtre);
+    $this->afficherVue('reservation', $dVueErreur, $results, 'user');
+}
 
     private function afficherVue(string $vueKey, array $dVueErreur, ?array $results = null, string $role = 'user')
     {
