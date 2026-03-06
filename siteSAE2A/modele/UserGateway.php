@@ -31,6 +31,18 @@ class UserGateway {
         $this->connection->executeQuery($query, $params);
     }
 
+    public function getClientId(int $id): ?int
+    {
+        $query = "SELECT client_id FROM users WHERE id=:id";
+        $params = [
+            ':id' => [$id, \PDO::PARAM_STR],
+        ];
+        
+        $this->connection->executeQuery($query, $params);
+        $result = $this->connection->getResults();
+        
+        return $result[0]['client_id'] ?? null;
+    }
 
     public function countUser(): int
     {

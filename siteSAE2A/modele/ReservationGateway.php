@@ -17,7 +17,7 @@ class ReservationGateway {
         switch ($filtre) {
             case 'a-venir': $where[] = "DateDebut > CURDATE()"; break;
             case 'passees': $where[] = "DateFin   < CURDATE()"; break;
-            case 'toutes':  $where[] = "1";                     break;
+            case 'toutes':  $where[] = "1"; break;
             default:        $where[] = "CURDATE() BETWEEN DateDebut AND DateFin";
         }
 
