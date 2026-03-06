@@ -83,6 +83,14 @@ class MainActivity : ComponentActivity() {
                         // composable("cars") { CarListScreen() }
                         // composable("planning") { PlanningScreen() }
                         // composable("settings") { SettingsPage(...) }
+
+                        //SettingsPage(
+                        //    isDarkMode = isDarkMode,
+                        //    onThemeChange = { newValue ->
+                        //        isDarkMode = newValue
+                        //        themePrefs.saveDarkMode(newValue)
+                        //    }
+                        //)
                     }
                 }
             }

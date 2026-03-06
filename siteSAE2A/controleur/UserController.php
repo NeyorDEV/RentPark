@@ -4,6 +4,7 @@ use modele\Connection;
 use modele\VehicleGateway;
 use modele\UserGateway;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\RequestException;
 use config\Validation;
 use modele\User;
 
