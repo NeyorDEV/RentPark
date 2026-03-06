@@ -153,20 +153,21 @@ class UserController
 
     }
 
-    public function connection(array $dVueErreur)
+    public function connection(array &$dVueErreur)
     {
         global $role;
         $username = $_POST['username'] ?? '';
         $password = $_POST['password'] ?? '';
         $savepass = $this->userGateway->getHashPass($username, $password);
         $role = $this->userGateway->getRole($username);
+        $clientId = $this->userGateway->getClientId($username);
         Validation::val_connection($username, $password, $savepass, $dVueErreur);
 
 
         session_regenerate_id(true);
         $_SESSION['username'] = $username;
         $_SESSION['role'] = $role;
-
+        $_SESSION['idClient'] = $clientId;
         
 
 

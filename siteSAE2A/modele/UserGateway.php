@@ -31,11 +31,11 @@ class UserGateway {
         $this->connection->executeQuery($query, $params);
     }
 
-    public function getClientId(int $id): ?int
+    public function getClientId(string $user): ?int
     {
-        $query = "SELECT client_id FROM users WHERE id=:id";
+        $query = "SELECT client_id FROM users WHERE username=:user";
         $params = [
-            ':id' => [$id, \PDO::PARAM_STR],
+            ':user' => [$user, \PDO::PARAM_STR],
         ];
         
         $this->connection->executeQuery($query, $params);
@@ -43,7 +43,7 @@ class UserGateway {
         
         return $result[0]['client_id'] ?? null;
     }
-
+    
     public function countUser(): int
     {
         $query = "SELECT COUNT(*) AS totalUsers FROM users";
