@@ -1,4 +1,4 @@
-package com.example.rentparkkotlin.ui.reservationsPage
+package com.example.rentparkkotlin.ui.contratsPage
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -19,6 +19,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.rentparkkotlin.ui.header.Header
 
 // --- 1. MODÈLE DE DONNÉES ---
 data class Reservation(
@@ -56,26 +57,24 @@ fun ContratsScreen() {
     var showDeleteDialog by remember { mutableStateOf(false) }
     var reservationToDelete by remember { mutableStateOf<Reservation?>(null) }
 
-    // État pour afficher/masquer le formulaire d'ajout
+    // État pour afficher/masquer le formulaire et gérer la modification
     var showSheet by remember { mutableStateOf(false) }
+    var reservationToEdit by remember { mutableStateOf<Reservation?>(null) } // NOUVEAU: État pour la modification
+
     val sheetState = rememberModalBottomSheetState()
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFF0F0F0F))
-            .padding(16.dp)
     ) {
-        Text(
-            text = "Contrats",
-            color = Color.White,
-            fontSize = 32.sp,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.fillMaxWidth().padding(vertical = 32.dp),
-            textAlign = TextAlign.Center
-        )
+        Header("Contrats")
 
-        FilterHeader(onAddClick = { showSheet = true })
+        // NOUVEAU: Réinitialiser reservationToEdit lors d'un ajout
+        FilterHeader(onAddClick = {
+            reservationToEdit = null
+            showSheet = true
+        })
 
         Spacer(modifier = Modifier.height(32.dp))
 
@@ -83,6 +82,10 @@ fun ContratsScreen() {
             items(reservations) { res ->
                 ReservationCard(
                     reservation = res,
+                    onEditRequest = { // NOUVEAU: Gérer le clic sur "Modifier"
+                        reservationToEdit = res
+                        showSheet = true
+                    },
                     onDeleteRequest = {
                         reservationToDelete = res
                         showDeleteDialog = true
@@ -95,11 +98,10 @@ fun ContratsScreen() {
     // --- DIALOGUE DE CONFIRMATION DE SUPPRESSION ---
     if (showDeleteDialog && reservationToDelete != null) {
         AlertDialog(
+            // ... (Code identique pour la suppression)
             onDismissRequest = { showDeleteDialog = false },
             containerColor = Color(0xFF1A1A1A),
-            title = {
-                Text("Confirmer la suppression", color = Color.White, fontSize = 18.sp)
-            },
+            title = { Text("Confirmer la suppression", color = Color.White, fontSize = 18.sp) },
             text = {
                 Text(
                     "Voulez-vous vraiment supprimer la réservation n°${reservationToDelete?.id} ?",
@@ -128,16 +130,32 @@ fun ContratsScreen() {
     // --- LE FORMULAIRE (BOTTOM SHEET) ---
     if (showSheet) {
         ModalBottomSheet(
-            onDismissRequest = { showSheet = false },
+            onDismissRequest = {
+                showSheet = false
+                reservationToEdit = null // Réinitialiser à la fermeture
+            },
             sheetState = sheetState,
             containerColor = Color(0xFF151515),
             dragHandle = { BottomSheetDefaults.DragHandle(color = Color.Gray) }
         ) {
-            AddReservationForm(
-                onDismiss = { showSheet = false },
-                onSave = { newRes ->
-                    reservations = reservations + newRes
+            ReservationForm( // RENOMMÉ ET MIS À JOUR
+                initialReservation = reservationToEdit,
+                onDismiss = {
                     showSheet = false
+                    reservationToEdit = null
+                },
+                onSave = { savedRes ->
+                    if (reservationToEdit == null) {
+                        // Ajout
+                        reservations = reservations + savedRes
+                    } else {
+                        // Modification
+                        reservations = reservations.map {
+                            if (it.id == savedRes.id) savedRes else it
+                        }
+                    }
+                    showSheet = false
+                    reservationToEdit = null
                 }
             )
         }
@@ -148,6 +166,7 @@ fun ContratsScreen() {
 
 @Composable
 fun FilterHeader(onAddClick: () -> Unit) {
+    // ... (Code identique)
     Surface(
         color = Color(0xFF151515),
         shape = RoundedCornerShape(50),
@@ -179,18 +198,31 @@ fun FilterHeader(onAddClick: () -> Unit) {
     }
 }
 
+// NOUVEAU: Le formulaire gère maintenant l'ajout ET la modification
 @Composable
-fun AddReservationForm(onDismiss: () -> Unit, onSave: (Reservation) -> Unit) {
-    var clientId by remember { mutableStateOf("") }
-    var vehiculeId by remember { mutableStateOf("") }
-    var debut by remember { mutableStateOf("") }
-    var fin by remember { mutableStateOf("") }
+fun ReservationForm(
+    initialReservation: Reservation?,
+    onDismiss: () -> Unit,
+    onSave: (Reservation) -> Unit
+) {
+    // Pré-remplir les champs si on est en mode édition
+    var clientId by remember { mutableStateOf(initialReservation?.clientId?.toString() ?: "") }
+    var vehiculeId by remember { mutableStateOf(initialReservation?.vehiculeId ?: "") }
+    var debut by remember { mutableStateOf(initialReservation?.debut ?: "") }
+    var fin by remember { mutableStateOf(initialReservation?.fin ?: "") }
+
+    val isEditing = initialReservation != null
 
     Column(
         modifier = Modifier.padding(24.dp).navigationBarsPadding(),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Text("Nouvelle Réservation", color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+        Text(
+            text = if (isEditing) "Modifier la Réservation" else "Nouvelle Réservation",
+            color = Color.White,
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Bold
+        )
 
         CustomTextField(value = clientId, onValueChange = { clientId = it }, label = "ID Client")
         CustomTextField(value = vehiculeId, onValueChange = { vehiculeId = it }, label = "Véhicule (Immatriculation)")
@@ -218,20 +250,23 @@ fun AddReservationForm(onDismiss: () -> Unit, onSave: (Reservation) -> Unit) {
             Button(
                 onClick = {
                     if (clientId.isNotEmpty() && vehiculeId.isNotEmpty()) {
-                        onSave(Reservation((100..999).random(), clientId.toIntOrNull() ?: 0, vehiculeId, debut, fin))
+                        // Conserver l'ID existant si édition, sinon générer un nouveau
+                        val id = initialReservation?.id ?: (100..999).random()
+                        onSave(Reservation(id, clientId.toIntOrNull() ?: 0, vehiculeId, debut, fin))
                     }
                 },
                 modifier = Modifier.weight(1f),
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF7DCEA0)),
                 shape = RoundedCornerShape(12.dp)
             ) {
-                Text("Confirmer", color = Color.Black, fontWeight = FontWeight.Bold)
+                Text(if (isEditing) "Mettre à jour" else "Confirmer", color = Color.Black, fontWeight = FontWeight.Bold)
             }
         }
         Spacer(modifier = Modifier.height(24.dp))
     }
 }
 
+// ... (CustomTextField reste identique)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CustomTextField(value: String, onValueChange: (String) -> Unit, label: String) {
@@ -245,8 +280,9 @@ fun CustomTextField(value: String, onValueChange: (String) -> Unit, label: Strin
     )
 }
 
+// NOUVEAU: Ajout du paramètre onEditRequest
 @Composable
-fun ReservationCard(reservation: Reservation, onDeleteRequest: () -> Unit) {
+fun ReservationCard(reservation: Reservation, onEditRequest: () -> Unit, onDeleteRequest: () -> Unit) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = Color(0xFF181818)),
@@ -265,13 +301,14 @@ fun ReservationCard(reservation: Reservation, onDeleteRequest: () -> Unit) {
                 InfoLabel("Période", "${reservation.debut} au ${reservation.fin}")
             }
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                ActionButton("Modifier", Color(0xFFEBF5FB), Color(0xFF2E86C1), onClick = { /* TODO */ })
+                ActionButton("Modifier", Color(0xFFEBF5FB), Color(0xFF2E86C1), onClick = onEditRequest)
                 ActionButton("Supprimer", Color(0xFFFDEDEC), Color(0xFFCB4335), onClick = onDeleteRequest)
             }
         }
     }
 }
 
+// ... (InfoLabel et ActionButton restent identiques)
 @Composable
 fun InfoLabel(label: String, value: String) {
     Text("$label : $value", color = Color.LightGray, fontSize = 13.sp)
