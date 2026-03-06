@@ -48,7 +48,7 @@ class MainActivity : ComponentActivity() {
                     //DashboardScreen()
                     //RentParkHomeScreen()
                     //PlanningScreen()
-                    //UserManagementScreen()
+                    UserManagementScreen()
                     //SettingsPage(
                     //    isDarkMode = isDarkMode,
                     //    onThemeChange = { newValue ->
@@ -57,10 +57,7 @@ class MainActivity : ComponentActivity() {
                     //    }
                     //)
 
-                    PlanningScreen()
-                    //CarListScreen()
-                    //UserManagementScreen()
-                    //ContratsScreen()
+                    DashboardScreen()
                 }
             }
         }
