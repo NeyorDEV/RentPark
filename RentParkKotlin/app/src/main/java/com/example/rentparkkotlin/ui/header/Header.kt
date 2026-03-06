@@ -20,18 +20,20 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.rentparkkotlin.ui.theme.BlackTheme
+import com.example.rentparkkotlin.ui.theme.Orange
 
 // Header commun à toutes les pages de rentpark (au moins les pages admin)
 
 @Composable
 fun Header(Title: String){
     Column() {
-        Box(modifier = Modifier.fillMaxWidth().height(25.dp).background(color = Color.Gray))
+        Box(modifier = Modifier.fillMaxWidth().height(25.dp).background(color = Orange))
 
         Row(modifier = Modifier
             .fillMaxWidth()
             .height(75.dp)
-            .background(Color.Black)) {
+            .background(color = BlackTheme)) {
             MenuBurger();
             TitlePart(Title);
         }
@@ -48,7 +50,7 @@ fun TitlePart(title: String) {
         verticalAlignment = Alignment.CenterVertically) {
         Box(modifier = Modifier
             .fillMaxWidth()){
-            Text(text = "Contrats",
+            Text(text = title,
                 color = Color.White,
                 fontSize = 40.sp,
                 fontWeight = FontWeight.Bold,

@@ -45,8 +45,6 @@ class ContratsActivity : ComponentActivity() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ContratsScreen() {
-    Header("Contrat")
-
     // État de la liste des réservations
     var reservations by remember {
         mutableStateOf(listOf(
@@ -69,16 +67,8 @@ fun ContratsScreen() {
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFF0F0F0F))
-            .padding(16.dp)
     ) {
-        Text(
-            text = "Contrats",
-            color = Color.White,
-            fontSize = 32.sp,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.fillMaxWidth().padding(vertical = 32.dp),
-            textAlign = TextAlign.Center
-        )
+        Header("Contrats")
 
         // NOUVEAU: Réinitialiser reservationToEdit lors d'un ajout
         FilterHeader(onAddClick = {
