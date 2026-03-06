@@ -52,9 +52,9 @@ fun TitlePart(title: String) {
             .fillMaxWidth()){
             Text(text = title,
                 color = Color.White,
-                fontSize = 40.sp,
+                fontSize = 35.sp,
                 fontWeight = FontWeight.Bold,
-                modifier = Modifier.fillMaxWidth().padding(end = 75.dp),
+                modifier = Modifier.fillMaxWidth().padding(end = 50.dp),
                 textAlign = TextAlign.Center)
         }
     }
