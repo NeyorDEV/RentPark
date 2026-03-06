@@ -12,11 +12,17 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import com.example.rentparkkotlin.ui.carsPage.CarListScreen
 import com.example.rentparkkotlin.ui.contratsPage.ContratsScreen
 import com.example.rentparkkotlin.ui.header.Header
+import com.example.rentparkkotlin.ui.dashboard.DashboardScreen
+import com.example.rentparkkotlin.ui.homeCustomer.RentParkHomeScreen
+import com.example.rentparkkotlin.ui.planning.PlanningScreen
+
 
 import com.example.rentparkkotlin.ui.theme.RentParkKotlinTheme
 import com.example.rentparkkotlin.ui.theme.ThemePrefs
+import com.example.rentparkkotlin.ui.userPage.UserManagementScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -32,6 +38,17 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
+
+                    //Mettez ici la fonction pour afficher votre page et commentez les autres
+                    //Ne rien casser svp sinon la matraque du policier
+
+
+                    //CarListScreen()
+                    //ContratsScreen()
+                    //DashboardScreen()
+                    //RentParkHomeScreen()
+                    //PlanningScreen()
+                    //UserManagementScreen()
                     //SettingsPage(
                     //    isDarkMode = isDarkMode,
                     //    onThemeChange = { newValue ->
@@ -45,9 +62,6 @@ class MainActivity : ComponentActivity() {
                         Header("a")
                         ContratsScreen()
                     }
-
-
-
                 }
             }
         }
