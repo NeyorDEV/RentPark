@@ -65,4 +65,16 @@ class CarViewModel : ViewModel() {
             }
         }
     }
+
+    fun updateVoiture(voiture: Voiture) {
+        viewModelScope.launch {
+            try {
+                val response = repository.updateVoiture(voiture)
+                if (response.isSuccessful) {
+                    fetchVoitures() // Recharger la liste
+                }
+            } catch (e: Exception) {
+            }
+        }
+    }
 }

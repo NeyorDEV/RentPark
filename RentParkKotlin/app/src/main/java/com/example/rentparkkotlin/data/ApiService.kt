@@ -10,20 +10,28 @@ import retrofit2.http.PUT
 
 interface ApiService {
 
+    // VEHICULES
     @GET("voitures")
     suspend fun getVoitures(): List<Voiture>
 
     @POST("vehicule")
-    suspend fun addVoiture(@Body newVoiture: Voiture) : retrofit2.Response<Unit>
+    suspend fun addVoiture(@Body newVoiture: Voiture) : Response<Unit>
 
     @DELETE("delete/voitures/{id}")
-    suspend fun deleteVoiture(@Path("id") id: String): retrofit2.Response<Unit>
+    suspend fun deleteVoiture(@Path("id") id: String): Response<Unit>
+
+    @PUT("voitures/{id}")
+    suspend fun updateVoiture(@Path("id") id: String, @Body voiture: Voiture): Response<Unit>
+
+    // CONTRATS
     @GET("contrat")
     suspend fun getContrats(): List<Contrat>
 
+    // CONNEXION
     @POST("login")
     suspend fun login(@Body request: LoginRequest): Response<LoginResponse>
 
+    // DASHBOARD
     @GET("stats/total-users")
     suspend fun getTotalUsers(): TotalUsersResponse
 
@@ -42,6 +50,7 @@ interface ApiService {
     @GET("stats/contrats-prochains")
     suspend fun getContratsProchains(): ContratsProchainsResponse
 
+    // USERS
     @POST("add/users")
     suspend fun register(@Body request: RegisterRequest): Response<RegisterResponse>
 
@@ -54,6 +63,7 @@ interface ApiService {
     @DELETE("users/{id}")
     suspend fun deleteUser(@Path("id") id: Int): Response<Unit>
 
+    // CLIENTS
     @GET("clients")
     suspend fun getClients(): List<Client>
 
