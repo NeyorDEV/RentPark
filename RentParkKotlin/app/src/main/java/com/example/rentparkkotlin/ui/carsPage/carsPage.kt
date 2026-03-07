@@ -39,6 +39,22 @@ fun CarListScreen(
     val isLoading = viewModel.isLoading
     val error = viewModel.error
 
+    // État pour la recherche
+    var searchQuery by remember { mutableStateOf("") }
+
+    // Logique de filtrage local
+    val filteredVoitures = remember(searchQuery, voitures) {
+        if (searchQuery.isEmpty()) {
+            voitures
+        } else {
+            voitures.filter { voiture ->
+                voiture.Marque.contains(searchQuery, ignoreCase = true) ||
+                        voiture.Nom.contains(searchQuery, ignoreCase = true) ||
+                        voiture.NumSerie.contains(searchQuery, ignoreCase = true)
+            }
+        }
+    }
+
     // États pour les modales
     var showAddDialog by remember { mutableStateOf(false) }
     var carToDelete by remember { mutableStateOf<Voiture?>(null) }
@@ -51,7 +67,7 @@ fun CarListScreen(
             .fillMaxSize()
             .background(Color(0xFFF8F9FA))
     ) {
-        Header("Flotte Automobile", onMenuClick = {}) // Assure-toi que ton Header est bien importé
+        Header("Flotte Automobile", onMenuClick = {})
 
         // 1. Barre de Recherche + Bouton Ajouter
         Row(
@@ -66,9 +82,23 @@ fun CarListScreen(
                     .weight(1f)
                     .clip(CircleShape)
                     .background(Color.White)
-                    .padding(15.dp)
+                    .padding(horizontal = 16.dp, vertical = 2.dp),
+                contentAlignment = Alignment.CenterStart
             ) {
-                Text("Rechercher une voiture...", color = Color.Gray)
+                TextField(
+                    value = searchQuery,
+                    onValueChange = { searchQuery = it },
+                    placeholder = { Text("Rechercher...", color = Color.Gray) },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = TextFieldDefaults.colors(
+                        focusedContainerColor = Color.Transparent,
+                        unfocusedContainerColor = Color.Transparent,
+                        disabledContainerColor = Color.Transparent,
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent,
+                    )
+                )
             }
 
             IconButton(
@@ -114,44 +144,59 @@ fun CarListScreen(
                     contentPadding = PaddingValues(16.dp),
                     modifier = Modifier.fillMaxSize()
                 ) {
-                    items(voitures) { voiture ->
-                        CarCard(
-                            voiture = voiture,
-                            onDeleteClick = { carToDelete = voiture },
-                            onEditClick = { carToEdit = voiture }
-                        )
+                    items(filteredVoitures, key = { it.NumSerie }) { voiture ->
+                        // AJOUT DU CLIC POUR LES DÉTAILS
+                        Box(modifier = Modifier.clickable {
+                            viewModel.getVoitureDetails(voiture.NumSerie)
+                        }) {
+                            CarCard(
+                                voiture = voiture,
+                                onDeleteClick = { carToDelete = voiture },
+                                onEditClick = { carToEdit = voiture }
+                            )
+                        }
                     }
                 }
             }
         }
     }
 
-    // Modale d'ajout
+    // --- AFFICHAGE DES MODALES ---
+
+    // Modale Détails (Appelée via le clic sur la carte)
+    viewModel.selectedVoiture?.let { selected ->
+        CarDetailsDialog(
+            voiture = selected,
+            onDismiss = { viewModel.clearSelectedVoiture() }
+        )
+    }
+
+    // Modale Ajout
     if (showAddDialog) {
         AddEditCarForm(
             title = "Nouveau Véhicule",
             onDismiss = { showAddDialog = false },
-            onConfirm = { newVoiture ->
-                viewModel.addVoiture(newVoiture)
+            onConfirm = {
+                viewModel.addVoiture(it)
                 showAddDialog = false
             }
         )
     }
 
-    // Modale d'édition
+    // Modale Édition
     if (carToEdit != null) {
         AddEditCarForm(
             title = "Modifier le véhicule",
             voiture = carToEdit,
             onDismiss = { carToEdit = null },
-            onConfirm = { updatedVoiture ->
-                viewModel.updateVoiture(updatedVoiture)
+            onConfirm = {
+                viewModel.updateVoiture(it)
                 carToEdit = null
             }
         )
     }
 
-    // Modale de confirmation de suppression
+    // Modale Suppression
     if (carToDelete != null) {
         AlertDialog(
             onDismissRequest = { carToDelete = null },
@@ -169,9 +214,7 @@ fun CarListScreen(
                 }
             },
             dismissButton = {
-                TextButton(onClick = { carToDelete = null }) {
-                    Text("Annuler")
-                }
+                TextButton(onClick = { carToDelete = null }) { Text("Annuler") }
             }
         )
     }
@@ -437,5 +480,106 @@ fun StableDropDown(
                 )
             }
         }
+    }
+}
+
+@Composable
+fun CarDetailsDialog(voiture: Voiture, onDismiss: () -> Unit) {
+    Dialog(onDismissRequest = onDismiss) {
+        Surface(
+            shape = RoundedCornerShape(24.dp),
+            color = Color.White,
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight()
+        ) {
+            Column(
+                modifier = Modifier
+                    .padding(24.dp)
+                    .verticalScroll(rememberScrollState())
+            ) {
+                // En-tête
+                Text(
+                    text = "${voiture.Marque} ${voiture.Nom}",
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Black
+                )
+                Text(
+                    text = "Numéro de Série : ${voiture.NumSerie}",
+                    fontSize = 14.sp,
+                    color = Color.Gray,
+                    modifier = Modifier.padding(bottom = 20.dp)
+                )
+
+                // Section Caractéristiques
+                DetailSectionTitle("Caractéristiques", Color(0xFFFF5A19))
+                InfoRow("Énergie", voiture.Energie)
+                InfoRow("Boîte", voiture.Boite)
+                InfoRow("Puissance", "${voiture.Puissance} CV")
+                InfoRow("Places", "${voiture.NbPlaces} places")
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Section État & Prix
+                DetailSectionTitle("État & Tarification", Color(0xFFFF5A19))
+                InfoRow("Statut actuel", voiture.Etat)
+                InfoRow("Prix / Jour", "${voiture.Prix} €")
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Section Technique
+                DetailSectionTitle("Suivi Technique", Color(0xFFFF5A19))
+                InfoRow("Dernier CT", voiture.DateDernierControleTech)
+                InfoRow("Expiration CT", voiture.DateExpirationControleTech)
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                // Bouton de fermeture
+                Button(
+                    onClick = onDismiss,
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF5A19)),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Text("Fermer", fontWeight = FontWeight.Bold)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun DetailSectionTitle(text: String, color: Color) {
+    Text(
+        text = text.uppercase(),
+        color = color,
+        fontSize = 12.sp,
+        fontWeight = FontWeight.ExtraBold,
+        letterSpacing = 1.sp,
+        modifier = Modifier.padding(bottom = 8.dp)
+    )
+}
+
+@Composable
+fun InfoRow(label: String, value: String) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 6.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = label,
+            color = Color.DarkGray,
+            fontSize = 15.sp
+        )
+        Text(
+            text = value,
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 15.sp,
+            color = Color.Black
+        )
     }
 }

@@ -21,4 +21,8 @@ class CarRepository {
     suspend fun updateVoiture(voiture: Voiture): retrofit2.Response<Unit> {
         return RetrofitInstance.api.updateVoiture(voiture.NumSerie, voiture)
     }
+
+    suspend fun getVoitureByNumSerie(numSerie: String): retrofit2.Response<Voiture> {
+        return RetrofitInstance.api.getVoitureByNumSerie(numSerie)
+    }
 }

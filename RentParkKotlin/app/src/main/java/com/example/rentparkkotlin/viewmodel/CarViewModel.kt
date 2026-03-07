@@ -20,6 +20,9 @@ class CarViewModel : ViewModel() {
     var error by mutableStateOf<String?>(null)
         private set
 
+    var selectedVoiture by mutableStateOf<Voiture?>(null)
+        private set
+
     init {
         fetchVoitures()
     }
@@ -77,4 +80,24 @@ class CarViewModel : ViewModel() {
             }
         }
     }
+
+    fun getVoitureDetails(numSerie: String) {
+        viewModelScope.launch {
+            isLoading = true
+            try {
+                val response = repository.getVoitureByNumSerie(numSerie)
+                if (response.isSuccessful) {
+                    selectedVoiture = response.body()
+                }
+            } catch (e: Exception) {
+                error = "Impossible de charger les détails"
+            } finally {
+                isLoading = false
+            }
+        }
+    }
+    fun clearSelectedVoiture() {
+        selectedVoiture = null
+    }
+
 }

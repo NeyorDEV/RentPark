@@ -23,6 +23,9 @@ interface ApiService {
     @PUT("voitures/{id}")
     suspend fun updateVoiture(@Path("id") id: String, @Body voiture: Voiture): Response<Unit>
 
+    @GET("voitures/{numSerie}")
+    suspend fun getVoitureByNumSerie(@Path("numSerie") numSerie: String): Response<Voiture>
+
     // CONTRATS
     @GET("contrat")
     suspend fun getContrats(): List<Contrat>
