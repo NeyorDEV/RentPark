@@ -40,4 +40,7 @@ interface ApiService {
 
     @GET("stats/contrats-prochains")
     suspend fun getContratsProchains(): ContratsProchainsResponse
+
+    @POST("add/users")
+    suspend fun register(@Body request: RegisterRequest): Response<RegisterResponse>
 }
