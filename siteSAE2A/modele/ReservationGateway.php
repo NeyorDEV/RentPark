@@ -46,6 +46,15 @@ class ReservationGateway {
         return $this->connection->getResults();
     }
 
+    public function getAllReservations(): array {
+            $sql = "SELECT idContrat, idVehicule, DateDebut, DateFin, IdClient, EtatAvant
+                    FROM Contrat
+                    ORDER BY DateDebut DESC";
+
+            $this->connection->executeQuery($sql);
+            
+            return $this->connection->getResults();
+        }
 
     public function insertReservation(string $vehicule, int $client, string $dateDebut, string $dateFin): void {
         $sql = "INSERT INTO Contrat (DateDebut, DateFin, Vehicule, Client, EtatDesLieu)

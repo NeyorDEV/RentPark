@@ -377,7 +377,7 @@ class UserController
         $q = trim($_GET['q'] ?? ''); // <-- Le trim() ici est très important !
         
         if (strtolower(trim($role)) === 'admin') {
-            $results = $reservationGateway->searchReservations($champ, $q, $filtre);
+            $results = $reservationGateway->getAllReservations();
         } else {
             $results = $reservationGateway->searchReservations('IdClient', (string)$idClient, $filtre);
         }
