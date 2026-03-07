@@ -38,7 +38,7 @@ fun RegisterScreen(
             .background(Color(0xFF0F0F0F)),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Header("Inscription")
+        Header("Inscription", onMenuClick = {})
 
         Spacer(modifier = Modifier.height(30.dp))
 
