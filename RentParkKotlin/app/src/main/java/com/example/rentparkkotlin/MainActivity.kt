@@ -17,12 +17,12 @@ import androidx.navigation.compose.rememberNavController
 
 // Imports de vos pages
 import com.example.rentparkkotlin.ui.dashboard.DashboardScreen
-import com.example.rentparkkotlin.ui.header.MainScreen
 import com.example.rentparkkotlin.ui.homeCustomer.RentParkHomeScreen
 import com.example.rentparkkotlin.ui.login.LoginScreen
 import com.example.rentparkkotlin.ui.theme.RentParkKotlinTheme
 import com.example.rentparkkotlin.ui.theme.ThemePrefs
 import com.example.rentparkkotlin.data.AuthPrefs // N'oubliez pas cet import !
+import com.example.rentparkkotlin.ui.register.RegisterScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -51,53 +51,61 @@ class MainActivity : ComponentActivity() {
                         "login"
                     }
 
-                    MainScreen(title = "Rentpark") {
-                        NavHost(navController = navController, startDestination = startDestination) {
-                            // Route : Connexion
-                            composable("login") {
-                                LoginScreen(
-                                    onLoginSuccess = {
-                                        // Après connexion, on lit le rôle et on redirige
-                                        val role = authPrefs.getRole()
-                                        val destination =
-                                            if (role == "admin" || role == "employe") "dashboard" else "homeCustomer"
+                    // 3. Configuration du routeur (NavHost)
+                    NavHost(navController = navController, startDestination = startDestination) {
 
-                                        navController.navigate(destination) {
-                                            // On vide l'historique pour ne pas revenir sur le login avec la touche retour
-                                            popUpTo("login") { inclusive = true }
-                                        }
+                        // Route : Connexion
+                        // Route : Connexion
+                        composable("login") {
+                            LoginScreen(
+                                onLoginSuccess = {
+                                    val role = authPrefs.getRole()
+                                    val destination = if (role == "admin" || role == "employe") "dashboard" else "homeCustomer"
+                                    navController.navigate(destination) {
+                                        popUpTo("login") { inclusive = true }
                                     }
-                                )
-                            }
-
-                            // Route : Dashboard (Admin / Employé)
-                            composable("dashboard") {
-                                DashboardScreen()
-                            }
-
-                            // Route : Accueil Client
-                            composable("homeCustomer") {
-                                RentParkHomeScreen()
-                            }
-
-                            // Ajoutez vos autres routes ici plus tard
-                            // composable("cars") { CarListScreen() }
-                            // composable("planning") { PlanningScreen() }
-                            // composable("settings") { SettingsPage(...) }
-
-                            //SettingsPage(
-                            //    isDarkMode = isDarkMode,
-                            //    onThemeChange = { newValue ->
-                            //        isDarkMode = newValue
-                            //        themePrefs.saveDarkMode(newValue)
-                            //    }
-                            //)
+                                },
+                                onNavigateToRegister = {
+                                    navController.navigate("register")
+                                }
+                            )
                         }
+
+                        // Route : Inscription
+                        composable("register") {
+                            RegisterScreen(
+                                onNavigateToLogin = {
+                                    // Retourne à la page de connexion (dépile la route register)
+                                    navController.popBackStack()
+                                }
+                            )
+                        }
+
+                        // Route : Dashboard (Admin / Employé)
+                        composable("dashboard") {
+                            DashboardScreen()
+                        }
+
+                        // Route : Accueil Client
+                        composable("homeCustomer") {
+                            RentParkHomeScreen()
+                        }
+
+                        // Ajoutez vos autres routes ici plus tard
+                        // composable("cars") { CarListScreen() }
+                        // composable("planning") { PlanningScreen() }
+                        // composable("settings") { SettingsPage(...) }
+
+                        //SettingsPage(
+                        //    isDarkMode = isDarkMode,
+                        //    onThemeChange = { newValue ->
+                        //        isDarkMode = newValue
+                        //        themePrefs.saveDarkMode(newValue)
+                        //    }
+                        //)
                     }
                 }
             }
         }
     }
 }
-// MainScreen(title = "Rentpark") {
-//    DashboardScreen() // Le contenu de la page s'affiche ici
