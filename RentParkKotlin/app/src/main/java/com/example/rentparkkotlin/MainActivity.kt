@@ -22,6 +22,7 @@ import com.example.rentparkkotlin.ui.login.LoginScreen
 import com.example.rentparkkotlin.ui.theme.RentParkKotlinTheme
 import com.example.rentparkkotlin.ui.theme.ThemePrefs
 import com.example.rentparkkotlin.data.AuthPrefs // N'oubliez pas cet import !
+import com.example.rentparkkotlin.ui.register.RegisterScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -54,17 +55,28 @@ class MainActivity : ComponentActivity() {
                     NavHost(navController = navController, startDestination = startDestination) {
 
                         // Route : Connexion
+                        // Route : Connexion
                         composable("login") {
                             LoginScreen(
                                 onLoginSuccess = {
-                                    // Après connexion, on lit le rôle et on redirige
                                     val role = authPrefs.getRole()
                                     val destination = if (role == "admin" || role == "employe") "dashboard" else "homeCustomer"
-
                                     navController.navigate(destination) {
-                                        // On vide l'historique pour ne pas revenir sur le login avec la touche retour
                                         popUpTo("login") { inclusive = true }
                                     }
+                                },
+                                onNavigateToRegister = {
+                                    navController.navigate("register")
+                                }
+                            )
+                        }
+
+                        // Route : Inscription
+                        composable("register") {
+                            RegisterScreen(
+                                onNavigateToLogin = {
+                                    // Retourne à la page de connexion (dépile la route register)
+                                    navController.popBackStack()
                                 }
                             )
                         }

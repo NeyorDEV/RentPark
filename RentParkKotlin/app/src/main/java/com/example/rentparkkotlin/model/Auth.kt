@@ -16,3 +16,14 @@ data class LoginResponse(
     @SerializedName("message") val message: String?,
     @SerializedName("error") val error: String?
 )
+
+data class RegisterRequest(
+    val username: String,
+    val password: String,
+    val role: String
+)
+
+data class RegisterResponse(
+    @SerializedName("message") val message: String?,
+    @SerializedName("error") val error: String?
+)
