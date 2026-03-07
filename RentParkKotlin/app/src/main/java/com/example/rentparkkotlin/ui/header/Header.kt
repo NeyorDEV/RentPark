@@ -42,14 +42,6 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun Header(title: String, onMenuClick: () -> Unit) {
-    Column {
-        Spacer(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(22.dp)
-                .background(color = Orange)
-        )
-
         Surface(
             color = BlackTheme,
             shadowElevation = 4.dp
@@ -90,7 +82,7 @@ fun Header(title: String, onMenuClick: () -> Unit) {
             }
         }
     }
-}
+
 val MaPoliceCustom = FontFamily(
     Font(R.font.fortnite, FontWeight.Normal),
     Font(R.font.fortnite, FontWeight.Bold)
