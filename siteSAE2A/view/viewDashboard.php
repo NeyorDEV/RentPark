@@ -25,20 +25,24 @@
 
 <body>
 
-    <nav>
-        <ul class="menu">
-            <li><a href="/siteSAE2A/home"><i class="fa-solid fa-house"></i> Accueil</a></li>
-            <li><a href="/siteSAE2A/dashboard" class="active"><i class="fa-solid fa-chart-line"></i> Tableau de bord</a>
-            </li>
-            <li><a href="/sitesae2A/voitures"><i class="fa-solid fa-car"></i> Flotte Automobile</a></li>
-            <li><a href="/siteSAE2A/planning"><i class="fa-solid fa-file-contract"></i> Planning</a></li>
-            <li><a href="/siteSAE2A/reservation"><i class="fa-solid fa-calendar-check"></i> Contrats</a></li>
-            <li><a href="/siteSAE2A/utilisateurs"><i class="fa-solid fa-users-gear"></i> Utilisateurs</a></li>
-            <li><a href="/siteSAE2A/parametres"><i class="fa-solid fa-gears"></i> Paramètres</a></li>
-            <li class="logout-item"><a href="/siteSAE2A/deconnection"><i class="fa-solid fa-right-from-bracket"></i>
-                    Déconnexion</a></li>
-        </ul>
-    </nav>
+<nav>
+    <ul class="menu">
+        <li><a href="/siteSAE2A/home"><i class="fa-solid fa-house"></i> Accueil</a></li>
+        <li><a href="/siteSAE2A/voitures"><i class="fa-solid fa-car"></i> Flotte Automobile</a></li>
+        <?php if ($role === 'admin') : ?>
+            <li><a href="/siteSAE2A/dashboard"><i class="fa-solid fa-dashboard"></i>Tableau de bord</a></li>
+        <?php endif; ?>
+        <?php if ($role === 'admin' || $role ==='employe') :?>
+            <li><a href="/siteSAE2A/planning"><i class="fa-solid fa-calendar-days "></i> Planning</a></li>
+            <li><a href="/siteSAE2A/utilisateurs"><i class="fa-solid fa-user"></i> Utilisateurs</a></li>
+        <?php endif;?>
+        <?php if ($role !== 'unknown') : ?>
+            <li><a href="/siteSAE2A/reservation"><i class="fa-solid fa-file-signature   "></i> Réservations</a></li>
+            <li><a href="/siteSAE2A/parametres"><i class="fa-solid fa-gear"></i> Paramètres</a></li>
+            <li class="logout-item"><a href="/siteSAE2A/deconnection"><i class="fa-solid fa-right-from-bracket"></i> Déconnexion</a></li>
+        <?php endif;?>
+    </ul>
+</nav>
 
     <main class="main-content">
         <header class="header-container">

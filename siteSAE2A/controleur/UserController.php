@@ -9,6 +9,8 @@ use modele\User;
 
 class UserController
 {
+    use RoleAwareTrait;
+    
     private Connection $connection;
     private VehicleGateway $gateway;
 
@@ -43,9 +45,12 @@ class UserController
                 case 'deconnecter':
                     $this->deconnecter();
                     break;
+                case "listeVoitures":
+                    $this->listeVoitures($dVueErreur);
+                    break;
                 case 'cars':
-                        $this->cars($dVueErreur);
-                        break;
+                    $this->cars($dVueErreur);
+                    break;
                 case 'homeCustomers':
                     $this->homeCustomers($dVueErreur);
                     break;
@@ -58,9 +63,15 @@ class UserController
                 case 'finaliserReservation':
                     $this->finaliserReservation($dVueErreur);
                     break;
+                case 'listeReservation':
+                    $this->listeReservation($dVueErreur);
+                    break;
+                case 'afficheParametres':
+                    $this->afficheParametres($dVueErreur);
+                    break;
                 default:
                     $dVueEreur[] = "Action inconnue";
-                    $this->afficherVue('homeCustomers', $dVueEreur, $results = null, 'user');
+                    $this->afficherVue('homeCustomers', $dVueEreur, $results = null);
                     break;
             }
 
@@ -75,7 +86,7 @@ class UserController
     public function homeCustomers(array $dVueEreur)
     {
 
-        $this->afficherVue('homeCustomers', $dVueEreur, $results = null, 'user');
+        $this->afficherVue('homeCustomers', $dVueEreur, $results = null);
 
     }
 
@@ -94,7 +105,7 @@ class UserController
             header("Location: /siteSAE2A/connection");
             exit;
         }
-        $this->afficherVue('inscription', $dVueEreur, $results = null, 'user');
+        $this->afficherVue('inscription', $dVueEreur, $results = null);
 
     }
 
@@ -102,7 +113,7 @@ class UserController
     {
         session_unset();
         session_destroy();
-        header("Location: /siteSAE2A/connection");
+        header("Location: /siteSAE2A/home");
         exit;
     }
 
@@ -114,17 +125,17 @@ class UserController
         $role = $_POST['role'] ?? '';
 
 
-        Validation::val_user($username, $password, $confirm, $role, $dVueErreur);
+        Validation::val_user($username, $password, $confirm, $dVueErreur);
 
         if (!empty($dVueErreur)) {
             $dVueErreur[] = "erreur dans l'inscription";
-            $this->afficherVue('erreur', $dVueErreur, $results = null, 'user');
+            $this->afficherVue('erreur', $dVueErreur, $results = null);
         }
 
         $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
 
-        $user = new User(null, $username, $hashedPassword, $role);
+        $user = new User(null, $username, $hashedPassword);
         $this->userGateway->login($user);
 
 
@@ -142,32 +153,28 @@ class UserController
             }
 
 
-            header("Location: /siteSAE2A/voitures");
+            header("Location: /siteSAE2A/home");
             exit;
         }
-        $this->afficherVue('connection', $dVueEreur, $results = null, 'user');
+        $this->afficherVue('connection', $dVueEreur, $results = null);
 
     }
 
     public function connection(array $dVueErreur)
     {
-        global $role;
         $username = $_POST['username'] ?? '';
         $password = $_POST['password'] ?? '';
         $savepass = $this->userGateway->getHashPass($username, $password);
-        $role = $this->userGateway->getRole($username);
+        $_SESSION['role'] = $this->userGateway->getRole($username);
+
         Validation::val_connection($username, $password, $savepass, $dVueErreur);
 
 
         session_regenerate_id(true);
         $_SESSION['username'] = $username;
-        $_SESSION['role'] = $role;
-
-        
-
 
         if (!empty($dVueErreur)) {
-            $this->afficherVue('erreur', $dVueErreur, $results = null, 'user');
+            $this->afficherVue('erreur', $dVueErreur, $results = null);
             exit;
         }
 
@@ -221,16 +228,16 @@ class UserController
         $results = array_values($results);
     }
 
-    $this->afficherVue('cars', $dVueEreur, $results, 'user');
+    $this->afficherVue('cars', $dVueEreur, $results);
     }
 
     public function reservationForm(array $dVueEreur){
-         $this->afficherVue('reservationForm', $dVueEreur, $results = null, 'user');
+         $this->afficherVue('reservationForm', $dVueEreur, $results = null);
     }
 
     public function afficheRecapitulatif(array $dVueEreur)
     {
-        $this->afficherVue('recapitulatif', $dVueEreur, $results = null, 'user');
+        $this->afficherVue('recapitulatif', $dVueEreur, $results = null);
     }
 
     public function finaliserReservation(array &$dVueEreur) 
@@ -294,7 +301,7 @@ class UserController
                 } catch (RequestException $e) {
                 if ($e->hasResponse()) {
                     $dVueEreur[] = $e->getResponse()->getBody()->getContents();
-                    $this->afficherVue('reservationForm', $dVueEreur, null, 'user');
+                    $this->afficherVue('reservationForm', $dVueEreur, null);
                     return;
                 }
             }
@@ -321,40 +328,83 @@ class UserController
                 $dataContrat = json_decode($responseContrat->getBody()->getContents(), true);
 
                 if (isset($dataContrat['message']) && $dataContrat['message'] === 'Contrat créé avec succès') {
-                    $this->afficherVue('confirmationSucces', $dVueEreur, null, 'user');
+                    $this->afficherVue('confirmationSucces', $dVueEreur, null);
                 } else {
                     $dVueEreur[] = "Erreur lors de la création du contrat";
-                    $this->afficherVue('confirmationSucces', $dVueEreur, null, 'user');
+                    $this->afficherVue('confirmationSucces', $dVueEreur, null);
                 }
             } else {
                 $dVueEreur[] = "Erreur lors de la création du client";
-                $this->afficherVue('confirmationSucces', $dVueEreur, null, 'user');
+                $this->afficherVue('confirmationSucces', $dVueEreur, null);
             }
 
             
         } catch (RequestException $e) {
             $dVueEreur[] = "Erreur API : " . $e->getMessage();
-            $this->afficherVue('reservationForm', $dVueEreur, null, 'user');
+            $this->afficherVue('reservationForm', $dVueEreur, null);
         } catch (\Exception $e) {
             $dVueEreur[] = "Erreur technique : " . $e->getMessage();
-            $this->afficherVue('reservationForm', $dVueEreur, null, 'user');
+            $this->afficherVue('reservationForm', $dVueEreur, null);
         }
+    }
+    public function listeVoitures(array $dVueEreur)
+    {
+        $sousAction = $_GET['action'] ?? '';
+        if ($sousAction === 'rechercherVoitures') {
+            $this->rechercherVoitures($dVueEreur);
+            return;
+        }
+        try {
+            $response = $this->apiClient->get('voitures');
+
+            $results = json_decode(
+                $response->getBody()->getContents(),
+                true
+            );
+
+        } catch (RequestException $e) {
+            $dVueEreur[] = "Impossible de récupérer les véhicules depuis l’API.";
+            $results = [];
+        }
+
+        $this->afficherVue('flotte', $dVueEreur, $results);
+
     }
 
-    private function afficherVue(string $vueKey, array $dVueEreur, ?array $results = null, string $role = 'user')
+    private function rechercherVoitures(array $dVueErreur = []): void
     {
-        global $rep, $vues;
-        if (!isset($vues[$vueKey])) {
-            echo "Vue '$vueKey' non définie.";
-            exit;
+        $motCle = trim($_GET['q'] ?? '');
+
+        try {
+            if ($motCle === '') {
+                $response = $this->apiClient->get("voitures");
+            } else {
+                $response = $this->apiClient->get("voitures", [
+                    'query' => ['nom' => $motCle]
+                ]);
+            }
+            $results = json_decode($response->getBody()->getContents(), true);
+
+            if (empty($results)) {
+                $dVueErreur[] = "Aucune voiture trouvée pour \"$motCle\".";
+            }
+        } catch (\Exception $e) {
+            $dVueErreur[] = "Erreur lors de la recherche via l’API : " . $e->getMessage();
+            $results = [];
         }
-        $cheminVue = realpath($rep . $vues[$vueKey]);
-        if ($cheminVue && file_exists($cheminVue)) {
-            require_once($cheminVue); // NOSONAR
-        } else {
-            echo "Fichier de vue introuvable : " . ($rep . $vues[$vueKey]);
-            exit;
-        }
+
+        $this->afficherVue('flotte', $dVueErreur, $results);
+    }
+
+    public function afficheParametres(array $dVueErreur)
+    {
+
+        $this->afficherVue('parametres', $dVueErreur, $results = null);
+    }
+    public function listeReservation(array &$dVueErreur)
+    {
+        header('HTTP/1.1 403 FORBIDDEN');
+            $dVueErreur[] = "Liste réservation non faite pour user";
+            $this->afficherVue('erreur', $dVueErreur);
     }
 }
-?>

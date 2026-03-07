@@ -51,10 +51,13 @@ if (!empty($voitures) && isset($_GET['tri'])) {
 <body>
 
 <header>
-    <div class="filtre" onclick="toggleMenu()" style="left: 25px; right: auto;">
+    <div class="filtre" onclick="toggleMenu()" >
         <span><i class="fa-solid fa-filter"></i> Filtres</span>
     </div>
-
+    <div class="filtre "  style="left: 130px;">
+        <a class="home" href="/siteSAE2A/home"><i class="fa-solid fa-house"></i> Accueil</a>
+    </div>
+    
     <a href="/siteSAE2A/connection">
         <div class="top-right-btn">
             <div class="circle"></div>

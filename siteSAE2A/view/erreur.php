@@ -25,7 +25,24 @@
     <link rel="icon" type="image/png" href="html/icons/voiture.png">
 </head>
 <body>
-
+<nav>
+    <ul class="menu">
+        <li><a href="/siteSAE2A/home"><i class="fa-solid fa-house"></i> Accueil</a></li>
+        <li><a href="/siteSAE2A/voitures"><i class="fa-solid fa-car"></i> Flotte Automobile</a></li>
+        <?php if ($role === 'admin') : ?>
+            <li><a href="/siteSAE2A/dashboard"><i class="fa-solid fa-dashboard"></i>Tableau de bord</a></li>
+        <?php endif; ?>
+        <?php if ($role === 'admin' || $role ==='employe') :?>
+            <li><a href="/siteSAE2A/planning"><i class="fa-solid fa-calendar-days "></i> Planning</a></li>
+            <li><a href="/siteSAE2A/utilisateurs"><i class="fa-solid fa-user"></i> Utilisateurs</a></li>
+        <?php endif;?>
+        <?php if ($role !== 'unknown') : ?>
+            <li><a href="/siteSAE2A/reservation"><i class="fa-solid fa-file-signature   "></i> Réservations</a></li>
+            <li><a href="/siteSAE2A/parametres"><i class="fa-solid fa-gear"></i> Paramètres</a></li>
+            <li class="logout-item"><a href="/siteSAE2A/deconnection"><i class="fa-solid fa-right-from-bracket"></i> Déconnexion</a></li>
+        <?php endif;?>
+    </ul>
+</nav>
     <div class="error-wrapper">
         <div class="error-card">
             <div class="error-icon">

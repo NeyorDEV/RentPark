@@ -17,8 +17,10 @@
         } catch (e) { }
     })();
     </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="html/css/homeCustomers.css">
     <link rel="shortcut icon" href="html/icons/favicon.ico" type="image/x-icon">
+
 </head>
 <body>
 
@@ -37,20 +39,38 @@
         <?php if ($role === 'admin') : ?>
             <li><a href="/siteSAE2A/dashboard"><i class="fa-solid fa-dashboard"></i>Tableau de bord</a></li>
         <?php endif; ?>
-        <li><a href="/siteSAE2A/planning"><i class="fa-solid fa-file-signature"></i> Contrats</a></li>
-        <li><a href="/siteSAE2A/reservation"><i class="fa-solid fa-calendar-days"></i> Réservations</a></li>
-        <li><a href="/siteSAE2A/utilisateurs"><i class="fa-solid fa-user"></i> Utilisateurs</a></li>
-        <li><a href="/siteSAE2A/parametres"><i class="fa-solid fa-gear"></i> Paramètres</a></li>
+        <?php if ($role === 'admin' || $role ==='employe') :?>
+            <li><a href="/siteSAE2A/planning"><i class="fa-solid fa-calendar-days "></i> Planning</a></li>
+            <li><a href="/siteSAE2A/utilisateurs"><i class="fa-solid fa-user"></i> Utilisateurs</a></li>
+        <?php endif;?>
+        <?php if ($role !== 'unknown') : ?>
+            <li><a href="/siteSAE2A/reservation"><i class="fa-solid fa-file-signature   "></i> Réservations</a></li>
+            <li><a href="/siteSAE2A/parametres"><i class="fa-solid fa-gear"></i> Paramètres</a></li>
+        <?php endif;?>
     </ul>
+    <?php if ($role !== 'unknown') : ?>
+            <div class="logout-item"><a href="/siteSAE2A/deconnection"><i class="fa-solid fa-right-from-bracket"></i> Déconnexion</a></div>
+        <?php endif;?>
 </aside>
 
 <!-- ========== HEADER + FORMULAIRE ========== -->
-<header>
+
+
+
+<header> 
+    <?php if ($role === 'unknown') : ?>
     <a href="/siteSAE2A/connection">
         <div class="top-right-btn">
             <div class="circle"></div>
             <span>Connexion/Inscription</span>
         </div>
+    </a>
+    <?php else :?>
+        <div class="top-right">
+            <div class="circle"></div>
+            <span>Connecté en tant que : <?php echo $role?></span>
+        </div>
+    <?php endif; ?>
     </a>
     <h1 id="RentPark">RENTPARK</h1>
 

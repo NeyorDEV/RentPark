@@ -82,12 +82,29 @@ body::before {
     border-radius: 3px;
 }
 
+.logout-item {
+    position : absolute;
+    margin-top: auto;
+    margin-bottom: 20px;
+    padding: 18px 25px;
+    width: 100%;
+    bottom:0;
+    transition: 0.2s;
+}
+.logout-item:hover { background: rgba(255, 255, 255, 0.1); }
+
+
+.logout-item a i {
+    color: var(--logout-red) !important;
+}
+
+
 #sidebar {
     position: fixed;
     top: 0;
     left: -250px;
     width: 250px;
-    height: 100vh;
+    height: 100%;
     background: rgba(0, 0, 0, 0.85);
     backdrop-filter: blur(12px);
     box-shadow: 2px 0 20px rgba(0, 0, 0, 0.5);
@@ -135,6 +152,22 @@ header h1 {
     border: 2px solid white;      
     border-radius: 12px;          
     cursor: pointer;
+    text-decoration: none;
+}
+
+.top-right{
+    position: absolute;
+    top: 25px;
+    right: 25px;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 20px;
+    background-color: transparent; 
+    border: 2px solid white;      
+    border-radius: 12px;
+    color : white;
+    font-size: 14px;
     text-decoration: none;
 }
 

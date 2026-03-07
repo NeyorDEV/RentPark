@@ -47,6 +47,10 @@ h1 {
     color: white;
 }
 
+.home {
+    text-decoration: none;
+    color: white;
+}
 /* Style du bouton Connection identique à la Home */
 .top-right-btn {
     position: absolute;

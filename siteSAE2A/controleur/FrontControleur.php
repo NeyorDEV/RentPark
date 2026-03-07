@@ -8,18 +8,18 @@ use controleur\UserController;
 
 class FrontControleur
 {
+    use RoleAwareTrait;
+
     public function __construct()
     {
         session_start();
+        
     }
 
     public function run()
     {
         global $rep, $vues,$action; 
-
-        $role = $_SESSION['role'] ?? 'user';
-
-       
+        $role = $this->getRole();
         $router = new AltoRouter();
         $router->setBasePath('/siteSAE2A'); 
 
@@ -40,13 +40,13 @@ class FrontControleur
         $router->map('GET|POST', '/connection', 'afficheConnection');
         $router->map('GET|POST', '/deconnection', 'deconnecter');
         $router->map('GET|POST', '/dashboard', 'afficheDashboard');
-        $router->map('GET|POST', '/homeCustomers', 'homeCustomers');// a voir
         $router->map('GET|POST', '/cars', 'cars'); // suite au home, la recherche de vehicule pour réserver
         $router->map('GET|POST', '/reservationForm', 'reservationForm');
         $router->map('GET|POST', '/recapitulatif', 'afficheRecapitulatif');
         $router->map('GET|POST', '/parametres', 'afficheParametres');
         $router->map('GET|POST', '/finaliserReservation', 'finaliserReservation');
         $router->map('GET|POST', '/planning', 'affichePlanning');
+        $router->map('GET|POST', '/homeCustomers', 'homeCustomers');// a voir
         
         $match = $router->match();
         if ($match) {
@@ -54,11 +54,12 @@ class FrontControleur
         
             // ROUTES PUBLIQUES (User par défaut)
             $publicRoutes = [
-                'homeCustomers',
-                'cars',
-                'afficheConnection',
                 'afficheInscription',
+                'afficheConnection',
                 'deconnecter',
+                'listeVoitures',
+                'cars',
+                'homeCustomers',
                 'reservationForm',
                 'afficheRecapitulatif',
                 'finaliserReservation'
@@ -66,60 +67,66 @@ class FrontControleur
         
             // ROUTES USER CONNECTÉ
             $userRoutes = [
-                'connection'
-    
+                'listeReservation',
+                'afficheParametres'
             ];
 
+            // ROUTES EMPLOYE
             $employeRoutes = [
-                'listeVoitures',
-                'listeReservation',
-                'listeUtilisateurs',
-                'listeClients',
                 'affichePlanning',
-                'afficheParametres'
-                
+                'listeClients',
+                'listeUtilisateurs',
+                'listeReservation',
+                'listeVoitures'               
             ];
-        
-            if ($role === 'admin') {
-                $controleur = new AdminControleur();
+
+            // ROUTES ADMIN
+            $adminRoutes=[
+                'listeClients',
+                'afficheDashboard',
+                'listeUtilisateurs',
+
+            ];         
+
+            $find=false;
+            /**
+             * PUBLIC
+             */
+            if (in_array($action, $publicRoutes)) {
+                $controleur = new UserController();
+                $find=true;
+
+            }
+            if (in_array($action, $userRoutes)) {
+                $this->checkUser();
+                $controleur = new UserController();
+                $find=true;
             }
             /**
              * EMPLOYÉ
              */
-            elseif (in_array($action, $employeRoutes)) {
-    
-                if ($role !== 'employe') {
-                    header('HTTP/1.1 403 Forbidden');
-                    exit('Accès refusé');
-                }
-    
+            if (in_array($action, $employeRoutes)){
+                $this->checkEmploye();
                 $controleur = new EmployeControleur();
+                $find=true;
             }
             /**
-             * USER CONNECTÉ
+             * ADMIN
              */
-            elseif (in_array($action, $userRoutes)) {
-    
-                if (!isset($_SESSION['username'])) {
-                    header('Location: /siteSAE2A/home');
-                    exit;
-                }
-    
-                $controleur = new UserController();
+            if (in_array($action, $adminRoutes)) {
+                $this->checkAdmin();
+                $controleur = new AdminControleur();
+                $find=true;
             }
             /**
-             * PUBLIC
+            * LE RESTE → REFUS
              */
-            elseif (in_array($action, $publicRoutes)) {
-                $controleur = new UserController();
+            if (!$find) {
+                header('HTTP/1.1 404 NotFound');
+                exit('Page non trouvée');
             }
-            /**
-             * LE RESTE → REFUS
-             */
-            else {
-                header('HTTP/1.1 403 Forbidden');
-                exit('Accès refusé');
-            }
+            
+            
     
             $controleur->$action();
         }
@@ -127,5 +134,5 @@ class FrontControleur
          
     }  
 }  
- 
-?>    
+?> 
+    

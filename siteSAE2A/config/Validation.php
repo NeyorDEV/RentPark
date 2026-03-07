@@ -78,18 +78,23 @@ class Validation
     
         if ($username === '' || $password === '') {
             $errors[] = "Tous les champs sont requis.";
+            session_unset();
+            session_destroy();
             return;
         }
     
         // Vérifie que le hash est bien fourni
         if ($savepass === null) {
             $errors[] = "Utilisateur introuvable.";
+            session_unset();
+            session_destroy();
             return;
         }
     
         // Vérifie la correspondance entre mot de passe saisi et hash stocké
         if (!password_verify($password, $savepass)) {
             $errors[] = "Mot de passe ou nom d'utilisateur invalide.";
+            session_unset();;
         }
     
         // Nettoyage du nom d’utilisateur
