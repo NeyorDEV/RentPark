@@ -195,7 +195,7 @@ class EmployeControleur
         $confirm = $_POST['confirm'] ?? '';
         $role = $_POST['role'] ?? '';
 
-        Validation::val_user($username, $password, $confirm, $role, $dVueEreur);
+        Validation::val_user($username, $password, $confirm, $role);
 
         if (empty($dVueEreur)) {
             $this->userGateway->addUser($username, $password, $role);
@@ -670,7 +670,7 @@ class EmployeControleur
             'currentMonthLabel' => $currentMonthLabel
         ];
 
-        $this->afficherVue('planning', $dVueEreur, $results, 'admin');
+        $this->afficherVue('planning', $dVueEreur, $results);
     }
 }
 ?>

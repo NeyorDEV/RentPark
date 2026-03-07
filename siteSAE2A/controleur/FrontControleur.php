@@ -88,51 +88,59 @@ class FrontControleur
 
             ];         
 
-            $find=false;
-            /**
-             * PUBLIC
-             */
-            if (in_array($action, $publicRoutes)) {
-                $controleur = new UserController();
-                $find=true;
+            $roleControleur = [
+                'admin'   => fn() => new AdminControleur(),
+                'employe' => fn() => new EmployeControleur(),
+                'user'    => fn() => new UserController(),
+                'public'  => fn() => new UserController(),
+            ];
 
+            // Hiérarchie des rôles (du plus haut au plus bas)
+            $hierarchie = ['admin', 'employe', 'user', 'public'];
+
+            // Toutes les routes par rôle minimum requis
+            $routesParRole = [
+                'public'  => $publicRoutes,
+                'user'    => $userRoutes,
+                'employe' => $employeRoutes,
+                'admin'   => $adminRoutes,
+            ];
+
+            $find = false;
+
+            foreach ($hierarchie as $roleReqis) {
+                if (!in_array($action, $routesParRole[$roleReqis])) {
+                    continue; // Cette route n'appartient pas à ce niveau
+                }
+
+                // Vérifier que l'utilisateur a au moins ce niveau
+                if ($this->hasRole($role, $roleReqis, $hierarchie)) {
+                    $this->checkRole($roleReqis);
+                    // 👇 Utiliser le contrôleur DU RÔLE DE LA ROUTE, pas celui de l'utilisateur
+                    $controleur = $roleControleur[$roleReqis]();
+                    $find = true;
+                    break;
+                }
             }
-            if (in_array($action, $userRoutes)) {
-                $this->checkUser();
-                $controleur = new UserController();
-                $find=true;
-            }
-            /**
-             * EMPLOYÉ
-             */
-            if (in_array($action, $employeRoutes)){
-                $this->checkEmploye();
-                $controleur = new EmployeControleur();
-                $find=true;
-            }
-            /**
-             * ADMIN
-             */
-            if (in_array($action, $adminRoutes)) {
-                $this->checkAdmin();
-                $controleur = new AdminControleur();
-                $find=true;
-            }
-            /**
-            * LE RESTE → REFUS
-             */
-            if (!$find) {
-                header('HTTP/1.1 404 NotFound');
-                exit('Page non trouvée');
-            }
-            
-            
-    
             $controleur->$action();
         }
 
+        
          
     }  
-}  
+    private function hasRole(string $roleUser, string $roleRequis, array $hierarchie): bool {
+        // Un rôle plus à gauche dans la hiérarchie a plus de droits
+        return array_search($roleUser, $hierarchie) <= array_search($roleRequis, $hierarchie);
+    }
+
+    private function checkRole(string $role): void {
+        match($role) {
+        'admin'   => $this->checkAdmin(),
+        'employe' => $this->checkEmploye(),
+        'user'    => $this->checkUser(),
+        default   => null,
+        };
+    }
+}
 ?> 
     

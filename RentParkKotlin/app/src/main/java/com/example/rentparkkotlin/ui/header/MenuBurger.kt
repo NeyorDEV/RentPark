@@ -1,6 +1,7 @@
 package com.example.rentparkkotlin.ui.header
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -16,33 +17,31 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
-// Menu burger pour la navigation dans l'application
-
 @Composable
-fun MenuBurger() {
-    Box(modifier = Modifier.size(75.dp)
-        .background(Color.Gray)
-        ,contentAlignment = Alignment.Center){
-        Column() {
-            Barre()
-            Spacer(Modifier.height(10.dp))
-            Barre()
-            Spacer(Modifier.height(10.dp))
-            Barre()
-        }
-    }
+fun Barre() {
+    Box(
+        modifier = Modifier
+            .size(width = 28.dp, height = 3.dp)
+            .background(
+                color = Color.White,
+                shape = RoundedCornerShape(50.dp)
+            )
+    )
 }
 
 @Composable
-fun Barre(){
-    Box(
-        modifier = Modifier
-            .size(55.dp, 8.dp)
-            .background(
-                color = Color.Black,
-                shape = RoundedCornerShape(50.dp) // L'arrondi est appliqué ici
-            )
-    )
+fun MenuBurger() {
+    Column(
+        modifier = Modifier.size(32.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Barre()
+        Spacer(Modifier.height(5.dp))
+        Barre()
+        Spacer(Modifier.height(5.dp))
+        Barre()
+    }
 }
 
 @Preview(showBackground = true)

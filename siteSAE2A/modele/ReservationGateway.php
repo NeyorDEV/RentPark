@@ -6,7 +6,9 @@ class ReservationGateway {
 
     public function __construct(Connection $connection) {
         $this->connection = $connection;
-    }
+    }   
+
+
     public function searchReservations(string $champ, string $q, string $filtre): array {
         $where  = [];
         $params = [];
@@ -15,13 +17,13 @@ class ReservationGateway {
         switch ($filtre) {
             case 'a-venir': $where[] = "DateDebut > CURDATE()"; break;
             case 'passees': $where[] = "DateFin   < CURDATE()"; break;
-            case 'toutes':  $where[] = "1";                     break;
+            case 'toutes':  $where[] = "1"; break;
             default:        $where[] = "CURDATE() BETWEEN DateDebut AND DateFin";
         }
 
         // recherche
         if ($q !== '') { // id de contrat ou de client
-            if ($champ === 'idContrat' || $champ === 'Client') {
+            if ($champ === 'idContrat' || $champ === 'IdClient') {
                 $where[] = "$champ = :qnum";
                 $params[':qnum'] = [ (int)$q, \PDO::PARAM_INT ];
             } else { // Vehicule (VIN)
@@ -35,9 +37,25 @@ class ReservationGateway {
                 WHERE ".implode(' AND ', $where)."
                 ORDER BY DateDebut DESC";
 
-        $this->connection->executeQuery($sql, $params);
+        if (empty($params)) {
+            $this->connection->executeQuery($sql);
+        } else {
+            $this->connection->executeQuery($sql, $params);
+        }
+        
         return $this->connection->getResults();
     }
+
+    public function getAllReservations(): array {
+            $sql = "SELECT idContrat, idVehicule, DateDebut, DateFin, IdClient, EtatAvant
+                    FROM Contrat
+                    ORDER BY DateDebut DESC";
+
+            $this->connection->executeQuery($sql);
+            
+            return $this->connection->getResults();
+        }
+
     public function insertReservation(string $vehicule, int $client, string $dateDebut, string $dateFin): void {
         $sql = "INSERT INTO Contrat (DateDebut, DateFin, Vehicule, Client, EtatDesLieu)
                 VALUES (:d1, :d2, :veh, :cli, :etat)";
@@ -49,6 +67,8 @@ class ReservationGateway {
             ':etat' => ['neuf',     \PDO::PARAM_STR], 
         ]);
     }
+
+
     public function update(int $id, string $vehicule, int $client, string $dateDebut, string $dateFin): void {
         $sql = "UPDATE Contrat
                 SET DateDebut = :d1, DateFin = :d2, Vehicule = :veh, Client = :cli
@@ -96,48 +116,48 @@ class ReservationGateway {
     }
 
     public function getContractsForNextMonth(): array
-{
-    $query = "
-        SELECT 
-            c.DateDebut,
-            c.DateFin,
-            v.Marque,
-            v.Nom AS Modele
-        FROM Contrat c
-        JOIN Vehicule v ON c.IdVehicule = v.NumSerie
-        WHERE (c.DateDebut BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 1 MONTH))
-           OR (c.DateFin   BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 1 MONTH))
-        ORDER BY c.DateDebut ASC
-    ";
+    {
+        $query = "
+            SELECT 
+                c.DateDebut,
+                c.DateFin,
+                v.Marque,
+                v.Nom AS Modele
+            FROM Contrat c
+            JOIN Vehicule v ON c.IdVehicule = v.NumSerie
+            WHERE (c.DateDebut BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 1 MONTH))
+            OR (c.DateFin   BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 1 MONTH))
+            ORDER BY c.DateDebut ASC
+        ";
 
-    $this->connection->executeQuery($query);
-    $results = $this->connection->getResults();
+        $this->connection->executeQuery($query);
+        $results = $this->connection->getResults();
 
-    // Renvoie un tableau vide si rien trouvé
-    if (empty($results)) {
-        return [];
+        // Renvoie un tableau vide si rien trouvé
+        if (empty($results)) {
+            return [];
+        }
+
+        return $results;
     }
 
-    return $results;
-}
+    public function getMonthlyPlanning(): array
+    {
+        $sql = "
+            SELECT 
+                c.DateDebut,
+                c.DateFin,
+                v.Marque,
+                v.Nom
+            FROM Contrat c
+            JOIN Vehicule v ON v.NumSerie = c.IdVehicule
+            WHERE 
+                c.DateFin >= CURDATE()
+                AND c.DateDebut <= LAST_DAY(CURDATE())
+            ORDER BY c.DateDebut ASC
+        ";
 
-public function getMonthlyPlanning(): array
-{
-    $sql = "
-        SELECT 
-            c.DateDebut,
-            c.DateFin,
-            v.Marque,
-            v.Nom
-        FROM Contrat c
-        JOIN Vehicule v ON v.NumSerie = c.IdVehicule
-        WHERE 
-            c.DateFin >= CURDATE()
-            AND c.DateDebut <= LAST_DAY(CURDATE())
-        ORDER BY c.DateDebut ASC
-    ";
-
-    $this->connection->executeQuery($sql);
-    return $this->connection->getResults();
-}   
+        $this->connection->executeQuery($sql);
+        return $this->connection->getResults();
+    }   
 }

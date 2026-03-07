@@ -52,15 +52,20 @@
             <h1>Oups ! Quelque chose a coincé</h1>
 
             <div class="error-msg-content">
-                <?php 
-                if (isset($dVueErreur) && !empty($dVueErreur)) {
-                    foreach ($dVueErreur as $msg) {
-                        echo htmlspecialchars($msg) . "<br>";
-                    }
-                } else {
-                    echo "Une erreur inattendue est survenue lors de l'opération.";
-                }
-                ?>
+                <?php if (isset($dVueErreur) && !empty($dVueErreur)): ?>
+                    <div class="user-friendly-message">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                        <?= htmlspecialchars($dVueErreur[0]) ?>
+                    </div>
+                    
+                    <?php if (count($dVueErreur) > 1): ?>
+                        <div class="technical-details">
+                            <small>Détails : <?= htmlspecialchars($dVueErreur[1]) ?></small>
+                        </div>
+                    <?php endif; ?>
+                <?php else: ?>
+                    <p>Une erreur inattendue est survenue.</p>
+                <?php endif; ?>
             </div>
 
             <p style="opacity: 0.7; margin-bottom: 20px;">

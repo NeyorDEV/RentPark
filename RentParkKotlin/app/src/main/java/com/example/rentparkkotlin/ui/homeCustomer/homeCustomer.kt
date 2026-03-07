@@ -1,6 +1,7 @@
 package com.example.rentparkkotlin.ui.homeCustomer
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -19,6 +20,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.rentparkkotlin.R
+import com.example.rentparkkotlin.ui.header.Header
 
 val MaPoliceCustom = FontFamily(
     Font(R.font.fortnite, FontWeight.Normal),
@@ -44,28 +46,6 @@ fun RentParkHomeScreen() {
             )
         }
 
-        // --- 2. Interface de Navigation (Top Bar) ---
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 48.dp, start = 20.dp, end = 20.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(Icons.Default.Menu, contentDescription = null, tint = Color.White)
-            Surface(
-                color = Color.White.copy(alpha = 0.1f),
-                shape = RoundedCornerShape(50.dp),
-                border = ButtonDefaults.outlinedButtonBorder
-            ) {
-                Row(modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Default.Person, contentDescription = null, tint = Color.White, modifier = Modifier.size(16.dp))
-                    Spacer(Modifier.width(8.dp))
-                    Text("Connexion", color = Color.White, fontSize = 12.sp)
-                }
-            }
-        }
-
         // --- 3. Contenu Central ---
         Column(
             modifier = Modifier
@@ -74,15 +54,6 @@ fun RentParkHomeScreen() {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Text(
-                text = "RENTPARK",
-                fontSize = 48.sp,
-                fontFamily = MaPoliceCustom,
-                fontWeight = FontWeight.Bold,
-
-                color = Color.White,
-                modifier = Modifier.padding(bottom = 40.dp)
-            )
 
             // --- Carte de réservation Verticale ---
             Surface(
@@ -107,6 +78,8 @@ fun RentParkHomeScreen() {
                     }
                 }
             }
+            Spacer(modifier = Modifier.height(40.dp))
+            ConnectionButton()
         }
     }
 }
@@ -123,6 +96,36 @@ fun VerticalDateField(label: String) {
             trailingIcon = { Icon(Icons.Default.DateRange, contentDescription = null, tint = Color.Gray) },
             shape = RoundedCornerShape(12.dp),
             readOnly = true
+        )
+    }
+}
+
+@Composable
+fun ConnectionButton() {
+    Row(
+        modifier = Modifier
+            .padding(horizontal = 12.dp, vertical = 6.dp)
+            // 1. Ajoute le contour ici
+            .border(
+                width = 1.dp,
+                color = Color.White,
+                shape = RoundedCornerShape(50) // 50% pour un effet pilule, ou 8.dp pour des coins arrondis
+            )
+            // 2. Ajoute un peu de padding interne pour que le texte ne touche pas le bord
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            imageVector = Icons.Default.Person,
+            contentDescription = null,
+            tint = Color.White,
+            modifier = Modifier.size(22.dp)
+        )
+        Spacer(Modifier.width(8.dp))
+        Text(
+            "Connexion",
+            color = Color.White,
+            fontSize = 18.sp
         )
     }
 }
