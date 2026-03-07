@@ -6,6 +6,7 @@ import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.Response
+import retrofit2.http.PUT
 
 interface ApiService {
 
@@ -43,4 +44,22 @@ interface ApiService {
 
     @POST("add/users")
     suspend fun register(@Body request: RegisterRequest): Response<RegisterResponse>
+
+    @GET("users")
+    suspend fun getUsers(): List<User>
+
+    @PUT("users/{id}")
+    suspend fun updateUser(@Path("id") id: Int, @Body request: UpdateUserRequest): Response<Unit>
+
+    @DELETE("users/{id}")
+    suspend fun deleteUser(@Path("id") id: Int): Response<Unit>
+
+    @GET("clients")
+    suspend fun getClients(): List<Client>
+
+    @POST("client")
+    suspend fun addClient(@Body request: ClientRequest): Response<ClientResponse>
+
+    @PUT("client/{id}")
+    suspend fun updateClient(@Path("id") id: Int, @Body request: ClientRequest): Response<Unit>
 }
