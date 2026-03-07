@@ -365,13 +365,28 @@ class UserController
     }
 
     public function listeReservation(array $dVueErreur = [])
-{
-    $reservationGateway = new \modele\ReservationGateway($this->connection);
-    $idClient = $_SESSION['idClient'] ?? 0; 
-    $filtre = $_GET['filtre'] ?? 'toutes';
-    $results = $reservationGateway->searchReservations('IdClient', (string)$idClient, $filtre);
-    $this->afficherVue('reservation', $dVueErreur, $results, 'user');
-}
+    {
+        $reservationGateway = new \modele\ReservationGateway($this->connection);
+        
+        // 1. Récupération des infos de session
+        $role = $_SESSION['role'] ?? 'user';
+        $idClient = $_SESSION['idClient'] ?? 0; 
+        $filtre = $_GET['filtre'] ?? 'toutes';
+        
+        // 2. Vérification du rôle (trim et strtolower par sécurité si la base de données a des espaces ou majuscules)
+        if (strtolower(trim($role)) === 'admin') {
+            // Si c'est un admin, on prend en compte la barre de recherche (ou on affiche tout)
+            $champ = $_GET['champ'] ?? 'idContrat';
+            $q = $_GET['q'] ?? '';
+            $results = $reservationGateway->searchReservations($champ, $q, $filtre);
+        } else {
+            // Si c'est un client classique, on bloque la recherche sur son propre ID
+            $results = $reservationGateway->searchReservations('IdClient', (string)$idClient, $filtre);
+        }
+        
+        // 3. On passe bien la variable $role à la vue, et non le texte 'user' en dur !
+        $this->afficherVue('reservation', $dVueErreur, $results, $role);
+    }
 
     private function afficherVue(string $vueKey, array $dVueErreur, ?array $results = null, string $role = 'user')
     {
