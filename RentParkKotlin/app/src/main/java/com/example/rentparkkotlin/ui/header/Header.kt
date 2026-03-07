@@ -109,8 +109,10 @@ fun HeaderPreview() {
 
 // Dans Header.kt (Extrait des modifications)
 
+// Dans Header.kt
+
 @Composable
-fun MainScreen(title: String, content: @Composable () -> Unit) { // Ajout du paramètre content
+fun MainScreen(title: String, content: @Composable () -> Unit) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
@@ -119,24 +121,26 @@ fun MainScreen(title: String, content: @Composable () -> Unit) { // Ajout du par
         gesturesEnabled = true,
         drawerContent = {
             ModalDrawerSheet(
-                modifier = Modifier.fillMaxWidth(0.75f).fillMaxHeight(), // 3/4 de l'écran
+                // Définit la largeur à 3/4 de l'écran
+                modifier = Modifier.fillMaxWidth(0.75f).fillMaxHeight(),
                 drawerContainerColor = BlackTheme,
                 drawerShape = RoundedCornerShape(topEnd = 16.dp, bottomEnd = 16.dp)
             ) {
-                // --- CONTENU DU MENU DE NAVIGATION ---
+                // --- CONTENU DU MENU ---
                 Text(
-                    "Navigation",
-                    color = Orange,
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(24.dp)
+                    "Menu RentPark",
+                    color = Color.White,
+                    modifier = Modifier.padding(24.dp),
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold
                 )
-                // Ajoutez vos boutons ici (ex: Profil, Paramètres, Déconnexion)
+                // Ajoutez ici vos liens de navigation (ex: NavigationDrawerItem)
             }
         }
     ) {
+        // Effet de flou sur le contenu principal quand le menu est ouvert
         val blurRadius by animateDpAsState(
-            targetValue = if (drawerState.isOpen) 12.dp else 0.dp, // Effet de flou
+            targetValue = if (drawerState.isOpen) 12.dp else 0.dp,
             label = "blurAnimation"
         )
 
@@ -149,11 +153,13 @@ fun MainScreen(title: String, content: @Composable () -> Unit) { // Ajout du par
                 Header(
                     title = title,
                     onMenuClick = {
+                        println("menu cliquer") // Log console demandé
                         scope.launch { drawerState.open() }
                     }
                 )
+                // Zone où s'affiche le contenu de la page
                 Box(modifier = Modifier.fillMaxSize()) {
-                    content() // Affiche la page passée en paramètre
+                    content()
                 }
             }
         }

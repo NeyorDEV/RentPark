@@ -35,4 +35,34 @@ class CarViewModel : ViewModel() {
             isLoading = false
         }
     }
+
+    fun addVoiture(voiture: Voiture) {
+        viewModelScope.launch {
+            try {
+                val response = repository.addVoiture(voiture)
+                if (response.isSuccessful) {
+                    fetchVoitures()
+                } else {
+                    error = "Erreur serveur : ${response.code()}"
+                }
+            } catch (e: Exception) {
+                error = "Impossible d'ajouter le véhicule : ${e.message}"
+            }
+        }
+    }
+
+    fun deleteVoiture(id: String) {
+        viewModelScope.launch {
+            try {
+                val response = repository.deleteVoiture(id)
+                if (response.isSuccessful) {
+                    fetchVoitures()
+                } else {
+                    error = "Erreur lors de la suppression"
+                }
+            } catch (e: Exception) {
+                error = "Erreur réseau : ${e.message}"
+            }
+        }
+    }
 }

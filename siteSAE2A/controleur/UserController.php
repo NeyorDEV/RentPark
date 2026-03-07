@@ -4,6 +4,7 @@ use modele\Connection;
 use modele\VehicleGateway;
 use modele\UserGateway;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\RequestException;
 use config\Validation;
 use modele\User;
 
@@ -57,6 +58,9 @@ class UserController
                     break;
                 case 'finaliserReservation':
                     $this->finaliserReservation($dVueErreur);
+                    break;
+                case 'listeReservation':
+                    $this->listeReservation($dVueErreur);
                     break;
                 default:
                     $dVueErreur[] = "Action inconnue";
@@ -149,20 +153,21 @@ class UserController
 
     }
 
-    public function connection(array $dVueErreur)
+    public function connection(array &$dVueErreur)
     {
         global $role;
         $username = $_POST['username'] ?? '';
         $password = $_POST['password'] ?? '';
         $savepass = $this->userGateway->getHashPass($username, $password);
         $role = $this->userGateway->getRole($username);
+        $clientId = $this->userGateway->getClientId($username);
         Validation::val_connection($username, $password, $savepass, $dVueErreur);
 
 
         session_regenerate_id(true);
         $_SESSION['username'] = $username;
         $_SESSION['role'] = $role;
-
+        $_SESSION['idClient'] = $clientId;
         
 
 
@@ -358,6 +363,15 @@ class UserController
             $this->afficherVue('erreur', $dVueErreur, null, 'user');
         }
     }
+
+    public function listeReservation(array $dVueErreur = [])
+{
+    $reservationGateway = new \modele\ReservationGateway($this->connection);
+    $idClient = $_SESSION['idClient'] ?? 0; 
+    $filtre = $_GET['filtre'] ?? 'toutes';
+    $results = $reservationGateway->searchReservations('IdClient', (string)$idClient, $filtre);
+    $this->afficherVue('reservation', $dVueErreur, $results, 'user');
+}
 
     private function afficherVue(string $vueKey, array $dVueErreur, ?array $results = null, string $role = 'user')
     {
