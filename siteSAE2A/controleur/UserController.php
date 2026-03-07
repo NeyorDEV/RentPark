@@ -368,23 +368,20 @@ class UserController
     {
         $reservationGateway = new \modele\ReservationGateway($this->connection);
         
-        // 1. Récupération des infos de session
         $role = $_SESSION['role'] ?? 'user';
         $idClient = $_SESSION['idClient'] ?? 0; 
-        $filtre = $_GET['filtre'] ?? 'toutes';
         
-        // 2. Vérification du rôle (trim et strtolower par sécurité si la base de données a des espaces ou majuscules)
+        // Nettoyage des variables GET
+        $filtre = $_GET['filtre'] ?? 'toutes';
+        $champ = $_GET['champ'] ?? 'idContrat';
+        $q = trim($_GET['q'] ?? ''); // <-- Le trim() ici est très important !
+        
         if (strtolower(trim($role)) === 'admin') {
-            // Si c'est un admin, on prend en compte la barre de recherche (ou on affiche tout)
-            $champ = $_GET['champ'] ?? 'idContrat';
-            $q = $_GET['q'] ?? '';
             $results = $reservationGateway->searchReservations($champ, $q, $filtre);
         } else {
-            // Si c'est un client classique, on bloque la recherche sur son propre ID
             $results = $reservationGateway->searchReservations('IdClient', (string)$idClient, $filtre);
         }
         
-        // 3. On passe bien la variable $role à la vue, et non le texte 'user' en dur !
         $this->afficherVue('reservation', $dVueErreur, $results, $role);
     }
 

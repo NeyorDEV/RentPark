@@ -37,7 +37,12 @@ class ReservationGateway {
                 WHERE ".implode(' AND ', $where)."
                 ORDER BY DateDebut DESC";
 
-        $this->connection->executeQuery($sql, $params);
+        if (empty($params)) {
+            $this->connection->executeQuery($sql);
+        } else {
+            $this->connection->executeQuery($sql, $params);
+        }
+        
         return $this->connection->getResults();
     }
 
