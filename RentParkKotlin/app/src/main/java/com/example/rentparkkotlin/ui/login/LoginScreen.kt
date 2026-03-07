@@ -41,8 +41,6 @@ fun LoginScreen(
             .background(Color(0xFF0F0F0F)),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Header("Connexion")
-
         Spacer(modifier = Modifier.height(60.dp))
 
         // Carte de connexion

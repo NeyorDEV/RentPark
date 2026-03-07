@@ -153,20 +153,21 @@ class UserController
 
     }
 
-    public function connection(array $dVueErreur)
+    public function connection(array &$dVueErreur)
     {
         global $role;
         $username = $_POST['username'] ?? '';
         $password = $_POST['password'] ?? '';
         $savepass = $this->userGateway->getHashPass($username, $password);
         $role = $this->userGateway->getRole($username);
+        $clientId = $this->userGateway->getClientId($username);
         Validation::val_connection($username, $password, $savepass, $dVueErreur);
 
 
         session_regenerate_id(true);
         $_SESSION['username'] = $username;
         $_SESSION['role'] = $role;
-
+        $_SESSION['idClient'] = $clientId;
         
 
 
@@ -364,13 +365,25 @@ class UserController
     }
 
     public function listeReservation(array $dVueErreur = [])
-{
-    $reservationGateway = new \modele\ReservationGateway($this->connection);
-    $idClient = $_SESSION['idClient'] ?? 0; 
-    $filtre = $_GET['filtre'] ?? 'toutes';
-    $results = $reservationGateway->searchReservations('Client', (string)$idClient, $filtre);
-    $this->afficherVue('reservation', $dVueErreur, $results, 'user');
-}
+    {
+        $reservationGateway = new \modele\ReservationGateway($this->connection);
+        
+        $role = $_SESSION['role'] ?? 'user';
+        $idClient = $_SESSION['idClient'] ?? 0; 
+        
+        // Nettoyage des variables GET
+        $filtre = $_GET['filtre'] ?? 'toutes';
+        $champ = $_GET['champ'] ?? 'idContrat';
+        $q = trim($_GET['q'] ?? ''); // <-- Le trim() ici est très important !
+        
+        if (strtolower(trim($role)) === 'admin') {
+            $results = $reservationGateway->searchReservations($champ, $q, $filtre);
+        } else {
+            $results = $reservationGateway->searchReservations('IdClient', (string)$idClient, $filtre);
+        }
+        
+        $this->afficherVue('reservation', $dVueErreur, $results, $role);
+    }
 
     private function afficherVue(string $vueKey, array $dVueErreur, ?array $results = null, string $role = 'user')
     {

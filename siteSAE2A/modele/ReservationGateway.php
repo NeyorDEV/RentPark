@@ -8,7 +8,7 @@ class ReservationGateway {
         $this->connection = $connection;
     }   
 
-    
+
     public function searchReservations(string $champ, string $q, string $filtre): array {
         $where  = [];
         $params = [];
@@ -17,13 +17,13 @@ class ReservationGateway {
         switch ($filtre) {
             case 'a-venir': $where[] = "DateDebut > CURDATE()"; break;
             case 'passees': $where[] = "DateFin   < CURDATE()"; break;
-            case 'toutes':  $where[] = "1";                     break;
+            case 'toutes':  $where[] = "1"; break;
             default:        $where[] = "CURDATE() BETWEEN DateDebut AND DateFin";
         }
 
         // recherche
         if ($q !== '') { // id de contrat ou de client
-            if ($champ === 'idContrat' || $champ === 'Client') {
+            if ($champ === 'idContrat' || $champ === 'IdClient') {
                 $where[] = "$champ = :qnum";
                 $params[':qnum'] = [ (int)$q, \PDO::PARAM_INT ];
             } else { // Vehicule (VIN)
@@ -37,7 +37,12 @@ class ReservationGateway {
                 WHERE ".implode(' AND ', $where)."
                 ORDER BY DateDebut DESC";
 
-        $this->connection->executeQuery($sql, $params);
+        if (empty($params)) {
+            $this->connection->executeQuery($sql);
+        } else {
+            $this->connection->executeQuery($sql, $params);
+        }
+        
         return $this->connection->getResults();
     }
 

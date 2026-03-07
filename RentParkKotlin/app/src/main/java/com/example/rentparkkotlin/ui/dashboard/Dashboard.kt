@@ -33,11 +33,8 @@ fun DashboardScreen(viewModel: DashboardViewModel = viewModel()) {
     val cards = viewModel.cards
     val isLoading = viewModel.isLoading
 
-    Scaffold(
-        topBar = {
-            Header("Tableau de Bord")
-        }
-    ) { innerPadding ->
+    Scaffold() {
+        innerPadding ->
 
         if (isLoading) {
             Box(modifier = Modifier.fillMaxSize().padding(innerPadding), contentAlignment = Alignment.Center) {
@@ -54,8 +51,7 @@ fun DashboardScreen(viewModel: DashboardViewModel = viewModel()) {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 items(cards) { card ->
-                    Card(
-                        modifier = Modifier
+                    Card(modifier = Modifier
                             .fillMaxWidth()
                             .heightIn(min = 150.dp),
                         shape = RoundedCornerShape(16.dp),

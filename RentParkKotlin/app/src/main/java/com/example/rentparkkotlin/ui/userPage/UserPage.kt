@@ -55,7 +55,6 @@ fun UserManagementScreen() {
             .background(DarkBackground)
             .padding(16.dp)
     ) {
-        Header("Utilisateurs")
         Row(
             modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
