@@ -16,6 +16,7 @@ import com.example.rentparkkotlin.ui.carsPage.CarListScreen
 import com.example.rentparkkotlin.ui.contratsPage.ContratsScreen
 import com.example.rentparkkotlin.ui.header.Header
 import com.example.rentparkkotlin.ui.dashboard.DashboardScreen
+import com.example.rentparkkotlin.ui.header.MainScreen
 import com.example.rentparkkotlin.ui.homeCustomer.RentParkHomeScreen
 import com.example.rentparkkotlin.ui.planning.PlanningScreen
 
@@ -57,7 +58,9 @@ class MainActivity : ComponentActivity() {
                     //    }
                     //)
 
-                    DashboardScreen()
+                    MainScreen(title = "Rentpark") {
+                        DashboardScreen() // Le contenu de la page s'affiche ici
+                    }
                 }
             }
         }

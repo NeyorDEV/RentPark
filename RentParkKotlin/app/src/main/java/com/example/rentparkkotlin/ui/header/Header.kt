@@ -1,6 +1,6 @@
 package com.example.rentparkkotlin.ui.header
 
-import android.R.attr.top
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,11 +11,20 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.ModalDrawerSheet
+import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -27,48 +36,61 @@ import androidx.compose.ui.unit.sp
 import com.example.rentparkkotlin.R
 import com.example.rentparkkotlin.ui.theme.BlackTheme
 import com.example.rentparkkotlin.ui.theme.Orange
+import kotlinx.coroutines.launch
 
 // Header commun à toutes les pages de rentpark (au moins les pages admin)
 
 @Composable
-fun Header(title: String) {
-    Column() {
-        Spacer(modifier = Modifier.fillMaxWidth().height(22.dp).background(color = Orange))
+fun Header(title: String, onMenuClick: () -> Unit) {
+    Column {
+        Spacer(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(22.dp)
+                .background(color = Orange)
+        )
+
         Surface(
             color = BlackTheme,
-            shadowElevation = 4.dp // Ajoute une légère ombre pour décoller du contenu
+            shadowElevation = 4.dp
         ) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(64.dp), // Hauteur standard Android pour les TopBar
+                    .height(64.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Section gauche : Menu
-                Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.CenterStart) {
-                    MenuBurger()
+                Box(
+                    modifier = Modifier.weight(1f),
+                    contentAlignment = Alignment.CenterStart
+                ) {
+                    IconButton(
+                        onClick = onMenuClick, // C'est ici que l'action est liée
+                        modifier = Modifier.padding(start = 8.dp)
+                    ) {
+                        MenuBurger()
+                    }
                 }
 
-                // Section centrale : Titre (Réellement centré)
-                Box(modifier = Modifier.weight(3f), contentAlignment = Alignment.Center) {
+                Box(
+                    modifier = Modifier.weight(3f),
+                    contentAlignment = Alignment.Center
+                ) {
                     Text(
                         text = title,
                         color = Color.White,
                         fontFamily = MaPoliceCustom,
-                        fontSize = 35.sp, // 35sp était trop gros, ça va tronquer sur les petits écrans
+                        fontSize = 28.sp,
                         fontWeight = FontWeight.ExtraBold,
                         textAlign = TextAlign.Center,
-                        modifier = Modifier.padding(top = 6.dp)
+                        modifier = Modifier.padding(top = 4.dp)
                     )
                 }
-
-                // Section droite : Vide (pour équilibrer le titre au milieu)
                 Spacer(modifier = Modifier.weight(1f))
             }
         }
     }
 }
-
 val MaPoliceCustom = FontFamily(
     Font(R.font.fortnite, FontWeight.Normal),
     Font(R.font.fortnite, FontWeight.Bold)
@@ -77,5 +99,63 @@ val MaPoliceCustom = FontFamily(
 @Preview(showBackground = true)
 @Composable
 fun HeaderPreview() {
-    Header("RentPark")
+    Header(
+        title = "RentPark",
+        onMenuClick = { /* Ne rien mettre ici */ }
+    )
+}
+
+// Dans Header.kt
+
+// Dans Header.kt (Extrait des modifications)
+
+@Composable
+fun MainScreen(title: String, content: @Composable () -> Unit) { // Ajout du paramètre content
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    val scope = rememberCoroutineScope()
+
+    ModalNavigationDrawer(
+        drawerState = drawerState,
+        gesturesEnabled = true,
+        drawerContent = {
+            ModalDrawerSheet(
+                modifier = Modifier.fillMaxWidth(0.75f).fillMaxHeight(), // 3/4 de l'écran
+                drawerContainerColor = BlackTheme,
+                drawerShape = RoundedCornerShape(topEnd = 16.dp, bottomEnd = 16.dp)
+            ) {
+                // --- CONTENU DU MENU DE NAVIGATION ---
+                Text(
+                    "Navigation",
+                    color = Orange,
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(24.dp)
+                )
+                // Ajoutez vos boutons ici (ex: Profil, Paramètres, Déconnexion)
+            }
+        }
+    ) {
+        val blurRadius by animateDpAsState(
+            targetValue = if (drawerState.isOpen) 12.dp else 0.dp, // Effet de flou
+            label = "blurAnimation"
+        )
+
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .blur(blurRadius)
+        ) {
+            Column {
+                Header(
+                    title = title,
+                    onMenuClick = {
+                        scope.launch { drawerState.open() }
+                    }
+                )
+                Box(modifier = Modifier.fillMaxSize()) {
+                    content() // Affiche la page passée en paramètre
+                }
+            }
+        }
+    }
 }

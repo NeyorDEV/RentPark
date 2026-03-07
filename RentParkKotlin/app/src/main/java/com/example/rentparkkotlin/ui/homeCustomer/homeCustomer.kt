@@ -46,9 +46,6 @@ fun RentParkHomeScreen() {
             )
         }
 
-        // --- 2. Interface de Navigation (Top Bar) ---
-        Header("RentPark")
-
         // --- 3. Contenu Central ---
         Column(
             modifier = Modifier

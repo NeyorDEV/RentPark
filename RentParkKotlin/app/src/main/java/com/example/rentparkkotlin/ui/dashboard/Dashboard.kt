@@ -66,11 +66,8 @@ fun DashboardScreen() {
         )
     )
 
-    Scaffold(
-        topBar = {
-            Header("Tableau de Bord")
-        }
-    ) { innerPadding ->
+    Scaffold()
+    { innerPadding ->
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()

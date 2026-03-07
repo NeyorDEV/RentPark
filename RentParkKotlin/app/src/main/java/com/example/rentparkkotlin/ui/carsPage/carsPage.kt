@@ -48,9 +48,6 @@ fun CarListScreen(
             .fillMaxSize()
             .background(Color(0xFFF8F9FA))
     ) {
-
-        Header("Liste des voitures")
-        // 1. Barre de Recherche
         Box(
             modifier = Modifier
                 .fillMaxWidth()
