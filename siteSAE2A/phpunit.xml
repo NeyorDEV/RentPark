@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit bootstrap="vendor/autoload.php" cacheDirectory=".phpunit.cache" colors="true">
+    <testsuites>
+        <testsuite name="valid">
+            <directory>tests/valid</directory>
+        </testsuite>
+        <testsuite name="modeles">
+            <directory>tests/modeles</directory>
+        </testsuite>
+        <testsuite name="gateways">
+            <directory>tests/gateways</directory>
+        </testsuite>
+        <testsuite name="controleurs">
+            <directory>tests/controleurs</directory>
+        </testsuite>
+    </testsuites>
+
+    <source>
+        <include>
+            <directory>config</directory>
+            <directory>modele</directory>
+            <directory>controleur</directory>
+        </include>
+    </source>
+</phpunit>
