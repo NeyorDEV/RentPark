@@ -49,7 +49,7 @@ class MainActivity : ComponentActivity() {
                         // Si c'est un admin ou employé -> Dashboard, sinon -> Accueil Client
                         if (role == "admin" || role == "employe") "dashboard" else "homeCustomer"
                     } else {
-                        "login"
+                        "photoDevice"
                     }
 
                     // 3. Configuration du routeur (NavHost)
@@ -90,6 +90,11 @@ class MainActivity : ComponentActivity() {
                         // Route : Accueil Client
                         composable("homeCustomer") {
                             RentParkHomeScreen()
+                        }
+                        composable("photoDevice") {
+                            PhotoDeviceScreen(
+                                onNavigateBack = { navController.popBackStack() }
+                            )
                         }
 
                         // Ajoutez vos autres routes ici plus tard
