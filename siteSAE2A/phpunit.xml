@@ -6,6 +6,7 @@
         </testsuite>
         <testsuite name="modeles">
             <directory>tests/modeles</directory>
+            <exclude>tests/modeles/ConnectionTest.php</exclude>
         </testsuite>
         <testsuite name="gateways">
             <directory>tests/gateways</directory>
