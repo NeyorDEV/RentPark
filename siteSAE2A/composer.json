@@ -11,8 +11,5 @@
              "config\\": "config/",
              "modele\\": "modele/"
         }
-    },
-    "require-dev": {
-        "phpunit/phpunit": "*"
     }
 }

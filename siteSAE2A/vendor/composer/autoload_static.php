@@ -19,31 +19,31 @@ class ComposerStaticInit6a6772df2521c6860a448e9115f2793a
     );
 
     public static $prefixLengthsPsr4 = array (
-        'm' => 
+        'm' =>
         array (
             'modele\\' => 7,
         ),
-        'c' => 
+        'c' =>
         array (
             'controleur\\' => 11,
             'config\\' => 7,
         ),
-        'T' => 
+        'T' =>
         array (
             'Twig\\' => 5,
         ),
-        'S' => 
+        'S' =>
         array (
             'Symfony\\Polyfill\\Mbstring\\' => 26,
             'Symfony\\Polyfill\\Ctype\\' => 23,
         ),
-        'P' => 
+        'P' =>
         array (
             'Psr\\Http\\Message\\' => 17,
             'Psr\\Http\\Client\\' => 16,
             'PHPMailer\\PHPMailer\\' => 20,
         ),
-        'G' => 
+        'G' =>
         array (
             'GuzzleHttp\\Psr7\\' => 16,
             'GuzzleHttp\\Promise\\' => 19,
@@ -52,52 +52,52 @@ class ComposerStaticInit6a6772df2521c6860a448e9115f2793a
     );
 
     public static $prefixDirsPsr4 = array (
-        'modele\\' => 
+        'modele\\' =>
         array (
             0 => __DIR__ . '/../..' . '/modele',
         ),
-        'controleur\\' => 
+        'controleur\\' =>
         array (
             0 => __DIR__ . '/../..' . '/controleur',
         ),
-        'config\\' => 
+        'config\\' =>
         array (
             0 => __DIR__ . '/../..' . '/config',
         ),
-        'Twig\\' => 
+        'Twig\\' =>
         array (
             0 => __DIR__ . '/..' . '/twig/twig/src',
         ),
-        'Symfony\\Polyfill\\Mbstring\\' => 
+        'Symfony\\Polyfill\\Mbstring\\' =>
         array (
             0 => __DIR__ . '/..' . '/symfony/polyfill-mbstring',
         ),
-        'Symfony\\Polyfill\\Ctype\\' => 
+        'Symfony\\Polyfill\\Ctype\\' =>
         array (
             0 => __DIR__ . '/..' . '/symfony/polyfill-ctype',
         ),
-        'Psr\\Http\\Message\\' => 
+        'Psr\\Http\\Message\\' =>
         array (
             0 => __DIR__ . '/..' . '/psr/http-factory/src',
             1 => __DIR__ . '/..' . '/psr/http-message/src',
         ),
-        'Psr\\Http\\Client\\' => 
+        'Psr\\Http\\Client\\' =>
         array (
             0 => __DIR__ . '/..' . '/psr/http-client/src',
         ),
-        'PHPMailer\\PHPMailer\\' => 
+        'PHPMailer\\PHPMailer\\' =>
         array (
             0 => __DIR__ . '/..' . '/phpmailer/phpmailer/src',
         ),
-        'GuzzleHttp\\Psr7\\' => 
+        'GuzzleHttp\\Psr7\\' =>
         array (
             0 => __DIR__ . '/..' . '/guzzlehttp/psr7/src',
         ),
-        'GuzzleHttp\\Promise\\' => 
+        'GuzzleHttp\\Promise\\' =>
         array (
             0 => __DIR__ . '/..' . '/guzzlehttp/promises/src',
         ),
-        'GuzzleHttp\\' => 
+        'GuzzleHttp\\' =>
         array (
             0 => __DIR__ . '/..' . '/guzzlehttp/guzzle/src',
         ),
