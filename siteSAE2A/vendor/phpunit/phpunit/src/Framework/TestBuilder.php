@@ -11,6 +11,8 @@ namespace PHPUnit\Framework;
 
 use function array_merge;
 use function assert;
+use function sprintf;
+use PHPUnit\Event\Facade as EventFacade;
 use PHPUnit\Metadata\Api\DataProvider;
 use PHPUnit\Metadata\Api\Groups;
 use PHPUnit\Metadata\Api\ProvidedData;
@@ -62,6 +64,7 @@ final readonly class TestBuilder
                 $data,
                 $this->shouldTestMethodBeRunInSeparateProcess($className, $methodName),
                 $this->shouldGlobalStateBePreserved($className, $methodName),
+                $this->shouldAllTestMethodsOfTestClassBeRunInSingleSeparateProcess($className),
                 $this->backupSettings($className, $methodName),
                 $groups,
             );
@@ -73,6 +76,7 @@ final readonly class TestBuilder
             $test,
             $this->shouldTestMethodBeRunInSeparateProcess($className, $methodName),
             $this->shouldGlobalStateBePreserved($className, $methodName),
+            $this->shouldAllTestMethodsOfTestClassBeRunInSingleSeparateProcess($className),
             $this->backupSettings($className, $methodName),
         );
 
@@ -86,7 +90,7 @@ final readonly class TestBuilder
      * @param array{backupGlobals: ?true, backupGlobalsExcludeList: list<string>, backupStaticProperties: ?true, backupStaticPropertiesExcludeList: array<string,list<string>>} $backupSettings
      * @param list<non-empty-string>                                                                                                                                            $groups
      */
-    private function buildDataProviderTestSuite(string $methodName, string $className, array $data, bool $runTestInSeparateProcess, ?bool $preserveGlobalState, array $backupSettings, array $groups): DataProviderTestSuite
+    private function buildDataProviderTestSuite(string $methodName, string $className, array $data, bool $runTestInSeparateProcess, ?bool $preserveGlobalState, bool $runClassInSeparateProcess, array $backupSettings, array $groups): DataProviderTestSuite
     {
         $dataProviderTestSuite = DataProviderTestSuite::empty(
             $className . '::' . $methodName,
@@ -106,6 +110,7 @@ final readonly class TestBuilder
                 $_test,
                 $runTestInSeparateProcess,
                 $preserveGlobalState,
+                $runClassInSeparateProcess,
                 $backupSettings,
             );
 
@@ -118,10 +123,14 @@ final readonly class TestBuilder
     /**
      * @param array{backupGlobals: ?true, backupGlobalsExcludeList: list<string>, backupStaticProperties: ?true, backupStaticPropertiesExcludeList: array<string,list<string>>} $backupSettings
      */
-    private function configureTestCase(TestCase $test, bool $runTestInSeparateProcess, ?bool $preserveGlobalState, array $backupSettings): void
+    private function configureTestCase(TestCase $test, bool $runTestInSeparateProcess, ?bool $preserveGlobalState, bool $runClassInSeparateProcess, array $backupSettings): void
     {
         if ($runTestInSeparateProcess) {
             $test->setRunTestInSeparateProcess(true);
+        }
+
+        if ($runClassInSeparateProcess) {
+            $test->setRunClassInSeparateProcess(true);
         }
 
         if ($preserveGlobalState !== null) {
@@ -267,6 +276,25 @@ final readonly class TestBuilder
         }
 
         return false;
+    }
+
+    /**
+     * @param class-string<TestCase> $className
+     */
+    private function shouldAllTestMethodsOfTestClassBeRunInSingleSeparateProcess(string $className): bool
+    {
+        $result = MetadataRegistry::parser()->forClass($className)->isRunClassInSeparateProcess()->isNotEmpty();
+
+        if ($result) {
+            EventFacade::emitter()->testRunnerTriggeredPhpunitDeprecation(
+                sprintf(
+                    'Class %s uses the #[RunClassInSeparateProcess]. This attribute is deprecated and will be removed in PHPUnit 13',
+                    $className,
+                ),
+            );
+        }
+
+        return $result;
     }
 
     /**

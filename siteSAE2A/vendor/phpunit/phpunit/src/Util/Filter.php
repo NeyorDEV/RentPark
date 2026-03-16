@@ -9,7 +9,6 @@
  */
 namespace PHPUnit\Util;
 
-use function array_any;
 use function array_unshift;
 use function defined;
 use function in_array;
@@ -125,9 +124,12 @@ final readonly class Filter
      */
     private static function frameExists(array $trace, string $file, int $line): bool
     {
-        return array_any(
-            $trace,
-            static fn (array $frame) => isset($frame['file'], $frame['line']) && $frame['file'] === $file && $frame['line'] === $line,
-        );
+        foreach ($trace as $frame) {
+            if (isset($frame['file'], $frame['line']) && $frame['file'] === $file && $frame['line'] === $line) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

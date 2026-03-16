@@ -14,10 +14,10 @@ use XMLWriter;
 /**
  * @internal This class is not covered by the backward compatibility promise for phpunit/php-code-coverage
  */
-final readonly class Coverage
+final class Coverage
 {
-    private XMLWriter $xmlWriter;
-    private string $line;
+    private readonly XMLWriter $xmlWriter;
+    private readonly string $line;
 
     public function __construct(
         XMLWriter $xmlWriter,

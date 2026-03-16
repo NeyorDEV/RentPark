@@ -14,6 +14,7 @@ use function assert;
 use function end;
 use function explode;
 use function fclose;
+use function is_array;
 use function is_dir;
 use function is_resource;
 use function proc_close;
@@ -62,7 +63,7 @@ final readonly class Version
 
         $git = $this->getGitInformation($path);
 
-        if ($git === false) {
+        if (!$git) {
             return $version;
         }
 
@@ -77,8 +78,6 @@ final readonly class Version
 
     /**
      * @param non-empty-string $path
-     *
-     * @return false|non-empty-string
      */
     private function getGitInformation(string $path): false|string
     {
@@ -100,6 +99,7 @@ final readonly class Version
             return false;
         }
 
+        assert(is_array($pipes));
         assert(isset($pipes[1]) && is_resource($pipes[1]));
         assert(isset($pipes[2]) && is_resource($pipes[2]));
 
@@ -113,8 +113,6 @@ final readonly class Version
         if ($returnCode !== 0) {
             return false;
         }
-
-        assert($result !== '');
 
         return $result;
     }

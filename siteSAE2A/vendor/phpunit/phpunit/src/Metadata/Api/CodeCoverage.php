@@ -10,6 +10,7 @@
 namespace PHPUnit\Metadata\Api;
 
 use function assert;
+use PHPUnit\Event\Facade as EventFacade;
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Metadata\CoversClass;
 use PHPUnit\Metadata\CoversClassesThatExtendClass;
@@ -148,9 +149,20 @@ final class CodeCoverage
 
     public function shouldCodeCoverageBeCollectedFor(TestCase $test): bool
     {
-        $parser = Registry::parser();
+        $className  = $test::class;
+        $methodName = $test->name();
+        $parser     = Registry::parser();
 
-        if ($parser->forClass($test::class)->isCoversNothing()->isNotEmpty()) {
+        if ($parser->forMethod($className, $methodName)->isCoversNothing()->isNotEmpty()) {
+            EventFacade::emitter()->testTriggeredPhpunitDeprecation(
+                $test->valueObjectForEvents(),
+                'Using #[CoversNothing] on a test method is deprecated, support for this will be removed in PHPUnit 13',
+            );
+
+            return false;
+        }
+
+        if ($parser->forClass($className)->isCoversNothing()->isNotEmpty()) {
             return false;
         }
 

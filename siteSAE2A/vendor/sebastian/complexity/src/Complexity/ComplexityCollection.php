@@ -66,7 +66,7 @@ final readonly class ComplexityCollection implements Countable, IteratorAggregat
 
     public function isEmpty(): bool
     {
-        return $this->items === [];
+        return empty($this->items);
     }
 
     /**

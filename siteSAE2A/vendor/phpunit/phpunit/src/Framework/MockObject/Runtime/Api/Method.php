@@ -27,7 +27,6 @@ trait Method
         return $this
             ->__phpunit_getInvocationHandler()
             ->expects(new AnyInvokedCount)
-            ->method($constraint)
-            ->markAsCreatedWithoutExplicitExpects();
+            ->method($constraint);
     }
 }

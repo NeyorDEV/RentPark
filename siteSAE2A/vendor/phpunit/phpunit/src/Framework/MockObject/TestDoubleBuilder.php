@@ -68,6 +68,7 @@ abstract class TestDoubleBuilder
             $reflector = new ReflectionClass($this->type);
 
             // @codeCoverageIgnoreStart
+            /** @phpstan-ignore catch.neverThrown */
         } catch (\ReflectionException $e) {
             throw new ReflectionException(
                 $e->getMessage(),

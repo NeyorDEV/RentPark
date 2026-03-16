@@ -48,23 +48,13 @@ final class Matcher
         return !$this->invocationRule instanceof AnyInvokedCount;
     }
 
-    /**
-     * @phpstan-assert-if-true !null $this->methodNameRule
-     */
     public function hasMethodNameRule(): bool
     {
         return $this->methodNameRule !== null;
     }
 
-    /**
-     * @throws MethodNameNotConfiguredException
-     */
     public function methodNameRule(): MethodName
     {
-        if (!$this->hasMethodNameRule()) {
-            throw new MethodNameNotConfiguredException;
-        }
-
         return $this->methodNameRule;
     }
 
@@ -73,9 +63,6 @@ final class Matcher
         $this->methodNameRule = $rule;
     }
 
-    /**
-     * @phpstan-assert-if-true !null $this->parametersRule
-     */
     public function hasParametersRule(): bool
     {
         return $this->parametersRule !== null;

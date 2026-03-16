@@ -33,7 +33,7 @@ use function strstr;
 use function substr;
 use function usort;
 
-final readonly class Parser
+final class Parser
 {
     /**
      * @param list<string> $argv
@@ -65,7 +65,7 @@ final readonly class Parser
 
         reset($argv);
 
-        $argv = array_map(trim(...), $argv);
+        $argv = array_map('trim', $argv);
 
         while (false !== $arg = current($argv)) {
             $i = key($argv);
@@ -167,8 +167,6 @@ final readonly class Parser
         $count          = count($longOptions);
         $list           = explode('=', $argument);
         $option         = $list[0];
-        $optionLength   = strlen($option);
-        $similarOptions = [];
         $optionArgument = null;
 
         if (count($list) > 1) {
@@ -176,12 +174,15 @@ final readonly class Parser
             $optionArgument = $list[1];
         }
 
+        $optionLength = strlen($option);
+
+        $similarOptions = [];
+
         foreach ($longOptions as $i => $longOption) {
             $similarOptions[] = [
                 levenshtein($longOption, $option),
                 '--' . rtrim($longOption, '='),
             ];
-
             $opt_start = substr($longOption, 0, $optionLength);
 
             if ($opt_start !== $option) {
@@ -194,7 +195,8 @@ final readonly class Parser
                 $i + 1 < $count &&
                 $option[0] !== '=' &&
                 /** @phpstan-ignore offsetAccess.notFound */
-                str_starts_with($longOptions[$i + 1], $option)) {
+                str_starts_with($longOptions[$i + 1], $option)
+            ) {
                 $candidates = [];
 
                 foreach ($longOptions as $aLongOption) {
@@ -234,10 +236,10 @@ final readonly class Parser
      */
     private function formatSimilarOptions(array $similarOptions): array
     {
-        usort(
-            $similarOptions,
-            static fn (array $a, array $b): int => $a[0] <=> $b[0],
-        );
+        usort($similarOptions, static function (array $a, array $b)
+        {
+            return $a[0] <=> $b[0];
+        });
 
         $similarFormatted = [];
 

@@ -21,8 +21,8 @@ final class TestDoubleState
      */
     private readonly array $configurableMethods;
     private readonly bool $generateReturnValues;
-    private readonly bool $isMockObject;
     private ?InvocationHandler $invocationHandler = null;
+    private readonly bool $isMockObject;
 
     /**
      * @param list<ConfigurableMethod> $configurableMethods

@@ -12,7 +12,6 @@ namespace SebastianBergmann\Diff;
 use const PHP_INT_SIZE;
 use const PREG_SPLIT_DELIM_CAPTURE;
 use const PREG_SPLIT_NO_EMPTY;
-use function array_any;
 use function array_shift;
 use function array_unshift;
 use function array_values;
@@ -168,14 +167,22 @@ final class Differ
         }
 
         // two-way compare
-        if (array_any($newLineBreaks, static fn (bool $set, string $break) => !isset($oldLineBreaks[$break]))) {
-            return true;
+        foreach ($newLineBreaks as $break => $set) {
+            if (!isset($oldLineBreaks[$break])) {
+                return true;
+            }
         }
 
-        return array_any($oldLineBreaks, static fn (bool $set, string $break) => !isset($newLineBreaks[$break]));
+        foreach ($oldLineBreaks as $break => $set) {
+            if (!isset($newLineBreaks[$break])) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
-    private function getLinebreak(int|string $line): string
+    private function getLinebreak($line): string
     {
         if (!is_string($line)) {
             return '';

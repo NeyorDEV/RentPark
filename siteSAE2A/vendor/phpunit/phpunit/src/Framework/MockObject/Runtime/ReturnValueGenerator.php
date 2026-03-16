@@ -9,7 +9,6 @@
  */
 namespace PHPUnit\Framework\MockObject;
 
-use function array_all;
 use function array_map;
 use function explode;
 use function in_array;
@@ -60,7 +59,7 @@ final class ReturnValueGenerator
         }
 
         if (!$intersection) {
-            $lowerTypes = array_map(strtolower(...), $types);
+            $lowerTypes = array_map('strtolower', $types);
 
             if (in_array('', $lowerTypes, true) ||
                 in_array('null', $lowerTypes, true) ||
@@ -164,7 +163,13 @@ final class ReturnValueGenerator
      */
     private function onlyInterfaces(array $types): bool
     {
-        return array_all($types, static fn (string $type) => interface_exists($type));
+        foreach ($types as $type) {
+            if (!interface_exists($type)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -176,7 +181,7 @@ final class ReturnValueGenerator
     private function newInstanceOf(StubInternal $testStub, string $className, string $methodName): Stub
     {
         try {
-            $object    = new ReflectionClass($testStub::class)->newInstanceWithoutConstructor();
+            $object    = (new ReflectionClass($testStub::class))->newInstanceWithoutConstructor();
             $reflector = new ReflectionObject($object);
 
             $reflector->getProperty('__phpunit_state')->setValue(
