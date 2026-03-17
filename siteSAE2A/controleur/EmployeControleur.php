@@ -8,6 +8,8 @@ use GuzzleHttp\Client;
 use config\Validation;
 use GuzzleHttp\Exception\RequestException;
 
+require_once __DIR__ . '/ApiHelper.php';
+
 class EmployeControleur
 {
     use RoleAwareTrait;
@@ -35,10 +37,7 @@ class EmployeControleur
             $this->userGateway = new UserGateway($this->connection);
             $this->reservationGateway = new ReservationGateway($this->connection);
 
-            $this->apiClient = new Client([
-                'base_uri' => 'http://localhost:8880/',
-                'timeout' => 2.0
-            ]);
+            $this->apiClient = getApiClient();
 
 
             switch ($action) {
@@ -74,41 +73,59 @@ class EmployeControleur
 
 
     private function ajouterVoiture(array $dVueEreur)
-    {
+{
+    $imagePath = '';
 
-        $imagePath = '';
-        if (isset($_FILES['image']) && $_FILES['image']['error'] === 0) {
-            $nomTemp = $_FILES['image']['tmp_name'];
-            $nomFichier = uniqid() . '_' . basename($_FILES['image']['name']);
-            $dossier = __DIR__ . '/../html/icons/' . $nomFichier;
-
-            if (move_uploaded_file($nomTemp, $dossier)) {
-                $imagePath = 'html/icons/' . $nomFichier;
-            }
+    var_dump($_FILES);
+    die();
+    if (isset($_FILES['image']) && $_FILES['image']['error'] === 0) {
+        $nomFichier = uniqid() . '_' . basename($_FILES['image']['name']);
+        $dossier = __DIR__ . '/../html/icons/' . $nomFichier;
+        if (move_uploaded_file($_FILES['image']['tmp_name'], $dossier)) {
+            $imagePath = 'html/icons/' . $nomFichier;
         }
-
-        $modele = $_POST['modele'] ?? '';
-        $couleur = $_POST['couleur'] ?? '';
-        $puissance = $_POST['puissance'] ?? '';
-
-
-        Validation::val_voiture($modele, $couleur, $puissance, $dVueEreur);
-
-        if (empty($dVueEreur)) {
-            $this->gateway->add($modele, $couleur, $puissance, $imagePath);
-            header("Location: /sitesae2A/voitures");
-            exit;
-        }
-
-        $results = $this->gateway->getAll();
-        $this->afficherVue('flotte', $dVueEreur, $results);
     }
+
+    try {
+        $this->apiClient->post("api/vehicules", [
+            'json' => [
+                'NumSerie'                    => $_POST['NumSerie'],
+                'Energie'                     => $_POST['Energie'],
+                'NbPlaces'                    => (int)$_POST['NbPlaces'],
+                'Categorie'                   => $_POST['Categorie'],
+                'Transmission'                => $_POST['Transmission'],
+                'Boite'                       => $_POST['Boite'],
+                'Etat'                        => $_POST['Etat'] ?? 'Libre',
+                'Puissance'                   => $_POST['Puissance'],
+                'Marque'                      => $_POST['Marque'],
+                'Nom'                         => $_POST['Nom'],
+                'Annee'                       => (int)$_POST['Annee'],
+                'IdAssureur'                  => (int)$_POST['IdAssureur'],
+                'IdFournisseur'               => (int)$_POST['IdFournisseur'],
+                'Prix'                        => $_POST['Prix'] ?? null,
+                'DateAchat'                   => $_POST['DateAchat'],
+                'DateExpirationControleTech'  => $_POST['DateExpirationControleTech'],
+                'DateDernierControleTech'     => $_POST['DateDernierControleTech'],
+                'ImagePath'                   => $imagePath,
+                'Couleur'                     => $_POST['Couleur'] ?? null,
+            ]
+        ]);
+    } catch (RequestException $e) {
+        $dVueEreur[] = "Erreur création véhicule : " . $e->getMessage();
+        $results = [];
+        $this->afficherVue('flotte', $dVueEreur, $results);
+        return;
+    }
+
+    header("Location: /siteSAE2A/voitures");
+    exit;
+}
 
     private function supprimerVoiture(array $dVueEreur)
     {
         $id = ($_POST['NumSerie'] ?? -1);
         try {
-            $this->apiClient->delete("/voitures/$id");
+            $this->apiClient->delete("api/vehicules/$id");
         } catch (RequestException $e) {
             $dVueEreur[] = "Erreur lors de la suppression via l’API.";
         }
@@ -117,41 +134,66 @@ class EmployeControleur
     }
 
     private function modifierVoiture(array $dVueEreur)
-    {
-        $id = (int) ($_POST['id'] ?? 0);
-        $modele = $_POST['modele'] ?? '';
-        $couleur = $_POST['couleur'] ?? '';
-        $puissance = $_POST['puissance'] ?? '';
+{
+    $numSerie = $_POST['NumSerie'] ?? '';
+    
+    $data = [
+        'Prix'                       => $_POST['Prix'] ?? null,
+        'Energie'                    => $_POST['Energie'] ?? null,
+        'Boite'                      => $_POST['Boite'] ?? null,
+        'Etat'                       => $_POST['Etat'] ?? null,
+        'Couleur'                    => $_POST['Couleur'] ?? null,
+        'Puissance'                  => $_POST['Puissance'] ?? null,
+        'Categorie'                  => $_POST['Categorie'] ?? null,
+        'Transmission'               => $_POST['Transmission'] ?? null,
+        'DateExpirationControleTech' => $_POST['DateExpirationControleTech'] ?? null,
+        'DateDernierControleTech'    => $_POST['DateDernierControleTech'] ?? null,
+    ];
 
-        Validation::val_voiture($modele, $couleur, $puissance, $dVueEreur);
-
-        if (empty($dVueEreur) && $id > 0) {
-
-            $this->gateway->update($id, $modele, $couleur, $puissance);
-            header("Location: /sitesae2A/voitures");
-            exit;
+    // Gestion image si fournie
+    if (isset($_FILES['image']) && $_FILES['image']['error'] === 0) {
+        $nomFichier = uniqid() . '_' . basename($_FILES['image']['name']);
+        $dossier = __DIR__ . '/../html/icons/' . $nomFichier;
+        if (move_uploaded_file($_FILES['image']['tmp_name'], $dossier)) {
+            $data['ImagePath'] = 'html/icons/' . $nomFichier;
         }
-        $results = $this->gateway->getAll();
-        $this->afficherVue('flotte', $dVueEreur, $results);
     }
 
-    private function rechercherVoitures(array $dVueErreur = []): void
-    {
-        $motCle = trim($_GET['q'] ?? '');
+    try {
+        $this->apiClient->put("api/vehicules/$numSerie", ['json' => $data]);
+    } catch (RequestException $e) {
+        $dVueEreur[] = "Erreur modification : " . $e->getMessage();
+    }
 
+    header("Location: /siteSAE2A/voitures");
+    exit;
+}
+
+private function rechercherVoitures(array $dVueErreur = []): void
+{
+    $motCle = trim($_GET['q'] ?? '');
+
+    try {
         if ($motCle === '') {
-            $results = $this->gateway->getAll();
-
+            $response = $this->apiClient->get('api/vehicules');
         } else {
-            $results = $this->gateway->rechercherVoitures($motCle);
-
-            if (empty($results)) {
-                $dVueErreur[] = "Aucune voiture trouvée pour \"$motCle\".";
-            }
+            $response = $this->apiClient->get('api/vehicules', [
+                'query' => ['nom' => $motCle]
+            ]);
         }
+        $results = json_decode($response->getBody()->getContents(), true);
 
-        $this->afficherVue('flotte', $dVueErreur, $results);
+        if (empty($results)) {
+            $dVueErreur[] = "Aucune voiture trouvée pour \"$motCle\".";
+            $results = [];
+        }
+    } catch (RequestException $e) {
+        $dVueErreur[] = "Erreur lors de la recherche : " . $e->getMessage();
+        $results = [];
     }
+
+    $this->afficherVue('flotte', $dVueErreur, $results);
+}
 
     private function rechercherUtilisateur(array $dVueErreur = []): void
     {
@@ -360,7 +402,7 @@ class EmployeControleur
 
 
         try {
-            $response = $this->apiClient->get('voitures');
+            $response = $this->apiClient->get('api/vehicules');
 
             $results = json_decode(
                 $response->getBody()->getContents(),

@@ -8,6 +8,8 @@ use modele\User;
 use config\Validation;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
+
+require_once __DIR__ . '/ApiHelper.php';
 class AdminControleur
 {
     use RoleAwareTrait;
@@ -36,10 +38,7 @@ class AdminControleur
             $this->reservationGateway = new ReservationGateway($this->connection);
 
             // test pour l'API
-            $this->apiClient = new Client([
-                'base_uri' => 'http://localhost:8880/',
-                'timeout' => 2.0
-            ]);
+            $this->apiClient = getApiClient();
 
 
             switch ($action) {

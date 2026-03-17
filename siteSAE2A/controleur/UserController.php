@@ -8,9 +8,12 @@ use GuzzleHttp\Exception\RequestException;
 use config\Validation;
 use modele\User;
 
+require_once __DIR__ . '/ApiHelper.php';
+
 class UserController
 {
     use RoleAwareTrait;
+    
     
     private Connection $connection;
     private VehicleGateway $gateway;
@@ -30,10 +33,7 @@ class UserController
             $this->gateway = new VehicleGateway($this->connection);
             $this->userGateway = new UserGateway($this->connection);
 
-            $this->apiClient = new Client([
-                'base_uri' => 'http://localhost:8880/',
-                'timeout' => 2.0
-            ]);
+            $this->apiClient = getApiClient();
 
 
             switch ($action) {
@@ -162,28 +162,40 @@ class UserController
     }
 
     public function connection(array &$dVueErreur)
-    {
-        $username = $_POST['username'] ?? '';
-        $password = $_POST['password'] ?? '';
-        $savepass = $this->userGateway->getHashPass($username, $password);
-        $_SESSION['role'] = $this->userGateway->getRole($username);
-        $clientId = $this->userGateway->getClientId($username);
+{
+    $username = $_POST['username'] ?? '';
+    $password = $_POST['password'] ?? '';
+    $savepass = $this->userGateway->getHashPass($username, $password);
+    $_SESSION['role'] = $this->userGateway->getRole($username);
+    $clientId = $this->userGateway->getClientId($username);
 
-        Validation::val_connection($username, $password, $savepass, $dVueErreur);
+    Validation::val_connection($username, $password, $savepass, $dVueErreur);
 
-
-        session_regenerate_id(true);
-        $_SESSION['username'] = $username;
-        $_SESSION['idClient'] = $clientId;
-        
-
-
-        if (!empty($dVueErreur)) {
-            $this->afficherVue('erreur', $dVueErreur, $results = null);
-            exit;
-        }
-
+    if (!empty($dVueErreur)) {
+        $this->afficherVue('erreur', $dVueErreur, $results = null);
+        exit;
     }
+
+    session_regenerate_id(true);
+    $_SESSION['username'] = $username;
+    $_SESSION['idClient'] = $clientId;
+
+    // Login API ici une seule fois
+    // Login API avec les credentials du client
+try {
+    $client = new Client([
+        'base_uri' => 'https://codefirst.iut.uca.fr/kubernetes/iut-inf63-projets-etudiants-rentpark/rentpark-api-pod/',
+        'timeout' => 60.0
+    ]);
+    $response = $client->post('login', [
+        'json' => ['username' => $username, 'password' => $password]
+    ]);
+    $data = json_decode($response->getBody()->getContents(), true);
+    $_SESSION['api_token'] = $data['token'];
+} catch (RequestException $e) {
+    // API down, on continue
+}
+}
 
     public function cars(array $dVueErreur)
     {
@@ -290,7 +302,7 @@ class UserController
             }
 
             // On SELECT le véhicule par son NumSerie pour garantir l'exactitude des données
-            $responseVehicule = $this->apiClient->get("voitures/$numSerie"); 
+            $responseVehicule = $this->apiClient->get("vehicules/$numSerie"); 
             $vehicule = json_decode($responseVehicule->getBody()->getContents(), true);
 
             if (!$vehicule) {
@@ -476,7 +488,7 @@ class UserController
             return;
         }
         try {
-            $response = $this->apiClient->get('voitures');
+            $response = $this->apiClient->get('api/vehicules');
 
             $results = json_decode(
                 $response->getBody()->getContents(),
@@ -498,9 +510,9 @@ class UserController
 
         try {
             if ($motCle === '') {
-                $response = $this->apiClient->get("voitures");
+                $response = $this->apiClient->get("api/vehicules");
             } else {
-                $response = $this->apiClient->get("voitures", [
+                $response = $this->apiClient->get("api/vehicules", [
                     'query' => ['nom' => $motCle]
                 ]);
             }
