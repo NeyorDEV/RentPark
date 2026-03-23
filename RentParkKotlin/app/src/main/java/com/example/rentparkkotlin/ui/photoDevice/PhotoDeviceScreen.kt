@@ -30,16 +30,19 @@ import coil.compose.AsyncImage
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.rentparkkotlin.viewmodel.PhotoViewModel
 
 const val MAX_PHOTOS = 10
 
 @Composable
 fun PhotoDeviceScreen(
     onNavigateBack: () -> Unit = {},
-    onSendPhotos: (List<Uri>) -> Unit = {}
+    onSendPhotos: (List<Uri>) -> Unit = {},
+    viewModel: PhotoViewModel = viewModel()
 ) {
     val context = LocalContext.current
-    val photos = remember { mutableStateListOf<Uri>() }
+    val photos = viewModel.photos
     var cameraUri by remember { mutableStateOf<Uri?>(null) }
     var showDialog by remember { mutableStateOf(false) }
     var permissionError by remember { mutableStateOf<String?>(null) }
@@ -48,7 +51,7 @@ fun PhotoDeviceScreen(
     val cameraLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.TakePicture()
     ) { success ->
-        if (success) cameraUri?.let { photos.add(it) }
+        if (success) cameraUri?.let { viewModel.addPhoto(it) }
     }
 
     // ── Galerie (multi-sélection) ────────────────────────────────────────────
@@ -61,7 +64,7 @@ fun PhotoDeviceScreen(
             context.contentResolver.takePersistableUriPermission(
                 uri, Intent.FLAG_GRANT_READ_URI_PERMISSION
             )
-            photos.add(uri)
+            viewModel.addPhotos(uris)
         }
     }
 
@@ -182,7 +185,7 @@ fun PhotoDeviceScreen(
                         itemsIndexed(photos) { index, uri ->
                             PhotoItem(
                                 uri = uri,
-                                onDelete = { photos.removeAt(index) }
+                                onDelete = { viewModel.removePhoto(index) }
                             )
                         }
                     }
