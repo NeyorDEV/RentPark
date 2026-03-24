@@ -13,7 +13,7 @@ stages:
 # ----------------------
 build-php:
   stage: build
-  image: php:8.2-cli
+  image: php:8.3-cli
   before_script:
     - apt-get update && apt-get install -y unzip git curl
     - curl -sS https://getcomposer.org/installer | php
