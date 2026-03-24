@@ -23,9 +23,9 @@ build-blazor:
       - Blazor/BlazorAdminRentPark/bin/Release/
     expire_in: 1 hour
 
-# ----------------------
-# SONAR SCANNER + PHP TESTS (On fusionne pour éviter l'erreur 413)
-# ----------------------
+
+
+
 sonarqube-check:
   stage: scan
   image: php:8.3-cli
@@ -35,32 +35,35 @@ sonarqube-check:
     SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"
     GIT_DEPTH: "0"
   before_script:
+    # 1. Installation des dépendances système nécessaires
     - apt-get update && apt-get install -y unzip git curl libxml2-dev
+    
+    # 2. Installation de Composer
     - curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
     
-    # Installation ET activation de Xdebug (Crucial !)
-    - pecl install xdebug && docker-php-ext-enable xdebug
-    - echo "xdebug.mode=coverage" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+    # 3. Installation de PCOV (moteur de couverture ultra-rapide)
+    - pecl install pcov && docker-php-ext-enable pcov
     
-    # Installation du Sonar Scanner
+    # 4. Installation du Sonar Scanner
     - curl -sSLo /tmp/sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-6.2.1.4610-linux-x64.zip
     - unzip /tmp/sonar-scanner.zip -d /opt
     - export PATH="/opt/sonar-scanner-6.2.1.4610-linux-x64/bin:$PATH"
+
   script:
-    # 1. Préparation PHP
+    # On entre dans le dossier PHP
     - cd siteSAE2A
+    
+    # Installation des dépendances PHP (dont PHPUnit)
     - composer install --no-interaction --prefer-dist
     
-    # 2. Exécution des tests avec génération des rapports
-    - echo "Lancement des tests PHPUnit..."
-    - php vendor/bin/phpunit --coverage-clover=../clover.xml --log-junit=../junit.xml
+    # Lancement des tests avec génération du rapport de couverture
+    # On utilise -d pcov.enabled=1 pour forcer l'activation pendant les tests
+    - php -d pcov.enabled=1 vendor/bin/phpunit --coverage-clover=../clover.xml --log-junit=../junit.xml
+    
+    # Retour à la racine pour le scan Sonar
     - cd ..
     
-    # 3. Vérification que les fichiers existent (pour le debug)
-    - ls -lh clover.xml junit.xml
-    
-    # 4. Envoi à Sonar
-    - echo "Envoi à SonarQube..."
+    # Lancement du scan SonarQube
     - sonar-scanner \
         -Dsonar.projectKey=$SONAR_PROJECT_KEY \
         -Dsonar.sources=siteSAE2A,Blazor \
@@ -69,6 +72,7 @@ sonarqube-check:
         -Dsonar.exclusions=siteSAE2A/vendor/**,Blazor/**/bin/**,Blazor/**/obj/** \
         -Dsonar.host.url=$SONAR_HOST_URL \
         -Dsonar.login=$SONAR_TOKEN
+
   allow_failure: true
   only:
     - main
