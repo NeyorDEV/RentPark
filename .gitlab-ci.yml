@@ -23,7 +23,6 @@ build-blazor:
       - Blazor/BlazorAdminRentPark/bin/Release/
     expire_in: 1 hour
 
-
 sonarqube-check:
   stage: scan
   image: php:8.3-cli
@@ -41,21 +40,20 @@ sonarqube-check:
   script:
     - cd siteSAE2A
     
-    # On réinstalle tout proprement
+    # Réinstallation propre
     - rm -rf vendor/ composer.lock
     - composer install --no-interaction --prefer-dist
     - composer dump-autoload
     
-    # Exécution des tests - On génère clover.xml pour Sonar
-    # Le "|| true" permet de ne pas stopper le job si un test échoue (pour avoir le rapport Sonar quand même)
-    - php -d pcov.enabled=1 vendor/phpunit/phpunit/phpunit --coverage-clover=../clover.xml --log-junit=../junit.xml --do-not-cache-result || echo "Tests en échec, mais on continue vers Sonar..."
+    # Exécution des tests pour générer les rapports
+    - php -d pcov.enabled=1 vendor/phpunit/phpunit/phpunit --coverage-clover=../clover.xml --log-junit=../junit.xml --do-not-cache-result tests || echo "Tests en échec, mais on continue..."
     
     - cd ..
     
-    # Lancement du scan Sonar sur le dossier PHP uniquement
+    # Lancement du scan simplifié
+    # Le scanner va lire automatiquement "sonar-project.properties" pour la clé du projet
     - |
       sonar-scanner \
-        -Dsonar.projectKey="${SONAR_PROJECT_KEY}" \
         -Dsonar.sources=siteSAE2A \
         -Dsonar.php.coverage.reportPaths=clover.xml \
         -Dsonar.php.tests.reportPath=junit.xml \
