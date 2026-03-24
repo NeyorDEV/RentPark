@@ -5,7 +5,6 @@ stages:
   - build
   - scan
   - 📦push
-  - 👨‍🚀configure-deploy
   - 🚀deploy
   - 🌐expose-service
 
@@ -103,17 +102,6 @@ push-dotnet-image:
 # ----------------------
 # DEPLOYMENT
 # ----------------------
-configure-deploy:
-  extends: .configure-deployment
-  stage: 👨‍🚀configure-deploy
-  variables:
-    CONTAINER_NAME: blazor-admin-pod
-    NAMESPACE_NAME: altixier1
-    CONTAINER_IMAGE_PATH: codefirst.iut.cca.fr/qumiotto/sae_2a_rentpark:latest
-  rules:
-    - when: manual
-  allow_failure: true
-
 deploy-my-pod:
   extends: .deploy-image
   stage: 🚀deploy
@@ -125,7 +113,6 @@ deploy-my-pod:
     NAMESPACE_NAME: altixier1
   dependencies:
     - push-dotnet-image
-    - configure-deploy
   allow_failure: true
   rules:
     - when: manual
@@ -133,12 +120,9 @@ deploy-my-pod:
 # ----------------------
 # SERVICE KUBERNETES
 # ----------------------
-# ----------------------
-# SERVICE KUBERNETES
-# ----------------------
 expose-service:
   stage: 🌐expose-service
-  image: lachlanevenson/k8s-kubectl:latest 
+  image: lachlanevenson/k8s-kubectl:latest
   dependencies:
     - deploy-my-pod
   variables:
@@ -165,10 +149,3 @@ expose-service:
   rules:
     - when: manual
   allow_failure: true
-
-
-
-    
-
-
-
