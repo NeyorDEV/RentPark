@@ -35,26 +35,32 @@ sonarqube-check:
     SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"
     GIT_DEPTH: "0"
   before_script:
-    # 1. Installation des outils nécessaires
     - apt-get update && apt-get install -y unzip git curl libxml2-dev
-    # 2. Installation de Composer
     - curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-    # 3. Installation de Xdebug (pour le coverage)
+    
+    # Installation ET activation de Xdebug (Crucial !)
     - pecl install xdebug && docker-php-ext-enable xdebug
-    # 4. Installation du Sonar Scanner CLI (puisqu'on est dans une image PHP)
+    - echo "xdebug.mode=coverage" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+    
+    # Installation du Sonar Scanner
     - curl -sSLo /tmp/sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-6.2.1.4610-linux-x64.zip
     - unzip /tmp/sonar-scanner.zip -d /opt
     - export PATH="/opt/sonar-scanner-6.2.1.4610-linux-x64/bin:$PATH"
   script:
-    # --- PARTIE PHP ---
+    # 1. Préparation PHP
     - cd siteSAE2A
     - composer install --no-interaction --prefer-dist
-    - echo "Running PHP Tests and generating coverage..."
-    - php -d xdebug.mode=coverage vendor/bin/phpunit --coverage-clover=../clover.xml --log-junit=../junit.xml
+    
+    # 2. Exécution des tests avec génération des rapports
+    - echo "Lancement des tests PHPUnit..."
+    - php vendor/bin/phpunit --coverage-clover=../clover.xml --log-junit=../junit.xml
     - cd ..
     
-    # --- PARTIE SONAR ---
-    - echo "Running Sonar Analysis..."
+    # 3. Vérification que les fichiers existent (pour le debug)
+    - ls -lh clover.xml junit.xml
+    
+    # 4. Envoi à Sonar
+    - echo "Envoi à SonarQube..."
     - sonar-scanner \
         -Dsonar.projectKey=$SONAR_PROJECT_KEY \
         -Dsonar.sources=siteSAE2A,Blazor \
@@ -66,7 +72,6 @@ sonarqube-check:
   allow_failure: true
   only:
     - main
-
 # ----------------------
 # INCLUDE & DOCKER JOBS (Inchangés)
 # ----------------------
