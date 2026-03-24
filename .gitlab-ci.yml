@@ -9,7 +9,7 @@ stages:
   - 🌐expose-service
 
 # ----------------------
-# BUILD PHP
+# BUILD PHP (prod, léger)
 # ----------------------
 build-php:
   stage: build
@@ -21,12 +21,13 @@ build-php:
   script:
     - echo "Installing PHP dependencies..."
     - cd siteSAE2A
-    - composer install --no-interaction --prefer-dist
-    - composer dump-autoload
+    - composer install --no-interaction --prefer-dist --no-dev
+    - composer dump-autoload --optimize
     - echo "PHP build done"
   artifacts:
     paths:
       - siteSAE2A/vendor/
+    expire_in: 1 hour
 
 # ----------------------
 # BUILD BLAZOR
@@ -43,6 +44,32 @@ build-blazor:
   artifacts:
     paths:
       - Blazor/BlazorAdminRentPark/bin/Release/
+    expire_in: 1 hour
+
+# ----------------------
+# PHP TESTS & COVERAGE
+# ----------------------
+php-coverage:
+  stage: scan
+  image: php:8.3-cli
+  before_script:
+    - apt-get update && apt-get install -y unzip git curl
+    - curl -sS https://getcomposer.org/installer | php
+    - mv composer.phar /usr/local/bin/composer
+  script:
+    - cd siteSAE2A
+    - composer install --no-interaction --prefer-dist
+    - php vendor/bin/phpunit --coverage-text --coverage-cobertura=coverage.xml
+  coverage: '/^\s*Lines:\s*\d+.\d+\%/'
+  artifacts:
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: siteSAE2A/coverage.xml
+    expire_in: 1 hour
+  allow_failure: true
+  only:
+    - main
 
 # ----------------------
 # SONAR SCANNER
