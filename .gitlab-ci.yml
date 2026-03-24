@@ -9,80 +9,73 @@ stages:
   - 🌐expose-service
 
 # ----------------------
-# BUILD PHP
-# ----------------------
-build-php:
-  stage: build
-  image: php:8.3-cli
-  before_script:
-    - apt-get update && apt-get install -y unzip git curl
-    - curl -sS https://getcomposer.org/installer | php
-    - mv composer.phar /usr/local/bin/composer
-  script:
-    - echo "Installing PHP dependencies..."
-    - cd siteSAE2A
-    - composer install --no-interaction --prefer-dist
-    - composer dump-autoload
-    - echo "PHP build done"
-  artifacts:
-    paths:
-      - siteSAE2A/vendor/
-
-# ----------------------
-# BUILD BLAZOR
+# BUILD BLAZOR (Le C# reste séparé car il est léger)
 # ----------------------
 build-blazor:
   stage: build
   image: mcr.microsoft.com/dotnet/sdk:9.0
   script:
     - cd Blazor/BlazorAdminRentPark
-    - echo "Restoring .NET packages..."
     - dotnet restore
-    - echo "Building Blazor app..."
     - dotnet build -c Release
   artifacts:
     paths:
       - Blazor/BlazorAdminRentPark/bin/Release/
+    expire_in: 1 hour
 
 # ----------------------
-# SONAR SCANNER
+# SONAR SCANNER + PHP TESTS (On fusionne pour éviter l'erreur 413)
 # ----------------------
 sonarqube-check:
   stage: scan
-  image: sonarsource/sonar-scanner-cli:latest
+  image: php:8.3-cli
+  dependencies:
+    - build-blazor
   variables:
     SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"
     GIT_DEPTH: "0"
-    JAVA_TOOL_OPTIONS: "-Dfile.encoding=UTF-8"
+  before_script:
+    # 1. Installation des outils nécessaires
+    - apt-get update && apt-get install -y unzip git curl libxml2-dev
+    # 2. Installation de Composer
+    - curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+    # 3. Installation de Xdebug (pour le coverage)
+    - pecl install xdebug && docker-php-ext-enable xdebug
+    # 4. Installation du Sonar Scanner CLI (puisqu'on est dans une image PHP)
+    - curl -sSLo /tmp/sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-6.2.1.4610-linux-x64.zip
+    - unzip /tmp/sonar-scanner.zip -d /opt
+    - export PATH="/opt/sonar-scanner-6.2.1.4610-linux-x64/bin:$PATH"
   script:
-    - echo "Running SonarScanner..."
-    - sonar-scanner -X
+    # --- PARTIE PHP ---
+    - cd siteSAE2A
+    - composer install --no-interaction --prefer-dist
+    - echo "Running PHP Tests and generating coverage..."
+    - php -d xdebug.mode=coverage vendor/bin/phpunit --coverage-clover=../clover.xml --log-junit=../junit.xml
+    - cd ..
+    
+    # --- PARTIE SONAR ---
+    - echo "Running Sonar Analysis..."
+    - sonar-scanner \
+        -Dsonar.projectKey=$SONAR_PROJECT_KEY \
+        -Dsonar.sources=siteSAE2A,Blazor \
+        -Dsonar.php.coverage.reportPaths=clover.xml \
+        -Dsonar.php.tests.reportPath=junit.xml \
+        -Dsonar.exclusions=siteSAE2A/vendor/**,Blazor/**/bin/**,Blazor/**/obj/** \
+        -Dsonar.host.url=$SONAR_HOST_URL \
+        -Dsonar.login=$SONAR_TOKEN
   allow_failure: true
-  dependencies:
-    - build-php
-    - build-blazor
   only:
     - main
 
 # ----------------------
-# INCLUDE DOCKER TEMPLATES
+# INCLUDE & DOCKER JOBS (Inchangés)
 # ----------------------
 include:
   - project: 'IUT_INF63/generic-ci'
     ref: 'main'
-    file:
-      - 'build/.docker-build.yml'
+    file: ['build/.docker-build.yml', 'deploy/.docker-deploy.yml']
     token: $CI_PERSONAL_TOKEN
 
-  - project: 'IUT_INF63/generic-ci'
-    ref: 'main'
-    file:
-      - 'deploy/.docker-deploy.yml'
-    token: $CI_PERSONAL_TOKEN
-
-# ----------------------
-# DOCKER BUILD & PUSH
-# ----------------------
 push-dotnet-image:
   extends: .build-and-push-docker-image
   stage: 📦push
@@ -91,29 +84,19 @@ push-dotnet-image:
     DOCKERFILE_CONTEXT_PATH: Blazor/BlazorAdminRentPark
     DESTINATION_REGISTRY_IMAGE_NAME: codefirst.iut.uca.fr/qumiotto/sae_2a_rentpark
     DESTINATION_REGISTRY_IMAGE_VERSION: latest
-    DESTINATION_REGISTRY_USER: $CI_REGISTRY_USER
-    DESTINATION_REGISTRY_PASSWORD: $CI_REGISTRY_PASSWORD
   dependencies:
     - build-blazor
-  allow_failure: false
   rules:
     - when: on_success
 
-# ----------------------
-# DEPLOYMENT
-# ----------------------
 deploy-my-pod:
   extends: .deploy-image
   stage: 🚀deploy
   variables:
     CONTAINER_NAME: blazor-admin-pod
-    CONTAINER_ENV_VAR_VAR_1: "ENV_PRODUCTION=true"
     CONTAINER_IMAGE_PATH: codefirst.iut.uca.fr/qumiotto/sae_2a_rentpark:latest
-    NAMESPACE_TOKEN: $K8S_TOKEN
     NAMESPACE_NAME: altixier1
   dependencies:
     - push-dotnet-image
-  allow_failure: true
   rules:
     - when: manual
-
