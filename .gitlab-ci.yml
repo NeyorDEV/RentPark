@@ -24,8 +24,6 @@ build-blazor:
     expire_in: 1 hour
 
 
-
-
 sonarqube-check:
   stage: scan
   image: php:8.3-cli
@@ -35,35 +33,27 @@ sonarqube-check:
     SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"
     GIT_DEPTH: "0"
   before_script:
-    # 1. Installation des dépendances système nécessaires
     - apt-get update && apt-get install -y unzip git curl libxml2-dev
-    
-    # 2. Installation de Composer
     - curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-    
-    # 3. Installation de PCOV (moteur de couverture ultra-rapide)
     - pecl install pcov && docker-php-ext-enable pcov
-    
-    # 4. Installation du Sonar Scanner
     - curl -sSLo /tmp/sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-6.2.1.4610-linux-x64.zip
     - unzip /tmp/sonar-scanner.zip -d /opt
     - export PATH="/opt/sonar-scanner-6.2.1.4610-linux-x64/bin:$PATH"
 
   script:
-    # On entre dans le dossier PHP
     - cd siteSAE2A
     
-    # Installation des dépendances PHP (dont PHPUnit)
+    # 1. On force la réinstallation propre pour corriger la classe manquante
+    - rm -rf vendor/ composer.lock
     - composer install --no-interaction --prefer-dist
     
-    # Lancement des tests avec génération du rapport de couverture
-    # On utilise -d pcov.enabled=1 pour forcer l'activation pendant les tests
-    - php -d pcov.enabled=1 vendor/bin/phpunit --coverage-clover=../clover.xml --log-junit=../junit.xml
+    # 2. Exécution des tests avec un chemin direct vers phpunit
+    # On ajoute --do-not-cache-result pour éviter les problèmes de droits en écriture
+    - php -d pcov.enabled=1 vendor/phpunit/phpunit/phpunit --coverage-clover=../clover.xml --log-junit=../junit.xml --do-not-cache-result
     
-    # Retour à la racine pour le scan Sonar
     - cd ..
     
-    # Lancement du scan SonarQube
+    # 3. Lancement du scan
     - sonar-scanner \
         -Dsonar.projectKey=$SONAR_PROJECT_KEY \
         -Dsonar.sources=siteSAE2A,Blazor \
