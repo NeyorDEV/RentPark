@@ -23,7 +23,6 @@ build-php:
     - cd siteSAE2A
     - composer install --no-interaction --prefer-dist --no-dev
     - composer dump-autoload --optimize
-    - echo "PHP build done"
   artifacts:
     paths:
       - siteSAE2A/vendor/
@@ -53,20 +52,28 @@ php-coverage:
   stage: scan
   image: php:8.3-cli
   before_script:
-    - apt-get update && apt-get install -y unzip git curl
+    - apt-get update && apt-get install -y unzip git curl libxml2-dev
+    # Installation de Xdebug pour permettre le calcul du coverage
+    - pecl install xdebug && docker-php-ext-enable xdebug
     - curl -sS https://getcomposer.org/installer | php
     - mv composer.phar /usr/local/bin/composer
   script:
     - cd siteSAE2A
     - composer install --no-interaction --prefer-dist
-    - php vendor/bin/phpunit --coverage-text --coverage-cobertura=coverage.xml
-  coverage: '/^\s*Lines:\s*\d+.\d+\%/'
+    # Commande PHPUnit avec génération des rapports JUnit (liste tests) et Cobertura (coverage)
+    - php -d xdebug.mode=coverage vendor/bin/phpunit --coverage-text --coverage-cobertura=../coverage.xml --log-junit=../junit.xml
+  coverage: '/^\s*Lines:\s*\d+(?:\.\d+)?\%/'
   artifacts:
+    when: always
+    paths:
+      - coverage.xml
+      - junit.xml
     reports:
+      junit: junit.xml
       coverage_report:
         coverage_format: cobertura
-        path: siteSAE2A/coverage.xml
-    expire_in: 1 hour
+        path: coverage.xml
+  expire_in: 1 hour
   allow_failure: true
   only:
     - main
@@ -83,11 +90,17 @@ sonarqube-check:
     JAVA_TOOL_OPTIONS: "-Dfile.encoding=UTF-8"
   script:
     - echo "Running SonarScanner..."
-    - sonar-scanner -X
+    # On indique explicitement à Sonar où trouver le fichier de coverage PHP
+    - sonar-scanner \
+        -Dsonar.php.coverage.reportPaths=coverage.xml \
+        -Dsonar.sources=siteSAE2A,Blazor \
+        -Dsonar.exclusions=siteSAE2A/vendor/**,Blazor/BlazorAdminRentPark/bin/** \
+        -X
   allow_failure: true
   dependencies:
     - build-php
     - build-blazor
+    - php-coverage
   only:
     - main
 
