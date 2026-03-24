@@ -1,71 +1,49 @@
-# ----------------------
-# STAGES
-# ----------------------
 stages:
   - build
+  - test
   - scan
-  - 📦push
-  - 🚀deploy
-  - 🌐expose-service
 
 # ----------------------
-# BUILD PHP (prod, léger)
+# 1. BUILD
 # ----------------------
 build-php:
   stage: build
   image: php:8.3-cli
-  before_script:
+  script:
     - apt-get update && apt-get install -y unzip git curl
     - curl -sS https://getcomposer.org/installer | php
     - mv composer.phar /usr/local/bin/composer
-  script:
-    - echo "Installing PHP dependencies..."
     - cd siteSAE2A
-    - composer install --no-interaction --prefer-dist --no-dev
-    - composer dump-autoload --optimize
+    - composer install --no-interaction --prefer-dist
   artifacts:
     paths:
       - siteSAE2A/vendor/
     expire_in: 1 hour
 
 # ----------------------
-# BUILD BLAZOR
+# 2. TESTS (C'est ici qu'on crée les fichiers pour Sonar)
 # ----------------------
-build-blazor:
-  stage: build
-  image: mcr.microsoft.com/dotnet/sdk:9.0
-  script:
-    - cd Blazor/BlazorAdminRentPark
-    - echo "Restoring .NET packages..."
-    - dotnet restore
-    - echo "Building Blazor app..."
-    - dotnet build -c Release
-  artifacts:
-    paths:
-      - Blazor/BlazorAdminRentPark/bin/Release/
-    expire_in: 1 hour
-
-# ----------------------
-# PHP TESTS & COVERAGE
-# ----------------------
-php-coverage:
-  stage: scan
+php-tests:
+  stage: test
   image: php:8.3-cli
+  dependencies:
+    - build-php
   before_script:
-    - apt-get update && apt-get install -y unzip git curl libxml2-dev
-    # Installation de Xdebug pour permettre le calcul du coverage
+    - apt-get update && apt-get install -y libxml2-dev
     - pecl install xdebug && docker-php-ext-enable xdebug
-    - curl -sS https://getcomposer.org/installer | php
-    - mv composer.phar /usr/local/bin/composer
   script:
     - cd siteSAE2A
-    - composer install --no-interaction --prefer-dist
-    # Commande PHPUnit avec génération des rapports JUnit (liste tests) et Cobertura (coverage)
-    - php -d xdebug.mode=coverage vendor/bin/phpunit --coverage-text --coverage-cobertura=../coverage.xml --log-junit=../junit.xml
+    # On génère les rapports DIRECTEMENT à la racine du projet GitLab (../)
+    - php -d xdebug.mode=coverage vendor/bin/phpunit \
+        --coverage-text \
+        --coverage-clover=../clover.xml \
+        --coverage-cobertura=../coverage.xml \
+        --log-junit=../junit.xml
   coverage: '/^\s*Lines:\s*\d+(?:\.\d+)?\%/'
   artifacts:
     when: always
     paths:
+      - clover.xml
       - coverage.xml
       - junit.xml
     reports:
@@ -73,119 +51,29 @@ php-coverage:
       coverage_report:
         coverage_format: cobertura
         path: coverage.xml
-  expire_in: 1 hour
-  allow_failure: true
-  only:
-    - main
 
 # ----------------------
-# SONAR SCANNER
+# 3. SONAR (Configuration adaptée à ton dossier siteSAE2A)
 # ----------------------
 sonarqube-check:
   stage: scan
   image: sonarsource/sonar-scanner-cli:latest
+  dependencies:
+    - php-tests
   variables:
     SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"
     GIT_DEPTH: "0"
-    JAVA_TOOL_OPTIONS: "-Dfile.encoding=UTF-8"
   script:
-    - echo "Running SonarScanner..."
-    # On indique explicitement à Sonar où trouver le fichier de coverage PHP
+    # On vérifie si les fichiers existent avant de lancer le scan (pour le debug)
+    - ls -l clover.xml junit.xml 
     - sonar-scanner \
-        -Dsonar.php.coverage.reportPaths=coverage.xml \
-        -Dsonar.sources=siteSAE2A,Blazor \
-        -Dsonar.exclusions=siteSAE2A/vendor/**,Blazor/BlazorAdminRentPark/bin/** \
+        -Dsonar.projectKey=$SONAR_PROJECT_KEY \
+        -Dsonar.sources=siteSAE2A \
+        -Dsonar.tests=siteSAE2A/tests \
+        -Dsonar.php.coverage.reportPaths=clover.xml \
+        -Dsonar.php.tests.reportPath=junit.xml \
+        -Dsonar.exclusions=siteSAE2A/vendor/** \
         -X
   allow_failure: true
-  dependencies:
-    - build-php
-    - build-blazor
-    - php-coverage
   only:
     - main
-
-# ----------------------
-# INCLUDE DOCKER TEMPLATES
-# ----------------------
-include:
-  - project: 'IUT_INF63/generic-ci'
-    ref: 'main'
-    file:
-      - 'build/.docker-build.yml'
-    token: $CI_PERSONAL_TOKEN
-
-  - project: 'IUT_INF63/generic-ci'
-    ref: 'main'
-    file:
-      - 'deploy/.docker-deploy.yml'
-    token: $CI_PERSONAL_TOKEN
-
-# ----------------------
-# DOCKER BUILD & PUSH
-# ----------------------
-push-dotnet-image:
-  extends: .build-and-push-docker-image
-  stage: 📦push
-  variables:
-    DOCKERFILE_RELATIVE_PATH: Blazor/BlazorAdminRentPark/Dockerfile
-    DOCKERFILE_CONTEXT_PATH: Blazor/BlazorAdminRentPark
-    DESTINATION_REGISTRY_IMAGE_NAME: codefirst.iut.uca.fr/qumiotto/sae_2a_rentpark
-    DESTINATION_REGISTRY_IMAGE_VERSION: latest
-    DESTINATION_REGISTRY_USER: $CI_REGISTRY_USER
-    DESTINATION_REGISTRY_PASSWORD: $CI_REGISTRY_PASSWORD
-  dependencies:
-    - build-blazor
-  allow_failure: false
-  rules:
-    - when: on_success
-
-# ----------------------
-# DEPLOYMENT
-# ----------------------
-deploy-my-pod:
-  extends: .deploy-image
-  stage: 🚀deploy
-  variables:
-    CONTAINER_NAME: blazor-admin-pod
-    CONTAINER_ENV_VAR_VAR_1: "ENV_PRODUCTION=true"
-    CONTAINER_IMAGE_PATH: codefirst.iut.uca.fr/qumiotto/sae_2a_rentpark:latest
-    NAMESPACE_TOKEN: $K8S_TOKEN
-    NAMESPACE_NAME: altixier1
-  dependencies:
-    - push-dotnet-image
-  allow_failure: true
-  rules:
-    - when: manual
-
-# ----------------------
-# SERVICE KUBERNETES
-# ----------------------
-expose-service:
-  stage: 🌐expose-service
-  image: lachlanevenson/k8s-kubectl:latest
-  dependencies:
-    - deploy-my-pod
-  variables:
-    KUBECONFIG: /tmp/kubeconfig
-  script:
-    - |
-      echo "apiVersion: v1
-      kind: Service
-      metadata:
-        name: blazor-admin-service
-      spec:
-        selector:
-          app: blazor-admin-pod
-        ports:
-          - protocol: TCP
-            port: 80
-            targetPort: 8080
-        type: NodePort" > blazor-service.yml
-    - kubectl config set-cluster my-cluster --server=$K8S_SERVER
-    - kubectl config set-credentials deployer --token=$K8S_TOKEN
-    - kubectl config set-context my-context --cluster=my-cluster --user=deployer --namespace=altixier1
-    - kubectl config use-context my-context
-    - kubectl apply -f blazor-service.yml
-  rules:
-    - when: manual
-  allow_failure: true
