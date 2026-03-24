@@ -27,8 +27,6 @@ build-blazor:
 sonarqube-check:
   stage: scan
   image: php:8.3-cli
-  dependencies:
-    - build-blazor
   variables:
     SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"
     GIT_DEPTH: "0"
@@ -43,30 +41,27 @@ sonarqube-check:
   script:
     - cd siteSAE2A
     
-    # Réinstallation propre
+    # On réinstalle tout proprement
     - rm -rf vendor/ composer.lock
     - composer install --no-interaction --prefer-dist
+    - composer dump-autoload
     
-    # On lance PHPUnit en précisant le fichier de conf s'il existe
-    # Si tes tests sont dans "tests", on lui indique le dossier explicitement
-    - php -d pcov.enabled=1 vendor/phpunit/phpunit/phpunit \
-        --configuration phpunit.xml \
-        --coverage-clover ../clover.xml \
-        --log-junit ../junit.xml \
-        --do-not-cache-result \
-        tests || echo "Tests failed but continuing to Sonar"
-
+    # Exécution des tests - On génère clover.xml pour Sonar
+    # Le "|| true" permet de ne pas stopper le job si un test échoue (pour avoir le rapport Sonar quand même)
+    - php -d pcov.enabled=1 vendor/phpunit/phpunit/phpunit --coverage-clover=../clover.xml --log-junit=../junit.xml --do-not-cache-result || echo "Tests en échec, mais on continue vers Sonar..."
+    
     - cd ..
     
-    # Lancement du scan
-    - sonar-scanner \
-        -Dsonar.projectKey=$SONAR_PROJECT_KEY \
-        -Dsonar.sources=siteSAE2A,Blazor \
+    # Lancement du scan Sonar sur le dossier PHP uniquement
+    - |
+      sonar-scanner \
+        -Dsonar.projectKey="${SONAR_PROJECT_KEY}" \
+        -Dsonar.sources=siteSAE2A \
         -Dsonar.php.coverage.reportPaths=clover.xml \
         -Dsonar.php.tests.reportPath=junit.xml \
-        -Dsonar.exclusions=siteSAE2A/vendor/**,Blazor/**/bin/**,Blazor/**/obj/** \
-        -Dsonar.host.url=$SONAR_HOST_URL \
-        -Dsonar.login=$SONAR_TOKEN
+        -Dsonar.exclusions="siteSAE2A/vendor/**,siteSAE2A/tests/**" \
+        -Dsonar.host.url="${SONAR_HOST_URL}" \
+        -Dsonar.login="${SONAR_TOKEN}"
 
   allow_failure: true
   only:
