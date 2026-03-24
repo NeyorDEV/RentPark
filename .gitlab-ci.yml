@@ -22,7 +22,6 @@ build-blazor:
     paths:
       - Blazor/BlazorAdminRentPark/bin/Release/
     expire_in: 1 hour
-
 sonarqube-check:
   stage: scan
   image: php:8.3-cli
@@ -30,28 +29,32 @@ sonarqube-check:
     SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"
     GIT_DEPTH: "0"
   before_script:
+    # Installation silencieuse des outils
     - apt-get update && apt-get install -y unzip git curl libxml2-dev
     - curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
     - pecl install pcov && docker-php-ext-enable pcov
+    
+    # Téléchargement et extraction silencieuse (-q) du scanner
     - curl -sSLo /tmp/sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-6.2.1.4610-linux-x64.zip
-    - unzip /tmp/sonar-scanner.zip -d /opt
+    - unzip -q /tmp/sonar-scanner.zip -d /opt
     - export PATH="/opt/sonar-scanner-6.2.1.4610-linux-x64/bin:$PATH"
 
   script:
     - cd siteSAE2A
     
-    # Réinstallation propre
+    # Nettoyage et installation des dépendances
     - rm -rf vendor/ composer.lock
     - composer install --no-interaction --prefer-dist
     - composer dump-autoload
     
-    # Exécution des tests pour générer les rapports
-    - php -d pcov.enabled=1 vendor/phpunit/phpunit/phpunit --coverage-clover=../clover.xml --log-junit=../junit.xml --do-not-cache-result tests || echo "Tests en échec, mais on continue..."
+    # Exécution des tests avec PCOV
+    # On force le dossier 'tests' pour éviter les erreurs de répertoires manquants
+    - php -d pcov.enabled=1 vendor/phpunit/phpunit/phpunit --coverage-clover=../clover.xml --log-junit=../junit.xml --do-not-cache-result tests || echo "Certains tests ont échoué, envoi des résultats partiels..."
     
     - cd ..
     
-    # Lancement du scan simplifié
-    # Le scanner va lire automatiquement "sonar-project.properties" pour la clé du projet
+    # Lancement du scan Sonar
+    # On utilise ton fichier sonar-project.properties pour la clé 'RentPark'
     - |
       sonar-scanner \
         -Dsonar.sources=siteSAE2A \
