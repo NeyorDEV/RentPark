@@ -5,16 +5,15 @@ stages:
   - build
   - scan
   - 📦push
-  - 👨‍🚀configure-deploy
   - 🚀deploy
   - 🌐expose-service
 
 # ----------------------
-# BUILD PHP
+# BUILD PHP (prod, léger)
 # ----------------------
 build-php:
   stage: build
-  image: php:8.2-cli
+  image: php:8.3-cli
   before_script:
     - apt-get update && apt-get install -y unzip git curl
     - curl -sS https://getcomposer.org/installer | php
@@ -22,12 +21,13 @@ build-php:
   script:
     - echo "Installing PHP dependencies..."
     - cd siteSAE2A
-    - composer install --no-interaction --prefer-dist
-    - composer dump-autoload
+    - composer install --no-interaction --prefer-dist --no-dev
+    - composer dump-autoload --optimize
     - echo "PHP build done"
   artifacts:
     paths:
       - siteSAE2A/vendor/
+    expire_in: 1 hour
 
 # ----------------------
 # BUILD BLAZOR
@@ -44,6 +44,32 @@ build-blazor:
   artifacts:
     paths:
       - Blazor/BlazorAdminRentPark/bin/Release/
+    expire_in: 1 hour
+
+# ----------------------
+# PHP TESTS & COVERAGE
+# ----------------------
+php-coverage:
+  stage: scan
+  image: php:8.3-cli
+  before_script:
+    - apt-get update && apt-get install -y unzip git curl
+    - curl -sS https://getcomposer.org/installer | php
+    - mv composer.phar /usr/local/bin/composer
+  script:
+    - cd siteSAE2A
+    - composer install --no-interaction --prefer-dist
+    - php vendor/bin/phpunit --coverage-text --coverage-cobertura=coverage.xml
+  coverage: '/^\s*Lines:\s*\d+.\d+\%/'
+  artifacts:
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: siteSAE2A/coverage.xml
+    expire_in: 1 hour
+  allow_failure: true
+  only:
+    - main
 
 # ----------------------
 # SONAR SCANNER
@@ -103,17 +129,6 @@ push-dotnet-image:
 # ----------------------
 # DEPLOYMENT
 # ----------------------
-configure-deploy:
-  extends: .configure-deployment
-  stage: 👨‍🚀configure-deploy
-  variables:
-    CONTAINER_NAME: blazor-admin-pod
-    NAMESPACE_NAME: altixier1
-    CONTAINER_IMAGE_PATH: codefirst.iut.cca.fr/qumiotto/sae_2a_rentpark:latest
-  rules:
-    - when: manual
-  allow_failure: true
-
 deploy-my-pod:
   extends: .deploy-image
   stage: 🚀deploy
@@ -125,7 +140,6 @@ deploy-my-pod:
     NAMESPACE_NAME: altixier1
   dependencies:
     - push-dotnet-image
-    - configure-deploy
   allow_failure: true
   rules:
     - when: manual
@@ -133,12 +147,9 @@ deploy-my-pod:
 # ----------------------
 # SERVICE KUBERNETES
 # ----------------------
-# ----------------------
-# SERVICE KUBERNETES
-# ----------------------
 expose-service:
   stage: 🌐expose-service
-  image: lachlanevenson/k8s-kubectl:latest 
+  image: lachlanevenson/k8s-kubectl:latest
   dependencies:
     - deploy-my-pod
   variables:
@@ -165,10 +176,3 @@ expose-service:
   rules:
     - when: manual
   allow_failure: true
-
-
-
-    
-
-
-
