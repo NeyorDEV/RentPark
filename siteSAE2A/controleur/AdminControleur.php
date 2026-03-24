@@ -10,6 +10,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 
 require_once __DIR__ . '/ApiHelper.php';
+
 class AdminControleur
 {
     use RoleAwareTrait;
@@ -17,320 +18,275 @@ class AdminControleur
     private VehicleGateway $gateway;
     private UserGateway $userGateway;
     private ReservationGateway $reservationGateway;
-
-    // test pour l'API3
-    private Client $apiClient;
+    private Client $apiClient;       // rentpark-api-pod (véhicules, contrats, rappels, users)
+    private Client $clientApiClient; // rentpark-client-pod (clients)
 
     public function __construct()
     {
         $this->checkAdmin();
-
         global $rep, $vues, $user, $pass, $dsn, $action;
-
-
-        $dVueEreur = [];
+        $dVueErreur = [];
 
         try {
-
-            $this->connection = new Connection($dsn, $user, $pass);
-            $this->gateway = new VehicleGateway($this->connection);
-            $this->userGateway = new UserGateway($this->connection);
+            $this->connection         = new Connection($dsn, $user, $pass);
+            $this->gateway            = new VehicleGateway($this->connection);
+            $this->userGateway        = new UserGateway($this->connection);
             $this->reservationGateway = new ReservationGateway($this->connection);
-
-            // test pour l'API
-            $this->apiClient = getApiClient();
-
+            $this->apiClient          = getApiClient();
+            $this->clientApiClient    = getClientApiClient();
 
             switch ($action) {
-                case "afficheDashboard":
-                    $this->afficheDashboard($dVueEreur);
-                    break;
-                case "listeUtilisateurs":
-                    $this->listeUtilisateurs($dVueEreur);
-                    break;
-                case "listeClients":
-                    $this->listeClients($dVueEreur);
-                    break;
+                case "afficheDashboard":  $this->afficheDashboard($dVueErreur);  break;
+                case "listeUtilisateurs": $this->listeUtilisateurs($dVueErreur); break;
+                case "listeClients":      $this->listeClients($dVueErreur);      break;
                 default:
-                    $dVueEreur[] = "Action inconnue";
-                    $this->afficherVue('homeCustomers', $dVueEreur, $results = null);
+                    $dVueErreur[] = "Action inconnue";
+                    $this->afficherVue('homeCustomers', $dVueErreur, null);
                     break;
             }
-
         } catch (\PDOException $e) {
-            $dVueEreur[] = "Erreur BDD : " . $e->getMessage();
-            $this->afficherVue('erreur', $dVueEreur, $results = null);
+            $dVueErreur[] = "Erreur BDD : " . $e->getMessage();
+            $this->afficherVue('erreur', $dVueErreur, null);
         }
-
         exit(0);
     }
-    
-    // ajouter les vue erreur et les vérif 
 
-    public function afficheDashboard(array $dVueEreur)
+    private function authHeaders(): array
     {
+        return [
+            'headers' => [
+                'Authorization' => 'Bearer ' . ($_SESSION['api_token'] ?? ''),
+                'Content-Type'  => 'application/json',
+            ]
+        ];
+    }
 
+    private function withAuth(array $options = []): array
+    {
+        return array_merge_recursive($this->authHeaders(), $options);
+    }
+
+    public function afficheDashboard(array $dVueErreur)
+    {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $sousAction = $_POST['action'] ?? '';
-
             if ($sousAction === 'ajouterRappel') {
-                $this->ajouterRappel($dVueEreur);
+                $this->ajouterRappel($dVueErreur);
             }
-
             header("Location: /siteSAE2A/dashboard");
             exit;
         }
 
         $results = [
-            "revenusMensuels" => $this->reservationGateway->getMonthlyIncome(),
+            "revenusMensuels"  => $this->reservationGateway->getMonthlyIncome(),
             "voiturePlusLouee" => $this->gateway->getMostRentedCar(),
-            "totalUsers" => $this->userGateway->countUser()
+            "totalUsers"       => $this->userGateway->countUser()
         ];
 
         $alerts = [];
 
-        // Contrôle technique < 2 mois
         $vehiculesCT = $this->gateway->getVehiculesControleTechniqueBientotExpire();
-
         foreach ($vehiculesCT as $v) {
             $alerts[] = [
-                "label" => "Contrôle technique",
+                "label"    => "Contrôle technique",
                 "vehicule" => $v["Marque"] . " " . $v["Modele"]
             ];
         }
 
         try {
-            $responseRappels = $this->apiClient->get('rappels');
+            $responseRappels = $this->apiClient->get('api/rappels', $this->authHeaders());
             $rappels = json_decode($responseRappels->getBody()->getContents(), true);
-
             if (is_array($rappels)) {
                 foreach ($rappels as $rappel) {
                     $dateRappel = date('d/m/Y', strtotime($rappel['Date']));
                     $alerts[] = [
-                        "label" => "Rappel le $dateRappel : " . $rappel['Titre'],
+                        "label"    => "Rappel le $dateRappel : " . $rappel['Titre'],
                         "vehicule" => $rappel['Description']
                     ];
                 }
             }
         } catch (RequestException $e) {
+            // rappels indisponibles, on continue
         }
 
-        // On injecte les alertes dans les résultats
         $results["alerts"] = $alerts;
 
         $contrats = $this->reservationGateway->getContractsForNextMonth();
         $planning = [];
-        $today = date('Y-m-d'); // date du jour
+        $today    = date('Y-m-d');
 
         foreach ($contrats as $c) {
-            // Départ (date de début) uniquement si futur ou aujourd'hui
             if ($c['DateDebut'] >= $today) {
                 $planning[] = [
-                    'time' => $c['DateDebut'],
-                    'action' => 'Location',
+                    'time'     => $c['DateDebut'],
+                    'action'   => 'Location',
                     'vehicule' => $c['Marque'] . ' ' . $c['Modele']
                 ];
             }
-
-            // Arrivée (date de fin) uniquement si futur ou aujourd'hui
             if ($c['DateFin'] >= $today) {
                 $planning[] = [
-                    'time' => $c['DateFin'],
-                    'action' => 'Retour',
+                    'time'     => $c['DateFin'],
+                    'action'   => 'Retour',
                     'vehicule' => $c['Marque'] . ' ' . $c['Modele']
                 ];
             }
         }
 
-        // Trier par date
         usort($planning, fn($a, $b) => strcmp($a['time'], $b['time']));
-
         $results['planning'] = $planning;
 
-
-
-
-        // Tri chronologique
-        usort($planning, fn($a, $b) => strcmp($a['time'], $b['time']));
-
-        $this->afficherVue('dashboard', $dVueEreur, $results);
+        $this->afficherVue('dashboard', $dVueErreur, $results);
     }
+
     private function rechercherUtilisateur(array $dVueErreur = []): void
     {
         $motCle = trim($_GET['q'] ?? '');
-
         if ($motCle === '') {
             $results = $this->userGateway->getAllUser();
         } else {
             $results = $this->userGateway->rechercherUtilisateur($motCle);
-
-            if (empty($results)) {
-                $dVueErreur[] = "Aucun utilisateur trouvée pour \"$motCle\".";
-            }
+            if (empty($results)) $dVueErreur[] = "Aucun utilisateur trouvé pour \"$motCle\".";
         }
-
         $this->afficherVue('user', $dVueErreur, $results);
     }
+
     private function rechercherClient(array $dVueErreur = []): void
     {
-        //A faire
-        $motCle = trim($_GET['q'] ?? '');
+        $motCle  = trim($_GET['q'] ?? '');
         $results = [];
 
-        if ($motCle === '') {
-            //A faire
-        } else {
-            // A faire
-
-            if (empty($results)) {
-                $dVueErreur[] = "Aucun utilisateur trouvée pour \"$motCle\".";
+        try {
+            if ($motCle === '') {
+                $response = $this->clientApiClient->get('api/clients', $this->authHeaders());
+            } else {
+                $response = $this->clientApiClient->get('api/clients', $this->withAuth([
+                    'query' => ['q' => $motCle]
+                ]));
             }
+            $results = json_decode($response->getBody()->getContents(), true) ?? [];
+            if (empty($results)) $dVueErreur[] = "Aucun client trouvé pour \"$motCle\".";
+        } catch (RequestException $e) {
+            $dVueErreur[] = "Erreur recherche client : " . $e->getMessage();
         }
 
         $this->afficherVue('client', $dVueErreur, $results);
     }
-    private function modifierClient(array $dVueEreur)
+
+    private function ajouterClient(array $dVueErreur)
     {
-        
-        $Nom = $_POST['nom'] ?? '';
-        $Prenom = $_POST['prenom'] ?? '';
-        $Email = $_POST['email'] ?? '';
-        $NumTel = $_POST['numTel'] ?? '';
-        $NumPermis = $_POST['numPermis'] ?? '';
-        $DateNaiss = $_POST['dateNaiss'] ?? '';
-        $Nationalite = $_POST['nationalite'] ?? '';
-        $IdClient = (int) ($_POST['idClient'] ?? -1);
+        $data = [
+            'Nom'         => $_POST['nom']         ?? '',
+            'Prenom'      => $_POST['prenom']      ?? '',
+            'Email'       => $_POST['email']       ?? '',
+            'NumTel'      => $_POST['numTel']      ?? '',
+            'NumPermis'   => $_POST['numPermis']   ?? '',
+            'DateNaiss'   => $_POST['dateNaiss']   ?? '',
+            'Nationalite' => $_POST['nationalite'] ?? '',
+        ];
 
-        //Validation::val_client($Nom, $Prenom, $Email, $NumTel, $NumPermis, $DateNaiss, $Nationalite, $IdClient, $dVueEreur);
-
-        if (empty($dVueEreur)) {
-            $this->apiClient->put("client/$IdClient", [
-                'json' => [
-                    'Nom' => $Nom,
-                    'Prenom' => $Prenom,
-                    'Email' => $Email,
-                    'NumTel' => $NumTel,
-                    'NumPermis' => $NumPermis,
-                    'DateNaiss' => $DateNaiss,
-                    'Nationalite' => $Nationalite
-                ]
-            ]);
-            
-            header("Location: /siteSAE2A/clients");
-            exit;
+        if (empty($dVueErreur)) {
+            try {
+                $this->clientApiClient->post('api/client', $this->withAuth(['json' => $data]));
+                header("Location: /siteSAE2A/clients");
+                exit;
+            } catch (RequestException $e) {
+                $dVueErreur[] = "Erreur ajout client : " . $e->getMessage();
+            }
         }
-        $response = $this->apiClient->get('clients');
-        $results = json_decode($response->getBody()->getContents(), true);
-        $this->afficherVue('client', $dVueEreur, $results);
-    }
-    // ok utilise API
-    private function supprimerUtilisateur(array $dVueEreur)
-    {
-        $id = (int) ($_POST['id'] ?? -1);
 
+        try {
+            $response = $this->clientApiClient->get('api/clients', $this->authHeaders());
+            $results  = json_decode($response->getBody()->getContents(), true) ?? [];
+        } catch (RequestException $e) {
+            $results = [];
+        }
+        $this->afficherVue('client', $dVueErreur, $results);
+    }
+
+    private function modifierClient(array $dVueErreur)
+    {
+        $IdClient = (int)($_POST['idClient'] ?? -1);
+        $data = [
+            'Nom'         => $_POST['nom']         ?? '',
+            'Prenom'      => $_POST['prenom']      ?? '',
+            'Email'       => $_POST['email']       ?? '',
+            'NumTel'      => $_POST['numTel']      ?? '',
+            'NumPermis'   => $_POST['numPermis']   ?? '',
+            'DateNaiss'   => $_POST['dateNaiss']   ?? '',
+            'Nationalite' => $_POST['nationalite'] ?? '',
+        ];
+
+        if (empty($dVueErreur)) {
+            try {
+                $this->clientApiClient->put("api/client/$IdClient", $this->withAuth(['json' => $data]));
+                header("Location: /siteSAE2A/clients");
+                exit;
+            } catch (RequestException $e) {
+                $dVueErreur[] = "Erreur modification client : " . $e->getMessage();
+            }
+        }
+
+        try {
+            $response = $this->clientApiClient->get('api/clients', $this->authHeaders());
+            $results  = json_decode($response->getBody()->getContents(), true) ?? [];
+        } catch (RequestException $e) {
+            $results = [];
+        }
+        $this->afficherVue('client', $dVueErreur, $results);
+    }
+
+    private function supprimerUtilisateur(array $dVueErreur)
+    {
+        $id = (int)($_POST['id'] ?? -1);
         if ($id <= 0) {
             header("Location: /siteSAE2A/utilisateurs");
             exit;
         }
-
         try {
-            // Appel API DELETE
-            $this->apiClient->delete("users/$id");
-
+            $this->apiClient->delete("api/users/$id", $this->authHeaders());
         } catch (RequestException $e) {
-            $dVueEreur[] = "Erreur lors de la suppression via l’API.";
-            // Optionnel : log
-            // error_log($e->getMessage());
+            // log si besoin
         }
-
         header("Location: /siteSAE2A/utilisateurs");
         exit;
     }
 
-    // ok utilise API
-    private function ajouterUtilisateur(array $dVueEreur)
+    private function ajouterUtilisateur(array $dVueErreur)
     {
         $username = $_POST['username'] ?? '';
         $password = $_POST['password'] ?? '';
-        $role = $_POST['role'] ?? '';
+        $role     = $_POST['role']     ?? '';
 
-        Validation::val_user($username, $password, $role, $dVueEreur);
+        Validation::val_user($username, $password, $role, $dVueErreur);
 
-        if (empty($dVueEreur)) {
-            $this->apiClient->post("/add/users", [
-                'form_params' => [
-                    'username' => $username,
-                    'password' => $password,
-                    'role' => $role
-                ]
-            ]);
-            header("Location: /siteSAE2A/utilisateurs");
-            exit;
-
+        if (empty($dVueErreur)) {
+            try {
+                $this->apiClient->post("api/add/users", $this->withAuth([
+                    'json' => [
+                        'username' => $username,
+                        'password' => $password,
+                        'role'     => $role
+                    ]
+                ]));
+                header("Location: /siteSAE2A/utilisateurs");
+                exit;
+            } catch (RequestException $e) {
+                $dVueErreur[] = "Erreur ajout utilisateur : " . $e->getMessage();
+            }
         }
 
-        $results = $this->apiClient->get("users");
-        $results = json_decode($results->getBody()->getContents(), true);
-        $this->afficherVue('user', $dVueEreur, $results);
+        $results = $this->userGateway->getAllUser();
+        $this->afficherVue('user', $dVueErreur, $results);
     }
 
-    private function ajouterClient(array $dVueEreur)
+    public function listeUtilisateurs(array $dVueErreur)
     {
-        $Nom = $_POST['nom'] ?? '';
-        $Prenom = $_POST['prenom'] ?? '';
-        $Email = $_POST['email'] ?? '';
-        $NumTel = $_POST['numTel'] ?? '';
-        $NumPermis = $_POST['numPermis'] ?? '';
-        $DateNaiss = $_POST['dateNaiss'] ?? '';
-        $Nationalite = $_POST['nationalite'] ?? '';
-        
-
-        //Validation::val_client($Nom, $Prenom, $Email, $NumTel, $NumPermis, $DateNaiss, $Nationalite, $IdClient, $dVueEreur);
-
-        if (empty($dVueEreur)) {
-            $this->apiClient->post("client", [
-                'json' => [
-                    'Nom' => $Nom,
-                    'Prenom' => $Prenom,
-                    'Email' => $Email,
-                    'NumTel' => $NumTel,
-                    'NumPermis' => $NumPermis,
-                    'DateNaiss' => $DateNaiss,
-                    'Nationalite' => $Nationalite
-                ]
-            ]);
-            header("Location: /siteSAE2A/clients");
-            exit;
-
-        }
-
-        $response = $this->apiClient->get('clients');
-        $results = json_decode($response->getBody()->getContents(), true);
-
-        $this->afficherVue('client', $dVueEreur, $results);
-    }
-
-    
-
-    public function listeUtilisateurs(array $dVueEreur)
-    {
-
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $sousAction = $_POST['action'] ?? '';
-
             switch ($sousAction) {
-                case 'ajouterUtilisateur':
-                    $this->ajouterUtilisateur($dVueEreur);
-                    break;
-
-                case 'supprimerUtilisateur':
-                    $this->supprimerUtilisateur($dVueEreur);
-                    break;
-
-                case 'modifierUtilisateur':
-                    $this->modifierUtilisateur($dVueEreur);
-                    break;
-
+                case 'ajouterUtilisateur':  $this->ajouterUtilisateur($dVueErreur);  break;
+                case 'supprimerUtilisateur': $this->supprimerUtilisateur($dVueErreur); break;
+                case 'modifierUtilisateur':  $this->modifierUtilisateur($dVueErreur);  break;
             }
             header("Location: /siteSAE2A/utilisateurs");
             exit;
@@ -338,27 +294,21 @@ class AdminControleur
 
         $sousAction = $_GET['action'] ?? '';
         if ($sousAction === 'rechercherUtilisateur') {
-            $this->rechercherUtilisateur($dVueEreur);
+            $this->rechercherUtilisateur($dVueErreur);
             return;
         }
+
         $results = $this->userGateway->getAllUser();
-        $this->afficherVue('user', $dVueEreur, $results);
+        $this->afficherVue('user', $dVueErreur, $results);
     }
 
-    public function listeClients(array $dVueEreur)
+    public function listeClients(array $dVueErreur)
     {
-
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $sousAction = $_POST['action'] ?? '';
-
             switch ($sousAction) {
-                case 'ajouterClient':
-                    $this->ajouterClient($dVueEreur);
-                    break;
-                case 'modifierClient':
-                    $this->modifierClient($dVueEreur);
-                    break;
-
+                case 'ajouterClient':  $this->ajouterClient($dVueErreur);  break;
+                case 'modifierClient': $this->modifierClient($dVueErreur); break;
             }
             header("Location: /siteSAE2A/clients");
             exit;
@@ -366,49 +316,47 @@ class AdminControleur
 
         $sousAction = $_GET['action'] ?? '';
         if ($sousAction === 'rechercherClient') {
-            $this->rechercherClient($dVueEreur);
+            $this->rechercherClient($dVueErreur);
             return;
         }
-        $response = $this->apiClient->get('clients');
-        $results = json_decode($response->getBody()->getContents(), true);
-        $this->afficherVue('client', $dVueEreur, $results);
-    }
-  
-
-    // ------------------------------------------------------------------------------------------------------
-    private function modifierUtilisateur(array $dVueEreur)
-    {
-        $username = $_POST['username'] ?? '';
-        $id = (int) ($_POST['id'] ?? -1);
-        $role= $_POST['role'] ?? '';
-
-        // faire de quoi changer le rôle pour le super admin mais pas pour les employés
-        if (empty($dVueEreur)) {
-            
-            $this->userGateway->update($username, $id, );
-            header("Location: /sitesae2A/utilisateurs");
-            exit;
-        }
-        $results = $this->gateway->getAll();
-        $this->afficherVue('user', $dVueEreur, $results);
-    }
-    private function ajouterRappel(array &$dVueEreur)
-    {
-        $titre = $_POST['Titre'] ?? '';
-        $description = $_POST['Description'] ?? '';
-        $date = $_POST['Date'] ?? '';
 
         try {
-            $this->apiClient->post('rappel', [
-                'json' => [
-                    'Titre' => $titre,
-                    'Description' => $description,
-                    'Date' => $date
-                ]
-            ]);
+            $response = $this->clientApiClient->get('api/clients', $this->authHeaders());
+            $results  = json_decode($response->getBody()->getContents(), true) ?? [];
         } catch (RequestException $e) {
-            $dVueEreur[] = "Erreur lors de l'ajout du rappel personnalisé.";
+            $dVueErreur[] = "Erreur chargement clients : " . $e->getMessage();
+            $results = [];
+        }
+        $this->afficherVue('client', $dVueErreur, $results);
+    }
+
+    private function modifierUtilisateur(array $dVueErreur)
+    {
+        $username = $_POST['username'] ?? '';
+        $id       = (int)($_POST['id'] ?? -1);
+
+        if (empty($dVueErreur)) {
+            $this->userGateway->update($username, $id);
+            header("Location: /siteSAE2A/utilisateurs");
+            exit;
+        }
+
+        $results = $this->userGateway->getAllUser();
+        $this->afficherVue('user', $dVueErreur, $results);
+    }
+
+    private function ajouterRappel(array &$dVueErreur)
+    {
+        try {
+            $this->apiClient->post('api/rappel', $this->withAuth([
+                'json' => [
+                    'Titre'       => $_POST['Titre']       ?? '',
+                    'Description' => $_POST['Description'] ?? '',
+                    'Date'        => $_POST['Date']        ?? '',
+                ]
+            ]));
+        } catch (RequestException $e) {
+            $dVueErreur[] = "Erreur ajout rappel : " . $e->getMessage();
         }
     }
 }
-?>

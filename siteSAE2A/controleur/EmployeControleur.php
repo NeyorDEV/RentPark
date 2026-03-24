@@ -13,348 +13,329 @@ require_once __DIR__ . '/ApiHelper.php';
 class EmployeControleur
 {
     use RoleAwareTrait;
+
     private Connection $connection;
     private VehicleGateway $gateway;
-
     private UserGateway $userGateway;
-
     private ReservationGateway $reservationGateway;
-
     private Client $apiClient;
+    private Client $clientApiClient;
 
     public function __construct()
     {
         global $rep, $vues, $user, $pass, $dsn, $action;
-
         $this->checkEmploye();
-
-        
         $dVueErreur = [];
 
         try {
-            $this->connection = new Connection($dsn, $user, $pass);
-            $this->gateway = new VehicleGateway($this->connection);
-            $this->userGateway = new UserGateway($this->connection);
+            $this->connection         = new Connection($dsn, $user, $pass);
+            $this->gateway            = new VehicleGateway($this->connection);
+            $this->userGateway        = new UserGateway($this->connection);
             $this->reservationGateway = new ReservationGateway($this->connection);
-
-            $this->apiClient = getApiClient();
-
+            $this->apiClient          = getApiClient();
+            $this->clientApiClient    = getClientApiClient();
 
             switch ($action) {
-                case "affichePlanning":
-                    $this->affichePlanning($dVueErreur);
-                    break;
-                case "listeClients":
-                    $this->listeClients($dVueErreur);
-                    break;
-                case "listeUtilisateurs":
-                    $this->listeUtilisateurs($dVueErreur);
-                    break;
-                case 'listeReservation':
-                    $this->listeReservation($dVueErreur);
-                    break;
-                case 'listeVoitures':
-                    $this->listeVoitures($dVueErreur);
-                    break;
+                case "affichePlanning":    $this->affichePlanning($dVueErreur); break;
+                case "listeClients":       $this->listeClients($dVueErreur); break;
+                case "listeUtilisateurs":  $this->listeUtilisateurs($dVueErreur); break;
+                case 'listeReservation':   $this->listeReservation($dVueErreur); break;
+                case 'listeVoitures':      $this->listeVoitures($dVueErreur); break;
                 default:
-                    $dVueEreur[] = "Action inconnue";
-                    $this->afficherVue('homeCustomers', $dVueEreur, $results = null);
+                    $dVueErreur[] = "Action inconnue";
+                    $this->afficherVue('homeCustomers', $dVueErreur, null);
                     break;
             }
-
         } catch (\PDOException $e) {
             $dVueErreur[] = "Erreur BDD : " . $e->getMessage();
             $this->afficherVue('erreur', $dVueErreur);
         }
-
         exit(0);
     }
 
-
-
-    private function ajouterVoiture(array $dVueEreur)
-{
-    $imagePath = '';
-
-    var_dump($_FILES);
-    die();
-    if (isset($_FILES['image']) && $_FILES['image']['error'] === 0) {
-        $nomFichier = uniqid() . '_' . basename($_FILES['image']['name']);
-        $dossier = __DIR__ . '/../html/icons/' . $nomFichier;
-        if (move_uploaded_file($_FILES['image']['tmp_name'], $dossier)) {
-            $imagePath = 'html/icons/' . $nomFichier;
-        }
-    }
-
-    try {
-        $this->apiClient->post("api/vehicules", [
-            'json' => [
-                'NumSerie'                    => $_POST['NumSerie'],
-                'Energie'                     => $_POST['Energie'],
-                'NbPlaces'                    => (int)$_POST['NbPlaces'],
-                'Categorie'                   => $_POST['Categorie'],
-                'Transmission'                => $_POST['Transmission'],
-                'Boite'                       => $_POST['Boite'],
-                'Etat'                        => $_POST['Etat'] ?? 'Libre',
-                'Puissance'                   => $_POST['Puissance'],
-                'Marque'                      => $_POST['Marque'],
-                'Nom'                         => $_POST['Nom'],
-                'Annee'                       => (int)$_POST['Annee'],
-                'IdAssureur'                  => (int)$_POST['IdAssureur'],
-                'IdFournisseur'               => (int)$_POST['IdFournisseur'],
-                'Prix'                        => $_POST['Prix'] ?? null,
-                'DateAchat'                   => $_POST['DateAchat'],
-                'DateExpirationControleTech'  => $_POST['DateExpirationControleTech'],
-                'DateDernierControleTech'     => $_POST['DateDernierControleTech'],
-                'ImagePath'                   => $imagePath,
-                'Couleur'                     => $_POST['Couleur'] ?? null,
-            ]
-        ]);
-    } catch (RequestException $e) {
-        $dVueEreur[] = "Erreur création véhicule : " . $e->getMessage();
-        $results = [];
-        $this->afficherVue('flotte', $dVueEreur, $results);
-        return;
-    }
-
-    header("Location: /siteSAE2A/voitures");
-    exit;
-}
-
-    private function supprimerVoiture(array $dVueEreur)
+    private function authHeaders(): array
     {
-        $id = ($_POST['NumSerie'] ?? -1);
-        try {
-            $this->apiClient->delete("api/vehicules/$id");
-        } catch (RequestException $e) {
-            $dVueEreur[] = "Erreur lors de la suppression via l’API.";
+        return [
+            'headers' => [
+                'Authorization' => 'Bearer ' . ($_SESSION['api_token'] ?? ''),
+                'Content-Type'  => 'application/json',
+            ]
+        ];
+    }
+
+    private function withAuth(array $options = []): array
+    {
+        return array_merge_recursive($this->authHeaders(), $options);
+    }
+
+    private function ajouterVoiture(array $dVueErreur)
+    {
+        $imagePath = '';
+
+        if (isset($_FILES['image']) && $_FILES['image']['error'] === 0) {
+            $nomFichier = uniqid() . '_' . basename($_FILES['image']['name']);
+            $dossier    = __DIR__ . '/../html/icons/' . $nomFichier;
+            if (move_uploaded_file($_FILES['image']['tmp_name'], $dossier)) {
+                $imagePath = 'html/icons/' . $nomFichier;
+            }
         }
-        header("Location: /sitesae2A/voitures");
+
+        try {
+            $this->apiClient->post("api/vehicules", $this->withAuth([
+                'json' => [
+                    'NumSerie'                   => $_POST['NumSerie'],
+                    'Energie'                    => $_POST['Energie'],
+                    'NbPlaces'                   => (int)$_POST['NbPlaces'],
+                    'Categorie'                  => $_POST['Categorie'],
+                    'Transmission'               => $_POST['Transmission'],
+                    'Boite'                      => $_POST['Boite'],
+                    'Etat'                       => $_POST['Etat'] ?? 'Libre',
+                    'Puissance'                  => $_POST['Puissance'],
+                    'Marque'                     => $_POST['Marque'],
+                    'Nom'                        => $_POST['Nom'],
+                    'Annee'                      => (int)$_POST['Annee'],
+                    'IdAssureur'                 => (int)$_POST['IdAssureur'],
+                    'IdFournisseur'              => (int)$_POST['IdFournisseur'],
+                    'Prix'                       => $_POST['Prix'] ?? null,
+                    'DateAchat'                  => $_POST['DateAchat'],
+                    'DateExpirationControleTech' => $_POST['DateExpirationControleTech'],
+                    'DateDernierControleTech'    => $_POST['DateDernierControleTech'],
+                    'ImagePath'                  => $imagePath,
+                    'Couleur'                    => $_POST['Couleur'] ?? null,
+                ]
+            ]));
+        } catch (RequestException $e) {
+            $dVueErreur[] = "Erreur création véhicule : " . $e->getMessage();
+            $this->afficherVue('flotte', $dVueErreur, []);
+            return;
+        }
+
+        header("Location: /siteSAE2A/voitures");
         exit;
     }
 
-    private function modifierVoiture(array $dVueEreur)
-{
-    $numSerie = $_POST['NumSerie'] ?? '';
-    
-    $data = [
-        'Prix'                       => $_POST['Prix'] ?? null,
-        'Energie'                    => $_POST['Energie'] ?? null,
-        'Boite'                      => $_POST['Boite'] ?? null,
-        'Etat'                       => $_POST['Etat'] ?? null,
-        'Couleur'                    => $_POST['Couleur'] ?? null,
-        'Puissance'                  => $_POST['Puissance'] ?? null,
-        'Categorie'                  => $_POST['Categorie'] ?? null,
-        'Transmission'               => $_POST['Transmission'] ?? null,
-        'DateExpirationControleTech' => $_POST['DateExpirationControleTech'] ?? null,
-        'DateDernierControleTech'    => $_POST['DateDernierControleTech'] ?? null,
-    ];
-
-    // Gestion image si fournie
-    if (isset($_FILES['image']) && $_FILES['image']['error'] === 0) {
-        $nomFichier = uniqid() . '_' . basename($_FILES['image']['name']);
-        $dossier = __DIR__ . '/../html/icons/' . $nomFichier;
-        if (move_uploaded_file($_FILES['image']['tmp_name'], $dossier)) {
-            $data['ImagePath'] = 'html/icons/' . $nomFichier;
+    private function supprimerVoiture(array $dVueErreur)
+    {
+        $id = $_POST['NumSerie'] ?? -1;
+        try {
+            $this->apiClient->delete("api/vehicules/$id", $this->authHeaders());
+        } catch (RequestException $e) {
+            $dVueErreur[] = "Erreur suppression : " . $e->getMessage();
         }
+        header("Location: /siteSAE2A/voitures");
+        exit;
     }
 
-    try {
-        $this->apiClient->put("api/vehicules/$numSerie", ['json' => $data]);
-    } catch (RequestException $e) {
-        $dVueEreur[] = "Erreur modification : " . $e->getMessage();
+    private function modifierVoiture(array $dVueErreur)
+    {
+        $numSerie = $_POST['NumSerie'] ?? '';
+        $data = [
+            'Prix'                       => $_POST['Prix']                       ?? null,
+            'Energie'                    => $_POST['Energie']                    ?? null,
+            'Boite'                      => $_POST['Boite']                      ?? null,
+            'Etat'                       => $_POST['Etat']                       ?? null,
+            'Couleur'                    => $_POST['Couleur']                    ?? null,
+            'Puissance'                  => $_POST['Puissance']                  ?? null,
+            'Categorie'                  => $_POST['Categorie']                  ?? null,
+            'Transmission'               => $_POST['Transmission']               ?? null,
+            'DateExpirationControleTech' => $_POST['DateExpirationControleTech'] ?? null,
+            'DateDernierControleTech'    => $_POST['DateDernierControleTech']    ?? null,
+        ];
+
+        if (isset($_FILES['image']) && $_FILES['image']['error'] === 0) {
+            $nomFichier = uniqid() . '_' . basename($_FILES['image']['name']);
+            $dossier    = __DIR__ . '/../html/icons/' . $nomFichier;
+            if (move_uploaded_file($_FILES['image']['tmp_name'], $dossier)) {
+                $data['ImagePath'] = 'html/icons/' . $nomFichier;
+            }
+        }
+
+        try {
+            $this->apiClient->put("api/vehicules/$numSerie", $this->withAuth(['json' => $data]));
+        } catch (RequestException $e) {
+            $dVueErreur[] = "Erreur modification : " . $e->getMessage();
+        }
+
+        header("Location: /siteSAE2A/voitures");
+        exit;
     }
 
-    header("Location: /siteSAE2A/voitures");
-    exit;
-}
-
-private function rechercherVoitures(array $dVueErreur = []): void
-{
-    $motCle = trim($_GET['q'] ?? '');
-
-    try {
-        if ($motCle === '') {
-            $response = $this->apiClient->get('api/vehicules');
-        } else {
-            $response = $this->apiClient->get('api/vehicules', [
-                'query' => ['nom' => $motCle]
-            ]);
-        }
-        $results = json_decode($response->getBody()->getContents(), true);
-
-        if (empty($results)) {
-            $dVueErreur[] = "Aucune voiture trouvée pour \"$motCle\".";
+    private function rechercherVoitures(array $dVueErreur = []): void
+    {
+        $motCle = trim($_GET['q'] ?? '');
+        try {
+            $options  = $motCle !== '' ? $this->withAuth(['query' => ['nom' => $motCle]]) : $this->authHeaders();
+            $response = $this->apiClient->get('api/vehicules', $options);
+            $results  = json_decode($response->getBody()->getContents(), true) ?? [];
+            if (empty($results)) $dVueErreur[] = "Aucune voiture trouvée pour \"$motCle\".";
+        } catch (RequestException $e) {
+            $dVueErreur[] = "Erreur recherche : " . $e->getMessage();
             $results = [];
         }
-    } catch (RequestException $e) {
-        $dVueErreur[] = "Erreur lors de la recherche : " . $e->getMessage();
-        $results = [];
+        $this->afficherVue('flotte', $dVueErreur, $results);
     }
 
-    $this->afficherVue('flotte', $dVueErreur, $results);
-}
+    public function listeVoitures(array $dVueErreur)
+    {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $sousAction = $_POST['action'] ?? '';
+            switch ($sousAction) {
+                case 'ajouterVoiture':   $this->ajouterVoiture($dVueErreur);  break;
+                case 'supprimerVoiture': $this->supprimerVoiture($dVueErreur); break;
+                case 'modifierVoiture':  $this->modifierVoiture($dVueErreur);  break;
+            }
+            header("Location: /siteSAE2A/voitures");
+            exit;
+        }
+
+        $sousAction = $_GET['action'] ?? '';
+        if ($sousAction === 'rechercherVoitures') {
+            $this->rechercherVoitures($dVueErreur);
+            return;
+        }
+
+        try {
+            $response = $this->apiClient->get('api/vehicules', $this->authHeaders());
+            $results  = json_decode($response->getBody()->getContents(), true) ?? [];
+        } catch (RequestException $e) {
+            $dVueErreur[] = "Impossible de récupérer les véhicules.";
+            $results = [];
+        }
+        $this->afficherVue('flotte', $dVueErreur, $results);
+    }
 
     private function rechercherUtilisateur(array $dVueErreur = []): void
     {
         $motCle = trim($_GET['q'] ?? '');
-
         if ($motCle === '') {
             $results = $this->userGateway->getAllUser();
         } else {
             $results = $this->userGateway->rechercherUtilisateur($motCle);
-
-            if (empty($results)) {
-                $dVueErreur[] = "Aucun utilisateur trouvée pour \"$motCle\".";
-            }
+            if (empty($results)) $dVueErreur[] = "Aucun utilisateur trouvé pour \"$motCle\".";
         }
-
         $this->afficherVue('user', $dVueErreur, $results);
     }
 
     private function rechercherClient(array $dVueErreur = []): void
     {
-        //A faire
-        $motCle = trim($_GET['q'] ?? '');
+        $motCle  = trim($_GET['q'] ?? '');
+        $results = [];
 
-        if ($motCle === '') {
-            //A faire
-        } else {
-            // A faire
-
-            if (empty($results)) {
-                $dVueErreur[] = "Aucun Client trouvée pour \"$motCle\".";
+        try {
+            if ($motCle === '') {
+                $response = $this->apiClient->get('clients', $this->authHeaders());
+            } else {
+                $response = $this->apiClient->get('clients', $this->withAuth(['query' => ['q' => $motCle]]));
             }
+            $results = json_decode($response->getBody()->getContents(), true) ?? [];
+            if (empty($results)) $dVueErreur[] = "Aucun client trouvé pour \"$motCle\".";
+        } catch (RequestException $e) {
+            $dVueErreur[] = "Erreur recherche client : " . $e->getMessage();
         }
 
         $this->afficherVue('client', $dVueErreur, $results);
     }
 
-    private function ajouterUtilisateur(array $dVueEreur)
+    private function ajouterUtilisateur(array $dVueErreur)
     {
         $username = $_POST['username'] ?? '';
         $password = $_POST['password'] ?? '';
-        $confirm = $_POST['confirm'] ?? '';
-        $role = $_POST['role'] ?? '';
+        $confirm  = $_POST['confirm']  ?? '';
+        $role     = $_POST['role']     ?? '';
 
         Validation::val_user($username, $password, $confirm, $role);
 
-        if (empty($dVueEreur)) {
+        if (empty($dVueErreur)) {
             $this->userGateway->addUser($username, $password, $role);
             header("Location: /siteSAE2A/utilisateurs");
             exit;
-
         }
 
-        $response = $this->apiClient->get('users');
-        $results = json_decode($response->getBody()->getContents(), true);
-        $this->afficherVue('user', $dVueEreur, $results);
+        $results = $this->userGateway->getAllUser();
+        $this->afficherVue('user', $dVueErreur, $results);
     }
-    private function ajouterClient(array $dVueEreur)
+
+    private function ajouterClient(array $dVueErreur)
     {
-        $Nom = $_POST['nom'] ?? '';
-        $Prenom = $_POST['prenom'] ?? '';
-        $Email = $_POST['email'] ?? '';
-        $NumTel = $_POST['numTel'] ?? '';
-        $NumPermis = $_POST['numPermis'] ?? '';
-        $DateNaiss = $_POST['dateNaiss'] ?? '';
-        $Nationalite = $_POST['nationalite'] ?? '';
-        
+        $data = [
+            'Nom'         => $_POST['nom']         ?? '',
+            'Prenom'      => $_POST['prenom']      ?? '',
+            'Email'       => $_POST['email']       ?? '',
+            'NumTel'      => $_POST['numTel']      ?? '',
+            'NumPermis'   => $_POST['numPermis']   ?? '',
+            'DateNaiss'   => $_POST['dateNaiss']   ?? '',
+            'Nationalite' => $_POST['nationalite'] ?? '',
+        ];
 
-        //Validation::val_client($Nom, $Prenom, $Email, $NumTel, $NumPermis, $DateNaiss, $Nationalite, $IdClient, $dVueEreur);
-
-        if (empty($dVueEreur)) {
-            $this->apiClient->post("client", [
-                'json' => [
-                    'Nom' => $Nom,
-                    'Prenom' => $Prenom,
-                    'Email' => $Email,
-                    'NumTel' => $NumTel,
-                    'NumPermis' => $NumPermis,
-                    'DateNaiss' => $DateNaiss,
-                    'Nationalite' => $Nationalite
-                ]
-            ]);
-            header("Location: /siteSAE2A/clients");
-            exit;
-
+        if (empty($dVueErreur)) {
+            try {
+                $this->apiClient->post("client", $this->withAuth(['json' => $data]));
+                header("Location: /siteSAE2A/clients");
+                exit;
+            } catch (RequestException $e) {
+                $dVueErreur[] = "Erreur ajout client : " . $e->getMessage();
+            }
         }
 
-        $response = $this->apiClient->get('clients');
-        $results = json_decode($response->getBody()->getContents(), true);
-        $this->afficherVue('client', $dVueEreur, $results);
+        $response = $this->apiClient->get('clients', $this->authHeaders());
+        $results  = json_decode($response->getBody()->getContents(), true) ?? [];
+        $this->afficherVue('client', $dVueErreur, $results);
     }
-    private function modifierClient(array $dVueEreur)
+
+    private function modifierClient(array $dVueErreur)
     {
-        
-        $Nom = $_POST['nom'] ?? '';
-        $Prenom = $_POST['prenom'] ?? '';
-        $Email = $_POST['email'] ?? '';
-        $NumTel = $_POST['numTel'] ?? '';
-        $NumPermis = $_POST['numPermis'] ?? '';
-        $DateNaiss = $_POST['dateNaiss'] ?? '';
-        $Nationalite = $_POST['nationalite'] ?? '';
-        $IdClient = (int) ($_POST['idClient'] ?? -1);
+        $IdClient = (int)($_POST['idClient'] ?? -1);
+        $data = [
+            'Nom'         => $_POST['nom']         ?? '',
+            'Prenom'      => $_POST['prenom']      ?? '',
+            'Email'       => $_POST['email']       ?? '',
+            'NumTel'      => $_POST['numTel']      ?? '',
+            'NumPermis'   => $_POST['numPermis']   ?? '',
+            'DateNaiss'   => $_POST['dateNaiss']   ?? '',
+            'Nationalite' => $_POST['nationalite'] ?? '',
+        ];
 
-        //Validation::val_client($Nom, $Prenom, $Email, $NumTel, $NumPermis, $DateNaiss, $Nationalite, $IdClient, $dVueEreur);
-
-        if (empty($dVueEreur)) {
-            $this->apiClient->put("client/$IdClient", [
-                'json' => [
-                    'Nom' => $Nom,
-                    'Prenom' => $Prenom,
-                    'Email' => $Email,
-                    'NumTel' => $NumTel,
-                    'NumPermis' => $NumPermis,
-                    'DateNaiss' => $DateNaiss,
-                    'Nationalite' => $Nationalite
-                ]
-            ]);
-            
-            header("Location: /siteSAE2A/clients");
-            exit;
+        if (empty($dVueErreur)) {
+            try {
+                $this->apiClient->put("client/$IdClient", $this->withAuth(['json' => $data]));
+                header("Location: /siteSAE2A/clients");
+                exit;
+            } catch (RequestException $e) {
+                $dVueErreur[] = "Erreur modification client : " . $e->getMessage();
+            }
         }
-        $response = $this->apiClient->get('clients');
-        $results = json_decode($response->getBody()->getContents(), true);
-        $this->afficherVue('client', $dVueEreur, $results);
-    }
-    public function listeUtilisateurs(array $dVueEreur)
-    {
 
+        $response = $this->apiClient->get('clients', $this->authHeaders());
+        $results  = json_decode($response->getBody()->getContents(), true) ?? [];
+        $this->afficherVue('client', $dVueErreur, $results);
+    }
+
+    public function listeUtilisateurs(array $dVueErreur)
+    {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $sousAction = $_POST['action'] ?? '';
-
-            switch ($sousAction) {
-                case 'ajouterUtilisateur':
-                    $this->ajouterUtilisateur($dVueEreur);
-                    break;
-            }
+            if ($sousAction === 'ajouterUtilisateur') $this->ajouterUtilisateur($dVueErreur);
             header("Location: /siteSAE2A/utilisateurs");
             exit;
         }
 
         $sousAction = $_GET['action'] ?? '';
         if ($sousAction === 'rechercherUtilisateur') {
-            $this->rechercherUtilisateur($dVueEreur);
+            $this->rechercherUtilisateur($dVueErreur);
             return;
         }
-        $results = $this->userGateway->getAllUser();
-        $this->afficherVue('user', $dVueEreur, $results);
-    }
-    public function listeClients(array $dVueEreur)
-    {
 
+        $results = $this->userGateway->getAllUser();
+        $this->afficherVue('user', $dVueErreur, $results);
+    }
+
+    public function listeClients(array $dVueErreur)
+    {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $sousAction = $_POST['action'] ?? '';
-
             switch ($sousAction) {
-                case 'ajouterClient':
-                    $this->ajouterClient($dVueEreur);
-                    break;
-                case 'modifierClient':
-                    $this->modifierClient($dVueEreur);
-                    break;
-
+                case 'ajouterClient':  $this->ajouterClient($dVueErreur);  break;
+                case 'modifierClient': $this->modifierClient($dVueErreur); break;
             }
             header("Location: /siteSAE2A/clients");
             exit;
@@ -362,193 +343,138 @@ private function rechercherVoitures(array $dVueErreur = []): void
 
         $sousAction = $_GET['action'] ?? '';
         if ($sousAction === 'rechercherClient') {
-            $this->rechercherClient($dVueEreur);
+            $this->rechercherClient($dVueErreur);
             return;
         }
-        $response = $this->apiClient->get('clients');
-        $results = json_decode($response->getBody()->getContents(), true);
-        $this->afficherVue('client', $dVueEreur, $results);
-    }
-
-    public function listeVoitures(array $dVueEreur)
-    {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $sousAction = $_POST['action'] ?? '';
-
-            switch ($sousAction) {
-                case 'ajouterVoiture':
-                    $this->ajouterVoiture($dVueEreur);
-                    break;
-
-                case 'supprimerVoiture':
-                    $this->supprimerVoiture($dVueEreur);
-                    break;
-
-                case 'modifierVoiture':
-                    $this->modifierVoiture($dVueEreur);
-                    break;
-            }
-
-            header("Location: /siteSAE2A/voitures");
-            exit;
-        }
-
-
-        $sousAction = $_GET['action'] ?? '';
-        if ($sousAction === 'rechercherVoitures') {
-            $this->rechercherVoitures($dVueEreur);
-            return;
-        }
-
 
         try {
-            $response = $this->apiClient->get('api/vehicules');
-
-            $results = json_decode(
-                $response->getBody()->getContents(),
-                true
-            );
-
+            $response = $this->clientApiClient->get('api/clients', $this->authHeaders());
+            $results  = json_decode($response->getBody()->getContents(), true) ?? [];
         } catch (RequestException $e) {
-            $dVueEreur[] = "Impossible de récupérer les véhicules depuis l’API.";
+            $dVueErreur[] = "Erreur chargement clients : " . $e->getMessage();
             $results = [];
         }
-
-        $this->afficherVue('flotte', $dVueEreur, $results);
-
+        $this->afficherVue('client', $dVueErreur, $results);
     }
 
-    // ---------------------------| Reservations |-----------------------------------------------------------
-    private function rechercherReservation(array &$dVueEreur = []): void
+    private function rechercherReservation(array &$dVueErreur = []): void
     {
-        $champ = $_GET['champ'] ?? 'idContrat';
-        $q = trim($_GET['q'] ?? '');
+        $champ  = $_GET['champ']  ?? 'idContrat';
+        $q      = trim($_GET['q'] ?? '');
         $filtre = $_GET['filtre'] ?? 'en-cours';
-
+        $today  = date('Y-m-d');
         $results = [];
+
         try {
-            $response = $this->apiClient->get('contrat');
+            $response    = $this->apiClient->get('contrat', $this->authHeaders());
             $allContrats = json_decode($response->getBody()->getContents(), true) ?? [];
 
-            $today = date('Y-m-d');
-
             $filtered = array_filter($allContrats, function ($c) use ($champ, $q, $filtre, $today) {
-
-                $match = false;
                 switch ($filtre) {
-                    case 'a-valider':
-                        $match = (isset($c['Statut']) && $c['Statut'] === 'EnCoursValidation');
-                        break;
-                    case 'a-venir':
-                        $match = ($c['DateDebut'] > $today);
-                        break;
-                    case 'passees':
-                        $match = ($c['DateFin'] < $today);
-                        break;
-                    case 'toutes':
-                        $match = true;
-                        break;
-                    case 'en-cours':
-                    default:
-                        $match = ($c['DateDebut'] <= $today && $c['DateFin'] >= $today);
-                        break;
+                    case 'a-valider': $match = ($c['Statut'] ?? '') === 'EnCoursValidation'; break;
+                    case 'a-venir':   $match = ($c['DateDebut'] ?? '') > $today; break;
+                    case 'passees':   $match = ($c['DateFin']   ?? '') < $today; break;
+                    case 'toutes':    $match = true; break;
+                    default:          $match = ($c['DateDebut'] ?? '') <= $today && ($c['DateFin'] ?? '') >= $today;
                 }
-                if (!$match)
-                    return false;
-
+                if (!$match) return false;
                 if ($q !== '') {
-                    $idContrat = $c['idContrat'] ?? $c['IdContrat'] ?? '';
-                    $idClient = $c['IdClient'] ?? $c['idClient'] ?? '';
+                    $idContrat  = $c['idContrat']  ?? $c['IdContrat']  ?? '';
+                    $idClient   = $c['IdClient']   ?? $c['idClient']   ?? '';
                     $idVehicule = $c['IdVehicule'] ?? $c['idVehicule'] ?? '';
-
-                    if ($champ === 'idContrat' && (string) $idContrat !== $q)
-                        return false;
-                    if ($champ === 'Client' && (string) $idClient !== $q)
-                        return false;
-                    if ($champ === 'Vehicule' && stripos((string) $idVehicule, $q) === false)
-                        return false;
+                    if ($champ === 'idContrat' && (string)$idContrat  !== $q) return false;
+                    if ($champ === 'Client'    && (string)$idClient   !== $q) return false;
+                    if ($champ === 'Vehicule'  && stripos((string)$idVehicule, $q) === false) return false;
                 }
                 return true;
             });
 
             foreach ($filtered as $c) {
                 $results[] = [
-                    'idContrat' => $c['idContrat'] ?? $c['IdContrat'] ?? null,
-                    'IdClient' => $c['IdClient'] ?? $c['idClient'] ?? null,
+                    'idContrat'  => $c['idContrat']  ?? $c['IdContrat']  ?? null,
+                    'IdClient'   => $c['IdClient']   ?? $c['idClient']   ?? null,
                     'idVehicule' => $c['IdVehicule'] ?? $c['idVehicule'] ?? null,
-                    'DateDebut' => $c['DateDebut'] ?? null,
-                    'DateFin' => $c['DateFin'] ?? null,
-                    'Statut' => $c['Statut'] ?? null
+                    'DateDebut'  => $c['DateDebut']  ?? null,
+                    'DateFin'    => $c['DateFin']    ?? null,
+                    'Statut'     => $c['Statut']     ?? null,
                 ];
             }
-
         } catch (RequestException $e) {
-            $dVueEreur[] = "Impossible de récupérer les contrats via l'API.";
+            $dVueErreur[] = "Impossible de récupérer les contrats.";
         }
 
-        $this->afficherVue('reservation', $dVueEreur, $results);
+        $this->afficherVue('reservation', $dVueErreur, $results);
     }
 
     private function ajouterReservation(array $post, array &$dVueErreur): void
     {
-        $vehicule = trim($post['Vehicule'] ?? '');
-        $client = (int) ($post['Client'] ?? 0);
-        $dateDebut = trim($post['DateDebut'] ?? '');
-        $dateFin = trim($post['DateFin'] ?? '');
-
         try {
-            $this->apiClient->post('modif/contrat', [
+            $this->apiClient->post('modif/contrat', $this->withAuth([
                 'json' => [
-                    'DateDebut' => $dateDebut,
-                    'DateFin' => $dateFin,
-                    'IdVehicule' => $vehicule,
-                    'IdClient' => $client,
-                    'Statut' => 'EnCoursValidation'
+                    'DateDebut'  => trim($post['DateDebut']  ?? ''),
+                    'DateFin'    => trim($post['DateFin']    ?? ''),
+                    'IdVehicule' => trim($post['Vehicule']   ?? ''),
+                    'IdClient'   => (int)($post['Client']   ?? 0),
+                    'Statut'     => 'EnCoursValidation'
                 ]
-            ]);
+            ]));
         } catch (RequestException $e) {
-            $dVueErreur[] = "Erreur lors de l'ajout via l'API.";
+            $dVueErreur[] = "Erreur ajout réservation : " . $e->getMessage();
         }
-
         $this->rechercherReservation($dVueErreur);
     }
 
     private function modifierReservation(array $post, array &$dVueErreur): void
     {
-        $id = (int) ($post['id'] ?? 0);
-
+        $id = (int)($post['id'] ?? 0);
         try {
-            $this->apiClient->put("contrat/{$id}", [
+            $this->apiClient->put("contrat/$id", $this->withAuth([
                 'json' => [
                     'DateDebut' => trim($post['DateDebut'] ?? ''),
-                    'DateFin' => trim($post['DateFin'] ?? ''),
-                    'Vehicule' => trim($post['Vehicule'] ?? ''),
-                    'Client' => (int) ($post['Client'] ?? 0)
+                    'DateFin'   => trim($post['DateFin']   ?? ''),
+                    'Vehicule'  => trim($post['Vehicule']  ?? ''),
+                    'Client'    => (int)($post['Client']  ?? 0),
                 ]
-            ]);
+            ]));
             header('Location: /siteSAE2A/reservation');
             exit;
         } catch (RequestException $e) {
-            $dVueErreur[] = "Erreur lors de la modification via l'API.";
+            $dVueErreur[] = "Erreur modification réservation : " . $e->getMessage();
         }
-
         $this->rechercherReservation($dVueErreur);
     }
 
     private function supprimerReservation(array &$dVueErreur): void
     {
-        $id = (int) ($_POST['id'] ?? -1);
-
+        $id = (int)($_POST['id'] ?? -1);
         if ($id > 0) {
             try {
-                $this->apiClient->delete("contrat/{$id}");
+                $this->apiClient->delete("contrat/$id", $this->authHeaders());
             } catch (RequestException $e) {
-                $dVueErreur[] = "Erreur lors de la suppression via l'API.";
+                $dVueErreur[] = "Erreur suppression réservation : " . $e->getMessage();
             }
         } else {
-            $dVueErreur[] = "ID invalide pour la suppression.";
+            $dVueErreur[] = "ID invalide.";
         }
+        $this->rechercherReservation($dVueErreur);
+    }
 
+    private function changerStatutReservation(array $post, array &$dVueErreur): void
+    {
+        $id            = (int)($post['id'] ?? 0);
+        $nouveauStatut = trim($post['nouveauStatut'] ?? '');
+
+        if ($id > 0 && in_array($nouveauStatut, ['Validé', 'Annulé'])) {
+            try {
+                $this->apiClient->patch("contrat/$id/statut", $this->withAuth([
+                    'json' => ['Statut' => $nouveauStatut]
+                ]));
+            } catch (RequestException $e) {
+                $dVueErreur[] = "Erreur changement statut : " . $e->getMessage();
+            }
+        } else {
+            $dVueErreur[] = "Données invalides pour le changement de statut.";
+        }
         $this->rechercherReservation($dVueErreur);
     }
 
@@ -556,163 +482,65 @@ private function rechercherVoitures(array $dVueErreur = []): void
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $sousAction = $_POST['action'] ?? '';
-
             switch ($sousAction) {
-                case 'ajouterReservation':
-                    $this->ajouterReservation($_POST, $dVueErreur);
-                    break;
-                case 'modifierReservation':
-                    $this->modifierReservation($_POST, $dVueErreur);
-                    break;
-                case 'supprimerReservation':
-                    $this->supprimerReservation($dVueErreur);
-                    break;
-                case 'changerStatut':
-                    $this->changerStatutReservation($_POST, $dVueErreur);
-                    break;
+                case 'ajouterReservation':   $this->ajouterReservation($_POST, $dVueErreur);   break;
+                case 'modifierReservation':  $this->modifierReservation($_POST, $dVueErreur);  break;
+                case 'supprimerReservation': $this->supprimerReservation($dVueErreur);          break;
+                case 'changerStatut':        $this->changerStatutReservation($_POST, $dVueErreur); break;
             }
             exit;
         }
-
-        $sousAction = $_GET['action'] ?? '';
-        if ($sousAction === 'rechercherReservation') {
-            $this->rechercherReservation($dVueErreur);
-            return;
-        }
-
         $this->rechercherReservation($dVueErreur);
     }
 
-    private function changerStatutReservation(array $post, array &$dVueErreur): void
+    public function affichePlanning(array $dVueErreur)
     {
-        $id = (int) ($post['id'] ?? 0);
-        $nouveauStatut = trim($post['nouveauStatut'] ?? '');
+        $month = max(1, min(12, (int)($_GET['month'] ?? date('m'))));
+        $year  = (int)($_GET['year'] ?? date('Y'));
 
-        if ($id > 0 && in_array($nouveauStatut, ['Validé', 'Annulé'])) {
-            try {
-                $this->apiClient->patch("contrat/{$id}/statut", [
-                    'json' => [
-                        'Statut' => $nouveauStatut
-                    ]
-                ]);
-            } catch (RequestException $e) {
-                $dVueErreur[] = "Erreur lors du changement de statut via l'API.";
-            }
-        } else {
-            $dVueErreur[] = "Données invalides pour le changement de statut.";
-        }
+        $prevMonth = $month - 1; $prevYear = $year;
+        $nextMonth = $month + 1; $nextYear = $year;
+        if ($prevMonth < 1)  { $prevMonth = 12; $prevYear--; }
+        if ($nextMonth > 12) { $nextMonth = 1;  $nextYear++; }
 
-        $this->rechercherReservation($dVueErreur);
-    }
-    public function affichePlanning(array $dVueEreur)
-    {
-        // 🔹 1. Récupération du mois depuis l’URL
-        $month = isset($_GET['month']) ? (int) $_GET['month'] : (int) date('m');
-        $year = isset($_GET['year']) ? (int) $_GET['year'] : (int) date('Y');
-
-        $month = max(1, min(12, $month)); // sécurité
-
-        // 🔹 2. Calcul mois précédent / suivant
-        $prevMonth = $month - 1;
-        $prevYear = $year;
-        $nextMonth = $month + 1;
-        $nextYear = $year;
-
-        if ($prevMonth < 1) {
-            $prevMonth = 12;
-            $prevYear--;
-        }
-        if ($nextMonth > 12) {
-            $nextMonth = 1;
-            $nextYear++;
-        }
-
-        // 🔹 3. Libellé du mois
-        $moisFr = [
-            1 => 'Janvier',
-            2 => 'Février',
-            3 => 'Mars',
-            4 => 'Avril',
-            5 => 'Mai',
-            6 => 'Juin',
-            7 => 'Juillet',
-            8 => 'Août',
-            9 => 'Septembre',
-            10 => 'Octobre',
-            11 => 'Novembre',
-            12 => 'Décembre'
-        ];
-
+        $moisFr = [1=>'Janvier',2=>'Février',3=>'Mars',4=>'Avril',5=>'Mai',6=>'Juin',
+                   7=>'Juillet',8=>'Août',9=>'Septembre',10=>'Octobre',11=>'Novembre',12=>'Décembre'];
         $currentMonthLabel = $moisFr[$month] . " " . $year;
 
-
-
-        // 🔹 4. Récupération des contrats (inchangé)
-        $contracts = $this->reservationGateway->getMonthlyPlanning();
-
-        // 🔹 5. Génération du calendrier du mois demandé
-        $calendar = [];
-        $today = date('Y-m-d');
-
-        $daysInMonth = cal_days_in_month(CAL_GREGORIAN, $month, $year);
+        $contracts     = $this->reservationGateway->getMonthlyPlanning();
+        $daysInMonth   = cal_days_in_month(CAL_GREGORIAN, $month, $year);
+        $today         = date('Y-m-d');
+        $calendar      = [];
 
         for ($day = 1; $day <= $daysInMonth; $day++) {
             $date = sprintf('%04d-%02d-%02d', $year, $month, $day);
-
-            $calendar[$date] = [
-                'label' => $day,
-                'isToday' => ($date === $today),
-                'events' => []
-            ];
+            $calendar[$date] = ['label' => $day, 'isToday' => ($date === $today), 'events' => []];
         }
 
-        // 🔹 6. Ajout des événements
         foreach ($contracts as $c) {
-
-            $eventDepart = [
-                'type' => 'depart',
-                'label' => 'Départ ' . $c['Marque'] . ' ' . $c['Nom'],
+            $base = [
                 'idContrat' => $c['idContrat'] ?? null,
-                'client' => $c['Client'] ?? 'Inconnu',
-                'vehicule' => $c['Marque'] . ' ' . $c['Nom'],
+                'client'    => $c['Client']    ?? 'Inconnu',
+                'vehicule'  => $c['Marque'] . ' ' . $c['Nom'],
                 'dateDebut' => $c['DateDebut'],
-                'dateFin' => $c['DateFin'],
-                'statut' => $c['Statut'] ?? 'Actif'
+                'dateFin'   => $c['DateFin'],
+                'statut'    => $c['Statut']    ?? 'Actif',
             ];
-
-            $eventRetour = [
-                'type' => 'retour',
-                'label' => 'Retour ' . $c['Marque'] . ' ' . $c['Nom'],
-                'idContrat' => $c['idContrat'] ?? null,
-                'client' => $c['Client'] ?? 'Inconnu',
-                'vehicule' => $c['Marque'] . ' ' . $c['Nom'],
-                'dateDebut' => $c['DateDebut'],
-                'dateFin' => $c['DateFin'],
-                'statut' => $c['Statut'] ?? 'Actif'
-            ];
-
-
             if (isset($calendar[$c['DateDebut']])) {
-                $calendar[$c['DateDebut']]['events'][] = $eventDepart;
+                $calendar[$c['DateDebut']]['events'][] = array_merge($base, ['type'=>'depart', 'label'=>'Départ '.$c['Marque'].' '.$c['Nom']]);
             }
             if (isset($calendar[$c['DateFin']])) {
-                $calendar[$c['DateFin']]['events'][] = $eventRetour;
+                $calendar[$c['DateFin']]['events'][]   = array_merge($base, ['type'=>'retour', 'label'=>'Retour '.$c['Marque'].' '.$c['Nom']]);
             }
         }
 
-
-
-        // 🔹 7. Envoi à la vue
-        $results = [
-            'calendar' => $calendar,
-            'prevMonth' => $prevMonth,
-            'prevYear' => $prevYear,
-            'nextMonth' => $nextMonth,
-            'nextYear' => $nextYear,
-            'currentMonthLabel' => $currentMonthLabel
-        ];
-
-        $this->afficherVue('planning', $dVueEreur, $results);
+        $this->afficherVue('planning', $dVueErreur, [
+            'calendar'          => $calendar,
+            'prevMonth'         => $prevMonth,
+            'prevYear'          => $prevYear,
+            'nextMonth'         => $nextMonth,
+            'nextYear'          => $nextYear,
+            'currentMonthLabel' => $currentMonthLabel,
+        ]);
     }
 }
-?>
