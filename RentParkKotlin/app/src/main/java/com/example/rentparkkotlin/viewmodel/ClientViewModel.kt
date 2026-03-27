@@ -10,9 +10,7 @@ import com.example.rentparkkotlin.model.ClientRequest
 import com.example.rentparkkotlin.repository.ClientRepository
 import kotlinx.coroutines.launch
 
-class ClientViewModel : ViewModel() {
-
-    private val repository = ClientRepository()
+class ClientViewModel(private val repository: ClientRepository = ClientRepository()) : ViewModel() {
 
     var clients by mutableStateOf<List<Client>>(emptyList())
         private set
