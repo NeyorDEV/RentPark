@@ -1,4 +1,4 @@
-package com.example.rentparkkotlin.data
+package com.example.rentparkkotlin.data.api
 
 import com.example.rentparkkotlin.model.LoginRequest
 import com.example.rentparkkotlin.model.LoginResponse

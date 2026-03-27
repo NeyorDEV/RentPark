@@ -1,6 +1,10 @@
 package com.example.rentparkkotlin.data
 
 import android.content.Context
+import com.example.rentparkkotlin.data.api.AuthApiService
+import com.example.rentparkkotlin.data.api.ClientApiService
+import com.example.rentparkkotlin.data.api.UserApiService
+import com.example.rentparkkotlin.data.api.VoitureApiService
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -34,7 +38,10 @@ object RetrofitInstance {
     }
 
     val apiAuth: AuthApiService = getRetrofit("rentpark-auth-pod/").create(AuthApiService::class.java)
-    val apiVoiture: VoitureApiService = getRetrofit("rentpark-api-pod/api/").create(VoitureApiService::class.java)
+    val apiVoiture: VoitureApiService = getRetrofit("rentpark-api-pod/api/").create(
+        VoitureApiService::class.java)
+    val apiUser: UserApiService = getRetrofit("rentpark-utilisateurs-pod/api/").create(UserApiService::class.java)
+    val apiClient: ClientApiService = getRetrofit("rentpark-clients-pod/api/").create(ClientApiService::class.java)
 
     private val retrofit = Retrofit.Builder()
         .baseUrl("http://10.0.2.2:8880/") // adapte à ton serveur
