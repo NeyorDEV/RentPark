@@ -19,7 +19,7 @@ class PlanningViewModel : ViewModel() {
     private fun fetchContrats() {
         viewModelScope.launch {
             try {
-                val response = RetrofitInstance.api.getContrats()
+                val response = RetrofitInstance.apiContrat.getContrats()
                 _contrats.value = response
             } catch (e: Exception) {
                 e.printStackTrace()

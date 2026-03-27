@@ -2,6 +2,7 @@ package com.example.rentparkkotlin.repository
 
 import com.example.rentparkkotlin.data.RetrofitInstance
 import com.example.rentparkkotlin.model.RegisterRequest
+import com.example.rentparkkotlin.model.RegisterResponse
 import com.example.rentparkkotlin.model.UpdateUserRequest
 import com.example.rentparkkotlin.model.User
 import retrofit2.Response
@@ -12,7 +13,7 @@ class UserRepository {
         return RetrofitInstance.apiUser.getUsers()
     }
 
-    suspend fun addUser(request: RegisterRequest): Response<com.example.rentparkkotlin.model.RegisterResponse> {
+    suspend fun addUser(request: RegisterRequest): Response<RegisterResponse> {
         return RetrofitInstance.apiUser.register(request)
     }
 

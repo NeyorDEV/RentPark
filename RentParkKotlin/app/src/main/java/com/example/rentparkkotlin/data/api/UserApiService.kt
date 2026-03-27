@@ -24,6 +24,7 @@ interface UserApiService {
 
     @GET("utilisateurs/{id}")
     suspend fun getUser(@Path("id") id: Int): User
+    
     @POST("utilisateurs")
     suspend fun register(@Body request: RegisterRequest): Response<RegisterResponse>
 }

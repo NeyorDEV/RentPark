@@ -6,6 +6,8 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.rentparkkotlin.data.RetrofitInstance
+import com.example.rentparkkotlin.repository.AuthRepository
+import com.example.rentparkkotlin.repository.RappelRepository
 import com.example.rentparkkotlin.ui.dashboard.DashboardCard
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
@@ -14,6 +16,8 @@ import java.util.Date
 import java.util.Locale
 
 class DashboardViewModel : ViewModel() {
+
+    private val repository = RappelRepository()
 
     var cards by mutableStateOf<List<DashboardCard>>(emptyList())
         private set
@@ -32,14 +36,13 @@ class DashboardViewModel : ViewModel() {
                 val totalUsersDeferred = async { RetrofitInstance.api.getTotalUsers() }
                 val bestCarDeferred = async { RetrofitInstance.api.getMostRentedCar() }
                 val incomeDeferred = async { RetrofitInstance.api.getMonthlyIncome() }
-                val rappelsDeferred = async { RetrofitInstance.api.getRappels() }
                 val ctAlertsDeferred = async { RetrofitInstance.api.getCTAlerts() }
                 val contratsDeferred = async { RetrofitInstance.api.getContratsProchains() }
 
                 val totalUsers = totalUsersDeferred.await().totalUsers
                 val bestCar = bestCarDeferred.await().voiturePlusLouee
                 val income = incomeDeferred.await().monthlyIncome
-                val rappels = rappelsDeferred.await()
+                val rappels = repository.getRappels()
                 val ctAlerts = ctAlertsDeferred.await().vehicules
                 val contrats = contratsDeferred.await().contratsProchains
 
@@ -96,6 +99,23 @@ class DashboardViewModel : ViewModel() {
             if (date != null) formatter.format(date) else dateString
         } catch (e: Exception) {
             dateString
+        }
+    }
+
+    fun addRappel(titre: String, description: String, date: String) {
+        viewModelScope.launch {
+            try {
+                val nouveauRappel = com.example.rentparkkotlin.model.Rappel(
+                    titre = titre,
+                    description = description,
+                    date = date
+                )
+                repository.addRappel(nouveauRappel)
+
+                fetchDashboardData()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
     }
 }
