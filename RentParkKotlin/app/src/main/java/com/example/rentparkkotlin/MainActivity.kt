@@ -25,6 +25,12 @@ import com.example.rentparkkotlin.ui.theme.ThemePrefs
 import com.example.rentparkkotlin.data.AuthPrefs // N'oubliez pas cet import !
 import com.example.rentparkkotlin.ui.carsPage.CarListScreen
 import com.example.rentparkkotlin.ui.register.RegisterScreen
+import com.example.rentparkkotlin.ui.planning.PlanningScreen
+import com.example.rentparkkotlin.ui.settings.SettingsPage
+import com.example.rentparkkotlin.ui.userPage.UserManagementScreen
+import  com.example.rentparkkotlin.ui.contratsPage.ContractsScreen
+
+
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -50,7 +56,7 @@ class MainActivity : ComponentActivity() {
                     val startDestination = if (authPrefs.isLoggedIn()) {
                         val role = authPrefs.getRole()
                         // Si c'est un admin ou employé -> Dashboard, sinon -> Accueil Client
-                        if (role == "admin" || role == "employe") "dashboard" else "homeCustomer"
+                        if (role == "admin" || role == "employe") "cars" else "homeCustomer"
                     } else {
                         "login"
                     }
@@ -75,7 +81,7 @@ class MainActivity : ComponentActivity() {
                             )
                         }
 
-                        composable("CarListScreen") {
+                        composable("cars") {
                             CarListScreen()
                         }
 
@@ -105,18 +111,29 @@ class MainActivity : ComponentActivity() {
                             )
                         }
 
-                        // Ajoutez vos autres routes ici plus tard
-                        // composable("cars") { CarListScreen() }
-                        // composable("planning") { PlanningScreen() }
-                        // composable("settings") { SettingsPage(...) }
+                        composable("planning") {
+                            PlanningScreen()
+                        }
 
-                        //SettingsPage(
-                        //    isDarkMode = isDarkMode,
-                        //    onThemeChange = { newValue ->
-                        //        isDarkMode = newValue
-                        //        themePrefs.saveDarkMode(newValue)
-                        //    }
-                        //)
+                        composable("users") {
+                            UserManagementScreen()
+                        }
+                        composable("contrats") {
+                            ContractsScreen()
+                        }
+
+
+                        composable("settings") {
+                            SettingsPage(
+                                isDarkMode = isDarkMode,
+                                onThemeChange = { newValue ->
+                                    isDarkMode = newValue
+                                    themePrefs.saveDarkMode(newValue)
+                                }
+                            )
+                        }
+
+
                     }
                 }
             }
