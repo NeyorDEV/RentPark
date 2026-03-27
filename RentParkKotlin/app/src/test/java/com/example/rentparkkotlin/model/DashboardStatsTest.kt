@@ -1,5 +1,5 @@
 package com.example.rentparkkotlin.model
 
-class MostRentedCarTest {
+class DashboardStatsTest {
 
 }
