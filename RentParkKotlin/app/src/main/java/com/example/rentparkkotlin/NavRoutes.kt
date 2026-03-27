@@ -7,6 +7,9 @@ sealed interface Routes {
     data object LoginRoute
 
     @Serializable
+    data object RegisterRoute
+
+    @Serializable
     data object HomeCustomerRoute
 
     @Serializable
