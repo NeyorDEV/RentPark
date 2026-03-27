@@ -13,101 +13,80 @@ require_once __DIR__ . '/ApiHelper.php';
 class UserController
 {
     use RoleAwareTrait;
-    
-    
+
     private Connection $connection;
     private VehicleGateway $gateway;
-
     private UserGateway $userGateway;
-
     private Client $apiClient;
 
     public function __construct()
     {
         global $rep, $vues, $user, $pass, $dsn, $action;
-
         $dVueErreur = [];
 
         try {
             $this->connection = new Connection($dsn, $user, $pass);
             $this->gateway = new VehicleGateway($this->connection);
             $this->userGateway = new UserGateway($this->connection);
-
             $this->apiClient = getApiClient();
 
-
             switch ($action) {
-                case "afficheInscription":
-                    $this->afficheInscription($dVueErreur);
-                    break;
-                case "afficheConnection":
-                    $this->afficheConnection($dVueErreur);
-                    break;
-                case 'deconnecter':
-                    $this->deconnecter();
-                    break;
-                case "listeVoitures":
-                    $this->listeVoitures($dVueErreur);
-                    break;
-                case 'cars':
-                    $this->cars($dVueErreur);
-                    break;
-                case 'homeCustomers':
-                    $this->homeCustomers($dVueErreur);
-                    break;
-                case 'reservationForm':
-                    $this->reservationForm($dVueErreur);
-                    break;
-                case 'afficheRecapitulatif':
-                    $this->afficheRecapitulatif($dVueErreur);
-                    break;
-                case 'finaliserReservation':
-                    $this->finaliserReservation($dVueErreur);
-                    break;
-                case 'listeReservation':
-                    $this->listeReservation($dVueErreur);
-                    break;
-                case 'afficheParametres':
-                    $this->afficheParametres($dVueErreur);
-                    break;
+                case "afficheInscription":      $this->afficheInscription($dVueErreur); break;
+                case "afficheConnection":       $this->afficheConnection($dVueErreur); break;
+                case 'deconnecter':             $this->deconnecter(); break;
+                case "listeVoitures":           $this->listeVoitures($dVueErreur); break;
+                case 'cars':                    $this->cars($dVueErreur); break;
+                case 'homeCustomers':           $this->homeCustomers($dVueErreur); break;
+                case 'reservationForm':         $this->reservationForm($dVueErreur); break;
+                case 'afficheRecapitulatif':    $this->afficheRecapitulatif($dVueErreur); break;
+                case 'finaliserReservation':    $this->finaliserReservation($dVueErreur); break;
+                case 'listeReservation':        $this->listeReservation($dVueErreur); break;
+                case 'afficheParametres':       $this->afficheParametres($dVueErreur); break;
                 default:
                     $dVueErreur[] = "Action inconnue";
-                    $this->afficherVue('homeCustomers', $dVueErreur, $results = null);
+                    $this->afficherVue('homeCustomers', $dVueErreur, null);
                     break;
             }
-
         } catch (\PDOException $e) {
             $dVueErreur[] = "Erreur BDD : " . $e->getMessage();
             $this->afficherVue('erreur', $dVueErreur);
         }
-
         exit(0);
+    }
+
+    // Token injecté dynamiquement à chaque requête
+    private function authHeaders(): array
+    {
+        return [
+            'headers' => [
+                'Authorization' => 'Bearer ' . ($_SESSION['api_token'] ?? ''),
+                'Content-Type'  => 'application/json',
+            ]
+        ];
+    }
+
+    // Fusionne authHeaders avec d'autres options Guzzle (json, query...)
+    private function withAuth(array $options = []): array
+    {
+        return array_merge_recursive($this->authHeaders(), $options);
     }
 
     public function homeCustomers(array $dVueErreur)
     {
-
-        $this->afficherVue('homeCustomers', $dVueErreur, $results = null);
-
+        $this->afficherVue('homeCustomers', $dVueErreur, null);
     }
 
     public function afficheInscription(array $dVueErreur)
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $sousAction = $_POST['action'] ?? '';
-
-            switch ($sousAction) {
-                case 'inscription':
-                    $this->inscription($dVueErreur);
-                    break;
+            if ($sousAction === 'inscription') {
+                $this->inscription($dVueErreur);
             }
-
-
             header("Location: /siteSAE2A/connection");
             exit;
         }
-        $this->afficherVue('inscription', $dVueErreur, $results = null);
-
+        $this->afficherVue('inscription', $dVueErreur, null);
     }
 
     public function deconnecter(): void
@@ -122,258 +101,205 @@ class UserController
     {
         $username = $_POST['username'] ?? '';
         $password = $_POST['password'] ?? '';
-        $confirm = $_POST['confirm'] ?? '';
-        $role = $_POST['role'] ?? '';
-
+        $confirm  = $_POST['confirm'] ?? '';
+        $role     = $_POST['role'] ?? '';
 
         Validation::val_user($username, $password, $confirm, $dVueErreur);
 
         if (!empty($dVueErreur)) {
-            $dVueErreur[] = "erreur dans l'inscription";
-            $this->afficherVue('erreur', $dVueErreur, $results = null);
+            $dVueErreur[] = "Erreur dans l'inscription";
+            $this->afficherVue('erreur', $dVueErreur, null);
+            return;
         }
 
         $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-
-
-        $user = new User(null, $username, $hashedPassword,$role);
+        $user = new User(null, $username, $hashedPassword, $role);
         $this->userGateway->login($user);
-
-
     }
 
     public function afficheConnection(array $dVueErreur)
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $sousAction = $_POST['action'] ?? '';
-
-            switch ($sousAction) {
-                case 'connection':
-                    $this->connection($dVueErreur);
-                    break;
+            if ($sousAction === 'connection') {
+                $this->connection($dVueErreur);
             }
-
-
             header("Location: /siteSAE2A/home");
             exit;
         }
-        $this->afficherVue('connection', $dVueErreur, $results = null);
-
+        $this->afficherVue('connection', $dVueErreur, null);
     }
 
     public function connection(array &$dVueErreur)
-{
-    $username = $_POST['username'] ?? '';
-    $password = $_POST['password'] ?? '';
-    $savepass = $this->userGateway->getHashPass($username, $password);
-    $_SESSION['role'] = $this->userGateway->getRole($username);
-    $clientId = $this->userGateway->getClientId($username);
+    {
+        $username = $_POST['username'] ?? '';
+        $password = $_POST['password'] ?? '';
+        $savepass = $this->userGateway->getHashPass($username, $password);
 
-    Validation::val_connection($username, $password, $savepass, $dVueErreur);
+        Validation::val_connection($username, $password, $savepass, $dVueErreur);
 
-    if (!empty($dVueErreur)) {
-        $this->afficherVue('erreur', $dVueErreur, $results = null);
-        exit;
+        if (!empty($dVueErreur)) {
+            $this->afficherVue('erreur', $dVueErreur, null);
+            exit;
+        }
+
+        // Régénérer la session AVANT d'écrire dedans
+        session_regenerate_id(true);
+
+        $_SESSION['username'] = $username;
+        $_SESSION['role']     = $this->userGateway->getRole($username);
+        $_SESSION['idClient'] = $this->userGateway->getClientId($username);
+
+        // Login API pour récupérer le token
+        try {
+            $client = new Client([
+                'base_uri' => 'https://codefirst.iut.uca.fr/kubernetes/iut-inf63-projets-etudiants-rentpark/rentpark-auth-pod/',
+                'timeout'  => 60.0
+            ]);
+            $response = $client->post('login', [
+                'json' => ['username' => $username, 'password' => $password]
+            ]);
+            $data = json_decode($response->getBody()->getContents(), true);
+            $_SESSION['api_token'] = $data['token'] ?? '';
+        } catch (RequestException $e) {
+            // API indisponible, on continue sans token
+            $_SESSION['api_token'] = '';
+        }
     }
-
-    session_regenerate_id(true);
-    $_SESSION['username'] = $username;
-    $_SESSION['idClient'] = $clientId;
-
-    // Login API ici une seule fois
-    // Login API avec les credentials du client
-try {
-    $client = new Client([
-        'base_uri' => 'https://codefirst.iut.uca.fr/kubernetes/iut-inf63-projets-etudiants-rentpark/rentpark-api-pod/',
-        'timeout' => 60.0
-    ]);
-    $response = $client->post('login', [
-        'json' => ['username' => $username, 'password' => $password]
-    ]);
-    $data = json_decode($response->getBody()->getContents(), true);
-    $_SESSION['api_token'] = $data['token'];
-} catch (RequestException $e) {
-    // API down, on continue
-}
-}
 
     public function cars(array $dVueErreur)
     {
-        // 1. Récupération des filtres depuis l'URL (GET)
-        $date_depart = $_GET['date_depart'] ?? null;
-        $date_retour = $_GET['date_retour'] ?? null;
-
-        $boite_filtre = $_GET['boite'] ?? null;
-        $energie_filtre = $_GET['energie'] ?? null; 
+        $date_depart   = $_GET['date_depart'] ?? null;
+        $date_retour   = $_GET['date_retour'] ?? null;
+        $boite_filtre  = $_GET['boite'] ?? null;
+        $energie_filtre = $_GET['energie'] ?? null;
         $prix_min = isset($_GET['prix_min']) && $_GET['prix_min'] !== '' ? (float)$_GET['prix_min'] : null;
         $prix_max = isset($_GET['prix_max']) && $_GET['prix_max'] !== '' ? (float)$_GET['prix_max'] : null;
 
-        // 2. Appel de l'API
         try {
-            // On prépare les query parameters pour l'API
-            $queryParams = [
+            $response = $this->apiClient->get('voituresForReservation', $this->withAuth([
                 'query' => [
                     'date_depart' => $date_depart,
                     'date_retour' => $date_retour,
                 ]
-            ];
-            // On passe le tableau de configuration en deuxième argument
-            $response = $this->apiClient->get('voituresForReservation', $queryParams);
-            $results = json_decode($response->getBody()->getContents(), true);
+            ]));
+            $results = json_decode($response->getBody()->getContents(), true) ?? [];
         } catch (RequestException $e) {
-            $dVueErreur[] = "Impossible de récupérer les véhicules depuis l’API.";
+            $dVueErreur[] = "Impossible de récupérer les véhicules depuis l'API.";
             $results = [];
         }
 
-        // 3. Application des filtres PHP
         if (!empty($results)) {
-            $results = array_filter($results, function($voiture) use ($boite_filtre, $energie_filtre, $prix_min, $prix_max) {
-                $match = true;
+            $results = array_values(array_filter($results, function($voiture) use ($boite_filtre, $energie_filtre, $prix_min, $prix_max) {
                 $prixVoiture = isset($voiture['Prix']) ? (float)$voiture['Prix'] : 0;
-
-                if ($boite_filtre && (!isset($voiture['Boite']) || $voiture['Boite'] !== $boite_filtre)) {
-                    $match = false;
-                }
-                
-                // AJOUT : Logique de filtrage pour l'énergie
-                if ($match && $energie_filtre && (!isset($voiture['Energie']) || $voiture['Energie'] !== $energie_filtre)) {
-                    $match = false;
-                }
-
-                if ($match && $prix_min !== null && $prixVoiture < $prix_min) {
-                    $match = false;
-                }
-                if ($match && $prix_max !== null && $prixVoiture > $prix_max) {
-                    $match = false;
-                }
-                return $match;
-            });
-            
-            $results = array_values($results);
+                if ($boite_filtre   && ($voiture['Boite']   ?? '') !== $boite_filtre)   return false;
+                if ($energie_filtre && ($voiture['Energie'] ?? '') !== $energie_filtre) return false;
+                if ($prix_min !== null && $prixVoiture < $prix_min) return false;
+                if ($prix_max !== null && $prixVoiture > $prix_max) return false;
+                return true;
+            }));
         }
 
-    $this->afficherVue('cars', $dVueErreur, $results);
+        $this->afficherVue('cars', $dVueErreur, $results);
     }
 
-    public function reservationForm(array $dVueEreur){
-         $this->afficherVue('reservationForm', $dVueEreur, $results = null);
+    public function reservationForm(array $dVueErreur)
+    {
+        $this->afficherVue('reservationForm', $dVueErreur, null);
     }
 
     public function afficheRecapitulatif(array $dVueErreur)
     {
-        $this->afficherVue('recapitulatif', $dVueErreur, $results = null);
+        $this->afficherVue('recapitulatif', $dVueErreur, null);
     }
 
-    public function finaliserReservation(array &$dVueErreur) 
+    public function finaliserReservation(array &$dVueErreur)
     {
         try {
-            $nom = $_POST['nom'] ?? null;
-            $prenom = $_POST['prenom'] ?? null;
-            $email = $_POST['email'] ?? null;
-            $tel = $_POST['numTel'] ?? null;
-            $permis = $_POST['numPermis'] ?? null;
-            $dateNaiss = $_POST['datenaiss'] ?? null;
+            $nom        = $_POST['nom']        ?? null;
+            $prenom     = $_POST['prenom']     ?? null;
+            $email      = $_POST['email']      ?? null;
+            $tel        = $_POST['numTel']     ?? null;
+            $permis     = $_POST['numPermis']  ?? null;
+            $dateNaiss  = $_POST['datenaiss']  ?? null;
             $nationalite = $_POST['nationalite'] ?? null;
+            $numSerie   = $_POST['num_serie']  ?? null;
+            $dateDebut  = $_POST['date_debut'] ?? null;
+            $dateFin    = $_POST['date_fin']   ?? null;
 
-            // 2. Récupération des données de base de la réservation
-            $numSerie = $_POST['num_serie'] ?? null;
-            $dateDebut = $_POST['date_debut'] ?? null;
-            $dateFin = $_POST['date_fin'] ?? null;
-
-            // --- NOUVELLES VÉRIFICATIONS ---
-            // 1. Vérification de l'âge (18 ans minimum)
             $dateN = new \DateTime($dateNaiss);
-            $aujourdhui = new \DateTime();
-            $age = $aujourdhui->diff($dateN)->y;
-            if ($age < 18) {
-                throw new \Exception("Vous devez avoir au moins 18 ans pour réserver.");
-            }
+            $age   = (new \DateTime())->diff($dateN)->y;
+            if ($age < 18) throw new \Exception("Vous devez avoir au moins 18 ans pour réserver.");
 
-            // 2. Vérification des dates de réservation
             $debut = new \DateTime($dateDebut);
-            $fin = new \DateTime($dateFin);
-            $now = new \DateTime('today'); // Minuit aujourd'hui
+            $fin   = new \DateTime($dateFin);
+            $now   = new \DateTime('today');
+            if ($debut < $now)   throw new \Exception("La date de départ ne peut pas être dans le passé.");
+            if ($fin   < $debut) throw new \Exception("La date de retour doit être égale ou supérieure à la date de départ.");
 
-            if ($debut < $now) {
-                throw new \Exception("La date de départ ne peut pas être dans le passé.");
-            }
-            if ($fin < $debut) {
-                throw new \Exception("La date de retour doit être égale ou supérieure à la date de départ.");
-            }
-
-            // On SELECT le véhicule par son NumSerie pour garantir l'exactitude des données
-            $responseVehicule = $this->apiClient->get("vehicules/$numSerie"); 
+            $responseVehicule = $this->apiClient->get("vehicules/$numSerie", $this->authHeaders());
             $vehicule = json_decode($responseVehicule->getBody()->getContents(), true);
+            if (!$vehicule) throw new \Exception("Véhicule introuvable pour le contrat.");
 
-            if (!$vehicule) {
-                throw new \Exception("Véhicule introuvable pour le contrat.");
-            }
-            
-            // --- ÉTAPE 1 : Créer le client via l'API ---
             try {
-                $responseClient = $this->apiClient->post('client', [
+                $responseClient = $this->apiClient->post('client', $this->withAuth([
                     'json' => [
-                        'Nom' => $nom,
-                        'Prenom' => $prenom,
-                        'Email' => $email,
-                        'NumTel' => $tel,
-                        'NumPermis' => $permis,
-                        'DateNaiss' => $dateNaiss,
+                        'Nom'         => $nom,
+                        'Prenom'      => $prenom,
+                        'Email'       => $email,
+                        'NumTel'      => $tel,
+                        'NumPermis'   => $permis,
+                        'DateNaiss'   => $dateNaiss,
                         'Nationalite' => $nationalite
                     ]
-                ]);
+                ]));
             } catch (RequestException $e) {
                 if ($e->hasResponse()) {
                     $body = $e->getResponse()->getBody()->getContents();
                     $data = json_decode($body, true);
-
                     if ($e->getResponse()->getStatusCode() === 409) {
-                        $dVueErreur[] = "Conflit d'identité : les informations saisies (Email ou Permis) sont déjà liées à un autre compte.";
-                        $dVueErreur[] = $data['message'] ?? "Erreur de doublon en base de données.";
+                        $dVueErreur[] = "Conflit d'identité : Email ou Permis déjà utilisés.";
+                        $dVueErreur[] = $data['message'] ?? "Erreur de doublon.";
                     } else {
-                        $dVueErreur[] = "L'API a rencontré un problème lors du traitement.";
+                        $dVueErreur[] = "Erreur API client.";
                         $dVueErreur[] = $e->getMessage();
                     }
                 } else {
-                    $dVueErreur[] = "Impossible de contacter le serveur distant.";
+                    $dVueErreur[] = "Impossible de contacter le serveur.";
                 }
                 $this->afficherVue('erreur', $dVueErreur, null);
                 return;
             }
 
             $dataClient = json_decode($responseClient->getBody()->getContents(), true);
-            $idClient = $dataClient['idClient'] ?? null;
+            $idClient   = $dataClient['idClient'] ?? null;
 
             if ($idClient) {
-                // --- ÉTAPE 2 : Créer le contrat via l'API ---
-                $responseContrat = $this->apiClient->post('modif/contrat', [
+                $responseContrat = $this->apiClient->post('modif/contrat', $this->withAuth([
                     'json' => [
-                        'DateDebut'  => $dateDebut,
-                        'DateFin'    => $dateFin,
-                        'Statut'     => 'EnCoursValidation',
-                        'IdClient'   => (int)$idClient,
-                        'EtatAvant'  => 5,
-                        'IdVehicule' => $numSerie,
-                        'Marque'     => $vehicule['Marque'], 
-                        'NomModele'  => $vehicule['Nom'],    
-                        'AnneeModele'=> $vehicule['Annee']   
+                        'DateDebut'   => $dateDebut,
+                        'DateFin'     => $dateFin,
+                        'Statut'      => 'EnCoursValidation',
+                        'IdClient'    => (int)$idClient,
+                        'EtatAvant'   => 5,
+                        'IdVehicule'  => $numSerie,
+                        'Marque'      => $vehicule['Marque'],
+                        'NomModele'   => $vehicule['Nom'],
+                        'AnneeModele' => $vehicule['Annee']
                     ]
-                ]);
-
+                ]));
                 $dataContrat = json_decode($responseContrat->getBody()->getContents(), true);
-
                 if (isset($dataContrat['message']) && $dataContrat['message'] === 'Contrat créé avec succès') {
                     $this->afficherVue('confirmationSucces', $dVueErreur);
                 } else {
-                    $dVueErreur[] = "Erreur lors de la création du contrat";
+                    $dVueErreur[] = "Erreur lors de la création du contrat.";
                     $this->afficherVue('erreur', $dVueErreur, null);
                 }
             } else {
-                $dVueErreur[] = "Erreur lors de la création du client";
+                $dVueErreur[] = "Erreur lors de la création du client.";
                 $this->afficherVue('erreur', $dVueErreur, null);
             }
 
-            
         } catch (RequestException $e) {
             $dVueErreur[] = "Erreur API : " . $e->getMessage();
             $this->afficherVue('erreur', $dVueErreur, null);
@@ -385,154 +311,45 @@ try {
 
     public function listeReservation(array $dVueErreur = [])
     {
-        /*  ---->>> ANCIEN CODE DE CLEMENT AVEC GATEWAY A CHANGER AVEC FONCTION : rechercherReservation() PRESENTE EN DESSOUS, 
-            ---->>> ET NON PAS LA GATEWAY, EXEMPLE DANS LE employeController.php SI JAMAIS
-
-
-        $reservationGateway = new \modele\ReservationGateway($this->connection);
-        
-        $idClient = $_SESSION['idClient'] ?? 0; 
-        
-        // Nettoyage des variables GET
-        $filtre = $_GET['filtre'] ?? 'toutes';
-        $champ = $_GET['champ'] ?? 'idContrat';
-        $q = trim($_GET['q'] ?? ''); // <-- Le trim() ici est très important !
-        
-
-        $results = $reservationGateway->searchReservations('IdClient', (string)$idClient, $filtre);
-        if ($this->getRole() == 'admin' || $this->getRole() == 'employe') {
-            $results = $reservationGateway->getAllReservations();
-        } else {
-            
-        }
-        */
-        $results=[];
-        $dVueErreur=['PAGE non faite pour user'];
+        $results = [];
+        $dVueErreur = ['PAGE non faite pour user'];
         $this->afficherVue('erreur', $dVueErreur, $results);
     }
 
-    private function rechercherReservation(array &$dVueEreur = []): void
-    {
-        $champ = $_GET['champ'] ?? 'idContrat';
-        $q = trim($_GET['q'] ?? '');
-        $filtre = $_GET['filtre'] ?? 'en-cours';
-
-        $results = [];
-        try {
-            $response = $this->apiClient->get('contrat');
-            $allContrats = json_decode($response->getBody()->getContents(), true) ?? [];
-
-            $today = date('Y-m-d');
-
-            $filtered = array_filter($allContrats, function ($c) use ($champ, $q, $filtre, $today) {
-
-                $match = false;
-                switch ($filtre) {
-                    case 'a-valider':
-                        $match = (isset($c['Statut']) && $c['Statut'] === 'EnCoursValidation');
-                        break;
-                    case 'a-venir':
-                        $match = ($c['DateDebut'] > $today);
-                        break;
-                    case 'passees':
-                        $match = ($c['DateFin'] < $today);
-                        break;
-                    case 'toutes':
-                        $match = true;
-                        break;
-                    case 'en-cours':
-                    default:
-                        $match = ($c['DateDebut'] <= $today && $c['DateFin'] >= $today);
-                        break;
-                }
-                if (!$match)
-                    return false;
-
-                if ($q !== '') {
-                    $idContrat = $c['idContrat'] ?? $c['IdContrat'] ?? '';
-                    $idClient = $c['IdClient'] ?? $c['idClient'] ?? '';
-                    $idVehicule = $c['IdVehicule'] ?? $c['idVehicule'] ?? '';
-
-                    if ($champ === 'idContrat' && (string) $idContrat !== $q)
-                        return false;
-                    if ($champ === 'Client' && (string) $idClient !== $q)
-                        return false;
-                    if ($champ === 'Vehicule' && stripos((string) $idVehicule, $q) === false)
-                        return false;
-                }
-                return true;
-            });
-
-            foreach ($filtered as $c) {
-                $results[] = [
-                    'idContrat' => $c['idContrat'] ?? $c['IdContrat'] ?? null,
-                    'IdClient' => $c['IdClient'] ?? $c['idClient'] ?? null,
-                    'idVehicule' => $c['IdVehicule'] ?? $c['idVehicule'] ?? null,
-                    'DateDebut' => $c['DateDebut'] ?? null,
-                    'DateFin' => $c['DateFin'] ?? null,
-                    'Statut' => $c['Statut'] ?? null
-                ];
-            }
-
-        } catch (RequestException $e) {
-            $dVueEreur[] = "Impossible de récupérer les contrats via l'API.";
-        }
-
-        $this->afficherVue('reservation', $dVueEreur, $results);
-    }
-    public function listeVoitures(array $dVueEreur)
+    public function listeVoitures(array $dVueErreur)
     {
         $sousAction = $_GET['action'] ?? '';
         if ($sousAction === 'rechercherVoitures') {
-            $this->rechercherVoitures($dVueEreur);
+            $this->rechercherVoitures($dVueErreur);
             return;
         }
         try {
-            $response = $this->apiClient->get('api/vehicules');
-
-            $results = json_decode(
-                $response->getBody()->getContents(),
-                true
-            );
-
+            $response = $this->apiClient->get('api/vehicules', $this->authHeaders());
+            $results  = json_decode($response->getBody()->getContents(), true) ?? [];
         } catch (RequestException $e) {
-            $dVueEreur[] = "Impossible de récupérer les véhicules depuis l’API.";
+            $dVueErreur[] = "Impossible de récupérer les véhicules depuis l'API.";
             $results = [];
         }
-
-        $this->afficherVue('flotte', $dVueEreur, $results);
-
+        $this->afficherVue('flotte', $dVueErreur, $results);
     }
 
     private function rechercherVoitures(array $dVueErreur = []): void
     {
         $motCle = trim($_GET['q'] ?? '');
-
         try {
-            if ($motCle === '') {
-                $response = $this->apiClient->get("api/vehicules");
-            } else {
-                $response = $this->apiClient->get("api/vehicules", [
-                    'query' => ['nom' => $motCle]
-                ]);
-            }
-            $results = json_decode($response->getBody()->getContents(), true);
-
-            if (empty($results)) {
-                $dVueErreur[] = "Aucune voiture trouvée pour \"$motCle\".";
-            }
+            $options = $motCle !== '' ? $this->withAuth(['query' => ['nom' => $motCle]]) : $this->authHeaders();
+            $response = $this->apiClient->get('api/vehicules', $options);
+            $results  = json_decode($response->getBody()->getContents(), true) ?? [];
+            if (empty($results)) $dVueErreur[] = "Aucune voiture trouvée pour \"$motCle\".";
         } catch (\Exception $e) {
-            $dVueErreur[] = "Erreur lors de la recherche via l’API : " . $e->getMessage();
+            $dVueErreur[] = "Erreur recherche : " . $e->getMessage();
             $results = [];
         }
-
         $this->afficherVue('flotte', $dVueErreur, $results);
     }
 
-
     public function afficheParametres(array $dVueErreur)
     {
-
-        $this->afficherVue('parametres', $dVueErreur, $results = null);
+        $this->afficherVue('parametres', $dVueErreur, null);
     }
 }
