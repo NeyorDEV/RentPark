@@ -8,14 +8,18 @@ import retrofit2.Response
 
 class ClientRepository {
     suspend fun getClients(): List<Client> {
-        return RetrofitInstance.api.getClients()
+        return RetrofitInstance.apiClient.getClients()
     }
 
     suspend fun addClient(request: ClientRequest): Response<ClientResponse> {
-        return RetrofitInstance.api.addClient(request)
+        return RetrofitInstance.apiClient.addClient(request)
     }
 
     suspend fun updateClient(id: Int, request: ClientRequest): Response<Unit> {
-        return RetrofitInstance.api.updateClient(id, request)
+        return RetrofitInstance.apiClient.updateClient(id, request)
+    }
+
+    suspend fun getClient(id: Int): Client {
+        return RetrofitInstance.apiClient.getClient(id)
     }
 }
