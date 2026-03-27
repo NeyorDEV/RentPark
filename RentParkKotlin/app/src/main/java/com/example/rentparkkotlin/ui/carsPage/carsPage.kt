@@ -50,7 +50,6 @@ fun CarListScreen(
             .background(Color(0xFFF8F9FA))
 
     ) {
-        Header("Voitures", onMenuClick = {})
         // 1. Barre de Recherche + Bouton Ajouter
         Row(
             modifier = Modifier

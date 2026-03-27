@@ -59,10 +59,6 @@ fun PlanningScreen(planningViewModel: PlanningViewModel = viewModel()) {
     }
 
     Scaffold(
-
-        topBar = {
-            Header("Planning", onMenuClick = {})
-        }
     ) { paddingValues ->
         Column(
             modifier = Modifier

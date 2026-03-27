@@ -67,7 +67,6 @@ fun ContractsScreen() {
             .fillMaxSize()
             .background(Color(0xFF0F0F0F))
     ) {
-        Header("Contrats", onMenuClick = {})
         // NOUVEAU: Réinitialiser reservationToEdit lors d'un ajout
         FilterHeader(onAddClick = {
             reservationToEdit = null
