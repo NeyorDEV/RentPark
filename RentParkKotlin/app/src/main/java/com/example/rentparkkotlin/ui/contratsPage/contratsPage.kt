@@ -18,6 +18,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.rentparkkotlin.ui.header.Header
 
 // --- 1. MODÈLE DE DONNÉES ---
 data class Reservation(
@@ -66,6 +67,7 @@ fun ContractsScreen() {
             .fillMaxSize()
             .background(Color(0xFF0F0F0F))
     ) {
+        Header("Contrats", onMenuClick = {})
         // NOUVEAU: Réinitialiser reservationToEdit lors d'un ajout
         FilterHeader(onAddClick = {
             reservationToEdit = null
@@ -213,6 +215,7 @@ fun ReservationForm(
         modifier = Modifier.padding(24.dp).navigationBarsPadding(),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
+
         Text(
             text = if (isEditing) "Modifier la Réservation" else "Nouvelle Réservation",
             color = Color.White,

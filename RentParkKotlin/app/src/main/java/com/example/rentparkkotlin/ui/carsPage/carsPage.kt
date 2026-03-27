@@ -30,6 +30,7 @@ import com.example.rentparkkotlin.ui.header.Header
 
 @Composable
 fun CarListScreen(
+
     viewModel: CarViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
 ) {
     val voitures = viewModel.voitures
@@ -42,16 +43,19 @@ fun CarListScreen(
 
     val orangeColor = Color(0xFFFF5A19)
 
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFFF8F9FA))
+
     ) {
+        Header("Voitures", onMenuClick = {})
         // 1. Barre de Recherche + Bouton Ajouter
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp),
+                .padding(horizontal = 16.dp, vertical = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {

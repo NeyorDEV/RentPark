@@ -22,7 +22,7 @@ import com.example.rentparkkotlin.ui.photoDevice.PhotoDeviceScreen
 import com.example.rentparkkotlin.ui.login.LoginScreen
 import com.example.rentparkkotlin.ui.theme.RentParkKotlinTheme
 import com.example.rentparkkotlin.ui.theme.ThemePrefs
-import com.example.rentparkkotlin.data.AuthPrefs // N'oubliez pas cet import !
+import com.example.rentparkkotlin.data.AuthPrefs
 import com.example.rentparkkotlin.ui.carsPage.CarListScreen
 import com.example.rentparkkotlin.ui.register.RegisterScreen
 import com.example.rentparkkotlin.ui.planning.PlanningScreen
@@ -56,7 +56,7 @@ class MainActivity : ComponentActivity() {
                     val startDestination = if (authPrefs.isLoggedIn()) {
                         val role = authPrefs.getRole()
                         // Si c'est un admin ou employé -> Dashboard, sinon -> Accueil Client
-                        if (role == "admin" || role == "employe") "cars" else "homeCustomer"
+                        if (role == "admin" || role == "employe") "settings" else "homeCustomer"
                     } else {
                         "login"
                     }

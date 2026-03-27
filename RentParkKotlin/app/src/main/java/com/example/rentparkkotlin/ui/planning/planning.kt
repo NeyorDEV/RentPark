@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.rentparkkotlin.model.Contrat
+import com.example.rentparkkotlin.ui.header.Header
 import com.example.rentparkkotlin.ui.theme.Orange
 import com.example.rentparkkotlin.viewmodel.PlanningViewModel
 import java.time.YearMonth
@@ -58,13 +59,9 @@ fun PlanningScreen(planningViewModel: PlanningViewModel = viewModel()) {
     }
 
     Scaffold(
+
         topBar = {
-            CenterAlignedTopAppBar(
-                title = { Text("Planning Mensuel", fontWeight = FontWeight.Bold) },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = Color(0xFFF5F5F5)
-                )
-            )
+            Header("Planning", onMenuClick = {})
         }
     ) { paddingValues ->
         Column(
@@ -74,6 +71,7 @@ fun PlanningScreen(planningViewModel: PlanningViewModel = viewModel()) {
                 .background(Color(0xFFFDFDFD))
                 .padding(16.dp)
         ) {
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
