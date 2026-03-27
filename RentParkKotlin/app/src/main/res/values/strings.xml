@@ -8,8 +8,8 @@
     <string name="home_show_cars">Voir les véhicules</string>
     <string name="home_connection">Connexion</string>
 
-    <!--    CarsPage     -->
 
+    <!--    CarsPage     -->
     <string name="car_search_placeholder">Rechercher une voiture...</string>
     <string name="filter_price">Prix</string>
     <string name="filter_gearbox">Boîte</string>
@@ -56,7 +56,7 @@
     <string name="state_sold">Vendue</string>
     <string name="state_repair">Réparation</string>
     <string name="places">%1$d places • %2$s </string>
-    <string name="state_repair">Réparation</string>
+    <string name="bloup">Réparation</string>
 
     <!--    ContratsPage     -->
 
