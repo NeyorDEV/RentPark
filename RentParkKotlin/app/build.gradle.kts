@@ -3,6 +3,7 @@ import org.gradle.kotlin.dsl.libs
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
@@ -51,14 +52,14 @@ dependencies {
     implementation("io.coil-kt:coil:2.6.0")
 // chargement images
     implementation(libs.androidx.compose.foundation)
-    
+
     // Retrofit & Converter
     implementation(libs.retrofit)
     implementation(libs.retrofit.converter.gson)
-    
+
     // Lifecycle
     implementation(libs.androidx.lifecycle.viewmodel.compose)
-    
+
     // Image loading
     implementation(libs.coil.compose)
 
@@ -69,5 +70,16 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
-    implementation("androidx.navigation:navigation-compose:2.7.7")
+
+    // Navigation
+    implementation(libs.androidx.navigation.compose)
+
+// Test
+    testImplementation("junit:junit:4.13.2")
+    testImplementation("com.google.code.gson:gson:2.10.1")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
+    implementation("com.google.code.gson:gson:2.10.1")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
+    testImplementation("androidx.arch.core:core-testing:2.2.0")
+    testImplementation("io.mockk:mockk:1.13.8")
 }

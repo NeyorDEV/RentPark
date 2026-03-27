@@ -43,18 +43,20 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
 
                 if (response.isSuccessful) {
                     val body = response.body()
-                    if (body?.success == true) {
+                    if (body?.status == "success") {
 
                         val token = body.token ?: ""
-                        val role = body.role ?: "user"
-                        val user = body.username ?: username
-                        val id = body.id ?: -1
 
-                        authPrefs.saveAuthInfo(token, role, user, id)
+                        val role = body.user?.role ?: "user"
+                        val userStr = body.user?.username ?: username
+
+                        val id = -1
+
+                        authPrefs.saveAuthInfo(token, role, userStr, id)
 
                         loginSuccess = true
                     } else {
-                        error = body?.message ?: "Erreur de connexion"
+                        error = body?.message ?: body?.error ?: "Erreur de connexion"
                     }
                 } else {
                     val errorBody = response.errorBody()?.string()

@@ -38,7 +38,7 @@ import com.example.rentparkkotlin.ui.theme.BlackTheme
 import com.example.rentparkkotlin.ui.theme.Orange
 import kotlinx.coroutines.launch
 
-// Header commun à toutes les pages de rentpark (au moins les pages admin)
+// Header commun à toutes les pages de rentpark
 
 @Composable
 fun Header(title: String, onMenuClick: () -> Unit) {

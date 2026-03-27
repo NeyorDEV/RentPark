@@ -29,7 +29,7 @@ $app->get('/voituresForReservation', function (Request $request, Response $respo
     $dateFin = $params['date_retour'] ?? null;
 
     $queryParams = [];
-    
+
     // Requête de base
     $sql = "SELECT * FROM Vehicule v WHERE 1=1";
 
@@ -391,18 +391,18 @@ $app->put('/client/{IdClient}', function (Request $request, Response $response, 
             DateNaiss = :dateNaiss, 
             Nationalite = :nationalite
         WHERE IdClient = :idClient";
-        $params = [
-        ':nom'         => [$data['Nom'], \PDO::PARAM_STR],
-        ':prenom'      => [$data['Prenom'], \PDO::PARAM_STR],
-        ':email'       => [$data['Email'], \PDO::PARAM_STR],
-        ':numTel'      => [$data['NumTel'] ?? null, \PDO::PARAM_STR],
-        ':numPermis'   => [$data['NumPermis'], \PDO::PARAM_STR],
-        ':dateNaiss'   => [$data['DateNaiss'] ?? null, \PDO::PARAM_STR],
+    $params = [
+        ':nom' => [$data['Nom'], \PDO::PARAM_STR],
+        ':prenom' => [$data['Prenom'], \PDO::PARAM_STR],
+        ':email' => [$data['Email'], \PDO::PARAM_STR],
+        ':numTel' => [$data['NumTel'] ?? null, \PDO::PARAM_STR],
+        ':numPermis' => [$data['NumPermis'], \PDO::PARAM_STR],
+        ':dateNaiss' => [$data['DateNaiss'] ?? null, \PDO::PARAM_STR],
         ':nationalite' => [$data['Nationalite'] ?? null, \PDO::PARAM_STR],
-        ':idClient'    => [$IdClient, \PDO::PARAM_INT]
+        ':idClient' => [$IdClient, \PDO::PARAM_INT]
     ];
 
-        
+
 
     try {
         $conn->executeQuery($sql, $params);
@@ -500,7 +500,7 @@ $app->post('/client', function (Request $request, Response $response, $args) use
             $sql = "UPDATE Client SET Nom = :nom, Prenom = :prenom, Email = :email, NumTel = :numTel, 
                     NumPermis = :numPermis, DateNaiss = :dateNaiss, Nationalite = :nationalite 
                     WHERE idClient = :id";
-            
+
             $params = [
                 ':nom' => [$data['Nom'], \PDO::PARAM_STR],
                 ':prenom' => [$data['Prenom'], \PDO::PARAM_STR],
@@ -717,7 +717,7 @@ $app->patch('/contrat/{id}', function (Request $request, Response $response, $ar
 $app->get('/users', function (Request $request, Response $response, $args) use ($conn) {
 
     $conn->executeQuery("SELECT * FROM users");
-    
+
     $users = $conn->getResults();
 
     $response->getBody()->write(json_encode($users));

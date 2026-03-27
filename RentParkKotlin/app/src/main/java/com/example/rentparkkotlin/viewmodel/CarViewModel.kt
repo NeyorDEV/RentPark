@@ -7,9 +7,17 @@ import androidx.compose.runtime.*
 import com.example.rentparkkotlin.model.Voiture
 import com.example.rentparkkotlin.repository.CarRepository
 
-class CarViewModel : ViewModel() {
+/*
+Si tu lances un test tel quel, ton ViewModel va essayer de contacter la vraie API sur internet.
+Si l'API est hors ligne ou si tu n'as pas de réseau, ton test échoue.
+Un test unitaire doit être isolé et déterministe.
 
-    private val repository = CarRepository()
+La solution : L'Injection de Dépendances
+Tu dois passer le repository au constructeur du ViewModel.
+Ainsi, pendant le test, on pourra lui donner un "Faux" repository (Mock) qui simule des réponses
+(succès, erreur 500, liste vide, etc.).
+*/
+class CarViewModel(private val repository: CarRepository = CarRepository()) : ViewModel() {
 
     var voitures by mutableStateOf<List<Voiture>>(emptyList())
         private set

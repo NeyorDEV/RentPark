@@ -23,11 +23,21 @@ import com.example.rentparkkotlin.ui.login.LoginScreen
 import com.example.rentparkkotlin.ui.theme.RentParkKotlinTheme
 import com.example.rentparkkotlin.ui.theme.ThemePrefs
 import com.example.rentparkkotlin.data.AuthPrefs // N'oubliez pas cet import !
+import com.example.rentparkkotlin.data.RetrofitInstance
+import com.example.rentparkkotlin.ui.carsPage.CarListScreen
 import com.example.rentparkkotlin.ui.register.RegisterScreen
+import com.example.rentparkkotlin.ui.planning.PlanningScreen
+import com.example.rentparkkotlin.ui.settings.SettingsPage
+import com.example.rentparkkotlin.ui.userPage.UserManagementScreen
+import  com.example.rentparkkotlin.ui.contratsPage.ContractsScreen
+
+
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        RetrofitInstance.init(this)
 
         val themePrefs = ThemePrefs(this)
         val authPrefs = AuthPrefs(this) // 1. Initialisation des préférences d'authentification
@@ -44,36 +54,40 @@ class MainActivity : ComponentActivity() {
 
                     // 2. LOGIQUE D'AUTO-CONNEXION
                     // On choisit la page de départ selon l'état de connexion et le rôle
-                    val startDestination = if (authPrefs.isLoggedIn()) {
+                    val startDestination : Any = if (authPrefs.isLoggedIn()) {
                         val role = authPrefs.getRole()
                         // Si c'est un admin ou employé -> Dashboard, sinon -> Accueil Client
-                        if (role == "admin" || role == "employe") "dashboard" else "homeCustomer"
+                        if (role == "admin" || role == "employe") Routes.DashBoardRoute else Routes.HomeCustomerRoute
                     } else {
-                        "homeCustomer"
+                        Routes.LoginRoute
                     }
 
                     // 3. Configuration du routeur (NavHost)
                     NavHost(navController = navController, startDestination = startDestination) {
 
                         // Route : Connexion
-                        // Route : Connexion
-                        composable("login") {
+                        composable<Routes.LoginRoute> {
                             LoginScreen(
                                 onLoginSuccess = {
                                     val role = authPrefs.getRole()
-                                    val destination = if (role == "admin" || role == "employe") "dashboard" else "homeCustomer"
+                                    val destination = if (role == "admin" || role == "employe") Routes.DashBoardRoute else Routes.HomeCustomerRoute
                                     navController.navigate(destination) {
-                                        popUpTo("login") { inclusive = true }
+                                        popUpTo(Routes.LoginRoute) { inclusive = true }
                                     }
                                 },
                                 onNavigateToRegister = {
-                                    navController.navigate("register")
+                                    navController.navigate(Routes.RegisterRoute)
                                 }
                             )
                         }
 
+                        composable<Routes.CarRoute> {
+                            CarListScreen()
+                        }
+
+
                         // Route : Inscription
-                        composable("register") {
+                        composable<Routes.DashBoardRoute> {
                             RegisterScreen(
                                 onNavigateToLogin = {
                                     // Retourne à la page de connexion (dépile la route register)
@@ -83,32 +97,43 @@ class MainActivity : ComponentActivity() {
                         }
 
                         // Route : Dashboard (Admin / Employé)
-                        composable("dashboard") {
+                        composable<Routes.DashBoardRoute> {
                             DashboardScreen()
                         }
 
                         // Route : Accueil Client
-                        composable("homeCustomer") {
+                        composable<Routes.HomeCustomerRoute> {
                             RentParkHomeScreen()
                         }
-                        composable("photoDevice") {
+                        composable<Routes.PhotoRoute> {
                             PhotoDeviceScreen(
                                 onNavigateBack = { navController.popBackStack() }
                             )
                         }
 
-                        // Ajoutez vos autres routes ici plus tard
-                        // composable("cars") { CarListScreen() }
-                        // composable("planning") { PlanningScreen() }
-                        // composable("settings") { SettingsPage(...) }
+                        composable<Routes.PlanningRoute> {
+                            PlanningScreen()
+                        }
 
-                        //SettingsPage(
-                        //    isDarkMode = isDarkMode,
-                        //    onThemeChange = { newValue ->
-                        //        isDarkMode = newValue
-                        //        themePrefs.saveDarkMode(newValue)
-                        //    }
-                        //)
+                        composable<Routes.UserRoute> {
+                            UserManagementScreen()
+                        }
+                        composable<Routes.ContratRoute> {
+                            ContractsScreen()
+                        }
+
+
+                        composable<Routes.SettingsRoute> {
+                            SettingsPage(
+                                isDarkMode = isDarkMode,
+                                onThemeChange = { newValue ->
+                                    isDarkMode = newValue
+                                    themePrefs.saveDarkMode(newValue)
+                                }
+                            )
+                        }
+
+
                     }
                 }
             }

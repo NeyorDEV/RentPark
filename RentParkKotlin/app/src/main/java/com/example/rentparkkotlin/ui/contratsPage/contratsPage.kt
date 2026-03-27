@@ -16,7 +16,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.rentparkkotlin.ui.header.Header
@@ -35,7 +34,7 @@ class ContratsActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             Surface(modifier = Modifier.fillMaxSize(), color = Color.Black) {
-                ContratsScreen()
+                ContractsScreen()
             }
         }
     }
@@ -44,7 +43,7 @@ class ContratsActivity : ComponentActivity() {
 // --- 2. ÉCRAN PRINCIPAL ---
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ContratsScreen() {
+fun ContractsScreen() {
     // État de la liste des réservations
     var reservations by remember {
         mutableStateOf(listOf(
@@ -68,6 +67,7 @@ fun ContratsScreen() {
             .fillMaxSize()
             .background(Color(0xFF0F0F0F))
     ) {
+        Header("Contrats", onMenuClick = {})
         // NOUVEAU: Réinitialiser reservationToEdit lors d'un ajout
         FilterHeader(onAddClick = {
             reservationToEdit = null
@@ -215,6 +215,7 @@ fun ReservationForm(
         modifier = Modifier.padding(24.dp).navigationBarsPadding(),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
+
         Text(
             text = if (isEditing) "Modifier la Réservation" else "Nouvelle Réservation",
             color = Color.White,
