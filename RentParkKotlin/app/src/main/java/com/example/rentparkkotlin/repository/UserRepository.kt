@@ -13,7 +13,7 @@ class UserRepository {
     }
 
     suspend fun addUser(request: RegisterRequest): Response<com.example.rentparkkotlin.model.RegisterResponse> {
-        return RetrofitInstance.api.register(request)
+        return RetrofitInstance.apiAuth.register(request)
     }
 
     suspend fun updateUser(id: Int, request: UpdateUserRequest): Response<Unit> {

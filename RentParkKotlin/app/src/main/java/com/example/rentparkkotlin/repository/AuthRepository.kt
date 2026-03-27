@@ -9,10 +9,10 @@ import retrofit2.Response
 
 class AuthRepository {
     suspend fun login(request: LoginRequest): Response<LoginResponse> {
-        return RetrofitInstance.api.login(request)
+        return RetrofitInstance.apiAuth.login(request)
     }
 
     suspend fun register(request: RegisterRequest): Response<RegisterResponse> {
-        return RetrofitInstance.api.register(request)
+        return RetrofitInstance.apiAuth.register(request)
     }
 }

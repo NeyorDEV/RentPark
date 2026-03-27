@@ -7,14 +7,14 @@ import retrofit2.http.Body
 class CarRepository {
 
     suspend fun getVoitures(): List<Voiture> {
-        return RetrofitInstance.api.getVoitures()
+        return RetrofitInstance.apiVoiture.getVoitures()
     }
 
     suspend fun addVoiture(@Body newVoiture: Voiture) : retrofit2.Response<Unit> {
-        return RetrofitInstance.api.addVoiture(newVoiture)
+        return RetrofitInstance.apiVoiture.addVoiture(newVoiture)
     }
 
     suspend fun deleteVoiture(id: String): retrofit2.Response<Unit> {
-        return RetrofitInstance.api.deleteVoiture(id)
+        return RetrofitInstance.apiVoiture.deleteVoiture(id)
     }
 }

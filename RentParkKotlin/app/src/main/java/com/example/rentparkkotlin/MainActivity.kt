@@ -23,11 +23,14 @@ import com.example.rentparkkotlin.ui.login.LoginScreen
 import com.example.rentparkkotlin.ui.theme.RentParkKotlinTheme
 import com.example.rentparkkotlin.ui.theme.ThemePrefs
 import com.example.rentparkkotlin.data.AuthPrefs // N'oubliez pas cet import !
+import com.example.rentparkkotlin.ui.carsPage.CarListScreen
 import com.example.rentparkkotlin.ui.register.RegisterScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        com.example.rentparkkotlin.data.RetrofitInstance.init(this)
 
         val themePrefs = ThemePrefs(this)
         val authPrefs = AuthPrefs(this) // 1. Initialisation des préférences d'authentification
@@ -49,7 +52,7 @@ class MainActivity : ComponentActivity() {
                         // Si c'est un admin ou employé -> Dashboard, sinon -> Accueil Client
                         if (role == "admin" || role == "employe") "dashboard" else "homeCustomer"
                     } else {
-                        "photoDevice"
+                        "login"
                     }
 
                     // 3. Configuration du routeur (NavHost)
@@ -71,6 +74,11 @@ class MainActivity : ComponentActivity() {
                                 }
                             )
                         }
+
+                        composable("CarListScreen") {
+                            CarListScreen()
+                        }
+
 
                         // Route : Inscription
                         composable("register") {

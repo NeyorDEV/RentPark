@@ -8,13 +8,16 @@ data class LoginRequest(
 )
 
 data class LoginResponse(
-    @SerializedName("success") val success: Boolean?,
+    @SerializedName("status") val status: String?,
     @SerializedName("token") val token: String?,
-    @SerializedName("role") val role: String?,
-    @SerializedName("username") val username: String?,
-    @SerializedName("id") val id: Int?,
+    @SerializedName("user") val user: UserInfo?,
     @SerializedName("message") val message: String?,
     @SerializedName("error") val error: String?
+)
+
+data class UserInfo(
+    @SerializedName("username") val username: String?,
+    @SerializedName("role") val role: String?
 )
 
 data class RegisterRequest(
