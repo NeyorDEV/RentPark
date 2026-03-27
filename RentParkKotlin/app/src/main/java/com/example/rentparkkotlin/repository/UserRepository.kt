@@ -9,18 +9,22 @@ import retrofit2.Response
 class UserRepository {
 
     suspend fun getUsers(): List<User> {
-        return RetrofitInstance.api.getUsers()
+        return RetrofitInstance.apiUser.getUsers()
     }
 
     suspend fun addUser(request: RegisterRequest): Response<com.example.rentparkkotlin.model.RegisterResponse> {
-        return RetrofitInstance.apiAuth.register(request)
+        return RetrofitInstance.apiUser.register(request)
     }
 
     suspend fun updateUser(id: Int, request: UpdateUserRequest): Response<Unit> {
-        return RetrofitInstance.api.updateUser(id, request)
+        return RetrofitInstance.apiUser.updateUser(id, request)
     }
 
     suspend fun deleteUser(id: Int): Response<Unit> {
-        return RetrofitInstance.api.deleteUser(id)
+        return RetrofitInstance.apiUser.deleteUser(id)
+    }
+
+    suspend fun getUser(id: Int): User {
+        return RetrofitInstance.apiUser.getUser(id)
     }
 }
