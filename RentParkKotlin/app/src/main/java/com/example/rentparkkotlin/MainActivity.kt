@@ -49,7 +49,7 @@ class MainActivity : ComponentActivity() {
                         // Si c'est un admin ou employé -> Dashboard, sinon -> Accueil Client
                         if (role == "admin" || role == "employe") "dashboard" else "homeCustomer"
                     } else {
-                        "photoDevice"
+                        "homeCustomer"
                     }
 
                     // 3. Configuration du routeur (NavHost)

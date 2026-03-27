@@ -19,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -26,8 +27,8 @@ import androidx.compose.ui.window.Dialog
 import coil.compose.AsyncImage
 import com.example.rentparkkotlin.model.Voiture
 import com.example.rentparkkotlin.viewmodel.CarViewModel
+import com.example.rentparkkotlin.R
 import com.example.rentparkkotlin.ui.header.Header
-
 @Composable
 fun CarListScreen(
     viewModel: CarViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
@@ -36,7 +37,6 @@ fun CarListScreen(
     val isLoading = viewModel.isLoading
     val error = viewModel.error
 
-    // États pour les modales
     var showAddDialog by remember { mutableStateOf(false) }
     var carToDelete by remember { mutableStateOf<Voiture?>(null) }
 
@@ -47,7 +47,6 @@ fun CarListScreen(
             .fillMaxSize()
             .background(Color(0xFFF8F9FA))
     ) {
-        // 1. Barre de Recherche + Bouton Ajouter
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -62,7 +61,7 @@ fun CarListScreen(
                     .background(Color.White)
                     .padding(15.dp)
             ) {
-                Text("Rechercher une voiture...", color = Color.Gray)
+                Text(stringResource(R.string.car_search_placeholder), color = Color.Gray)
             }
 
             IconButton(
@@ -71,25 +70,23 @@ fun CarListScreen(
                     .size(54.dp)
                     .background(orangeColor, CircleShape)
             ) {
-                Icon(Icons.Default.Add, contentDescription = "Ajouter", tint = Color.White)
+                Icon(Icons.Default.Add, contentDescription = stringResource(R.string.add_car_title), tint = Color.White)
             }
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // 2. Filtres
         Row(
             modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            FilterBadge(text = "Prix", icon = "€")
-            FilterBadge(text = "Boîte", icon = "⚙️")
-            FilterBadge(text = "Énergie", icon = "⚡")
+            FilterBadge(text = stringResource(R.string.filter_price), icon = "€")
+            FilterBadge(text = stringResource(R.string.filter_gearbox), icon = "⚙️")
+            FilterBadge(text = stringResource(R.string.filter_energy), icon = "⚡")
         }
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        // 3. Liste des voitures
         when {
             isLoading -> {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -98,7 +95,10 @@ fun CarListScreen(
             }
             error != null -> {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text(text = "Erreur : $error", color = Color.Red)
+                    Text(
+                        text = stringResource(R.string.car_loading_error, error),
+                        color = Color.Red
+                    )
                 }
             }
             else -> {
@@ -119,7 +119,6 @@ fun CarListScreen(
         }
     }
 
-    // Modale d'ajout
     if (showAddDialog) {
         AddCarsForm(
             onDismiss = { showAddDialog = false },
@@ -130,12 +129,19 @@ fun CarListScreen(
         )
     }
 
-    // Modale de confirmation de suppression
     if (carToDelete != null) {
         AlertDialog(
             onDismissRequest = { carToDelete = null },
-            title = { Text("Supprimer le véhicule") },
-            text = { Text("Voulez-vous vraiment supprimer la ${carToDelete?.Marque} ${carToDelete?.Nom} ? Cette action est irréversible.") },
+            title = { Text(stringResource(R.string.delete_car_title)) },
+            text = {
+                Text(
+                    stringResource(
+                        R.string.delete_car_message,
+                        carToDelete?.Marque ?: "",
+                        carToDelete?.Nom ?: ""
+                    )
+                )
+            },
             confirmButton = {
                 Button(
                     onClick = {
@@ -144,12 +150,12 @@ fun CarListScreen(
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
                 ) {
-                    Text("Supprimer", color = Color.White)
+                    Text(stringResource(R.string.delete_confirm), color = Color.White)
                 }
             },
             dismissButton = {
                 TextButton(onClick = { carToDelete = null }) {
-                    Text("Annuler")
+                    Text(stringResource(R.string.delete_cancel))
                 }
             }
         )
@@ -158,33 +164,39 @@ fun CarListScreen(
 
 @Composable
 fun AddCarsForm(onDismiss: () -> Unit, onConfirm: (Voiture) -> Unit) {
-    // 1. IDENTIFICATION
     var numSerie by remember { mutableStateOf("") }
     var marque by remember { mutableStateOf("") }
     var nom by remember { mutableStateOf("") }
     var annee by remember { mutableStateOf("") }
     var couleur by remember { mutableStateOf("") }
-
-    // 2. TECHNIQUE
     var energie by remember { mutableStateOf("") }
     var puissance by remember { mutableStateOf("") }
     var nbPlaces by remember { mutableStateOf("5") }
     var categorie by remember { mutableStateOf("") }
 
-    val transmissions = listOf("Propulsion", "Traction", "Intégrale")
-    val boites = listOf("Manuelle", "Automatique", "Semi-Manuelle")
-    val etats = listOf("Libre", "Louée", "Vendue", "Réparation")
+    val transmissions = listOf(
+        stringResource(R.string.transmission_rear),
+        stringResource(R.string.transmission_front),
+        stringResource(R.string.transmission_all)
+    )
+    val boites = listOf(
+        stringResource(R.string.gearbox_manual),
+        stringResource(R.string.gearbox_auto),
+        stringResource(R.string.gearbox_semi)
+    )
+    val etats = listOf(
+        stringResource(R.string.state_free),
+        stringResource(R.string.state_rented),
+        stringResource(R.string.state_sold),
+        stringResource(R.string.state_repair)
+    )
 
     var transmission by remember { mutableStateOf(transmissions[1]) }
     var boite by remember { mutableStateOf(boites[0]) }
     var etat by remember { mutableStateOf(etats[0]) }
-
-    // 3. DATES (Format AAAA-MM-JJ attendu par SQL)
     var dateAchat by remember { mutableStateOf("") }
     var dateDerCT by remember { mutableStateOf("") }
     var dateExpCT by remember { mutableStateOf("") }
-
-    // 4. ADMIN & FINANCE
     var prix by remember { mutableStateOf("") }
     var idAssureur by remember { mutableStateOf("1") }
     var idFournisseur by remember { mutableStateOf("1") }
@@ -204,58 +216,51 @@ fun AddCarsForm(onDismiss: () -> Unit, onConfirm: (Voiture) -> Unit) {
                     .verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                Text("Nouveau Véhicule", fontSize = 22.sp, fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.add_car_title), fontSize = 22.sp, fontWeight = FontWeight.Bold)
 
-                // --- IDENTITÉ ---
-                FormSectionTitle("Identité", orangePark)
-                SimpleField(numSerie, { numSerie = it }, "Numéro de Série (Obligatoire)")
+                FormSectionTitle(stringResource(R.string.form_section_identity), orangePark)
+                SimpleField(numSerie, { numSerie = it }, stringResource(R.string.field_num_serie))
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    SimpleField(marque, { marque = it }, "Marque", Modifier.weight(1f))
-                    SimpleField(nom, { nom = it }, "Modèle", Modifier.weight(1f))
+                    SimpleField(marque, { marque = it }, stringResource(R.string.field_brand), Modifier.weight(1f))
+                    SimpleField(nom, { nom = it }, stringResource(R.string.field_model), Modifier.weight(1f))
                 }
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    SimpleField(annee, { annee = it }, "Année", Modifier.weight(1f))
-                    SimpleField(couleur, { couleur = it }, "Couleur", Modifier.weight(1f))
+                    SimpleField(annee, { annee = it }, stringResource(R.string.field_year), Modifier.weight(1f))
+                    SimpleField(couleur, { couleur = it }, stringResource(R.string.field_color), Modifier.weight(1f))
                 }
 
-                // --- TECHNIQUE ---
-                FormSectionTitle("Caractéristiques", orangePark)
-                StableDropDown("Boîte", boites, boite) { boite = it }
-                StableDropDown("Transmission", transmissions, transmission) { transmission = it }
-
+                FormSectionTitle(stringResource(R.string.form_section_specs), orangePark)
+                StableDropDown(stringResource(R.string.field_gearbox), boites, boite) { boite = it }
+                StableDropDown(stringResource(R.string.field_transmission), transmissions, transmission) { transmission = it }
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    SimpleField(puissance, { puissance = it }, "Puissance (ch)", Modifier.weight(1f))
-                    SimpleField(energie, { energie = it }, "Énergie", Modifier.weight(1f))
+                    SimpleField(puissance, { puissance = it }, stringResource(R.string.field_power), Modifier.weight(1f))
+                    SimpleField(energie, { energie = it }, stringResource(R.string.field_energy), Modifier.weight(1f))
                 }
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    SimpleField(nbPlaces, { nbPlaces = it }, "Places", Modifier.weight(1f))
-                    SimpleField(categorie, { categorie = it }, "Catégorie", Modifier.weight(1f))
+                    SimpleField(nbPlaces, { nbPlaces = it }, stringResource(R.string.field_seats), Modifier.weight(1f))
+                    SimpleField(categorie, { categorie = it }, stringResource(R.string.field_category), Modifier.weight(1f))
                 }
 
-                // --- STATUT ET PRIX ---
-                FormSectionTitle("Prix & Disponibilité", orangePark)
-                StableDropDown("État actuel", etats, etat) { etat = it }
-                SimpleField(prix, { prix = it }, "Prix / jour (€)")
+                FormSectionTitle(stringResource(R.string.form_section_price), orangePark)
+                StableDropDown(stringResource(R.string.field_state), etats, etat) { etat = it }
+                SimpleField(prix, { prix = it }, stringResource(R.string.field_price_day))
 
-                // --- DATES (Note : Assure-toi que l'utilisateur saisit YYYY-MM-DD) ---
-                FormSectionTitle("Suivi Technique", orangePark)
-                SimpleField(dateAchat, { dateAchat = it }, "Date Achat (YYYY-MM-DD)")
-                SimpleField(dateDerCT, { dateDerCT = it }, "Dernier CT (YYYY-MM-DD)")
-                SimpleField(dateExpCT, { dateExpCT = it }, "Expiration CT (YYYY-MM-DD)")
+                FormSectionTitle(stringResource(R.string.form_section_technical), orangePark)
+                SimpleField(dateAchat, { dateAchat = it }, stringResource(R.string.field_date_purchase))
+                SimpleField(dateDerCT, { dateDerCT = it }, stringResource(R.string.field_date_last_ct))
+                SimpleField(dateExpCT, { dateExpCT = it }, stringResource(R.string.field_date_exp_ct))
 
-                // --- ADMIN ---
-                FormSectionTitle("Administration", orangePark)
-                SimpleField(imagePath, { imagePath = it }, "Nom de l'image")
+                FormSectionTitle(stringResource(R.string.form_section_admin), orangePark)
+                SimpleField(imagePath, { imagePath = it }, stringResource(R.string.field_image_name))
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    SimpleField(idAssureur, { idAssureur = it }, "ID Assureur", Modifier.weight(1f))
-                    SimpleField(idFournisseur, { idFournisseur = it }, "ID Fournisseur", Modifier.weight(1f))
+                    SimpleField(idAssureur, { idAssureur = it }, stringResource(R.string.field_id_insurer), Modifier.weight(1f))
+                    SimpleField(idFournisseur, { idFournisseur = it }, stringResource(R.string.field_id_supplier), Modifier.weight(1f))
                 }
 
                 Spacer(modifier = Modifier.height(20.dp))
 
                 Button(
                     onClick = {
-                        // On vérifie le champ obligatoire défini dans ton PHP
                         if (numSerie.isNotBlank()) {
                             val v = Voiture(
                                 NumSerie = numSerie,
@@ -284,9 +289,9 @@ fun AddCarsForm(onDismiss: () -> Unit, onConfirm: (Voiture) -> Unit) {
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(containerColor = orangePark),
                     shape = RoundedCornerShape(12.dp),
-                    enabled = numSerie.isNotBlank() // Désactivé si NumSerie est vide
+                    enabled = numSerie.isNotBlank()
                 ) {
-                    Text("Enregistrer", fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.add_car_save), fontWeight = FontWeight.Bold)
                 }
             }
         }
@@ -394,7 +399,7 @@ fun CarCard(voiture: Voiture, onDeleteClick: () -> Unit) {
         ) {
             Icon(
                 imageVector = Icons.Default.Delete,
-                contentDescription = "Supprimer",
+                contentDescription = stringResource(R.string.delete_confirm) ,
                 tint = Color.Red
             )
         }
