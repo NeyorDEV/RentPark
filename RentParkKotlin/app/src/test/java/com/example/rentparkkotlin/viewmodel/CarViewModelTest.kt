@@ -132,6 +132,37 @@ class CarViewModelTest {
         assertEquals("Impossible d'ajouter le véhicule : Timeout", viewModel.error)
     }
 
+    @Test
+    fun `deleteVoiture erreur serveur devrait afficher Erreur lors de la suppression`() = runTest {
+        // Given
+        coEvery { repository.deleteVoiture("1") } returns Response.error(500, mockk(relaxed = true))
+
+        viewModel = CarViewModel(repository)
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        // When
+        viewModel.deleteVoiture("1")
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        // Then
+        assertEquals("Erreur lors de la suppression", viewModel.error)
+    }
+
+    @Test
+    fun `deleteVoiture exception devrait afficher Erreur reseau`() = runTest {
+        // Given
+        coEvery { repository.deleteVoiture("1") } throws Exception("Pas d'internet")
+
+        viewModel = CarViewModel(repository)
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        // When
+        viewModel.deleteVoiture("1")
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        // Then
+        assertEquals("Erreur réseau : Pas d'internet", viewModel.error)
+    }
     private fun createFakeVoiture(numSerie: String = "TEST-123", marque: String = "Toyota"): Voiture {
         return Voiture(
             NumSerie = numSerie,
