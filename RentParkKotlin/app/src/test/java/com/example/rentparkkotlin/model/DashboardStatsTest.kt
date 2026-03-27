@@ -98,4 +98,43 @@ class DashboardStatsTest {
         assertEquals("Vidange", rappel.titre)
         assertEquals("2024-06-01", rappel.date)
     }
+
+    @Test
+    fun `test deserialisation ContratsProchainsResponse avec donnees completes`() {
+        // Given: Un JSON contenant une liste de contrats avec des clés en PascalCase
+        val json = """
+            {
+                "contrats_prochains": [
+                    {
+                        "DateDebut": "2024-04-01",
+                        "DateFin": "2024-04-10",
+                        "Marque": "Toyota",
+                        "Modele": "Yaris"
+                    }
+                ]
+            }
+        """.trimIndent()
+
+        // When
+        val response = gson.fromJson(json, ContratsProchainsResponse::class.java)
+
+        // Then
+        assertNotNull(response.contratsProchains)
+        assertEquals(1, response.contratsProchains.size)
+
+        val contrat = response.contratsProchains[0]
+        assertEquals("2024-04-01", contrat.dateDebut)
+        assertEquals("2024-04-10", contrat.dateFin)
+        assertEquals("Toyota", contrat.marque)
+        assertEquals("Yaris", contrat.modele)
+    }
+
+    @Test
+    fun `test integrity de la data class ContratProchain`() {
+        // Vérifie simplement que le constructeur et les propriétés fonctionnent hors JSON
+        val contrat = ContratProchain("01/01", "02/01", "Ford", "Fiesta")
+
+        assertEquals("Ford", contrat.marque)
+        assertEquals("Fiesta", contrat.modele)
+    }
 }
