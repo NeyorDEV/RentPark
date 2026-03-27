@@ -30,7 +30,7 @@ import com.example.rentparkkotlin.ui.planning.PlanningScreen
 import com.example.rentparkkotlin.ui.settings.SettingsPage
 import com.example.rentparkkotlin.ui.userPage.UserManagementScreen
 import  com.example.rentparkkotlin.ui.contratsPage.ContractsScreen
-
+import com.example.rentparkkotlin.ui.header.MainScreen
 
 
 class MainActivity : ComponentActivity() {
@@ -70,41 +70,40 @@ class MainActivity : ComponentActivity() {
                             LoginScreen(
                                 onLoginSuccess = {
                                     val role = authPrefs.getRole()
-                                    val destination = if (role == "admin" || role == "employe") Routes.DashBoardRoute else Routes.HomeCustomerRoute
-                                    navController.navigate(destination) {
+                                    val dest = if (role == "admin" || role == "employe") Routes.DashBoardRoute else Routes.HomeCustomerRoute
+                                    navController.navigate(dest) {
                                         popUpTo(Routes.LoginRoute) { inclusive = true }
                                     }
                                 },
-                                onNavigateToRegister = {
-                                    navController.navigate(Routes.RegisterRoute)
-                                }
+                                onNavigateToRegister = { navController.navigate(Routes.RegisterRoute) }
                             )
                         }
 
                         composable<Routes.CarRoute> {
-                            CarListScreen()
+                            MainScreen(title = "Voitures", navController = navController) {
+                                CarListScreen()
+                            }
                         }
 
-
                         // Route : Inscription
-                        composable<Routes.DashBoardRoute> {
-                            RegisterScreen(
-                                onNavigateToLogin = {
-                                    // Retourne à la page de connexion (dépile la route register)
-                                    navController.popBackStack()
-                                }
-                            )
+                        composable<Routes.RegisterRoute> {
+                            RegisterScreen(onNavigateToLogin = { navController.popBackStack() })
                         }
 
                         // Route : Dashboard (Admin / Employé)
                         composable<Routes.DashBoardRoute> {
-                            DashboardScreen()
+                            MainScreen(title = "Tableau de bord", navController = navController) {
+                                DashboardScreen()
+                            }
                         }
 
                         // Route : Accueil Client
                         composable<Routes.HomeCustomerRoute> {
-                            RentParkHomeScreen()
+                            MainScreen(title = "RENTPARK", navController = navController) {
+                                RentParkHomeScreen()
+                            }
                         }
+
                         composable<Routes.PhotoRoute> {
                             PhotoDeviceScreen(
                                 onNavigateBack = { navController.popBackStack() }
@@ -112,28 +111,34 @@ class MainActivity : ComponentActivity() {
                         }
 
                         composable<Routes.PlanningRoute> {
-                            PlanningScreen()
+                            MainScreen(title = "Planning", navController = navController) {
+                                PlanningScreen()
+                            }
                         }
 
                         composable<Routes.UserRoute> {
-                            UserManagementScreen()
-                        }
-                        composable<Routes.ContratRoute> {
-                            ContractsScreen()
+                            MainScreen(title = "Utilisateurs", navController = navController) {
+                                UserManagementScreen()
+                            }
                         }
 
+                        composable<Routes.ContratRoute> {
+                            MainScreen(title = "Contrats", navController = navController) {
+                                ContractsScreen()
+                            }
+                        }
 
                         composable<Routes.SettingsRoute> {
-                            SettingsPage(
-                                isDarkMode = isDarkMode,
-                                onThemeChange = { newValue ->
-                                    isDarkMode = newValue
-                                    themePrefs.saveDarkMode(newValue)
-                                }
-                            )
+                            MainScreen(title = "", navController = navController) {
+                                SettingsPage(
+                                    isDarkMode = isDarkMode,
+                                    onThemeChange = { newValue ->
+                                        isDarkMode = newValue
+                                        themePrefs.saveDarkMode(newValue)
+                                    }
+                                )
+                            }
                         }
-
-
                     }
                 }
             }

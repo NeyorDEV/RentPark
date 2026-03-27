@@ -35,9 +35,6 @@ fun DashboardScreen(viewModel: DashboardViewModel = viewModel()) {
 
     Scaffold() {
         innerPadding ->
-
-        Header("Tableau de bord", onMenuClick = {})
-
         if (isLoading) {
             Box(modifier = Modifier.fillMaxSize().padding(innerPadding), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator(color = Color(0xFFFF5722))

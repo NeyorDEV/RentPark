@@ -25,9 +25,6 @@ fun SettingsPage(
     var notificationsEnabled by remember { mutableStateOf(false) }
 
     Scaffold(
-        topBar = {
-            Header("", onMenuClick = {})
-        }
     ) { paddingValues ->
         Column(
             modifier = Modifier

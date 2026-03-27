@@ -49,7 +49,6 @@ fun UserManagementScreen(
             .background(DarkBackground)
             .padding(16.dp)
     ) {
-        Header("Utilisateurs", onMenuClick = {})
         TabRow(
             selectedTabIndex = selectedTabIndex,
             containerColor = Color.Transparent,
