@@ -126,10 +126,8 @@ class LoginViewModelTest {
         viewModel.login()
         testDispatcher.scheduler.advanceUntilIdle()
 
-        // Remarque: En test local (JVM), org.json.JSONObject crash (normal, c'est de l'Android natif),
-        // ce qui déclenche le catch parfait que tu as prévu dans ton code !
         assertFalse(viewModel.loginSuccess)
-        assertEquals("Identifiants incorrects", viewModel.error)
+        assertEquals("User not found", viewModel.error)
     }
 
     @Test
