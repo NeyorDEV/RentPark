@@ -95,14 +95,18 @@ sonarqube-kotlin:
     - cd ..
     - |
       sonar-scanner \
-        -Dsonar.projectKey=RentParkKotlin \
-        -Dsonar.projectName="RentPark Kotlin Android" \
-        -Dsonar.sources=RentParkKotlin/app/src/main \
-        -Dsonar.tests=RentParkKotlin/app/src/test \
-        -Dsonar.coverage.jacoco.xmlReportPaths=RentParkKotlin/app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml \
-        -Dsonar.exclusions="**/R.class,**/R$*.class,**/BuildConfig.*,**/Manifest*.*,**/ComposableSingletons*" \
-        -Dsonar.host.url="${SONAR_HOST_URL}" \
-        -Dsonar.login="${SONAR_TOKEN}"
+      -Dsonar.projectKey=RentParkKotlin \
+      -Dsonar.projectName="RentPark Kotlin Android" \
+      -Dsonar.sources=RentParkKotlin/app/src/main \
+      -Dsonar.tests=RentParkKotlin/app/src/test \
+      -Dsonar.java.coveragePlugin=jacoco \
+      -Dsonar.coverage.jacoco.xmlReportPaths=RentParkKotlin/app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml \
+      -Dsonar.kotlin.file.suffixes=.kt \
+      -Dsonar.sourceEncoding=UTF-8 \
+      -Dsonar.java.binaries=RentParkKotlin/app/build/tmp/kotlin-classes/debug \
+      -Dsonar.exclusions="**/R.class,**/R$*.class,**/BuildConfig.*,**/Manifest*.*,**/ComposableSingletons*" \
+      -Dsonar.host.url="${SONAR_HOST_URL}" \
+      -Dsonar.login="${SONAR_TOKEN}"
   allow_failure: true
   only:
     - main
