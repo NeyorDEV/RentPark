@@ -11,9 +11,7 @@ import com.example.rentparkkotlin.model.User
 import com.example.rentparkkotlin.repository.UserRepository
 import kotlinx.coroutines.launch
 
-class UserViewModel : ViewModel() {
-
-    private val repository = UserRepository()
+class UserViewModel(private val repository: UserRepository) : ViewModel() {
 
     var users by mutableStateOf<List<User>>(emptyList())
         private set

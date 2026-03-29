@@ -12,10 +12,11 @@ import com.example.rentparkkotlin.repository.AuthRepository
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 
-class LoginViewModel(application: Application) : AndroidViewModel(application) {
-
-    private val repository = AuthRepository()
-    private val authPrefs = AuthPrefs(application)
+class LoginViewModel(
+    application: Application,
+    private val repository: AuthRepository = AuthRepository(),
+    private val authPrefs: AuthPrefs = AuthPrefs(application)
+) : AndroidViewModel(application) {
 
     var username by mutableStateOf("")
     var password by mutableStateOf("")

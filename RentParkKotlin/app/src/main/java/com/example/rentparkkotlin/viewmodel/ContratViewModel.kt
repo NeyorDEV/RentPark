@@ -9,10 +9,8 @@ import com.example.rentparkkotlin.model.Contrat
 import com.example.rentparkkotlin.repository.ContratRepository
 import kotlinx.coroutines.launch
 
-class ContratViewModel : ViewModel() {
-
-    private val repository = ContratRepository()
-
+// Modifie l'en-tête de ta classe comme ceci :
+class ContratViewModel(private val repository: ContratRepository = ContratRepository()) : ViewModel() {
     var contrats by mutableStateOf<List<Contrat>>(emptyList())
         private set
 

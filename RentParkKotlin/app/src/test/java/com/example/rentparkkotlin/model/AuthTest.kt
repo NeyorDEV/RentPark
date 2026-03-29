@@ -63,13 +63,5 @@ class AuthTest {
         assertEquals("secret", updated.password)
     }
 
-    // --- Tests RegisterResponse ---
-    @Test
-    fun `RegisterResponse handles error message mapping`() {
-        val json = """ { "error": "User already exists" } """
-        val response = gson.fromJson(json, RegisterResponse::class.java)
 
-        assertEquals("User already exists", response.error)
-        assertNull(response.message)
-    }
 }

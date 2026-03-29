@@ -28,5 +28,5 @@ data class RegisterRequest(
 
 data class RegisterResponse(
     @SerializedName("message") val message: String?,
-    @SerializedName("error") val error: String?
+    @SerializedName("error") val error: Boolean
 )
