@@ -70,7 +70,7 @@ sonarqube-check:
 
 sonarqube-kotlin:
   stage: scan
-  image: eclipse-temurin:17-jdk
+  image: eclipse-temurin:11-jdk
   variables:
     SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"
     GIT_DEPTH: "0"
