@@ -28,6 +28,9 @@ android {
                 "proguard-rules.pro"
             )
         }
+        debug {
+            enableUnitTestCoverage = true  
+        }
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
@@ -53,17 +56,11 @@ dependencies {
     implementation("androidx.recyclerview:recyclerview:1.3.2")
     implementation("com.google.android.material:material:1.11.0")
     implementation("io.coil-kt:coil:2.6.0")
-// chargement images
     implementation(libs.androidx.compose.foundation)
 
-    // Retrofit & Converter
     implementation(libs.retrofit)
     implementation(libs.retrofit.converter.gson)
-
-    // Lifecycle
     implementation(libs.androidx.lifecycle.viewmodel.compose)
-
-    // Image loading
     implementation(libs.coil.compose)
 
     testImplementation(libs.junit)
@@ -74,10 +71,8 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 
-    // Navigation
     implementation(libs.androidx.navigation.compose)
 
-// Test
     testImplementation("junit:junit:4.13.2")
     testImplementation("com.google.code.gson:gson:2.10.1")
     testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
