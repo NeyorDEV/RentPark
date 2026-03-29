@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
+    id("jacoco")
 }
 
 android {
@@ -29,7 +30,7 @@ android {
             )
         }
         debug {
-            enableUnitTestCoverage = true  
+            enableUnitTestCoverage = true
         }
     }
     compileOptions {
@@ -42,6 +43,31 @@ android {
     testOptions {
         unitTests.isReturnDefaultValues = true
     }
+}
+
+tasks.register<JacocoReport>("jacocoTestReport") {
+    dependsOn("testDebugUnitTest")
+    reports {
+        xml.required.set(true)
+        html.required.set(false)
+    }
+    val fileFilter = listOf(
+        "**/R.class", "**/R$*.class",
+        "**/BuildConfig.*", "**/Manifest*.*",
+        "**/*Test*.*", "android/**/*.*",
+        "**/ComposableSingletons*"
+    )
+    classDirectories.setFrom(
+        fileTree("${layout.buildDirectory.get()}/tmp/kotlin-classes/debug") {
+            exclude(fileFilter)
+        }
+    )
+    sourceDirectories.setFrom("${projectDir}/src/main/java")
+    executionData.setFrom(
+        fileTree(layout.buildDirectory.get()) {
+            include("**/*.exec", "**/*.ec")
+        }
+    )
 }
 
 dependencies {
