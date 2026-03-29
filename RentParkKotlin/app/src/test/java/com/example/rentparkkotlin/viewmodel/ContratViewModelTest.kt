@@ -176,7 +176,7 @@ class ContratViewModelTest {
 
         assertEquals("Erreur de suppression: Suppression impossible", viewModel.error)
     }
-    
+
     private fun createFakeContrat(id: Int, statut: String? = "Actif") = Contrat(
         idContrat = id,
         dateDebut = "2023-01-01",
