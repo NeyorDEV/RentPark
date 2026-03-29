@@ -67,6 +67,44 @@ sonarqube-check:
   allow_failure: true
   only:
     - main
+
+sonarqube-kotlin:
+  stage: scan
+  image: eclipse-temurin:17-jdk
+  variables:
+    SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"
+    GIT_DEPTH: "0"
+    ANDROID_HOME: "/opt/android-sdk"
+  before_script:
+    - apt-get update && apt-get install -y wget unzip curl
+    - mkdir -p ${ANDROID_HOME}/cmdline-tools
+    - wget -q https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip -O /tmp/cmdtools.zip
+    - unzip -q /tmp/cmdtools.zip -d ${ANDROID_HOME}/cmdline-tools
+    - mv ${ANDROID_HOME}/cmdline-tools/cmdline-tools ${ANDROID_HOME}/cmdline-tools/latest
+    - export PATH="${ANDROID_HOME}/cmdline-tools/latest/bin:${ANDROID_HOME}/platform-tools:${PATH}"
+    - yes | sdkmanager --licenses > /dev/null 2>&1
+    - sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0" > /dev/null 2>&1
+    - curl -sSLo /tmp/sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-6.2.1.4610-linux-x64.zip
+    - unzip -q /tmp/sonar-scanner.zip -d /opt
+    - export PATH="/opt/sonar-scanner-6.2.1.4610-linux-x64/bin:${PATH}"
+  script:
+    - cd RentParkKotlin
+    - chmod +x ./gradlew
+    - ./gradlew testDebugUnitTest --no-daemon
+    - cd ..
+    - |
+      sonar-scanner \
+        -Dsonar.projectKey=RentParkKotlin \
+        -Dsonar.projectName="RentPark Kotlin Android" \
+        -Dsonar.sources=RentParkKotlin/app/src/main \
+        -Dsonar.tests=RentParkKotlin/app/src/test \
+        -Dsonar.coverage.jacoco.xmlReportPaths=RentParkKotlin/app/build/reports/coverage/test/debug/report.xml \
+        -Dsonar.exclusions="**/R.class,**/R$*.class,**/BuildConfig.*,**/Manifest*.*,**/ComposableSingletons*" \
+        -Dsonar.host.url="${SONAR_HOST_URL}" \
+        -Dsonar.login="${SONAR_TOKEN}"
+  allow_failure: true
+  only:
+    - main
 # ----------------------
 # INCLUDE & DOCKER JOBS (Inchangés)
 # ----------------------
