@@ -70,11 +70,12 @@ sonarqube-check:
 
 sonarqube-kotlin:
   stage: scan
-  image: eclipse-temurin:11-jdk
+  image: eclipse-temurin:17-jdk
   variables:
     SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"
     GIT_DEPTH: "0"
     ANDROID_HOME: "/opt/android-sdk"
+    JAVA_TOOL_OPTIONS: "-Xmx2g"
   before_script:
     - apt-get update && apt-get install -y wget unzip curl
     - mkdir -p ${ANDROID_HOME}/cmdline-tools
@@ -82,7 +83,7 @@ sonarqube-kotlin:
     - unzip -q /tmp/cmdtools.zip -d ${ANDROID_HOME}/cmdline-tools
     - mv ${ANDROID_HOME}/cmdline-tools/cmdline-tools ${ANDROID_HOME}/cmdline-tools/latest
     - export PATH="${ANDROID_HOME}/cmdline-tools/latest/bin:${ANDROID_HOME}/platform-tools:${PATH}"
-    - yes | sdkmanager --licenses
+    - yes | sdkmanager --licenses || true
     - sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0" > /dev/null 2>&1
     - curl -sSLo /tmp/sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-6.2.1.4610-linux-x64.zip
     - unzip -q /tmp/sonar-scanner.zip -d /opt
