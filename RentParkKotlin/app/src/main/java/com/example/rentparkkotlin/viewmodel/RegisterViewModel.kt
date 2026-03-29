@@ -10,9 +10,7 @@ import com.example.rentparkkotlin.repository.AuthRepository
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 
-class RegisterViewModel : ViewModel() {
-
-    private val repository = AuthRepository()
+class RegisterViewModel(private val repository: AuthRepository) : ViewModel() {
 
     var username by mutableStateOf("")
     var password by mutableStateOf("")
