@@ -151,4 +151,44 @@ class DashboardViewModelTest {
         // Vérifie que fetchDashboardData a bien été relancé (getMonthlyIncome appelé 2 fois : init + refresh)
         coVerify(exactly = 2) { api.getMonthlyIncome() }
     }
+
+    @Test
+    fun `fetchDashboardData formatte correctement les dates du planning`() = runTest {
+        // Given : Mocks de base pour les autres cartes (pour éviter les crashs)
+        coEvery { api.getTotalUsers() } returns mockk { every { totalUsers } returns 0 }
+        coEvery { api.getMostRentedCar() } returns mockk { every { voiturePlusLouee } returns null }
+        coEvery { api.getMonthlyIncome() } returns mockk { every { monthlyIncome } returns 0.0f }
+        coEvery { api.getCTAlerts() } returns mockk { every { vehicules } returns emptyList() }
+        coEvery { repository.getRappels() } returns emptyList()
+
+        // Given : Mock spécifique des contrats pour forcer le passage dans formatDate()
+        coEvery { api.getContratsProchains() } returns mockk {
+            every { contratsProchains } returns listOf(
+                mockk {
+                    every { marque } returns "Toyota"
+                    every { modele } returns "Yaris"
+                    // Date valide (sera formatée grâce au try)
+                    every { dateDebut } returns "2099-12-25 14:00:00"
+                    // Date invalide (fera planter le parser, passera dans le catch et restera telle quelle)
+                    every { dateFin } returns "DateInvalide"
+                }
+            )
+        }
+
+        // When
+        viewModel = DashboardViewModel(repository, api)
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        // Then : On récupère la carte du planning
+        val planningCard = viewModel.cards.find { it.title == "Planning Proche" }
+        assertNotNull(planningCard)
+
+        // On vérifie que le formatage "yyyy-MM-dd" -> "dd/MM/yyyy" a bien fonctionné
+        val locationItem = planningCard!!.items.find { it.contains("Location : Toyota Yaris") }
+        assertEquals("25/12/2099 – Location : Toyota Yaris", locationItem)
+
+        // On vérifie que le catch a bien fonctionné pour la date invalide
+        val retourItem = planningCard.items.find { it.contains("Retour : Toyota Yaris") }
+        assertEquals("DateInvalide – Retour : Toyota Yaris", retourItem)
+    }
 }
