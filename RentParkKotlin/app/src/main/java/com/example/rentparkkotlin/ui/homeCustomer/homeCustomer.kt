@@ -14,13 +14,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.rentparkkotlin.R
-import com.example.rentparkkotlin.ui.header.Header
 
 val MaPoliceCustom = FontFamily(
     Font(R.font.fortnite, FontWeight.Normal),
@@ -65,8 +65,8 @@ fun RentParkHomeScreen() {
                     modifier = Modifier.padding(24.dp),
                     verticalArrangement = Arrangement.spacedBy(20.dp)
                 ) {
-                    VerticalDateField(label = "Date de départ")
-                    VerticalDateField(label = "Date de retour")
+                    VerticalDateField(label = stringResource(R.string.home_departure_date))
+                    VerticalDateField(label = stringResource(R.string.home_return_date))
 
                     Button(
                         onClick = { /* Action */ },
@@ -74,7 +74,7 @@ fun RentParkHomeScreen() {
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF16937)),
                         shape = RoundedCornerShape(16.dp)
                     ) {
-                        Text("Voir les véhicules", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.home_show_cars), fontSize = 16.sp, fontWeight = FontWeight.Bold)
                     }
                 }
             }
@@ -90,7 +90,7 @@ fun VerticalDateField(label: String) {
     Column {
         Text(label, color = Color.Gray, fontSize = 14.sp, modifier = Modifier.padding(bottom = 8.dp))
         OutlinedTextField(
-            value = "jj/mm/aaaa",
+            value = stringResource(R.string.home_style_date),
             onValueChange = {},
             modifier = Modifier.fillMaxWidth(),
             trailingIcon = { Icon(Icons.Default.DateRange, contentDescription = null, tint = Color.Gray) },
@@ -123,7 +123,7 @@ fun ConnectionButton() {
         )
         Spacer(Modifier.width(8.dp))
         Text(
-            "Connexion",
+            stringResource(R.string.home_connection),
             color = Color.White,
             fontSize = 18.sp
         )

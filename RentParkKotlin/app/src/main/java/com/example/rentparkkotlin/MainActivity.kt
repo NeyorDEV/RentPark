@@ -22,21 +22,22 @@ import com.example.rentparkkotlin.ui.photoDevice.PhotoDeviceScreen
 import com.example.rentparkkotlin.ui.login.LoginScreen
 import com.example.rentparkkotlin.ui.theme.RentParkKotlinTheme
 import com.example.rentparkkotlin.ui.theme.ThemePrefs
-import com.example.rentparkkotlin.data.AuthPrefs
+import com.example.rentparkkotlin.data.AuthPrefs // N'oubliez pas cet import !
+import com.example.rentparkkotlin.data.RetrofitInstance
 import com.example.rentparkkotlin.ui.carsPage.CarListScreen
 import com.example.rentparkkotlin.ui.register.RegisterScreen
 import com.example.rentparkkotlin.ui.planning.PlanningScreen
 import com.example.rentparkkotlin.ui.settings.SettingsPage
 import com.example.rentparkkotlin.ui.userPage.UserManagementScreen
 import  com.example.rentparkkotlin.ui.contratsPage.ContractsScreen
-
+import com.example.rentparkkotlin.ui.header.MainScreen
 
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        com.example.rentparkkotlin.data.RetrofitInstance.init(this)
+        RetrofitInstance.init(this)
 
         val themePrefs = ThemePrefs(this)
         val authPrefs = AuthPrefs(this) // 1. Initialisation des préférences d'authentification
@@ -53,87 +54,91 @@ class MainActivity : ComponentActivity() {
 
                     // 2. LOGIQUE D'AUTO-CONNEXION
                     // On choisit la page de départ selon l'état de connexion et le rôle
-                    val startDestination = if (authPrefs.isLoggedIn()) {
+                    val startDestination : Any = if (authPrefs.isLoggedIn()) {
                         val role = authPrefs.getRole()
                         // Si c'est un admin ou employé -> Dashboard, sinon -> Accueil Client
-                        if (role == "admin" || role == "employe") "settings" else "homeCustomer"
+                        if (role == "admin" || role == "employe") Routes.DashBoardRoute else Routes.HomeCustomerRoute
                     } else {
-                        "login"
+                        Routes.LoginRoute
                     }
 
                     // 3. Configuration du routeur (NavHost)
                     NavHost(navController = navController, startDestination = startDestination) {
 
                         // Route : Connexion
-                        // Route : Connexion
-                        composable("login") {
+                        composable<Routes.LoginRoute> {
                             LoginScreen(
                                 onLoginSuccess = {
                                     val role = authPrefs.getRole()
-                                    val destination = if (role == "admin" || role == "employe") "dashboard" else "homeCustomer"
-                                    navController.navigate(destination) {
-                                        popUpTo("login") { inclusive = true }
+                                    val dest = if (role == "admin" || role == "employe") Routes.DashBoardRoute else Routes.HomeCustomerRoute
+                                    navController.navigate(dest) {
+                                        popUpTo(Routes.LoginRoute) { inclusive = true }
                                     }
                                 },
-                                onNavigateToRegister = {
-                                    navController.navigate("register")
-                                }
+                                onNavigateToRegister = { navController.navigate(Routes.RegisterRoute) }
                             )
                         }
 
-                        composable("cars") {
-                            CarListScreen()
+                        composable<Routes.CarRoute> {
+                            MainScreen(title = "Voitures", navController = navController) {
+                                CarListScreen()
+                            }
                         }
-
 
                         // Route : Inscription
-                        composable("register") {
-                            RegisterScreen(
-                                onNavigateToLogin = {
-                                    // Retourne à la page de connexion (dépile la route register)
-                                    navController.popBackStack()
-                                }
-                            )
+                        composable<Routes.RegisterRoute> {
+                            RegisterScreen(onNavigateToLogin = { navController.popBackStack() })
                         }
 
                         // Route : Dashboard (Admin / Employé)
-                        composable("dashboard") {
-                            DashboardScreen()
+                        composable<Routes.DashBoardRoute> {
+                            MainScreen(title = "Tableau de bord", navController = navController) {
+                                DashboardScreen()
+                            }
                         }
 
                         // Route : Accueil Client
-                        composable("homeCustomer") {
-                            RentParkHomeScreen()
+                        composable<Routes.HomeCustomerRoute> {
+                            MainScreen(title = "RENTPARK", navController = navController) {
+                                RentParkHomeScreen()
+                            }
                         }
-                        composable("photoDevice") {
+
+                        composable<Routes.PhotoRoute> {
                             PhotoDeviceScreen(
                                 onNavigateBack = { navController.popBackStack() }
                             )
                         }
 
-                        composable("planning") {
-                            PlanningScreen()
+                        composable<Routes.PlanningRoute> {
+                            MainScreen(title = "Planning", navController = navController) {
+                                PlanningScreen()
+                            }
                         }
 
-                        composable("users") {
-                            UserManagementScreen()
-                        }
-                        composable("contrats") {
-                            ContractsScreen()
-                        }
-
-
-                        composable("settings") {
-                            SettingsPage(
-                                isDarkMode = isDarkMode,
-                                onThemeChange = { newValue ->
-                                    isDarkMode = newValue
-                                    themePrefs.saveDarkMode(newValue)
-                                }
-                            )
+                        composable<Routes.UserRoute> {
+                            MainScreen(title = "Utilisateurs", navController = navController) {
+                                UserManagementScreen()
+                            }
                         }
 
+                        composable<Routes.ContratRoute> {
+                            MainScreen(title = "Contrats", navController = navController) {
+                                ContractsScreen()
+                            }
+                        }
 
+                        composable<Routes.SettingsRoute> {
+                            MainScreen(title = "", navController = navController) {
+                                SettingsPage(
+                                    isDarkMode = isDarkMode,
+                                    onThemeChange = { newValue ->
+                                        isDarkMode = newValue
+                                        themePrefs.saveDarkMode(newValue)
+                                    }
+                                )
+                            }
+                        }
                     }
                 }
             }

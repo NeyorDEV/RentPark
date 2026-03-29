@@ -18,16 +18,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.rentparkkotlin.ui.header.Header
-
-// --- 1. MODÈLE DE DONNÉES ---
-data class Reservation(
-    val id: Int,
-    val clientId: Int,
-    val vehiculeId: String,
-    val debut: String,
-    val fin: String
-)
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.rentparkkotlin.model.Contrat
+import com.example.rentparkkotlin.viewmodel.ContratViewModel
 
 class ContratsActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -40,25 +33,21 @@ class ContratsActivity : ComponentActivity() {
     }
 }
 
-// --- 2. ÉCRAN PRINCIPAL ---
+// --- ÉCRAN PRINCIPAL ---
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ContractsScreen() {
-    // État de la liste des réservations
-    var reservations by remember {
-        mutableStateOf(listOf(
-            Reservation(36, 50, "TEST22335564", "2026-02-27", "2026-03-01"),
-            Reservation(38, 44, "TEST22335564", "2026-02-27", "2026-02-28")
-        ))
-    }
+fun ContractsScreen(viewModel: ContratViewModel = viewModel()) { // Injection du ViewModel ici
 
-    // États pour la suppression
+    // Récupération des données depuis l'API
+    val contrats = viewModel.contrats
+    val isLoading = viewModel.isLoading
+
+    // États pour la suppression et l'édition
     var showDeleteDialog by remember { mutableStateOf(false) }
-    var reservationToDelete by remember { mutableStateOf<Reservation?>(null) }
+    var contratToDelete by remember { mutableStateOf<Contrat?>(null) }
 
-    // État pour afficher/masquer le formulaire et gérer la modification
     var showSheet by remember { mutableStateOf(false) }
-    var reservationToEdit by remember { mutableStateOf<Reservation?>(null) } // NOUVEAU: État pour la modification
+    var contratToEdit by remember { mutableStateOf<Contrat?>(null) }
 
     val sheetState = rememberModalBottomSheetState()
 
@@ -67,51 +56,54 @@ fun ContractsScreen() {
             .fillMaxSize()
             .background(Color(0xFF0F0F0F))
     ) {
-        Header("Contrats", onMenuClick = {})
-        // NOUVEAU: Réinitialiser reservationToEdit lors d'un ajout
         FilterHeader(onAddClick = {
-            reservationToEdit = null
+            contratToEdit = null
             showSheet = true
         })
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        LazyColumn(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-            items(reservations) { res ->
-                ReservationCard(
-                    reservation = res,
-                    onEditRequest = { // NOUVEAU: Gérer le clic sur "Modifier"
-                        reservationToEdit = res
-                        showSheet = true
-                    },
-                    onDeleteRequest = {
-                        reservationToDelete = res
-                        showDeleteDialog = true
-                    }
-                )
+        if (isLoading) {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator(color = Color(0xFFE67E22))
+            }
+        } else {
+            LazyColumn(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                items(contrats) { contrat ->
+                    ContratCard(
+                        contrat = contrat,
+                        onEditRequest = {
+                            contratToEdit = contrat
+                            showSheet = true
+                        },
+                        onDeleteRequest = {
+                            contratToDelete = contrat
+                            showDeleteDialog = true
+                        }
+                    )
+                }
             }
         }
     }
 
     // --- DIALOGUE DE CONFIRMATION DE SUPPRESSION ---
-    if (showDeleteDialog && reservationToDelete != null) {
+    if (showDeleteDialog && contratToDelete != null) {
         AlertDialog(
-            // ... (Code identique pour la suppression)
             onDismissRequest = { showDeleteDialog = false },
             containerColor = Color(0xFF1A1A1A),
             title = { Text("Confirmer la suppression", color = Color.White, fontSize = 18.sp) },
             text = {
                 Text(
-                    "Voulez-vous vraiment supprimer la réservation n°${reservationToDelete?.id} ?",
+                    "Voulez-vous vraiment supprimer le contrat n°${contratToDelete?.idContrat} ?",
                     color = Color.LightGray
                 )
             },
             confirmButton = {
                 TextButton(
                     onClick = {
-                        reservations = reservations.filter { it.id != reservationToDelete?.id }
+                        contratToDelete?.let { viewModel.deleteContrat(it.idContrat) }
                         showDeleteDialog = false
-                        reservationToDelete = null
+                        contratToDelete = null
                     }
                 ) {
                     Text("Supprimer", color = Color(0xFFCB4335), fontWeight = FontWeight.Bold)
@@ -130,41 +122,36 @@ fun ContractsScreen() {
         ModalBottomSheet(
             onDismissRequest = {
                 showSheet = false
-                reservationToEdit = null // Réinitialiser à la fermeture
+                contratToEdit = null
             },
             sheetState = sheetState,
             containerColor = Color(0xFF151515),
             dragHandle = { BottomSheetDefaults.DragHandle(color = Color.Gray) }
         ) {
-            ReservationForm( // RENOMMÉ ET MIS À JOUR
-                initialReservation = reservationToEdit,
+            ContratForm(
+                initialContrat = contratToEdit,
                 onDismiss = {
                     showSheet = false
-                    reservationToEdit = null
+                    contratToEdit = null
                 },
-                onSave = { savedRes ->
-                    if (reservationToEdit == null) {
-                        // Ajout
-                        reservations = reservations + savedRes
+                onSave = { savedContrat ->
+                    if (contratToEdit == null) {
+                        viewModel.addContrat(savedContrat) // Ajout API
                     } else {
-                        // Modification
-                        reservations = reservations.map {
-                            if (it.id == savedRes.id) savedRes else it
-                        }
+                        viewModel.updateContrat(savedContrat.idContrat, savedContrat) // Modif API
                     }
                     showSheet = false
-                    reservationToEdit = null
+                    contratToEdit = null
                 }
             )
         }
     }
 }
 
-// --- 3. COMPOSANTS DE L'INTERFACE ---
+// --- COMPOSANTS DE L'INTERFACE ---
 
 @Composable
 fun FilterHeader(onAddClick: () -> Unit) {
-    // ... (Code identique)
     Surface(
         color = Color(0xFF151515),
         shape = RoundedCornerShape(50),
@@ -196,35 +183,35 @@ fun FilterHeader(onAddClick: () -> Unit) {
     }
 }
 
-// NOUVEAU: Le formulaire gère maintenant l'ajout ET la modification
 @Composable
-fun ReservationForm(
-    initialReservation: Reservation?,
+fun ContratForm(
+    initialContrat: Contrat?,
     onDismiss: () -> Unit,
-    onSave: (Reservation) -> Unit
+    onSave: (Contrat) -> Unit
 ) {
     // Pré-remplir les champs si on est en mode édition
-    var clientId by remember { mutableStateOf(initialReservation?.clientId?.toString() ?: "") }
-    var vehiculeId by remember { mutableStateOf(initialReservation?.vehiculeId ?: "") }
-    var debut by remember { mutableStateOf(initialReservation?.debut ?: "") }
-    var fin by remember { mutableStateOf(initialReservation?.fin ?: "") }
+    var clientId by remember { mutableStateOf(initialContrat?.idClient?.toString() ?: "") }
+    var vehiculeId by remember { mutableStateOf(initialContrat?.idVehicule ?: "") }
+    var debut by remember { mutableStateOf(initialContrat?.dateDebut ?: "") }
+    var fin by remember { mutableStateOf(initialContrat?.dateFin ?: "") }
+    var statut by remember { mutableStateOf(initialContrat?.statut ?: "En cours") }
 
-    val isEditing = initialReservation != null
+    val isEditing = initialContrat != null
 
     Column(
         modifier = Modifier.padding(24.dp).navigationBarsPadding(),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-
         Text(
-            text = if (isEditing) "Modifier la Réservation" else "Nouvelle Réservation",
+            text = if (isEditing) "Modifier le Contrat" else "Nouveau Contrat",
             color = Color.White,
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold
         )
 
         CustomTextField(value = clientId, onValueChange = { clientId = it }, label = "ID Client")
-        CustomTextField(value = vehiculeId, onValueChange = { vehiculeId = it }, label = "Véhicule (Immatriculation)")
+        CustomTextField(value = vehiculeId, onValueChange = { vehiculeId = it }, label = "Véhicule (Num Série)")
+        CustomTextField(value = statut, onValueChange = { statut = it }, label = "Statut (ex: En cours, Terminé)")
 
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             Box(modifier = Modifier.weight(1f)) {
@@ -249,9 +236,16 @@ fun ReservationForm(
             Button(
                 onClick = {
                     if (clientId.isNotEmpty() && vehiculeId.isNotEmpty()) {
-                        // Conserver l'ID existant si édition, sinon générer un nouveau
-                        val id = initialReservation?.id ?: (100..999).random()
-                        onSave(Reservation(id, clientId.toIntOrNull() ?: 0, vehiculeId, debut, fin))
+                        val id = initialContrat?.idContrat ?: 0 // 0 si c'est un ajout (l'API générera l'ID)
+                        val nouveauContrat = Contrat(
+                            idContrat = id,
+                            dateDebut = debut,
+                            dateFin = fin,
+                            statut = statut,
+                            idClient = clientId.toIntOrNull() ?: 1,
+                            idVehicule = vehiculeId
+                        )
+                        onSave(nouveauContrat)
                     }
                 },
                 modifier = Modifier.weight(1f),
@@ -265,7 +259,6 @@ fun ReservationForm(
     }
 }
 
-// ... (CustomTextField reste identique)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CustomTextField(value: String, onValueChange: (String) -> Unit, label: String) {
@@ -279,9 +272,8 @@ fun CustomTextField(value: String, onValueChange: (String) -> Unit, label: Strin
     )
 }
 
-// NOUVEAU: Ajout du paramètre onEditRequest
 @Composable
-fun ReservationCard(reservation: Reservation, onEditRequest: () -> Unit, onDeleteRequest: () -> Unit) {
+fun ContratCard(contrat: Contrat, onEditRequest: () -> Unit, onDeleteRequest: () -> Unit) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = Color(0xFF181818)),
@@ -293,11 +285,12 @@ fun ReservationCard(reservation: Reservation, onEditRequest: () -> Unit, onDelet
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(modifier = Modifier.weight(1f)) {
-                Text("Reservation n°${reservation.id}", color = Color(0xFFE67E22), fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                Text("Contrat n°${contrat.idContrat}", color = Color(0xFFE67E22), fontWeight = FontWeight.Bold, fontSize = 16.sp)
                 Spacer(modifier = Modifier.height(8.dp))
-                InfoLabel("Client", reservation.clientId.toString())
-                InfoLabel("Véhicule", reservation.vehiculeId)
-                InfoLabel("Période", "${reservation.debut} au ${reservation.fin}")
+                InfoLabel("Client (ID)", contrat.idClient?.toString() ?: "Inconnu")
+                InfoLabel("Véhicule", contrat.idVehicule ?: "Inconnu")
+                InfoLabel("Statut", contrat.statut ?: "Non défini")
+                InfoLabel("Période", "${contrat.dateDebut.take(10)} au ${contrat.dateFin.take(10)}")
             }
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 ActionButton("Modifier", Color(0xFFEBF5FB), Color(0xFF2E86C1), onClick = onEditRequest)
@@ -307,7 +300,6 @@ fun ReservationCard(reservation: Reservation, onEditRequest: () -> Unit, onDelet
     }
 }
 
-// ... (InfoLabel et ActionButton restent identiques)
 @Composable
 fun InfoLabel(label: String, value: String) {
     Text("$label : $value", color = Color.LightGray, fontSize = 13.sp)

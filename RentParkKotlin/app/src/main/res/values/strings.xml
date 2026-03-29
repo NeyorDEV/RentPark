@@ -1,3 +1,81 @@
 <resources>
     <string name="app_name">RentParkKotlin</string>
+
+    <!--    HomeCustomer     -->
+    <string name="home_departure_date">Date de départ</string>
+    <string name="home_return_date">Date de retour</string>
+    <string name="home_style_date">jj/mm/aaaa</string>
+    <string name="home_show_cars">Voir les véhicules</string>
+    <string name="home_connection">Connexion</string>
+
+
+    <!--    CarsPage     -->
+    <string name="car_search_placeholder">Rechercher une voiture...</string>
+    <string name="filter_price">Prix</string>
+    <string name="filter_gearbox">Boîte</string>
+    <string name="filter_energy">Énergie</string>
+    <string name="car_loading_error">Erreur : %1$s</string>
+    <string name="delete_car_title">Supprimer le véhicule</string>
+    <string name="delete_car_message">Voulez-vous vraiment supprimer la %1$s %2$s ? Cette action est irréversible.</string>
+    <string name="delete_confirm">Supprimer</string>
+    <string name="delete_cancel">Annuler</string>
+    <string name="add_car_title">Nouveau Véhicule</string>
+    <string name="add_car_save">Enregistrer</string>
+    <string name="form_section_identity">Identité</string>
+    <string name="form_section_specs">Caractéristiques</string>
+    <string name="form_section_price">Prix &amp; Disponibilité</string>
+    <string name="form_section_technical">Suivi Technique</string>
+    <string name="form_section_admin">Administration</string>
+    <string name="field_num_serie">Numéro de Série (Obligatoire)</string>
+    <string name="field_brand">Marque</string>
+    <string name="field_model">Modèle</string>
+    <string name="field_year">Année</string>
+    <string name="field_color">Couleur</string>
+    <string name="field_gearbox">Boîte</string>
+    <string name="field_transmission">Transmission</string>
+    <string name="field_power">Puissance (ch)</string>
+    <string name="field_energy">Énergie</string>
+    <string name="field_seats">Places</string>
+    <string name="field_category">Catégorie</string>
+    <string name="field_state">État actuel</string>
+    <string name="field_price_day">Prix / jour (€)</string>
+    <string name="field_date_purchase">Date Achat (YYYY-MM-DD)</string>
+    <string name="field_date_last_ct">Dernier CT (YYYY-MM-DD)</string>
+    <string name="field_date_exp_ct">Expiration CT (YYYY-MM-DD)</string>
+    <string name="field_image_name">Nom de l\'image</string>
+    <string name="field_id_insurer">ID Assureur</string>
+    <string name="field_id_supplier">ID Fournisseur</string>
+    <string name="transmission_rear">Propulsion</string>
+    <string name="transmission_front">Traction</string>
+    <string name="transmission_all">Intégrale</string>
+    <string name="gearbox_manual">Manuelle</string>
+    <string name="gearbox_auto">Automatique</string>
+    <string name="gearbox_semi">Semi-Manuelle</string>
+    <string name="state_free">Libre</string>
+    <string name="state_rented">Louée</string>
+    <string name="state_sold">Vendue</string>
+    <string name="state_repair">Réparation</string>
+    <string name="places">%1$d places • %2$s </string>
+    <string name="bloup">Réparation</string>
+
+    <!--    ContratsPage     -->
+
+    <!--    Dashboard     -->
+
+
+    <!--    Header     -->
+
+    <!--    Login     -->
+
+    <!--    photoDevice     -->
+
+    <!--    Planning     -->
+
+    <!--    RegisterScreen     -->
+
+    <!--    Settings     -->
+
+    <!--    Theme     -->
+
+    <!--    UserPage     -->
 </resources>
