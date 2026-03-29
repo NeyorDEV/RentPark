@@ -91,7 +91,7 @@ sonarqube-kotlin:
   script:
     - cd RentParkKotlin
     - chmod +x ./gradlew
-    - ./gradlew testDebugUnitTest --no-daemon
+    - ./gradlew testDebugUnitTest jacocoTestReport --no-daemon
     - cd ..
     - |
       sonar-scanner \
@@ -99,7 +99,7 @@ sonarqube-kotlin:
         -Dsonar.projectName="RentPark Kotlin Android" \
         -Dsonar.sources=RentParkKotlin/app/src/main \
         -Dsonar.tests=RentParkKotlin/app/src/test \
-        -Dsonar.coverage.jacoco.xmlReportPaths=RentParkKotlin/app/build/reports/coverage/test/debug/report.xml \
+        -Dsonar.coverage.jacoco.xmlReportPaths=RentParkKotlin/app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml \
         -Dsonar.exclusions="**/R.class,**/R$*.class,**/BuildConfig.*,**/Manifest*.*,**/ComposableSingletons*" \
         -Dsonar.host.url="${SONAR_HOST_URL}" \
         -Dsonar.login="${SONAR_TOKEN}"
