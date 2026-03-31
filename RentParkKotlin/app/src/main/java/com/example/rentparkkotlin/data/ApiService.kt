@@ -9,6 +9,7 @@ import retrofit2.Response
 import retrofit2.http.PUT
 
 interface ApiService {
+
     @GET("stats/total-users")
     suspend fun getTotalUsers(): TotalUsersResponse
 
@@ -23,4 +24,5 @@ interface ApiService {
 
     @GET("stats/contrats-prochains")
     suspend fun getContratsProchains(): ContratsProchainsResponse
+
 }

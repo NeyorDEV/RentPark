@@ -8,15 +8,16 @@ import com.example.rentparkkotlin.model.Voiture
 import com.example.rentparkkotlin.repository.CarRepository
 
 /*
-Si tu lances un test tel quel, ton ViewModel va essayer de contacter la vraie API sur internet.
-Si l'API est hors ligne ou si tu n'as pas de réseau, ton test échoue.
-Un test unitaire doit être isolé et déterministe.
-
-La solution : L'Injection de Dépendances
-Tu dois passer le repository au constructeur du ViewModel.
-Ainsi, pendant le test, on pourra lui donner un "Faux" repository (Mock) qui simule des réponses
-(succès, erreur 500, liste vide, etc.).
+    Si tu lances un test tel quel, ton ViewModel va essayer de contacter la vraie API sur internet.
+    Si l'API est hors ligne ou si tu n'as pas de réseau, ton test échoue.
+    Un test unitaire doit être isolé et déterministe.
+    
+    La solution : L'Injection de Dépendances
+    Tu dois passer le repository au constructeur du ViewModel.
+    Ainsi, pendant le test, on pourra lui donner un "Faux" repository (Mock) qui simule des réponses
+    (succès, erreur 500, liste vide, etc.).
 */
+
 class CarViewModel(private val repository: CarRepository = CarRepository()) : ViewModel() {
 
     var voitures by mutableStateOf<List<Voiture>>(emptyList())
@@ -26,6 +27,9 @@ class CarViewModel(private val repository: CarRepository = CarRepository()) : Vi
         private set
 
     var error by mutableStateOf<String?>(null)
+        private set
+
+    var selectedVoiture by mutableStateOf<Voiture?>(null)
         private set
 
     init {
@@ -73,4 +77,36 @@ class CarViewModel(private val repository: CarRepository = CarRepository()) : Vi
             }
         }
     }
+
+    fun updateVoiture(voiture: Voiture) {
+        viewModelScope.launch {
+            try {
+                val response = repository.updateVoiture(voiture.NumSerie, voiture)
+                if (response.isSuccessful) {
+                    fetchVoitures() // Recharger la liste
+                }
+            } catch (e: Exception) {
+            }
+        }
+    }
+
+    fun getVoitureDetails(numSerie: String) {
+        viewModelScope.launch {
+            isLoading = true
+            try {
+                val response = repository.getVoitureByNumSerie(numSerie)
+                if (response.isSuccessful) {
+                    selectedVoiture = response.body()
+                }
+            } catch (e: Exception) {
+                error = "Impossible de charger les détails"
+            } finally {
+                isLoading = false
+            }
+        }
+    }
+    fun clearSelectedVoiture() {
+        selectedVoiture = null
+    }
 }
+
