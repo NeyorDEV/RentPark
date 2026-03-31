@@ -1,6 +1,7 @@
 package com.example.rentparkkotlin.ui.userPage
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -8,6 +9,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Person
@@ -291,26 +293,96 @@ fun ClientFormDialog(initialClient: Client?, onDismiss: () -> Unit, onConfirm: (
 }
 
 @Composable
-fun UserFormDialog(title: String, confirmLabel: String, initialUser: User? = null, onDismiss: () -> Unit, onConfirm: (String, String, String) -> Unit) {
+fun UserFormDialog(
+    title: String,
+    confirmLabel: String,
+    initialUser: User? = null,
+    onDismiss: () -> Unit,
+    onConfirm: (String, String, String) -> Unit
+) {
     var name by remember { mutableStateOf(initialUser?.username ?: "") }
     var role by remember { mutableStateOf(initialUser?.role ?: "") }
     var mdp by remember { mutableStateOf("") }
+
+    var expanded by remember { mutableStateOf(false) }
+    val roles = listOf("admin", "employe", "user")
+
     AlertDialog(
-        onDismissRequest = onDismiss, containerColor = CardColor,
+        onDismissRequest = onDismiss,
+        containerColor = CardColor,
         title = { Text(title, color = Color.White, fontSize = 18.sp) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                OutlinedTextField(value = name, onValueChange = { name = it }, label = { Text("Nom d'utilisateur", color = Color.Gray) }, textStyle = TextStyle(color = Color.White), singleLine = true)
-                OutlinedTextField(value = mdp, onValueChange = { mdp = it }, label = { Text(if (initialUser == null) "Mot de passe" else "Nouveau mdp (optionnel)", color = Color.Gray) }, textStyle = TextStyle(color = Color.White), singleLine = true)
-                OutlinedTextField(value = role, onValueChange = { role = it }, label = { Text("Rôle", color = Color.Gray) }, textStyle = TextStyle(color = Color.White), singleLine = true)
+                OutlinedTextField(
+                    value = name,
+                    onValueChange = { name = it },
+                    label = { Text("Nom d'utilisateur", color = Color.Gray) },
+                    textStyle = TextStyle(color = Color.White),
+                    singleLine = true,
+                    colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = AccentOrange, unfocusedBorderColor = Color.Gray)
+                )
+
+                OutlinedTextField(
+                    value = mdp,
+                    onValueChange = { mdp = it },
+                    label = { Text(if (initialUser == null) "Mot de passe" else "Nouveau mdp (optionnel)", color = Color.Gray) },
+                    textStyle = TextStyle(color = Color.White),
+                    singleLine = true,
+                    colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = AccentOrange, unfocusedBorderColor = Color.Gray)
+                )
+
+                Box(modifier = Modifier.fillMaxWidth()) {
+                    OutlinedTextField(
+                        value = role,
+                        onValueChange = {},
+                        readOnly = true,
+                        label = { Text("Rôle", color = Color.Gray) },
+                        textStyle = TextStyle(color = Color.White),
+                        modifier = Modifier.fillMaxWidth(),
+                        trailingIcon = {
+                            Icon(
+                                imageVector = Icons.Default.ArrowDropDown,
+                                contentDescription = null,
+                                tint = AccentOrange
+                            )
+                        },
+                        colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = AccentOrange, unfocusedBorderColor = Color.Gray)
+                    )
+
+                    Box(
+                        modifier = Modifier
+                            .matchParentSize()
+                            .clickable { expanded = true }
+                    )
+
+                    DropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false },
+                        modifier = Modifier
+                            .fillMaxWidth(0.6f)
+                            .background(SurfaceColor)
+                    ) {
+                        roles.forEach { option ->
+                            DropdownMenuItem(
+                                text = { Text(option, color = Color.White) },
+                                onClick = {
+                                    role = option
+                                    expanded = false
+                                }
+                            )
+                        }
+                    }
+                }
             }
         },
         confirmButton = {
             TextButton(
                 onClick = { onConfirm(name, role, mdp) },
-                enabled = name.isNotBlank() && role.isNotBlank() && (initialUser != null || mdp.isNotBlank())
+                enabled = name.isNotBlank() && (initialUser != null || mdp.isNotBlank())
             ) { Text(confirmLabel, color = AccentOrange, fontWeight = FontWeight.Bold) }
         },
-        dismissButton = { TextButton(onClick = onDismiss) { Text("ANNULER", color = Color.Gray) } }
+        dismissButton = {
+            TextButton(onClick = onDismiss) { Text("ANNULER", color = Color.Gray) }
+        }
     )
 }
