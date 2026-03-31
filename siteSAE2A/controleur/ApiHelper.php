@@ -17,3 +17,10 @@ function getClientApiClient(): Client
         'timeout'  => 30.0,
     ]);
 }
+function getAuthApiClient(): Client
+{
+    return new Client([
+        'base_uri' => 'https://codefirst.iut.uca.fr/kubernetes/iut-inf63-projets-etudiants-rentpark/rentpark-auth-pod/',
+        'timeout'  => 30.0,
+    ]);
+}
