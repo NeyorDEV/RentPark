@@ -14,15 +14,13 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-
-// Imports de vos pages
 import com.example.rentparkkotlin.ui.dashboard.DashboardScreen
 import com.example.rentparkkotlin.ui.homeCustomer.RentParkHomeScreen
-import com.example.rentparkkotlin.ui.photoDevice.PhotoDeviceScreen
 import com.example.rentparkkotlin.ui.login.LoginScreen
 import com.example.rentparkkotlin.ui.theme.RentParkKotlinTheme
 import com.example.rentparkkotlin.ui.theme.ThemePrefs
-import com.example.rentparkkotlin.data.AuthPrefs // N'oubliez pas cet import !
+
+import com.example.rentparkkotlin.data.AuthPrefs
 import com.example.rentparkkotlin.data.RetrofitInstance
 import com.example.rentparkkotlin.ui.carsPage.CarListScreen
 import com.example.rentparkkotlin.ui.register.RegisterScreen
@@ -31,7 +29,7 @@ import com.example.rentparkkotlin.ui.settings.SettingsPage
 import com.example.rentparkkotlin.ui.userPage.UserManagementScreen
 import  com.example.rentparkkotlin.ui.contratsPage.ContractsScreen
 import com.example.rentparkkotlin.ui.header.MainScreen
-
+import com.example.rentparkkotlin.ui.photoDevice.PhotoDeviceScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -40,7 +38,7 @@ class MainActivity : ComponentActivity() {
         RetrofitInstance.init(this)
 
         val themePrefs = ThemePrefs(this)
-        val authPrefs = AuthPrefs(this) // 1. Initialisation des préférences d'authentification
+        val authPrefs = AuthPrefs(this)
 
         setContent {
             var isDarkMode by remember { mutableStateOf(themePrefs.getDarkMode()) }
@@ -51,7 +49,7 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     val navController = rememberNavController()
-
+                    
                     // 2. LOGIQUE D'AUTO-CONNEXION
                     // On choisit la page de départ selon l'état de connexion et le rôle
                     val startDestination : Any = if (authPrefs.isLoggedIn()) {
@@ -62,7 +60,6 @@ class MainActivity : ComponentActivity() {
                         Routes.LoginRoute
                     }
 
-                    // 3. Configuration du routeur (NavHost)
                     NavHost(navController = navController, startDestination = startDestination) {
 
                         // Route : Connexion
