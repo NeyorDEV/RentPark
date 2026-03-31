@@ -18,6 +18,7 @@ class UserController
     private VehicleGateway $gateway;
     private UserGateway $userGateway;
     private Client $apiClient;
+    private Client $authApiClient;
 
     public function __construct()
     {
@@ -29,6 +30,7 @@ class UserController
             $this->gateway = new VehicleGateway($this->connection);
             $this->userGateway = new UserGateway($this->connection);
             $this->apiClient = getApiClient();
+            $this->authApiClient = getAuthApiClient();
 
             switch ($action) {
                 case "afficheInscription":      $this->afficheInscription($dVueErreur); break;
@@ -152,15 +154,12 @@ class UserController
 
         // Login API pour récupérer le token
         try {
-            $client = new Client([
-                'base_uri' => 'https://codefirst.iut.uca.fr/kubernetes/iut-inf63-projets-etudiants-rentpark/rentpark-auth-pod/',
-                'timeout'  => 60.0
-            ]);
-            $response = $client->post('login', [
+            $response = $this->authApiClient->post('login', [
                 'json' => ['username' => $username, 'password' => $password]
             ]);
             $data = json_decode($response->getBody()->getContents(), true);
             $_SESSION['api_token'] = $data['token'] ?? '';
+
         } catch (RequestException $e) {
             // API indisponible, on continue sans token
             $_SESSION['api_token'] = '';
