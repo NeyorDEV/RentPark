@@ -20,6 +20,11 @@ class AdminControleur
     private ReservationGateway $reservationGateway;
     private Client $apiClient;       // rentpark-api-pod (véhicules, contrats, rappels, users)
     private Client $clientApiClient; // rentpark-client-pod (clients)
+    private Client $authApiClient;   // rentpark-auth-pod (authentification)
+    private Client $contratApiClient; // rentpark-contrat-pod (contrats)
+    private Client $planningApiClient; // rentpark-planning-pod (planning)
+    private Client $rappelApiClient;  // rentpark-rappel-pod (rappels)
+    private Client $userApiClient;    // rentpark-utilisateurs-pod (utilisateurs)
 
     public function __construct()
     {
@@ -34,6 +39,11 @@ class AdminControleur
             $this->reservationGateway = new ReservationGateway($this->connection);
             $this->apiClient          = getApiClient();
             $this->clientApiClient    = getClientApiClient();
+            $this->authApiClient      = getAuthApiClient();
+            $this->contratApiClient    = getContratApiClient();
+            $this->planningApiClient   = getPlanningApiClient();
+            $this->rappelApiClient     = getRappelApiClient();
+            $this->userApiClient       = getUserApiClient();
 
             switch ($action) {
                 case "afficheDashboard":  $this->afficheDashboard($dVueErreur);  break;
