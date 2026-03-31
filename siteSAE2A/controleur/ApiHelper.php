@@ -31,3 +31,10 @@ function getContratApiClient(): Client
         'timeout'  => 30.0,
     ]);
 }
+function getPlanningApiClient(): Client
+{
+    return new Client([
+        'base_uri' => 'https://codefirst.iut.uca.fr/kubernetes/iut-inf63-projets-etudiants-rentpark/rentpark-planning-pod/',
+        'timeout'  => 30.0,
+    ]);
+}
