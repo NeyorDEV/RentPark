@@ -1,301 +1,356 @@
 package com.example.rentparkkotlin.ui.carsPage
 
-import androidx.compose.foundation.background
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.lazy.grid.*
+import androidx.compose.foundation.shape.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
+import androidx.compose.ui.*
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.*
 import androidx.compose.ui.window.Dialog
 import coil.compose.AsyncImage
 import com.example.rentparkkotlin.model.Voiture
 import com.example.rentparkkotlin.viewmodel.CarViewModel
 import com.example.rentparkkotlin.R
 import com.example.rentparkkotlin.ui.header.Header
+
+// Couleur thématique
+val orangePark = Color(0xFFFF5A19)
+
 @Composable
 fun CarListScreen(
-
     viewModel: CarViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
 ) {
-    val voitures = viewModel.voitures
-    val isLoading = viewModel.isLoading
-    val error = viewModel.error
+    var searchQuery by remember { mutableStateOf("") }
+    var selectedBoites by remember { mutableStateOf(setOf<String>()) }
+    var selectedEnergies by remember { mutableStateOf(setOf<String>()) }
+    var selectedPrixRanges by remember { mutableStateOf(setOf<String>()) }
+    var filterTypeToOpen by remember { mutableStateOf<String?>(null) }
+
+    val filteredVoitures = remember(
+        searchQuery,
+        viewModel.voitures,
+        selectedBoites,
+        selectedEnergies,
+        selectedPrixRanges
+    ) {
+        filtrerLaFlotte(
+            viewModel.voitures,
+            searchQuery,
+            selectedBoites,
+            selectedEnergies,
+            selectedPrixRanges
+        )
+    }
 
     var showAddDialog by remember { mutableStateOf(false) }
     var carToDelete by remember { mutableStateOf<Voiture?>(null) }
-
-    val orangeColor = Color(0xFFFF5A19)
-
+    var carToEdit by remember { mutableStateOf<Voiture?>(null) }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFFF8F9FA))
-
     ) {
-        // 1. Barre de Recherche + Bouton Ajouter
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 10.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            Box(
-                modifier = Modifier
-                    .weight(1f)
-                    .clip(CircleShape)
-                    .background(Color.White)
-                    .padding(15.dp)
-            ) {
-                Text(stringResource(R.string.car_search_placeholder), color = Color.Gray)
-            }
+        SearchSection(
+            query = searchQuery,
+            onValueChange = { searchQuery = it },
+            onAddClick = { showAddDialog = true }
+        )
 
-            IconButton(
-                onClick = { showAddDialog = true },
-                modifier = Modifier
-                    .size(54.dp)
-                    .background(orangeColor, CircleShape)
-            ) {
-                Icon(Icons.Default.Add, contentDescription = stringResource(R.string.add_car_title), tint = Color.White)
+        FilterBar(
+            prixSize = selectedPrixRanges.size,
+            boiteSize = selectedBoites.size,
+            energieSize = selectedEnergies.size,
+            onFilterClick = { filterTypeToOpen = it },
+            onClear = {
+                selectedBoites = emptySet()
+                selectedEnergies = emptySet()
+                selectedPrixRanges = emptySet()
+            }
+        )
+
+        CarGrid(
+            isLoading = viewModel.isLoading,
+            error = viewModel.error,
+            voitures = filteredVoitures,
+            onCarClick = { viewModel.getVoitureDetails(it.NumSerie) },
+            onEdit = { carToEdit = it },
+            onDelete = { carToDelete = it }
+        )
+    }
+
+    // Gestion centralisée des fenêtres surgissantes
+    CarListModals(
+        viewModel = viewModel,
+        filterTypeToOpen = filterTypeToOpen,
+        showAddDialog = showAddDialog,
+        carToEdit = carToEdit,
+        carToDelete = carToDelete,
+        filters = Triple(selectedPrixRanges, selectedBoites, selectedEnergies),
+        onFilterDismiss = { filterTypeToOpen = null },
+        onFilterConfirm = { type, set ->
+            when(type) {
+                "Prix" -> selectedPrixRanges = set
+                "Boîte" -> selectedBoites = set
+                "Énergie" -> selectedEnergies = set
+            }
+            filterTypeToOpen = null
+        },
+        onAddDismiss = { showAddDialog = false },
+        onEditDismiss = { carToEdit = null },
+        onDeleteDismiss = { carToDelete = null }
+    )
+}
+
+// --- LOGIQUE DE FILTRAGE ---
+fun filtrerLaFlotte(
+    liste: List<Voiture>,
+    query: String,
+    boites: Set<String>,
+    energies: Set<String>,
+    prixRanges: Set<String>
+): List<Voiture> {
+    return liste.filter { v ->
+        val matchSearch = v.Marque.contains(query, true) || v.Nom.contains(query, true)
+        val matchBoite = boites.isEmpty() || boites.contains(v.Boite)
+        val matchEnergie = energies.isEmpty() || energies.contains(v.Energie)
+
+        val p = v.Prix.toDoubleOrNull() ?: 0.0
+        val matchPrix = prixRanges.isEmpty() || prixRanges.any { r ->
+            when(r) {
+                "0 - 50€" -> p <= 50
+                "50 - 100€" -> p in 50.0..100.0
+                "100€ +" -> p > 100
+                else -> true
             }
         }
+        matchSearch && matchBoite && matchEnergie && matchPrix
+    }
+}
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+// --- COMPOSANTS DE L'INTERFACE ---
+@Composable
+fun SearchSection(query: String, onValueChange: (String) -> Unit, onAddClick: () -> Unit) {
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(16.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        TextField(
+            value = query,
+            onValueChange = onValueChange,
+            placeholder = { Text(stringResource(R.string.car_search_placeholder)) },
+            modifier = Modifier.weight(1f).clip(CircleShape),
+            singleLine = true,
+            colors = TextFieldDefaults.colors(
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent
+            )
+        )
+        IconButton(
+            onClick = onAddClick,
+            modifier = Modifier.size(50.dp).background(orangePark, CircleShape)
         ) {
-            FilterBadge(text = stringResource(R.string.filter_price), icon = "€")
-            FilterBadge(text = stringResource(R.string.filter_gearbox), icon = "⚙️")
-            FilterBadge(text = stringResource(R.string.filter_energy), icon = "⚡")
+            Icon(Icons.Default.Add, contentDescription = stringResource(R.string.add_car_title), tint = Color.White)
         }
+    }
+}
 
-        Spacer(modifier = Modifier.height(20.dp))
+@Composable
+fun FilterBar(prixSize: Int, boiteSize: Int, energieSize: Int, onFilterClick: (String) -> Unit, onClear: () -> Unit) {
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        FilterBadge(if (prixSize > 0) "${stringResource(R.string.filter_price)} ($prixSize)" else stringResource(R.string.filter_price)) { onFilterClick("Prix") }
+        FilterBadge(if (boiteSize > 0) "${stringResource(R.string.filter_gearbox)} ($boiteSize)" else stringResource(R.string.filter_gearbox)) { onFilterClick("Boîte") }
+        FilterBadge(if (energieSize > 0) "${stringResource(R.string.filter_energy)} ($energieSize)" else stringResource(R.string.filter_energy)) { onFilterClick("Énergie") }
 
-        when {
-            isLoading -> {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator(color = orangeColor)
-                }
-            }
-            error != null -> {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text(
-                        text = stringResource(R.string.car_loading_error, error),
-                        color = Color.Red
-                    )
-                }
-            }
-            else -> {
-                LazyVerticalGrid(
-                    columns = GridCells.Fixed(1),
-                    verticalArrangement = Arrangement.spacedBy(12.dp),
-                    contentPadding = PaddingValues(16.dp),
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    items(voitures) { voiture ->
-                        CarCard(
-                            voiture = voiture,
-                            onDeleteClick = { carToDelete = voiture }
-                        )
-                    }
+        if (prixSize + boiteSize + energieSize > 0) {
+            TextButton(onClick = onClear) { Text("Effacer", color = orangePark) }
+        }
+    }
+}
+
+@Composable
+fun CarGrid(isLoading: Boolean, error: String?, voitures: List<Voiture>, onCarClick: (Voiture) -> Unit, onEdit: (Voiture) -> Unit, onDelete: (Voiture) -> Unit) {
+    if (isLoading) {
+        Box(Modifier.fillMaxSize(), Alignment.Center) { CircularProgressIndicator(color = orangePark) }
+    } else if (error != null) {
+        Box(Modifier.fillMaxSize(), Alignment.Center) {
+            Text(text = stringResource(R.string.car_loading_error, error), color = Color.Red)
+        }
+    } else {
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(1),
+            contentPadding = PaddingValues(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            items(voitures) { voiture ->
+                Box(Modifier.clickable { onCarClick(voiture) }) {
+                    CarCard(voiture, onDelete = { onDelete(voiture) }, onEdit = { onEdit(voiture) })
                 }
             }
         }
     }
+}
+
+@Composable
+fun CarCard(voiture: Voiture, onDelete: () -> Unit, onEdit: () -> Unit) {
+    Card(
+        modifier = Modifier.fillMaxWidth().height(280.dp),
+        shape = RoundedCornerShape(20.dp),
+        elevation = CardDefaults.cardElevation(4.dp)
+    ) {
+        Box {
+            AsyncImage(
+                model = "http://10.0.2.2:9990/${voiture.ImagePath}",
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize()
+            )
+            Row(
+                modifier = Modifier.align(Alignment.TopEnd).padding(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                ActionIcon(Icons.Default.Edit, Color(0xFF2196F3), onEdit)
+                ActionIcon(Icons.Default.Delete, Color.Red, onDelete)
+            }
+            Column(
+                modifier = Modifier.align(Alignment.BottomCenter).fillMaxWidth()
+                    .background(Color.White.copy(alpha = 0.9f)).padding(12.dp)
+            ) {
+                Text("${voiture.Marque} ${voiture.Nom}", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                    Text("${voiture.Boite} • ${voiture.Energie}", color = Color.Gray, fontSize = 12.sp)
+                    Text("${voiture.Prix} €/j", color = orangePark, fontWeight = FontWeight.ExtraBold)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun ActionIcon(icon: androidx.compose.ui.graphics.vector.ImageVector, color: Color, onClick: () -> Unit) {
+    IconButton(
+        onClick = onClick,
+        modifier = Modifier.background(Color.White, CircleShape).size(36.dp)
+    ) {
+        Icon(icon, null, tint = color, modifier = Modifier.size(20.dp))
+    }
+}
+
+@Composable
+fun FilterBadge(text: String, onClick: () -> Unit) {
+    Surface(
+        modifier = Modifier.clickable { onClick() },
+        shape = RoundedCornerShape(12.dp),
+        color = Color.White,
+        shadowElevation = 2.dp
+    ) {
+        Text(text, Modifier.padding(horizontal = 12.dp, vertical = 8.dp), fontSize = 13.sp)
+    }
+}
+
+@Composable
+fun CarListModals(
+    viewModel: CarViewModel,
+    filterTypeToOpen: String?,
+    showAddDialog: Boolean,
+    carToEdit: Voiture?,
+    carToDelete: Voiture?,
+    filters: Triple<Set<String>, Set<String>, Set<String>>,
+    onFilterDismiss: () -> Unit,
+    onFilterConfirm: (String, Set<String>) -> Unit,
+    onAddDismiss: () -> Unit,
+    onEditDismiss: () -> Unit,
+    onDeleteDismiss: () -> Unit
+) {
+    if (filterTypeToOpen != null) {
+        val options = when(filterTypeToOpen) {
+            "Prix" -> listOf("0 - 50€", "50 - 100€", "100€ +")
+            "Boîte" -> listOf("Manuelle", "Automatique", "Semi-Manuelle")
+            else -> listOf("Essence", "Diesel", "Électrique", "Hybride")
+        }
+        FilterSelectionDialog(
+            title = "Filtrer par $filterTypeToOpen",
+            options = options,
+            initialSelection = when(filterTypeToOpen) {
+                "Prix" -> filters.first
+                "Boîte" -> filters.second
+                else -> filters.third
+            },
+            onDismiss = onFilterDismiss,
+            onConfirm = { onFilterConfirm(filterTypeToOpen, it) }
+        )
+    }
+
+    viewModel.selectedVoiture?.let {
+        CarDetailsDialog(it) { viewModel.clearSelectedVoiture() }
+    }
 
     if (showAddDialog) {
-        AddCarsForm(
-            onDismiss = { showAddDialog = false },
-            onConfirm = { newVoiture ->
-                viewModel.addVoiture(newVoiture)
-                showAddDialog = false
-            }
-        )
+        AddEditCarForm(stringResource(R.string.add_car_title), onDismiss = onAddDismiss, onConfirm = { viewModel.addVoiture(it); onAddDismiss() })
+    }
+
+    if (carToEdit != null) {
+        AddEditCarForm("Modifier", carToEdit, onDismiss = onEditDismiss, onConfirm = { viewModel.updateVoiture(it); onEditDismiss() })
     }
 
     if (carToDelete != null) {
         AlertDialog(
-            onDismissRequest = { carToDelete = null },
+            onDismissRequest = onDeleteDismiss,
             title = { Text(stringResource(R.string.delete_car_title)) },
-            text = {
-                Text(
-                    stringResource(
-                        R.string.delete_car_message,
-                        carToDelete?.Marque ?: "",
-                        carToDelete?.Nom ?: ""
-                    )
-                )
-            },
+            text = { Text(stringResource(R.string.delete_car_message, carToDelete.Marque, carToDelete.Nom)) },
             confirmButton = {
-                Button(
-                    onClick = {
-                        carToDelete?.let { viewModel.deleteVoiture(it.NumSerie) }
-                        carToDelete = null
-                    },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
-                ) {
-                    Text(stringResource(R.string.delete_confirm), color = Color.White)
+                Button(onClick = { viewModel.deleteVoiture(carToDelete.NumSerie); onDeleteDismiss() }, colors = ButtonDefaults.buttonColors(containerColor = Color.Red)) {
+                    Text(stringResource(R.string.delete_confirm))
                 }
             },
-            dismissButton = {
-                TextButton(onClick = { carToDelete = null }) {
-                    Text(stringResource(R.string.delete_cancel))
-                }
-            }
+            dismissButton = { TextButton(onClick = onDeleteDismiss) { Text(stringResource(R.string.delete_cancel)) } }
         )
     }
 }
 
 @Composable
-fun AddCarsForm(onDismiss: () -> Unit, onConfirm: (Voiture) -> Unit) {
-    var numSerie by remember { mutableStateOf("") }
-    var marque by remember { mutableStateOf("") }
-    var nom by remember { mutableStateOf("") }
-    var annee by remember { mutableStateOf("") }
-    var couleur by remember { mutableStateOf("") }
-    var energie by remember { mutableStateOf("") }
-    var puissance by remember { mutableStateOf("") }
-    var nbPlaces by remember { mutableStateOf("5") }
-    var categorie by remember { mutableStateOf("") }
-
-    val transmissions = listOf(
-        stringResource(R.string.transmission_rear),
-        stringResource(R.string.transmission_front),
-        stringResource(R.string.transmission_all)
-    )
-    val boites = listOf(
-        stringResource(R.string.gearbox_manual),
-        stringResource(R.string.gearbox_auto),
-        stringResource(R.string.gearbox_semi)
-    )
-    val etats = listOf(
-        stringResource(R.string.state_free),
-        stringResource(R.string.state_rented),
-        stringResource(R.string.state_sold),
-        stringResource(R.string.state_repair)
-    )
-
-    var transmission by remember { mutableStateOf(transmissions[1]) }
-    var boite by remember { mutableStateOf(boites[0]) }
-    var etat by remember { mutableStateOf(etats[0]) }
-    var dateAchat by remember { mutableStateOf("") }
-    var dateDerCT by remember { mutableStateOf("") }
-    var dateExpCT by remember { mutableStateOf("") }
-    var prix by remember { mutableStateOf("") }
-    var idAssureur by remember { mutableStateOf("1") }
-    var idFournisseur by remember { mutableStateOf("1") }
-    var imagePath by remember { mutableStateOf("default_car.jpg") }
-
-    val orangePark = Color(0xFFFF5A19)
-
+fun CarDetailsDialog(voiture: Voiture, onDismiss: () -> Unit) {
     Dialog(onDismissRequest = onDismiss) {
-        Surface(
-            shape = RoundedCornerShape(24.dp),
-            color = Color.White,
-            modifier = Modifier.fillMaxWidth().fillMaxHeight(0.9f)
-        ) {
-            Column(
-                modifier = Modifier
-                    .padding(16.dp)
-                    .verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                Text(stringResource(R.string.add_car_title), fontSize = 22.sp, fontWeight = FontWeight.Bold)
-
-                FormSectionTitle(stringResource(R.string.form_section_identity), orangePark)
-                SimpleField(numSerie, { numSerie = it }, stringResource(R.string.field_num_serie))
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    SimpleField(marque, { marque = it }, stringResource(R.string.field_brand), Modifier.weight(1f))
-                    SimpleField(nom, { nom = it }, stringResource(R.string.field_model), Modifier.weight(1f))
-                }
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    SimpleField(annee, { annee = it }, stringResource(R.string.field_year), Modifier.weight(1f))
-                    SimpleField(couleur, { couleur = it }, stringResource(R.string.field_color), Modifier.weight(1f))
-                }
-
-                FormSectionTitle(stringResource(R.string.form_section_specs), orangePark)
-                StableDropDown(stringResource(R.string.field_gearbox), boites, boite) { boite = it }
-                StableDropDown(stringResource(R.string.field_transmission), transmissions, transmission) { transmission = it }
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    SimpleField(puissance, { puissance = it }, stringResource(R.string.field_power), Modifier.weight(1f))
-                    SimpleField(energie, { energie = it }, stringResource(R.string.field_energy), Modifier.weight(1f))
-                }
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    SimpleField(nbPlaces, { nbPlaces = it }, stringResource(R.string.field_seats), Modifier.weight(1f))
-                    SimpleField(categorie, { categorie = it }, stringResource(R.string.field_category), Modifier.weight(1f))
-                }
-
-                FormSectionTitle(stringResource(R.string.form_section_price), orangePark)
-                StableDropDown(stringResource(R.string.field_state), etats, etat) { etat = it }
-                SimpleField(prix, { prix = it }, stringResource(R.string.field_price_day))
-
-                FormSectionTitle(stringResource(R.string.form_section_technical), orangePark)
-                SimpleField(dateAchat, { dateAchat = it }, stringResource(R.string.field_date_purchase))
-                SimpleField(dateDerCT, { dateDerCT = it }, stringResource(R.string.field_date_last_ct))
-                SimpleField(dateExpCT, { dateExpCT = it }, stringResource(R.string.field_date_exp_ct))
-
-                FormSectionTitle(stringResource(R.string.form_section_admin), orangePark)
-                SimpleField(imagePath, { imagePath = it }, stringResource(R.string.field_image_name))
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    SimpleField(idAssureur, { idAssureur = it }, stringResource(R.string.field_id_insurer), Modifier.weight(1f))
-                    SimpleField(idFournisseur, { idFournisseur = it }, stringResource(R.string.field_id_supplier), Modifier.weight(1f))
-                }
-
-                Spacer(modifier = Modifier.height(20.dp))
-
-                Button(
-                    onClick = {
-                        if (numSerie.isNotBlank()) {
-                            val v = Voiture(
-                                NumSerie = numSerie,
-                                Energie = energie,
-                                NbPlaces = nbPlaces,
-                                Categorie = categorie,
-                                Transmission = transmission,
-                                Boite = boite,
-                                Etat = etat,
-                                Puissance = puissance,
-                                DateAchat = dateAchat,
-                                DateExpirationControleTech = dateExpCT,
-                                DateDernierControleTech = dateDerCT,
-                                Marque = marque,
-                                Nom = nom,
-                                Annee = annee,
-                                IdAssureur = idAssureur.toIntOrNull() ?: 1,
-                                IdFournisseur = idFournisseur.toIntOrNull() ?: 1,
-                                ImagePath = imagePath,
-                                Couleur = couleur,
-                                Prix = prix
-                            )
-                            onConfirm(v)
-                        }
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(containerColor = orangePark),
-                    shape = RoundedCornerShape(12.dp),
-                    enabled = numSerie.isNotBlank()
-                ) {
-                    Text(stringResource(R.string.add_car_save), fontWeight = FontWeight.Bold)
+        Surface(shape = RoundedCornerShape(24.dp), color = Color.White, modifier = Modifier.fillMaxWidth().fillMaxHeight(0.85f)) {
+            Column(Modifier.padding(24.dp).verticalScroll(rememberScrollState())) {
+                Text("${voiture.Marque} ${voiture.Nom}", fontSize = 24.sp, fontWeight = FontWeight.Bold)
+                Text("S/N: ${voiture.NumSerie}", fontSize = 14.sp, color = Color.Gray)
+                Spacer(Modifier.height(20.dp))
+                DetailSectionTitle("Fiche Technique")
+                InfoRow("Année", voiture.Annee)
+                InfoRow("Couleur", voiture.Couleur)
+                InfoRow("Énergie", voiture.Energie)
+                InfoRow("Puissance", "${voiture.Puissance} CV")
+                InfoRow("Boîte", voiture.Boite)
+                InfoRow("Transmission", voiture.Transmission)
+                InfoRow("Places", voiture.NbPlaces)
+                InfoRow("Catégorie", voiture.Categorie)
+                Spacer(Modifier.height(20.dp))
+                DetailSectionTitle("Gestion & Tarifs")
+                InfoRow("État actuel", voiture.Etat)
+                InfoRow("Prix journalier", "${voiture.Prix} €")
+                Spacer(Modifier.height(20.dp))
+                DetailSectionTitle("Maintenance")
+                InfoRow("Date d'achat", voiture.DateAchat)
+                InfoRow("Dernier CT", voiture.DateDernierControleTech)
+                InfoRow("Expiration CT", voiture.DateExpirationControleTech)
+                Spacer(Modifier.height(24.dp))
+                Button(onClick = onDismiss, modifier = Modifier.fillMaxWidth(), colors = ButtonDefaults.buttonColors(containerColor = orangePark)) {
+                    Text("Fermer", fontWeight = FontWeight.Bold)
                 }
             }
         }
@@ -303,14 +358,114 @@ fun AddCarsForm(onDismiss: () -> Unit, onConfirm: (Voiture) -> Unit) {
 }
 
 @Composable
-fun FormSectionTitle(text: String, color: Color) {
-    Text(text, color = color, fontWeight = FontWeight.SemiBold, fontSize = 14.sp, modifier = Modifier.padding(top = 8.dp))
+fun FilterSelectionDialog(title: String, options: List<String>, initialSelection: Set<String>, onDismiss: () -> Unit, onConfirm: (Set<String>) -> Unit) {
+    var temp by remember { mutableStateOf(initialSelection) }
+    Dialog(onDismissRequest = onDismiss) {
+        Surface(shape = RoundedCornerShape(24.dp), color = Color.White) {
+            Column(Modifier.padding(20.dp)) {
+                Text(title, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                Spacer(Modifier.height(12.dp))
+                options.forEach { opt ->
+                    Row(Modifier.fillMaxWidth().clickable { temp = if(temp.contains(opt)) temp - opt else temp + opt }.padding(vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Checkbox(checked = temp.contains(opt), onCheckedChange = null)
+                        Text(opt, Modifier.padding(start = 8.dp))
+                    }
+                }
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                    TextButton(onClick = onDismiss) { Text("Annuler") }
+                    Button(onClick = { onConfirm(temp) }, colors = ButtonDefaults.buttonColors(containerColor = orangePark)) { Text("Appliquer") }
+                }
+            }
+        }
+    }
 }
+
+@Composable
+fun AddEditCarForm(title: String, voiture: Voiture? = null, onDismiss: () -> Unit, onConfirm: (Voiture) -> Unit) {
+    var numSerie by remember { mutableStateOf(voiture?.NumSerie ?: "") }
+    var marque by remember { mutableStateOf(voiture?.Marque ?: "") }
+    var nom by remember { mutableStateOf(voiture?.Nom ?: "") }
+    var energie by remember { mutableStateOf(voiture?.Energie ?: "") }
+    var puissance by remember { mutableStateOf(voiture?.Puissance ?: "") }
+    var prix by remember { mutableStateOf(voiture?.Prix ?: "") }
+    var boite by remember { mutableStateOf(voiture?.Boite ?: "Manuelle") }
+    var etat by remember { mutableStateOf(voiture?.Etat ?: "Libre") }
+    var annee by remember { mutableStateOf(voiture?.Annee ?: "") }
+    var couleur by remember { mutableStateOf(voiture?.Couleur ?: "") }
+    var nbPlaces by remember { mutableStateOf(voiture?.NbPlaces ?: "5") }
+    var categorie by remember { mutableStateOf(voiture?.Categorie ?: "") }
+    var transmission by remember { mutableStateOf(voiture?.Transmission ?: "") }
+    var dateAchat by remember { mutableStateOf(voiture?.DateAchat ?: "") }
+    var dateCT by remember { mutableStateOf(voiture?.DateDernierControleTech ?: "") }
+    var dateExpCT by remember { mutableStateOf(voiture?.DateExpirationControleTech ?: "") }
+
+    val optionsBoite = listOf("Manuelle", "Automatique", "Semi-Manuelle")
+    val optionsEtat = listOf("Libre", "Louée", "En réparation", "Vendue")
+
+    Dialog(onDismissRequest = onDismiss) {
+        Surface(shape = RoundedCornerShape(24.dp), color = Color.White, modifier = Modifier.fillMaxWidth().fillMaxHeight(0.9f)) {
+            Column(modifier = Modifier.padding(20.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Text(title, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                FormSectionTitle("Identification & Style")
+                SimpleField(numSerie, { numSerie = it }, "N° Série", readOnly = (voiture != null))
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    SimpleField(marque, { marque = it }, "Marque", modifier = Modifier.weight(1f))
+                    SimpleField(nom, { nom = it }, "Modèle", modifier = Modifier.weight(1f))
+                }
+                FormSectionTitle("Technique")
+                StableDropDown("Boîte de vitesse", optionsBoite, boite) { boite = it }
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    SimpleField(puissance, { puissance = it }, "Puissance (CV)", modifier = Modifier.weight(1f))
+                    SimpleField(energie, { energie = it }, "Énergie", modifier = Modifier.weight(1f))
+                }
+                FormSectionTitle("Gestion & Maintenance")
+                StableDropDown("État actuel", optionsEtat, etat) { etat = it }
+                SimpleField(prix, { prix = it }, "Prix journalier (€)")
+
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                    TextButton(onClick = onDismiss) { Text("Annuler") }
+                    Button(
+                        onClick = {
+                            if (numSerie.isNotBlank()) {
+                                onConfirm(Voiture(
+                                    NumSerie = numSerie, Marque = marque, Nom = nom,
+                                    Energie = energie, Puissance = puissance, Prix = prix,
+                                    Boite = boite, Etat = etat, Annee = annee,
+                                    Couleur = couleur, NbPlaces = nbPlaces, Categorie = categorie,
+                                    Transmission = transmission, DateAchat = dateAchat,
+                                    DateDernierControleTech = dateCT, DateExpirationControleTech = dateExpCT,
+                                    ImagePath = voiture?.ImagePath ?: "default_car.jpg",
+                                    IdAssureur = voiture?.IdAssureur ?: 1,
+                                    IdFournisseur = voiture?.IdFournisseur ?: 1
+                                ))
+                            }
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = orangePark)
+                    ) { Text("Enregistrer") }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun SimpleField(value: String, onValueChange: (String) -> Unit, label: String, modifier: Modifier = Modifier, readOnly: Boolean = false) {
+    OutlinedTextField(
+        value = value,
+        onValueChange = onValueChange,
+        label = { Text(label) },
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(12.dp),
+        singleLine = true,
+        readOnly = readOnly,
+        colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = orangePark, unfocusedBorderColor = Color.LightGray)
+    )
+}
+
 @Composable
 fun StableDropDown(label: String, options: List<String>, selected: String, onSelect: (String) -> Unit) {
     var expanded by remember { mutableStateOf(false) }
-
-    Box(modifier = Modifier.fillMaxWidth()) {
+    Box(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
         OutlinedTextField(
             value = selected,
             onValueChange = {},
@@ -318,115 +473,32 @@ fun StableDropDown(label: String, options: List<String>, selected: String, onSel
             label = { Text(label) },
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(12.dp),
-            trailingIcon = {
-                // Icône simple pour indiquer le menu
-                TextButton(onClick = { expanded = true }) {
-                    Text("▼", color = Color.Gray)
-                }
-            }
+            trailingIcon = { Icon(Icons.Default.ArrowDropDown, null, Modifier.clickable { expanded = !expanded }) },
+            colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = orangePark, unfocusedBorderColor = Color.LightGray)
         )
-        // Le clic sur le champ ouvre aussi le menu
-        TextButton(
-            onClick = { expanded = true },
-            modifier = Modifier.matchParentSize()
-        ) { }
-
-        DropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false },
-            modifier = Modifier.fillMaxWidth(0.7f) // Un peu moins large que l'écran
-        ) {
+        Box(modifier = Modifier.matchParentSize().clickable { expanded = true })
+        DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
             options.forEach { option ->
-                DropdownMenuItem(
-                    text = { Text(option) },
-                    onClick = {
-                        onSelect(option)
-                        expanded = false
-                    }
-                )
+                DropdownMenuItem(text = { Text(option) }, onClick = { onSelect(option); expanded = false })
             }
         }
     }
 }
 
 @Composable
-fun SimpleField(value: String, onValueChange: (String) -> Unit, label: String, modifier: Modifier = Modifier) {
-    OutlinedTextField(
-        value = value,
-        onValueChange = onValueChange,
-        label = { Text(label) },
-        modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
-        singleLine = true
-    )
+fun FormSectionTitle(text: String) {
+    Text(text = text, color = orangePark, fontWeight = FontWeight.Bold, fontSize = 14.sp, modifier = Modifier.padding(top = 8.dp, bottom = 4.dp))
 }
 
 @Composable
-fun FilterBadge(text: String, icon: String) {
-    Box(
-        modifier = Modifier
-            .clip(RoundedCornerShape(12.dp))
-            .background(Color.White)
-            .padding(horizontal = 12.dp, vertical = 8.dp)
-    ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(text = "$icon ", fontSize = 12.sp)
-            Text(text = text, fontSize = 13.sp, fontWeight = FontWeight.Medium, color = Color.Black)
-        }
-    }
+fun DetailSectionTitle(text: String) {
+    Text(text = text.uppercase(), color = orangePark, fontSize = 12.sp, fontWeight = FontWeight.ExtraBold, letterSpacing = 1.sp, modifier = Modifier.padding(top = 16.dp, bottom = 8.dp))
 }
 
 @Composable
-fun CarCard(voiture: Voiture, onDeleteClick: () -> Unit) {
-    val imageUrl = "http://10.0.2.2:9990/${voiture.ImagePath}"
-
-    Box(
-        modifier = Modifier
-            .height(300.dp)
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(25.dp))
-    ) {
-        AsyncImage(
-            model = imageUrl,
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier.fillMaxSize()
-        )
-
-        // Bouton Supprimer (Icône Poubelle)
-        IconButton(
-            onClick = onDeleteClick,
-            modifier = Modifier
-                .align(Alignment.TopEnd)
-                .padding(12.dp)
-                .background(Color.White.copy(alpha = 0.7f), CircleShape)
-        ) {
-            Icon(
-                imageVector = Icons.Default.Delete,
-                contentDescription = stringResource(R.string.delete_confirm) ,
-                tint = Color.Red
-            )
-        }
-
-        // Barre d'infos basse
-        Column(
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .fillMaxWidth()
-                .background(Color.White.copy(alpha = 0.85f))
-                .padding(12.dp)
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Column {
-                    Text(text = "${voiture.Marque} ${voiture.Nom}", fontWeight = FontWeight.Bold, fontSize = 18.sp)
-                    Text(text = "${voiture.NbPlaces} places • ${voiture.Energie}", fontSize = 13.sp, color = Color.Gray)
-                }
-                Text(text = "${voiture.Prix} €/j", color = Color(0xFFFF5A19), fontWeight = FontWeight.ExtraBold, fontSize = 18.sp)
-            }
-        }
+fun InfoRow(label: String, value: String) {
+    Row(Modifier.fillMaxWidth().padding(vertical = 4.dp), horizontalArrangement = Arrangement.SpaceBetween) {
+        Text(label, color = Color.Gray, fontSize = 14.sp)
+        Text(value, fontWeight = FontWeight.Bold, fontSize = 14.sp)
     }
 }

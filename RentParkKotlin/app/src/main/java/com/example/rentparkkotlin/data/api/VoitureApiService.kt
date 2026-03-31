@@ -20,7 +20,7 @@ interface VoitureApiService {
     suspend fun deleteVoiture(@Path("id") id: String): Response<Unit>
 
     @GET("vehicules/{numSerie}")
-    suspend fun getVoiture(@Path("numSerie") numSerie: String): Voiture
+    suspend fun getVoitureByNumSerie(@Path("numSerie") numSerie: String): Response<Voiture>
 
     @PUT("vehicules/{numSerie}")
     suspend fun updateVoiture(@Path("numSerie") numSerie: String, @Body updatedVoiture: Voiture): Response<Unit>
