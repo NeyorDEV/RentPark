@@ -4,10 +4,13 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
@@ -41,6 +44,7 @@ fun ContractsScreen(viewModel: ContratViewModel = viewModel()) { // Injection du
     // Récupération des données depuis l'API
     val contrats = viewModel.contrats
     val isLoading = viewModel.isLoading
+    val error = viewModel.error
 
     // États pour la suppression et l'édition
     var showDeleteDialog by remember { mutableStateOf(false) }
@@ -48,6 +52,7 @@ fun ContractsScreen(viewModel: ContratViewModel = viewModel()) { // Injection du
 
     var showSheet by remember { mutableStateOf(false) }
     var contratToEdit by remember { mutableStateOf<Contrat?>(null) }
+    var contratDetails by remember { mutableStateOf<Contrat?>(null) }
 
     val sheetState = rememberModalBottomSheetState()
 
@@ -62,6 +67,14 @@ fun ContractsScreen(viewModel: ContratViewModel = viewModel()) { // Injection du
         })
 
         Spacer(modifier = Modifier.height(32.dp))
+
+        if (error != null) {
+            Text(
+                text = error,
+                color = Color(0xFFE74C3C),
+                fontWeight = FontWeight.Bold,
+            )
+        }
 
         if (isLoading) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -79,6 +92,9 @@ fun ContractsScreen(viewModel: ContratViewModel = viewModel()) { // Injection du
                         onDeleteRequest = {
                             contratToDelete = contrat
                             showDeleteDialog = true
+                        },
+                        onCardClick = {
+                            contratDetails = contrat
                         }
                     )
                 }
@@ -145,6 +161,9 @@ fun ContractsScreen(viewModel: ContratViewModel = viewModel()) { // Injection du
                 }
             )
         }
+    }
+    contratDetails?.let { contrat ->
+        ContratDetailsDialog(contrat = contrat, onDismiss = { contratDetails = null })
     }
 }
 
@@ -273,9 +292,9 @@ fun CustomTextField(value: String, onValueChange: (String) -> Unit, label: Strin
 }
 
 @Composable
-fun ContratCard(contrat: Contrat, onEditRequest: () -> Unit, onDeleteRequest: () -> Unit) {
+fun ContratCard(contrat: Contrat, onEditRequest: () -> Unit, onDeleteRequest: () -> Unit, onCardClick: () -> Unit) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth().clickable { onCardClick() },
         colors = CardDefaults.cardColors(containerColor = Color(0xFF181818)),
         shape = RoundedCornerShape(20.dp)
     ) {
@@ -315,5 +334,73 @@ fun ActionButton(text: String, bgColor: Color, textColor: Color, onClick: () -> 
         modifier = Modifier.width(100.dp).height(32.dp)
     ) {
         Text(text, color = textColor, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+    }
+}
+
+@Composable
+fun ContratDetailsDialog(contrat: Contrat, onDismiss: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        containerColor = Color(0xFF151515),
+        title = {
+            Text("Détails du Contrat", color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+        },
+        text = {
+            Column(
+                modifier = Modifier.verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                ContratDetailRow("ID Contrat", contrat.idContrat.toString())
+                ContratDetailRow("Client (ID)", contrat.idClient?.toString() ?: "Inconnu")
+                ContratDetailRow("Véhicule (S/N)", contrat.idVehicule ?: "Inconnu")
+                ContratDetailRow("Date de Début", contrat.dateDebut.take(10))
+                ContratDetailRow("Date de Fin", contrat.dateFin.take(10))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text("Statut", color = Color.Gray, fontSize = 14.sp)
+                    Surface(
+                        color = Color(0xFFE67E22).copy(alpha = 0.1f),
+                        shape = RoundedCornerShape(8.dp),
+                        border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFE67E22))
+                    ) {
+                        Text(
+                            text = contrat.statut ?: "Non défini",
+                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
+                            color = Color(0xFFE67E22),
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onDismiss) {
+                Text("FERMER", color = Color(0xFFE67E22), fontWeight = FontWeight.Bold)
+            }
+        }
+    )
+}
+
+@Composable
+fun ContratDetailRow(label: String, value: String) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(text = label, color = Color.Gray, fontSize = 14.sp)
+        Text(
+            text = value,
+            color = Color.White,
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Medium,
+            modifier = Modifier.padding(start = 16.dp)
+        )
     }
 }

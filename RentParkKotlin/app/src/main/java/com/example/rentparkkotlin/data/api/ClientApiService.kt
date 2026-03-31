@@ -17,9 +17,9 @@ interface ClientApiService {
     @POST("clients")
     suspend fun addClient(@Body request: ClientRequest): Response<ClientResponse>
 
-    @PUT("/clients/{IdClient}")
-    suspend fun updateClient(@Path("id") id: Int, @Body request: ClientRequest): Response<Unit>
+    @PUT("clients/{IdClient}")
+    suspend fun updateClient(@Path("IdClient") id: Int, @Body request: ClientRequest): Response<Unit>
 
     @GET("clients/{IdClient}")
-    suspend fun getClient(@Path("id") id: Int): Client
+    suspend fun getClient(@Path("IdClient") id: Int): Client
 }

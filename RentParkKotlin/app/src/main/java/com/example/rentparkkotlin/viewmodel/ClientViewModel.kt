@@ -40,6 +40,7 @@ class ClientViewModel(private val repository: ClientRepository = ClientRepositor
 
     fun addClient(request: ClientRequest) {
         viewModelScope.launch {
+            isLoading = true
             try {
                 val response = repository.addClient(request)
                 if (response.isSuccessful) {
@@ -49,12 +50,15 @@ class ClientViewModel(private val repository: ClientRepository = ClientRepositor
                 }
             } catch (e: Exception) {
                 error = "Erreur réseau: ${e.localizedMessage}"
+            } finally {
+                isLoading = false
             }
         }
     }
 
     fun updateClient(id: Int, request: ClientRequest) {
         viewModelScope.launch {
+            isLoading = true
             try {
                 val response = repository.updateClient(id, request)
                 if (response.isSuccessful) {
@@ -64,6 +68,8 @@ class ClientViewModel(private val repository: ClientRepository = ClientRepositor
                 }
             } catch (e: Exception) {
                 error = "Erreur réseau: ${e.localizedMessage}"
+            } finally {
+                isLoading = false
             }
         }
     }

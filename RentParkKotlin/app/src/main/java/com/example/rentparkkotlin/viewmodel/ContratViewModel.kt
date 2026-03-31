@@ -8,6 +8,8 @@ import androidx.lifecycle.viewModelScope
 import com.example.rentparkkotlin.model.Contrat
 import com.example.rentparkkotlin.repository.ContratRepository
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
+import org.json.JSONObject
 
 // Modifie l'en-tête de ta classe comme ceci :
 class ContratViewModel(private val repository: ContratRepository = ContratRepository()) : ViewModel() {
@@ -39,33 +41,81 @@ class ContratViewModel(private val repository: ContratRepository = ContratReposi
 
     fun addContrat(contrat: Contrat) {
         viewModelScope.launch {
+            isLoading = true
+            error = null
             try {
                 repository.addContrat(contrat)
                 fetchContrats()
+            } catch (e: HttpException) {
+                val errorBody = e.response()?.errorBody()?.string()
+                if (errorBody != null) {
+                    try {
+                        val jsonError = JSONObject(errorBody)
+                        error = jsonError.optString("message", jsonError.optString("error", "Erreur API : ${e.code()}"))
+                    } catch (jsonEx: Exception) {
+                        error = "Erreur serveur : ${e.code()}"
+                    }
+                } else {
+                    error = "Erreur serveur : ${e.code()}"
+                }
             } catch (e: Exception) {
                 error = "Erreur d'ajout: ${e.localizedMessage}"
+            } finally {
+                isLoading = false
             }
         }
     }
 
     fun updateContrat(id: Int, contrat: Contrat) {
         viewModelScope.launch {
+            isLoading = true
+            error = null
             try {
                 repository.updateContrat(id, contrat)
                 fetchContrats()
+            } catch (e: HttpException) {
+                val errorBody = e.response()?.errorBody()?.string()
+                if (errorBody != null) {
+                    try {
+                        val jsonError = JSONObject(errorBody)
+                        error = jsonError.optString("message", jsonError.optString("error", "Erreur API : ${e.code()}"))
+                    } catch (jsonEx: Exception) {
+                        error = "Erreur serveur : ${e.code()}"
+                    }
+                } else {
+                    error = "Erreur serveur : ${e.code()}"
+                }
             } catch (e: Exception) {
                 error = "Erreur de modification: ${e.localizedMessage}"
+            } finally {
+                isLoading = false
             }
         }
     }
 
     fun deleteContrat(id: Int) {
         viewModelScope.launch {
+            isLoading = true
+            error = null
             try {
                 repository.deleteContrat(id)
                 fetchContrats()
+            } catch (e: HttpException) {
+                val errorBody = e.response()?.errorBody()?.string()
+                if (errorBody != null) {
+                    try {
+                        val jsonError = JSONObject(errorBody)
+                        error = jsonError.optString("message", jsonError.optString("error", "Erreur API : ${e.code()}"))
+                    } catch (jsonEx: Exception) {
+                        error = "Erreur serveur : ${e.code()}"
+                    }
+                } else {
+                    error = "Erreur serveur : ${e.code()}"
+                }
             } catch (e: Exception) {
                 error = "Erreur de suppression: ${e.localizedMessage}"
+            } finally {
+                isLoading = false
             }
         }
     }

@@ -32,6 +32,9 @@ class CarViewModel(private val repository: CarRepository = CarRepository()) : Vi
     var selectedVoiture by mutableStateOf<Voiture?>(null)
         private set
 
+    var deleteError by mutableStateOf<String?>(null)
+        private set
+
     init {
         fetchVoitures()
     }
@@ -50,6 +53,7 @@ class CarViewModel(private val repository: CarRepository = CarRepository()) : Vi
 
     fun addVoiture(voiture: Voiture) {
         viewModelScope.launch {
+            isLoading = true
             try {
                 val response = repository.addVoiture(voiture)
                 if (response.isSuccessful) {
@@ -59,33 +63,41 @@ class CarViewModel(private val repository: CarRepository = CarRepository()) : Vi
                 }
             } catch (e: Exception) {
                 error = "Impossible d'ajouter le véhicule : ${e.message}"
+            } finally {
+                isLoading = false
             }
         }
     }
 
     fun deleteVoiture(id: String) {
         viewModelScope.launch {
+            isLoading = true
             try {
                 val response = repository.deleteVoiture(id)
                 if (response.isSuccessful) {
                     fetchVoitures()
                 } else {
-                    error = "Erreur lors de la suppression"
+                    deleteError = "Impossible de supprimer ce véhicule : il est actuellement relié à un ou plusieurs contrats."
                 }
             } catch (e: Exception) {
-                error = "Erreur réseau : ${e.message}"
+                deleteError = "Erreur réseau : impossible de joindre le serveur."
+            } finally {
+                isLoading = false
             }
         }
     }
 
     fun updateVoiture(voiture: Voiture) {
         viewModelScope.launch {
+            isLoading = true
             try {
                 val response = repository.updateVoiture(voiture.NumSerie, voiture)
                 if (response.isSuccessful) {
                     fetchVoitures() // Recharger la liste
                 }
             } catch (e: Exception) {
+            } finally {
+                isLoading = false
             }
         }
     }
@@ -107,6 +119,10 @@ class CarViewModel(private val repository: CarRepository = CarRepository()) : Vi
     }
     fun clearSelectedVoiture() {
         selectedVoiture = null
+    }
+
+    fun clearDeleteError() {
+        deleteError = null
     }
 }
 

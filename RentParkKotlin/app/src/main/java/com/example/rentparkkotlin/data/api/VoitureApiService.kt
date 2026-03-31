@@ -17,7 +17,7 @@ interface VoitureApiService {
     suspend fun addVoiture(@Body newVoiture: Voiture) : Response<Unit>
 
     @DELETE("vehicules/{numSerie}")
-    suspend fun deleteVoiture(@Path("id") id: String): Response<Unit>
+    suspend fun deleteVoiture(@Path("numSerie") id: String): Response<Unit>
 
     @GET("vehicules/{numSerie}")
     suspend fun getVoitureByNumSerie(@Path("numSerie") numSerie: String): Response<Voiture>

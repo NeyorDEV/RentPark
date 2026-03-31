@@ -14,7 +14,7 @@ interface ContratApiService {
     suspend fun getContrats(): List<Contrat>
 
     @POST("contrat")
-    suspend fun addContrat(contrat: Contrat): Contrat
+    suspend fun addContrat(@Body contrat: Contrat): Contrat
 
     @PUT("contrat/{id}")
     suspend fun updateContrat(@Path("id") id: Int, @Body contrat: Contrat): Contrat

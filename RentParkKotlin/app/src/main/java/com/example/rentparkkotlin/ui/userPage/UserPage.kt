@@ -1,5 +1,6 @@
 package com.example.rentparkkotlin.ui.userPage
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -94,6 +95,7 @@ fun UsersContent(viewModel: UserViewModel) {
     var showAddDialog by remember { mutableStateOf(false) }
     var userToEdit by remember { mutableStateOf<User?>(null) }
     var userToDelete by remember { mutableStateOf<User?>(null) }
+    var userDetails by remember { mutableStateOf<User?>(null) }
 
     Column(modifier = Modifier.fillMaxSize()) {
         Row(
@@ -130,7 +132,7 @@ fun UsersContent(viewModel: UserViewModel) {
 
                     LazyColumn {
                         items(users, key = { it.id }) { user ->
-                            Row(modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
+                            Row(modifier = Modifier.fillMaxWidth().clickable { userDetails = user }.padding(vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
                                 Text(user.username, Modifier.weight(1.2f), color = Color.White, fontSize = 14.sp)
                                 Box(Modifier.weight(1f)) {
                                     Surface(color = Color(0xFF2A2A2A), shape = RoundedCornerShape(4.dp)) {
@@ -176,6 +178,10 @@ fun UsersContent(viewModel: UserViewModel) {
             dismissButton = { TextButton(onClick = { userToDelete = null }) { Text("ANNULER", color = Color.Gray) } }
         )
     }
+
+    userDetails?.let { user ->
+        UserDetailsDialog(user = user, onDismiss = { userDetails = null })
+    }
 }
 
 @Composable
@@ -186,6 +192,7 @@ fun ClientsContent(viewModel: ClientViewModel) {
 
     var showClientDialog by remember { mutableStateOf(false) }
     var clientToEdit by remember { mutableStateOf<Client?>(null) }
+    var clientDetails by remember { mutableStateOf<Client?>(null) }
 
     Column(modifier = Modifier.fillMaxSize()) {
         Row(
@@ -222,7 +229,13 @@ fun ClientsContent(viewModel: ClientViewModel) {
 
                     LazyColumn {
                         items(clients) { client ->
-                            Row(modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable { clientDetails = client }
+                                    .padding(vertical = 12.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
                                 Column(Modifier.weight(1.2f)) {
                                     Text(client.nom.uppercase() + " " + client.prenom, color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.Bold)
                                     Text(client.email, color = Color.Gray, fontSize = 12.sp)
@@ -252,6 +265,10 @@ fun ClientsContent(viewModel: ClientViewModel) {
                 clientToEdit = null
             }
         )
+    }
+
+    clientDetails?.let { client ->
+        ClientDetailsDialog(client = client, onDismiss = { clientDetails = null })
     }
 }
 
@@ -383,6 +400,101 @@ fun UserFormDialog(
         },
         dismissButton = {
             TextButton(onClick = onDismiss) { Text("ANNULER", color = Color.Gray) }
+        }
+    )
+}
+
+@Composable
+fun ClientDetailsDialog(client: Client, onDismiss: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        containerColor = CardColor,
+        title = { Text("Fiche Client", color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Bold) },
+        text = {
+            Column(
+                modifier = Modifier.verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                DetailRow(label = "ID Client", value = client.idClient.toString())
+                DetailRow(label = "Nom", value = client.nom.uppercase())
+                DetailRow(label = "Prénom", value = client.prenom)
+                DetailRow(label = "Email", value = client.email)
+                DetailRow(label = "Téléphone", value = client.numTel ?: "Non renseigné")
+                DetailRow(label = "N° de Permis", value = client.numPermis)
+                DetailRow(label = "Date de Naissance", value = client.dateNaiss ?: "Non renseignée")
+                DetailRow(label = "Nationalité", value = client.nationalite ?: "Non renseignée")
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onDismiss) {
+                Text("FERMER", color = AccentOrange, fontWeight = FontWeight.Bold)
+            }
+        }
+    )
+}
+
+@Composable
+fun DetailRow(label: String, value: String) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(text = label, color = Color.Gray, fontSize = 14.sp)
+        Text(
+            text = value,
+            color = Color.White,
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Medium,
+            modifier = Modifier.padding(start = 16.dp)
+        )
+    }
+}
+
+@Composable
+fun UserDetailsDialog(user: User, onDismiss: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        containerColor = CardColor,
+        title = {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Default.Person, contentDescription = null, tint = AccentOrange)
+                Spacer(Modifier.width(10.dp))
+                Text("Profil Utilisateur", color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+            }
+        },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                DetailRow(label = "Identifiant (ID)", value = user.id.toString())
+                DetailRow(label = "Nom d'utilisateur", value = user.username)
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(text = "Rôle", color = Color.Gray, fontSize = 14.sp)
+                    Surface(
+                        color = AccentOrange.copy(alpha = 0.1f),
+                        shape = RoundedCornerShape(8.dp),
+                        border = BorderStroke(1.dp, AccentOrange)
+                    ) {
+                        Text(
+                            text = user.role.uppercase(),
+                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
+                            color = AccentOrange,
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onDismiss) {
+                Text("FERMER", color = AccentOrange, fontWeight = FontWeight.Bold)
+            }
         }
     )
 }

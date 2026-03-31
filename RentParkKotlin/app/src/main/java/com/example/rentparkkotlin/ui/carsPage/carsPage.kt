@@ -320,6 +320,26 @@ fun CarListModals(
             dismissButton = { TextButton(onClick = onDeleteDismiss) { Text(stringResource(R.string.delete_cancel)) } }
         )
     }
+
+    viewModel.deleteError?.let { errorMessage ->
+        AlertDialog(
+            onDismissRequest = { viewModel.clearDeleteError() },
+            title = {
+                Text("Suppression impossible", fontWeight = FontWeight.Bold)
+            },
+            text = {
+                Text(errorMessage)
+            },
+            confirmButton = {
+                Button(
+                    onClick = { viewModel.clearDeleteError() },
+                    colors = ButtonDefaults.buttonColors(containerColor = orangePark)
+                ) {
+                    Text("J'ai compris", color = Color.White)
+                }
+            }
+        )
+    }
 }
 
 @Composable

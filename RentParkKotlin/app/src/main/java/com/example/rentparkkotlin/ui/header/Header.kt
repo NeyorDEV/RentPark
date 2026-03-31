@@ -24,6 +24,10 @@ import com.example.rentparkkotlin.Routes
 import com.example.rentparkkotlin.ui.theme.BlackTheme
 import com.example.rentparkkotlin.ui.theme.Orange
 import kotlinx.coroutines.launch
+import androidx.compose.ui.platform.LocalContext
+import com.example.rentparkkotlin.data.AuthPrefs
+import androidx.compose.runtime.remember
+
 val MaPoliceCustom = FontFamily(
     Font(R.font.fortnite, FontWeight.Normal),
     Font(R.font.fortnite, FontWeight.Bold)
@@ -38,7 +42,8 @@ fun Header(title: String, onMenuClick: () -> Unit) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(64.dp),
+                .height(86.dp)
+                .padding(top = 32.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box(
@@ -80,6 +85,8 @@ fun MainScreen(
 ) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
+    val context = LocalContext.current
+    val authPrefs = remember { AuthPrefs(context) }
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -143,6 +150,11 @@ fun MainScreen(
                 Spacer(modifier = Modifier.weight(1f)) // Pousse les paramètres vers le bas
 
                 DrawerMenuItem("Se Déconnecter", onClick = {
+                    scope.launch { drawerState.close() }
+                    authPrefs.clearAuth()
+                    navController.navigate(Routes.LoginRoute) {
+                        popUpTo(0) { inclusive = true }
+                    }
                 })
 
                 Spacer(modifier = Modifier.height(16.dp))

@@ -28,16 +28,16 @@ class UserViewModel(private val repository: UserRepository = UserRepository()) :
         fetchUsers()
     }
 
-    fun fetchUsers() {
+    fun fetchUsers(showLoading: Boolean = true) {
         viewModelScope.launch {
-            isLoading = true
+            if (showLoading) isLoading = true
             try {
                 users = repository.getUsers()
                 error = null
             } catch (e: Exception) {
                 error = "Erreur de chargement: ${e.localizedMessage}"
             }
-            isLoading = false
+            if (showLoading) isLoading = false
         }
     }
 
@@ -51,11 +51,10 @@ class UserViewModel(private val repository: UserRepository = UserRepository()) :
 
                 if (response.isSuccessful) {
                     val body = response.body()
-                    if (body?.error != null) {
+                    if (body?.error == true) {
                         error = "Erreur serveur"
                     } else {
-                        delay(300)
-                        fetchUsers()
+                        fetchUsers(showLoading = false)
                     }
                 } else {
                     val errorBody = response.errorBody()?.string()
@@ -80,6 +79,7 @@ class UserViewModel(private val repository: UserRepository = UserRepository()) :
 
     fun updateUser(id: Int, username: String, role: String, mdp: String?) {
         viewModelScope.launch {
+            isLoading = true
             try {
                 val request = UpdateUserRequest(username, role, if (mdp.isNullOrBlank()) null else mdp)
                 val response = repository.updateUser(id, request)
@@ -90,12 +90,15 @@ class UserViewModel(private val repository: UserRepository = UserRepository()) :
                 }
             } catch (e: Exception) {
                 error = "Erreur réseau: ${e.localizedMessage}"
+            } finally {
+                isLoading = false
             }
         }
     }
 
     fun deleteUser(id: Int) {
         viewModelScope.launch {
+            isLoading = true
             try {
                 val response = repository.deleteUser(id)
                 if (response.isSuccessful) {
@@ -105,6 +108,8 @@ class UserViewModel(private val repository: UserRepository = UserRepository()) :
                 }
             } catch (e: Exception) {
                 error = "Erreur réseau: ${e.localizedMessage}"
+            } finally {
+                isLoading = false
             }
         }
     }
