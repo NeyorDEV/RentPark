@@ -48,22 +48,29 @@
       <div class="input-group">
         <label>Rôle</label>
         <div class="role-options">
-          <label>
-            <input type="radio" name="role" value="admin" required>
-            Admin
+          <label> 
+            <input type="radio" name="role" value="admin" required> Admin
           </label>
           <label>
-            <input type="radio" name="role" value="employe">
-            Employé
+            <input type="radio" name="role" value="employe"> Employé
           </label>
           <label>
-            <input type="radio" name="role" value="client">
-            Client
+            <input type="radio" name="role" value="user" required> Client
           </label>
         </div>
       </div>
 
       <button type="submit" name="inscription">S'inscrire</button>
+
+      <?php if (!empty($dVueErreur)): ?>
+        <div class="error-box" style="color: red; border: 1px solid red; background: #fee; padding: 10px; margin-top: 10px;">
+            <ul style="list-style: disc; margin-left: 20px;">
+                <?php foreach ($dVueErreur as $erreur): ?>
+                    <li><?php echo htmlspecialchars($erreur); ?></li>
+                <?php endforeach; ?>
+            </ul>
+        </div>
+      <?php endif; ?>
 
       <?php if (isset($_GET['error'])): ?>
         <p class="error"><?php echo htmlspecialchars($_GET['error']); ?></p>

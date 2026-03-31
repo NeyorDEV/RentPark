@@ -82,12 +82,19 @@ class UserController
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $sousAction = $_POST['action'] ?? '';
+            
             if ($sousAction === 'inscription') {
+                // On passe $dVueErreur par référence pour récupérer les messages
                 $this->inscription($dVueErreur);
+
+                // S'il n'y a aucune erreur après l'appel API, on redirige vers la connexion
+                if (empty($dVueErreur)) {
+                    header("Location: /siteSAE2A/connection?success=" . urlencode("Compte créé avec succès !"));
+                    exit;
+                }
             }
-            header("Location: /siteSAE2A/connection");
-            exit;
         }
+        // Si c'est un GET ou s'il y a des erreurs, on affiche le formulaire avec les erreurs
         $this->afficherVue('inscription', $dVueErreur, null);
     }
 
@@ -99,24 +106,42 @@ class UserController
         exit;
     }
 
-    public function inscription(array $dVueErreur)
+    public function inscription(array &$dVueErreur) // Note le & ici
     {
         $username = $_POST['username'] ?? '';
         $password = $_POST['password'] ?? '';
-        $confirm  = $_POST['confirm'] ?? '';
-        $role     = $_POST['role'] ?? '';
+        $confirm  = $_POST['confirm'] ?? ''; // Utilisé pour une vérification manuelle si besoin
+        $role     = $_POST['role'] ?? 'user';
 
-        Validation::val_user($username, $password, $confirm, $dVueErreur);
+        // CORRECTION : L'ordre doit être (username, password, role, dVueErreur)
+        Validation::val_user($username, $password, $role, $dVueErreur);
 
         if (!empty($dVueErreur)) {
-            $dVueErreur[] = "Erreur dans l'inscription";
-            $this->afficherVue('erreur', $dVueErreur, null);
             return;
         }
 
-        $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-        $user = new User(null, $username, $hashedPassword, $role);
-        $this->userGateway->login($user);
+        try {
+            // Envoi à l'API (On envoie le mot de passe en clair car l'API le hash)
+            $response = $this->authApiClient->post('register', [
+                'json' => [
+                    'username' => $username,
+                    'password' => $password,
+                    'role'     => $role
+                ]
+            ]);
+
+            if ($response->getStatusCode() !== 201) {
+                $dVueErreur[] = "Erreur inattendue du serveur d'authentification.";
+            }
+
+        } catch (RequestException $e) {
+            if ($e->hasResponse()) {
+                $data = json_decode($e->getResponse()->getBody()->getContents(), true);
+                $dVueErreur[] = $data['error'] ?? "Erreur lors de l'inscription.";
+            } else {
+                $dVueErreur[] = "Le service d'authentification est injoignable.";
+            }
+        }
     }
 
     public function afficheConnection(array $dVueErreur)
