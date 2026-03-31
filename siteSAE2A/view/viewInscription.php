@@ -63,7 +63,7 @@
         </div>
       </div>
 
-      <button type="submit" name="inscritpion">S'inscrire</button>
+      <button type="submit" name="inscription">S'inscrire</button>
 
       <?php if (isset($_GET['error'])): ?>
         <p class="error"><?php echo htmlspecialchars($_GET['error']); ?></p>
