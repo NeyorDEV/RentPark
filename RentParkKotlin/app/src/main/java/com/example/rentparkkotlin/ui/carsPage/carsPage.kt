@@ -381,67 +381,140 @@ fun FilterSelectionDialog(title: String, options: List<String>, initialSelection
 }
 
 @Composable
-fun AddEditCarForm(title: String, voiture: Voiture? = null, onDismiss: () -> Unit, onConfirm: (Voiture) -> Unit) {
+fun AddEditCarForm(
+    title: String,
+    voiture: Voiture? = null,
+    onDismiss: () -> Unit,
+    onConfirm: (Voiture) -> Unit
+) {
+    // --- ÉTATS DES CHAMPS (Initialisés avec l'objet si modification) ---
     var numSerie by remember { mutableStateOf(voiture?.NumSerie ?: "") }
     var marque by remember { mutableStateOf(voiture?.Marque ?: "") }
     var nom by remember { mutableStateOf(voiture?.Nom ?: "") }
-    var energie by remember { mutableStateOf(voiture?.Energie ?: "") }
-    var puissance by remember { mutableStateOf(voiture?.Puissance ?: "") }
-    var prix by remember { mutableStateOf(voiture?.Prix ?: "") }
-    var boite by remember { mutableStateOf(voiture?.Boite ?: "Manuelle") }
-    var etat by remember { mutableStateOf(voiture?.Etat ?: "Libre") }
     var annee by remember { mutableStateOf(voiture?.Annee ?: "") }
     var couleur by remember { mutableStateOf(voiture?.Couleur ?: "") }
     var nbPlaces by remember { mutableStateOf(voiture?.NbPlaces ?: "5") }
     var categorie by remember { mutableStateOf(voiture?.Categorie ?: "") }
+
+    var energie by remember { mutableStateOf(voiture?.Energie ?: "") }
+    var puissance by remember { mutableStateOf(voiture?.Puissance ?: "") }
     var transmission by remember { mutableStateOf(voiture?.Transmission ?: "") }
+    var boite by remember { mutableStateOf(voiture?.Boite ?: "Manuelle") }
+
+    var prix by remember { mutableStateOf(voiture?.Prix ?: "") }
+    var etat by remember { mutableStateOf(voiture?.Etat ?: "Libre") }
+
     var dateAchat by remember { mutableStateOf(voiture?.DateAchat ?: "") }
     var dateCT by remember { mutableStateOf(voiture?.DateDernierControleTech ?: "") }
     var dateExpCT by remember { mutableStateOf(voiture?.DateExpirationControleTech ?: "") }
+
+    // IDs (Numériques)
+    var idAssureur by remember { mutableStateOf(voiture?.IdAssureur?.toString() ?: "") }
+    var idFournisseur by remember { mutableStateOf(voiture?.IdFournisseur?.toString() ?: "") }
 
     val optionsBoite = listOf("Manuelle", "Automatique", "Semi-Manuelle")
     val optionsEtat = listOf("Libre", "Louée", "En réparation", "Vendue")
 
     Dialog(onDismissRequest = onDismiss) {
-        Surface(shape = RoundedCornerShape(24.dp), color = Color.White, modifier = Modifier.fillMaxWidth().fillMaxHeight(0.9f)) {
-            Column(modifier = Modifier.padding(20.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                Text(title, fontSize = 20.sp, fontWeight = FontWeight.Bold)
-                FormSectionTitle("Identification & Style")
-                SimpleField(numSerie, { numSerie = it }, "N° Série", readOnly = (voiture != null))
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    SimpleField(marque, { marque = it }, "Marque", modifier = Modifier.weight(1f))
-                    SimpleField(nom, { nom = it }, "Modèle", modifier = Modifier.weight(1f))
-                }
-                FormSectionTitle("Technique")
-                StableDropDown("Boîte de vitesse", optionsBoite, boite) { boite = it }
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    SimpleField(puissance, { puissance = it }, "Puissance (CV)", modifier = Modifier.weight(1f))
-                    SimpleField(energie, { energie = it }, "Énergie", modifier = Modifier.weight(1f))
-                }
-                FormSectionTitle("Gestion & Maintenance")
-                StableDropDown("État actuel", optionsEtat, etat) { etat = it }
-                SimpleField(prix, { prix = it }, "Prix journalier (€)")
+        Surface(
+            shape = RoundedCornerShape(24.dp),
+            color = Color.White,
+            modifier = Modifier.fillMaxWidth().fillMaxHeight(0.9f)
+        ) {
+            Column(
+                modifier = Modifier
+                    .padding(20.dp)
+                    .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Text(title, fontSize = 22.sp, fontWeight = FontWeight.Bold, color = Color.Black)
 
+                // --- SECTION 1 : IDENTIFICATION ---
+                FormSectionTitle("Identification & Style")
+                SimpleField(numSerie, { numSerie = it }, "N° Série (VIN)", readOnly = (voiture != null))
+
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    SimpleField(marque, { marque = it }, "Marque", Modifier.weight(1f))
+                    SimpleField(nom, { nom = it }, "Modèle", Modifier.weight(1f))
+                }
+
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    SimpleField(annee, { annee = it }, "Année", Modifier.weight(1f))
+                    SimpleField(couleur, { couleur = it }, "Couleur", Modifier.weight(1f))
+                }
+
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    SimpleField(nbPlaces, { nbPlaces = it }, "Places", Modifier.weight(1f))
+                    SimpleField(categorie, { categorie = it }, "Catégorie", Modifier.weight(1f))
+                }
+
+                // --- SECTION 2 : TECHNIQUE ---
+                FormSectionTitle("Moteur & Transmission")
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    SimpleField(energie, { energie = it }, "Énergie", Modifier.weight(1f))
+                    SimpleField(puissance, { puissance = it }, "Puissance (CV)", Modifier.weight(1f))
+                }
+                SimpleField(transmission, { transmission = it }, "Transmission (ex: Intégrale)")
+                StableDropDown("Boîte de vitesse", optionsBoite, boite) { boite = it }
+
+                // --- SECTION 3 : COMMERCIAL & IDS ---
+                FormSectionTitle("Gestion & Partenaires")
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    SimpleField(prix, { prix = it }, "Prix / jour (€)", Modifier.weight(1f))
+                    Box(Modifier.weight(1f)) {
+                        StableDropDown("État", optionsEtat, etat) { etat = it }
+                    }
+                }
+
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    // Filtre pour n'accepter que des chiffres
+                    SimpleField(idAssureur, { if (it.all { c -> c.isDigit() }) idAssureur = it }, "ID Assureur", Modifier.weight(1f))
+                    SimpleField(idFournisseur, { if (it.all { c -> c.isDigit() }) idFournisseur = it }, "ID Fournisseur", Modifier.weight(1f))
+                }
+
+                // --- SECTION 4 : MAINTENANCE ---
+                FormSectionTitle("Dates de suivi")
+                SimpleField(dateAchat, { dateAchat = it }, "Date d'achat (AAAA-MM-JJ)")
+                SimpleField(dateCT, { dateCT = it }, "Dernier Contrôle Technique")
+                SimpleField(dateExpCT, { dateExpCT = it }, "Expiration Contrôle Technique")
+
+                Spacer(Modifier.height(20.dp))
+
+                // --- ACTIONS ---
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
                     TextButton(onClick = onDismiss) { Text("Annuler") }
                     Button(
                         onClick = {
                             if (numSerie.isNotBlank()) {
                                 onConfirm(Voiture(
-                                    NumSerie = numSerie, Marque = marque, Nom = nom,
-                                    Energie = energie, Puissance = puissance, Prix = prix,
-                                    Boite = boite, Etat = etat, Annee = annee,
-                                    Couleur = couleur, NbPlaces = nbPlaces, Categorie = categorie,
-                                    Transmission = transmission, DateAchat = dateAchat,
-                                    DateDernierControleTech = dateCT, DateExpirationControleTech = dateExpCT,
+                                    NumSerie = numSerie,
+                                    Marque = marque,
+                                    Nom = nom,
+                                    Energie = energie,
+                                    Puissance = puissance,
+                                    Prix = prix,
+                                    Boite = boite,
+                                    Etat = etat,
+                                    Annee = annee,
+                                    Couleur = couleur,
+                                    NbPlaces = nbPlaces,
+                                    Categorie = categorie,
+                                    Transmission = transmission,
+                                    DateAchat = dateAchat,
+                                    DateDernierControleTech = dateCT,
+                                    DateExpirationControleTech = dateExpCT,
                                     ImagePath = voiture?.ImagePath ?: "default_car.jpg",
-                                    IdAssureur = voiture?.IdAssureur ?: 1,
-                                    IdFournisseur = voiture?.IdFournisseur ?: 1
+                                    // Conversion sécurisée vers Int
+                                    IdAssureur = idAssureur.toIntOrNull() ?: 1,
+                                    IdFournisseur = idFournisseur.toIntOrNull() ?: 1
                                 ))
                             }
                         },
-                        colors = ButtonDefaults.buttonColors(containerColor = orangePark)
-                    ) { Text("Enregistrer") }
+                        colors = ButtonDefaults.buttonColors(containerColor = orangePark),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Text("Enregistrer", color = Color.White, fontWeight = FontWeight.Bold)
+                    }
                 }
             }
         }

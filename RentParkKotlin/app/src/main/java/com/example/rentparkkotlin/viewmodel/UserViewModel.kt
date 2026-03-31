@@ -9,9 +9,11 @@ import com.example.rentparkkotlin.model.RegisterRequest
 import com.example.rentparkkotlin.model.UpdateUserRequest
 import com.example.rentparkkotlin.model.User
 import com.example.rentparkkotlin.repository.UserRepository
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.json.JSONObject
 
-class UserViewModel(private val repository: UserRepository) : ViewModel() {
+class UserViewModel(private val repository: UserRepository = UserRepository()) : ViewModel() {
 
     var users by mutableStateOf<List<User>>(emptyList())
         private set
@@ -41,15 +43,37 @@ class UserViewModel(private val repository: UserRepository) : ViewModel() {
 
     fun addUser(username: String, role: String, mdp: String) {
         viewModelScope.launch {
+            isLoading = true
+            error = null
+
             try {
                 val response = repository.addUser(RegisterRequest(username, mdp, role))
+
                 if (response.isSuccessful) {
-                    fetchUsers()
+                    val body = response.body()
+                    if (body?.error != null) {
+                        error = "Erreur serveur"
+                    } else {
+                        delay(300)
+                        fetchUsers()
+                    }
                 } else {
-                    error = "Erreur lors de l'ajout"
+                    val errorBody = response.errorBody()?.string()
+                    if (errorBody != null) {
+                        try {
+                            val jsonError = JSONObject(errorBody)
+                            error = jsonError.optString("error", jsonError.optString("message", "Erreur lors de l'ajout"))
+                        } catch (e: Exception) {
+                            error = "Erreur lors de l'ajout"
+                        }
+                    } else {
+                        error = "Erreur serveur"
+                    }
                 }
             } catch (e: Exception) {
                 error = "Erreur réseau: ${e.localizedMessage}"
+            } finally {
+                isLoading = false
             }
         }
     }

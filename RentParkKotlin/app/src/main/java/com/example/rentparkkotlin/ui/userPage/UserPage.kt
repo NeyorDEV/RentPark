@@ -25,7 +25,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.rentparkkotlin.model.Client
 import com.example.rentparkkotlin.model.ClientRequest
 import com.example.rentparkkotlin.model.User
-import com.example.rentparkkotlin.ui.header.Header
 import com.example.rentparkkotlin.viewmodel.ClientViewModel
 import com.example.rentparkkotlin.viewmodel.UserViewModel
 
@@ -128,7 +127,7 @@ fun UsersContent(viewModel: UserViewModel) {
                     HorizontalDivider(color = Color.White.copy(alpha = 0.1f))
 
                     LazyColumn {
-                        items(users) { user ->
+                        items(users, key = { it.id }) { user ->
                             Row(modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
                                 Text(user.username, Modifier.weight(1.2f), color = Color.White, fontSize = 14.sp)
                                 Box(Modifier.weight(1f)) {

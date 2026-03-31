@@ -50,7 +50,7 @@ object RetrofitInstance {
 
 
     private val retrofit = Retrofit.Builder()
-        .baseUrl("http://192.168.1.99:8880/") // adapte à ton serveur
+        .baseUrl("http://10.0.2.2:8880/") // adapte à ton serveur
         .addConverterFactory(GsonConverterFactory.create())
         .build()
 
