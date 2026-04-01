@@ -26,6 +26,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.rentparkkotlin.model.Client
 import com.example.rentparkkotlin.model.Contrat
 import com.example.rentparkkotlin.model.Voiture
+import com.example.rentparkkotlin.ui.components.DatePickerField
 import com.example.rentparkkotlin.viewmodel.CarViewModel
 import com.example.rentparkkotlin.viewmodel.ClientViewModel
 import com.example.rentparkkotlin.viewmodel.ContratViewModel
@@ -282,10 +283,18 @@ fun ContratForm(
         // Dates
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             Box(modifier = Modifier.weight(1f)) {
-                CustomTextField(value = debut, onValueChange = { debut = it }, label = "Début (AAAA-MM-JJ)")
+                DatePickerField(
+                    value = debut,
+                    onDateSelected = { debut = it },
+                    label = "Date de début"
+                )
             }
             Box(modifier = Modifier.weight(1f)) {
-                CustomTextField(value = fin, onValueChange = { fin = it }, label = "Fin (AAAA-MM-JJ)")
+                DatePickerField(
+                    value = fin,
+                    onDateSelected = { fin = it },
+                    label = "Date de fin"
+                )
             }
         }
 

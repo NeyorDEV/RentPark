@@ -21,7 +21,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.rentparkkotlin.ui.header.Header
+import com.example.rentparkkotlin.ui.components.DatePickerField
 import com.example.rentparkkotlin.viewmodel.DashboardViewModel
 
 data class DashboardCard(val title: String, val items: List<String> = emptyList())
@@ -179,12 +179,10 @@ fun AddRappelDialog(
                     label = { Text("Description") },
                     modifier = Modifier.fillMaxWidth()
                 )
-                OutlinedTextField(
+                DatePickerField(
                     value = date,
-                    onValueChange = { date = it },
-                    label = { Text("Date (AAAA-MM-JJ)") },
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth()
+                    onDateSelected = { date = it },
+                    label = "Date du rappel"
                 )
             }
         },

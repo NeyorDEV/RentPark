@@ -20,6 +20,7 @@ import coil.compose.AsyncImage
 import com.example.rentparkkotlin.model.Voiture
 import com.example.rentparkkotlin.viewmodel.CarViewModel
 import com.example.rentparkkotlin.R
+import com.example.rentparkkotlin.ui.components.DatePickerField
 import com.example.rentparkkotlin.ui.header.Header
 
 // Couleur thématique
@@ -424,9 +425,9 @@ fun AddEditCarForm(
     var prix by remember { mutableStateOf(voiture?.Prix ?: "") }
     var etat by remember { mutableStateOf(voiture?.Etat ?: "") }
 
-    var dateAchat by remember { mutableStateOf(voiture?.DateAchat ?: "") }
-    var dateCT by remember { mutableStateOf(voiture?.DateDernierControleTech ?: "") }
-    var dateExpCT by remember { mutableStateOf(voiture?.DateExpirationControleTech ?: "") }
+    var dateAchat by remember { mutableStateOf(voiture?.DateAchat?.take(10) ?: "") }
+    var dateCT by remember { mutableStateOf(voiture?.DateDernierControleTech?.take(10) ?: "") }
+    var dateExpCT by remember { mutableStateOf(voiture?.DateExpirationControleTech?.take(10) ?: "") }
 
     // IDs (Numériques)
     var idAssureur by remember { mutableStateOf(voiture?.IdAssureur?.toString() ?: "") }
@@ -496,10 +497,23 @@ fun AddEditCarForm(
 
                 // --- SECTION 4 : MAINTENANCE ---
                 FormSectionTitle("Dates de suivi")
-                SimpleField(dateAchat, { dateAchat = it }, "Date d'achat (AAAA-MM-JJ)")
-                SimpleField(dateCT, { dateCT = it }, "Dernier Contrôle Technique")
-                SimpleField(dateExpCT, { dateExpCT = it }, "Expiration Contrôle Technique")
+                DatePickerField(
+                    value = dateAchat,
+                    onDateSelected = { dateAchat = it },
+                    label = "Date d'achat"
+                )
 
+                DatePickerField(
+                    value = dateCT,
+                    onDateSelected = { dateCT = it },
+                    label = "Date du dernier contrôle technique"
+                )
+
+                DatePickerField(
+                    value = dateExpCT,
+                    onDateSelected = { dateExpCT = it },
+                    label = "Expiration du contrôle technique"
+                )
                 Spacer(Modifier.height(20.dp))
 
                 // --- ACTIONS ---
