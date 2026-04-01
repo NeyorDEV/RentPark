@@ -226,12 +226,17 @@ fun ContratForm(
     var vehiculeId by remember { mutableStateOf(initialContrat?.idVehicule ?: "") }
     var debut by remember { mutableStateOf(initialContrat?.dateDebut ?: "") }
     var fin by remember { mutableStateOf(initialContrat?.dateFin ?: "") }
-    var statut by remember { mutableStateOf(initialContrat?.statut ?: "En cours") }
+
+    var statut by remember { mutableStateOf(initialContrat?.statut ?: "EnCoursValidation") }
+    val optionsStatut = listOf("Validé", "Annulé", "EnCoursValidation")
 
     val isEditing = initialContrat != null
 
     Column(
-        modifier = Modifier.padding(24.dp).navigationBarsPadding(),
+        modifier = Modifier
+            .padding(24.dp)
+            .navigationBarsPadding()
+            .verticalScroll(rememberScrollState()), // Ajout du scroll pour les petits écrans
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         Text(
@@ -258,8 +263,17 @@ fun ContratForm(
             itemLabel = { "${it.Marque} ${it.Nom} (${it.NumSerie})" },
             itemId = { it.NumSerie }
         )
-        CustomTextField(value = statut, onValueChange = { statut = it }, label = "Statut (ex: En cours, Terminé)")
 
+        DropdownSelector(
+            label = "Statut du contrat",
+            items = optionsStatut,
+            selectedId = statut,
+            onItemSelected = { statut = it },
+            itemLabel = { it },
+            itemId = { it }
+        )
+
+        // Dates
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             Box(modifier = Modifier.weight(1f)) {
                 CustomTextField(value = debut, onValueChange = { debut = it }, label = "Début (AAAA-MM-JJ)")
@@ -271,6 +285,7 @@ fun ContratForm(
 
         Spacer(modifier = Modifier.height(8.dp))
 
+        // Boutons d'action
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             OutlinedButton(
                 onClick = onDismiss,
@@ -283,7 +298,7 @@ fun ContratForm(
             Button(
                 onClick = {
                     if (clientId.isNotEmpty() && vehiculeId.isNotEmpty()) {
-                        val id = initialContrat?.idContrat ?: 0 // 0 si c'est un ajout (l'API générera l'ID)
+                        val id = initialContrat?.idContrat ?: 0
                         val nouveauContrat = Contrat(
                             idContrat = id,
                             dateDebut = debut,
