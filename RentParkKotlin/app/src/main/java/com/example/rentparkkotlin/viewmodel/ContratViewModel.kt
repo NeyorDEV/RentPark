@@ -119,4 +119,19 @@ class ContratViewModel(private val repository: ContratRepository = ContratReposi
             }
         }
     }
+
+    fun updateContratStatut(id: Int, nouveauStatut: String) {
+        viewModelScope.launch {
+            isLoading = true
+            error = null
+            try {
+                repository.updateContratStatut(id, nouveauStatut)
+                fetchContrats()
+            } catch (e: Exception) {
+                error = "Erreur de changement de statut: ${e.localizedMessage}"
+            } finally {
+                isLoading = false
+            }
+        }
+    }
 }

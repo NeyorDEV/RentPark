@@ -104,6 +104,12 @@ fun ContractsScreen(viewModel: ContratViewModel = viewModel(), clientViewModel: 
                         },
                         onCardClick = {
                             contratDetails = contrat
+                        },
+                        onValidateRequest = {
+                            viewModel.updateContratStatut(contrat.idContrat, "Validé")
+                        },
+                        onCancelRequest = {
+                            viewModel.updateContratStatut(contrat.idContrat, "Annulé")
                         }
                     )
                 }
@@ -335,7 +341,7 @@ fun CustomTextField(value: String, onValueChange: (String) -> Unit, label: Strin
 }
 
 @Composable
-fun ContratCard(contrat: Contrat, onEditRequest: () -> Unit, onDeleteRequest: () -> Unit, onCardClick: () -> Unit) {
+fun ContratCard(contrat: Contrat, onEditRequest: () -> Unit, onDeleteRequest: () -> Unit, onCardClick: () -> Unit, onValidateRequest: () -> Unit, onCancelRequest: () -> Unit) {
     Card(
         modifier = Modifier.fillMaxWidth().clickable { onCardClick() },
         colors = CardDefaults.cardColors(containerColor = Color(0xFF181818)),
@@ -355,8 +361,13 @@ fun ContratCard(contrat: Contrat, onEditRequest: () -> Unit, onDeleteRequest: ()
                 InfoLabel("Période", "${contrat.dateDebut.take(10)} au ${contrat.dateFin.take(10)}")
             }
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                ActionButton("Modifier", Color(0xFFEBF5FB), Color(0xFF2E86C1), onClick = onEditRequest)
-                ActionButton("Supprimer", Color(0xFFFDEDEC), Color(0xFFCB4335), onClick = onDeleteRequest)
+                if (contrat.statut == "EnCoursValidation") {
+                    ActionButton("Valider", Color(0xFFE8F8F5), Color(0xFF27AE60), onClick = onValidateRequest)
+                    ActionButton("Refuser", Color(0xFFFDEDEC), Color(0xFFCB4335), onClick = onCancelRequest)
+                } else {
+                    ActionButton("Modifier", Color(0xFFEBF5FB), Color(0xFF2E86C1), onClick = onEditRequest)
+                    ActionButton("Supprimer", Color(0xFFFDEDEC), Color(0xFFCB4335), onClick = onDeleteRequest)
+                }
             }
         }
     }

@@ -24,8 +24,9 @@ class ContratRepository {
         return RetrofitInstance.apiContrat.getContrat(id)
     }
 
-    suspend fun updateContratStatut(id: Int, statut: String): Contrat {
-        return RetrofitInstance.apiContrat.updateContratStatut(id, statut)
+    suspend fun updateContratStatut(id: Int, nouveauStatut: String) {
+        val body = mapOf("Statut" to nouveauStatut)
+        RetrofitInstance.apiContrat.updateContratStatut(id, body)
     }
 
     suspend fun partialUpdateContrat(id: Int, contrat: Contrat): Contrat {

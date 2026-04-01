@@ -21,9 +21,9 @@ interface ContratApiService {
 
     @PATCH("contrat/{id}")
     suspend fun partialUpdateContrat(@Path("id") id: Int, @Body contrat: Contrat): Contrat
-    
+
     @PATCH("contrat/{id}/statut")
-    suspend fun updateContratStatut(@Path("id") id: Int, @Body statut: String): Contrat
+    suspend fun updateContratStatut(@Path("id") id: Int, @Body statutJson: Map<String, String>): Contrat
 
     @DELETE("contrat/{id}")
     suspend fun deleteContrat(@Path("id") id: Int): Contrat
