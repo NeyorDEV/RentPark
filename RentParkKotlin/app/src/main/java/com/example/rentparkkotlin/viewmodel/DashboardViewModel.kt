@@ -78,8 +78,12 @@ class DashboardViewModel(
                     }
 
                     rappels.forEach { rappel ->
-                        val dateAffichee = formatDate(rappel.date)
-                        alertItems.add("Rappel du $dateAffichee : ${rappel.titre} – ${rappel.description}")
+                        val dateRappel = if (rappel.date.length >= 10) rappel.date.substring(0, 10) else rappel.date
+
+                        if (dateRappel >= today) {
+                            val dateAffichee = formatDate(rappel.date)
+                            alertItems.add("Rappel du $dateAffichee : ${rappel.titre} – ${rappel.description}")
+                        }
                     }
                     if (alertItems.isEmpty()) alertItems.add("✅ Aucun rappel en cours")
 
