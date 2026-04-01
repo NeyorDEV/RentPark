@@ -104,7 +104,7 @@ class AdminControleur
         }
 
         try {
-            $responseRappels = $this->apiClient->get('api/rappels', $this->authHeaders());
+            $responseRappels = $this->rappelApiClient->get('api/rappels', $this->authHeaders());
             $rappels = json_decode($responseRappels->getBody()->getContents(), true);
             if (is_array($rappels)) {
                 foreach ($rappels as $rappel) {
@@ -148,14 +148,15 @@ class AdminControleur
         $this->afficherVue('dashboard', $dVueErreur, $results);
     }
 
-    private function rechercherUtilisateur(array $dVueErreur = []): void
+    private function rechercherUtilisateur(array $dVueErreur)
     {
-        $motCle = trim($_GET['q'] ?? '');
-        if ($motCle === '') {
-            $results = $this->userGateway->getAllUser();
-        } else {
-            $results = $this->userGateway->rechercherUtilisateur($motCle);
-            if (empty($results)) $dVueErreur[] = "Aucun utilisateur trouvé pour \"$motCle\".";
+        $q = $_POST['q'] ?? '';
+        $results = [];
+        try {
+            $response = $this->userApiClient->get('api/utilisateurs', $this->withAuth(['query' => ['q' => $q]]));
+            $results = json_decode($response->getBody()->getContents(), true) ?? [];
+        } catch (RequestException $e) {
+            $dVueErreur[] = "Erreur recherche.";
         }
         $this->afficherVue('user', $dVueErreur, $results);
     }
@@ -253,9 +254,11 @@ class AdminControleur
             exit;
         }
         try {
-            $this->apiClient->delete("api/users/$id", $this->authHeaders());
+            $this->userApiClient->delete("api/utilisateurs/$id", $this->authHeaders());
         } catch (RequestException $e) {
-            // log si besoin
+            $response = $this->userApiClient->get("api/utilisateurs", $this->authHeaders());
+            $results = json_decode($response->getBody()->getContents(), true) ?? [];
+            $this->afficherVue('user', $dVueErreur, $results);
         }
         header("Location: /siteSAE2A/utilisateurs");
         exit;
@@ -271,7 +274,7 @@ class AdminControleur
 
         if (empty($dVueErreur)) {
             try {
-                $this->apiClient->post("api/add/users", $this->withAuth([
+                $this->userApiClient->post("api/utilisateurs", $this->withAuth([
                     'json' => [
                         'username' => $username,
                         'password' => $password,
@@ -285,7 +288,8 @@ class AdminControleur
             }
         }
 
-        $results = $this->userGateway->getAllUser();
+        $response = $this->userApiClient->get("api/utilisateurs", $this->authHeaders());
+        $results = json_decode($response->getBody()->getContents(), true) ?? [];
         $this->afficherVue('user', $dVueErreur, $results);
     }
 
@@ -294,21 +298,30 @@ class AdminControleur
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $sousAction = $_POST['action'] ?? '';
             switch ($sousAction) {
-                case 'ajouterUtilisateur':  $this->ajouterUtilisateur($dVueErreur);  break;
-                case 'supprimerUtilisateur': $this->supprimerUtilisateur($dVueErreur); break;
-                case 'modifierUtilisateur':  $this->modifierUtilisateur($dVueErreur);  break;
+                case 'ajouterUtilisateur':
+                    $this->ajouterUtilisateur($dVueErreur);
+                    break;
+                case 'supprimerUtilisateur':
+                    $this->supprimerUtilisateur($dVueErreur);
+                    break;
+                case 'modifierUtilisateur':
+                    $this->modifierUtilisateur($dVueErreur);
+                    break;
+                case 'rechercherUtilisateur':
+                    $this->rechercherUtilisateur($dVueErreur);
+                    return;
             }
             header("Location: /siteSAE2A/utilisateurs");
             exit;
         }
 
-        $sousAction = $_GET['action'] ?? '';
-        if ($sousAction === 'rechercherUtilisateur') {
-            $this->rechercherUtilisateur($dVueErreur);
-            return;
+        $results = [];
+        try {
+            $response = $this->userApiClient->get('api/utilisateurs', $this->authHeaders());
+            $results = json_decode($response->getBody()->getContents(), true) ?? [];
+        } catch (RequestException $e) {
+            $dVueErreur[] = "Erreur service utilisateurs.";
         }
-
-        $results = $this->userGateway->getAllUser();
         $this->afficherVue('user', $dVueErreur, $results);
     }
 
@@ -342,23 +355,23 @@ class AdminControleur
 
     private function modifierUtilisateur(array $dVueErreur)
     {
+        $id = $_POST['id'] ?? '';
         $username = $_POST['username'] ?? '';
-        $id       = (int)($_POST['id'] ?? -1);
-
-        if (empty($dVueErreur)) {
-            $this->userGateway->update($username, $id);
-            header("Location: /siteSAE2A/utilisateurs");
-            exit;
+        try {
+            $this->userApiClient->put("api/utilisateurs/$id", $this->withAuth([
+                'json' => ['username' => $username]
+            ]));
+        } catch (RequestException $e) {
+            $response = $this->userApiClient->get("api/utilisateurs", $this->authHeaders());
+            $results = json_decode($response->getBody()->getContents(), true) ?? [];
+            $this->afficherVue('user', $dVueErreur, $results);
         }
-
-        $results = $this->userGateway->getAllUser();
-        $this->afficherVue('user', $dVueErreur, $results);
     }
 
     private function ajouterRappel(array &$dVueErreur)
     {
         try {
-            $this->apiClient->post('api/rappel', $this->withAuth([
+            $this->rappelApiClient->post('api/rappels', $this->withAuth([
                 'json' => [
                     'Titre'       => $_POST['Titre']       ?? '',
                     'Description' => $_POST['Description'] ?? '',
