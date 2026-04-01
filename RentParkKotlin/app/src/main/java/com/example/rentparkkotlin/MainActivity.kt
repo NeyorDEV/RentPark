@@ -97,7 +97,7 @@ class MainActivity : ComponentActivity() {
                         // Route : Accueil Client
                         composable<Routes.HomeCustomerRoute> {
                             MainScreen(title = "RENTPARK", navController = navController) {
-                                RentParkHomeScreen()
+                                RentParkHomeScreen(navController)
                             }
                         }
 

@@ -2,6 +2,7 @@ package com.example.rentparkkotlin.ui.homeCustomer
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -20,14 +21,17 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.example.rentparkkotlin.R
+import com.example.rentparkkotlin.Routes
+import com.example.rentparkkotlin.ui.login.LoginScreen
 
 val MaPoliceCustom = FontFamily(
     Font(R.font.fortnite, FontWeight.Normal),
     Font(R.font.fortnite, FontWeight.Bold)
 )
 @Composable
-fun RentParkHomeScreen() {
+fun RentParkHomeScreen(navController: NavController) {
     Box(modifier = Modifier.fillMaxSize().background(Color.Black)) {
 
         // --- 1. Image de fond (Voiture) avec dégradé noir ---
@@ -79,7 +83,9 @@ fun RentParkHomeScreen() {
                 }
             }
             Spacer(modifier = Modifier.height(40.dp))
-            ConnectionButton()
+            ConnectionButton(onClick = {
+                navController.navigate(Routes.LoginRoute)
+            })
         }
     }
 }
@@ -101,7 +107,7 @@ fun VerticalDateField(label: String) {
 }
 
 @Composable
-fun ConnectionButton() {
+fun ConnectionButton(onClick: () -> Unit) {
     Row(
         modifier = Modifier
             .padding(horizontal = 12.dp, vertical = 6.dp)
@@ -112,6 +118,7 @@ fun ConnectionButton() {
                 shape = RoundedCornerShape(50) // 50% pour un effet pilule, ou 8.dp pour des coins arrondis
             )
             // 2. Ajoute un peu de padding interne pour que le texte ne touche pas le bord
+            .clickable { onClick() }
             .padding(horizontal = 16.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
