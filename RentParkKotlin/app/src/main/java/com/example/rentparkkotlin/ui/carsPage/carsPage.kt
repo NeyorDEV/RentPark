@@ -416,13 +416,13 @@ fun AddEditCarForm(
     var nbPlaces by remember { mutableStateOf(voiture?.NbPlaces ?: "5") }
     var categorie by remember { mutableStateOf(voiture?.Categorie ?: "") }
 
-    var energie by remember { mutableStateOf(voiture?.Energie ?: "") }
     var puissance by remember { mutableStateOf(voiture?.Puissance ?: "") }
+    var boite by remember { mutableStateOf(voiture?.Boite ?: "") }
     var transmission by remember { mutableStateOf(voiture?.Transmission ?: "") }
-    var boite by remember { mutableStateOf(voiture?.Boite ?: "Manuelle") }
+    var energie by remember { mutableStateOf(voiture?.Energie ?: "") }
 
     var prix by remember { mutableStateOf(voiture?.Prix ?: "") }
-    var etat by remember { mutableStateOf(voiture?.Etat ?: "Libre") }
+    var etat by remember { mutableStateOf(voiture?.Etat ?: "") }
 
     var dateAchat by remember { mutableStateOf(voiture?.DateAchat ?: "") }
     var dateCT by remember { mutableStateOf(voiture?.DateDernierControleTech ?: "") }
@@ -432,8 +432,10 @@ fun AddEditCarForm(
     var idAssureur by remember { mutableStateOf(voiture?.IdAssureur?.toString() ?: "") }
     var idFournisseur by remember { mutableStateOf(voiture?.IdFournisseur?.toString() ?: "") }
 
+    val optionsEnergie = listOf("Hybride", "Électrique", "Essence", "Diesel")
+    val optionsTranmission = listOf("Propulsion", "Traction", "Intégrale")
     val optionsBoite = listOf("Manuelle", "Automatique", "Semi-Manuelle")
-    val optionsEtat = listOf("Libre", "Louée", "En réparation", "Vendue")
+    val optionsEtat = listOf("Libre", "Louée", "Réparation", "Vendue")
 
     Dialog(onDismissRequest = onDismiss) {
         Surface(
@@ -471,10 +473,10 @@ fun AddEditCarForm(
                 // --- SECTION 2 : TECHNIQUE ---
                 FormSectionTitle("Moteur & Transmission")
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    SimpleField(energie, { energie = it }, "Énergie", Modifier.weight(1f))
                     SimpleField(puissance, { puissance = it }, "Puissance (CV)", Modifier.weight(1f))
                 }
-                SimpleField(transmission, { transmission = it }, "Transmission (ex: Intégrale)")
+                StableDropDown("Énergie", optionsEnergie, energie) { energie = it }
+                StableDropDown("Transmission", optionsTranmission, transmission) { transmission = it }
                 StableDropDown("Boîte de vitesse", optionsBoite, boite) { boite = it }
 
                 // --- SECTION 3 : COMMERCIAL & IDS ---
