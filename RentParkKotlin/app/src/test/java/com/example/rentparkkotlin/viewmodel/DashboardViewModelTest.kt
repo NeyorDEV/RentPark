@@ -1,8 +1,8 @@
 package com.example.rentparkkotlin.viewmodel
 
-import com.example.rentparkkotlin.data.ApiService
 import com.example.rentparkkotlin.model.Rappel
 import com.example.rentparkkotlin.repository.RappelRepository
+import com.example.rentparkkotlin.repository.StatsRepository
 import com.example.rentparkkotlin.ui.dashboard.DashboardCard
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -20,15 +20,15 @@ import org.junit.Test
 class DashboardViewModelTest {
 
     private val testDispatcher = StandardTestDispatcher()
-    private lateinit var repository: RappelRepository
-    private lateinit var api: ApiService
+    private lateinit var repositoryRappel: RappelRepository
+    private lateinit var repositoryStats: StatsRepository
     private lateinit var viewModel: DashboardViewModel
 
     @Before
     fun setup() {
         Dispatchers.setMain(testDispatcher)
-        repository = mockk()
-        api = mockk()
+        repositoryRappel = mockk()
+        repositoryStats = mockk()
     }
 
     @After
@@ -41,30 +41,21 @@ class DashboardViewModelTest {
     @Test
     fun `fetchDashboardData succes cree les 5 cartes correctement`() = runTest {
         // Given : On mock TOUTES les requêtes réseau et BDD avec la syntaxe mockk { every { ... } }
-        coEvery { api.getTotalUsers() } returns mockk { every { totalUsers } returns 150 }
-        coEvery { api.getMostRentedCar() } returns mockk {
+        coEvery { repositoryStats.getTotalUsers() } returns mockk { every { totalUsers } returns 150 }
+        coEvery { repositoryStats.getMostRentedCar() } returns mockk {
             every { voiturePlusLouee } returns mockk {
                 every { marque } returns "Peugeot"
                 every { modele } returns "208"
                 every { nbLocations } returns 42
             }
         }
-        coEvery { api.getMonthlyIncome() } returns mockk { every { monthlyIncome } returns 4500.50f }
-        coEvery { api.getCTAlerts() } returns mockk {
-            every { vehicules } returns listOf(
-                mockk {
-                    every { marque } returns "Renault"
-                    every { modele } returns "Clio"
-                }
-            )
-        }
-        coEvery { api.getContratsProchains() } returns mockk { every { contratsProchains } returns emptyList() }
+        coEvery { repositoryStats.getMonthlyIncome() } returns mockk { every { monthlyIncome } returns 4500.50f }
 
         // Correction du constructeur de Rappel (sans l'ID)
-        coEvery { repository.getRappels() } returns listOf(Rappel("Vidange", "Faire la vidange", "2023-10-10"))
+        coEvery { repositoryRappel.getRappels() } returns listOf(Rappel("Vidange", "Faire la vidange", "2023-10-10"))
 
         // When : L'instanciation lance fetchDashboardData
-        viewModel = DashboardViewModel(repository, api)
+        viewModel = DashboardViewModel(repositoryRappel, repositoryStats)
         testDispatcher.scheduler.advanceUntilIdle()
 
         // Then
@@ -94,10 +85,10 @@ class DashboardViewModelTest {
     @Test
     fun `fetchDashboardData erreur reseau cree une carte Erreur`() = runTest {
         // Given : L'API crash
-        coEvery { api.getTotalUsers() } throws Exception("Timeout serveur")
+        coEvery { repositoryStats.getTotalUsers() } throws Exception("Timeout serveur")
 
         // When
-        viewModel = DashboardViewModel(repository, api)
+        viewModel = DashboardViewModel(repositoryRappel, repositoryStats)
         testDispatcher.scheduler.advanceUntilIdle()
 
         // Then
@@ -109,14 +100,12 @@ class DashboardViewModelTest {
 
     @Test
     fun `fetchDashboardData sans aucune alerte affiche le message par defaut`() = runTest {
-        coEvery { api.getTotalUsers() } returns mockk { every { totalUsers } returns 10 }
-        coEvery { api.getMostRentedCar() } returns mockk { every { voiturePlusLouee } returns null }
-        coEvery { api.getMonthlyIncome() } returns mockk { every { monthlyIncome } returns 100.0f }
-        coEvery { api.getCTAlerts() } returns mockk { every { vehicules } returns emptyList() }
-        coEvery { api.getContratsProchains() } returns mockk { every { contratsProchains } returns emptyList() }
-        coEvery { repository.getRappels() } returns emptyList()
+        coEvery { repositoryStats.getTotalUsers() } returns mockk { every { totalUsers } returns 10 }
+        coEvery { repositoryStats.getMostRentedCar() } returns mockk { every { voiturePlusLouee } returns null }
+        coEvery { repositoryStats.getMonthlyIncome() } returns mockk { every { monthlyIncome } returns 100.0f }
+        coEvery { repositoryRappel.getRappels() } returns emptyList()
 
-        viewModel = DashboardViewModel(repository, api)
+        viewModel = DashboardViewModel(repositoryRappel, repositoryStats)
         testDispatcher.scheduler.advanceUntilIdle()
 
         val alertsCard = viewModel.cards.find { it.title == "Rappels" }
@@ -129,54 +118,37 @@ class DashboardViewModelTest {
     @Test
     fun `addRappel succes ajoute via le repo et rafraichit les donnees`() = runTest {
         // Mocks initiaux pour que le ViewModel démarre sans crasher
-        coEvery { api.getTotalUsers() } returns mockk { every { totalUsers } returns 10 }
-        coEvery { api.getMostRentedCar() } returns mockk { every { voiturePlusLouee } returns null }
-        coEvery { api.getMonthlyIncome() } returns mockk { every { monthlyIncome } returns 100.0f }
-        coEvery { api.getCTAlerts() } returns mockk { every { vehicules } returns emptyList() }
-        coEvery { api.getContratsProchains() } returns mockk { every { contratsProchains } returns emptyList() }
-        coEvery { repository.getRappels() } returns emptyList()
+        coEvery { repositoryStats.getTotalUsers() } returns mockk { every { totalUsers } returns 10 }
+        coEvery { repositoryStats.getMostRentedCar() } returns mockk { every { voiturePlusLouee } returns null }
+        coEvery { repositoryStats.getMonthlyIncome() } returns mockk { every { monthlyIncome } returns 100.0f }
+        coEvery { repositoryRappel.getRappels() } returns emptyList()
 
-        viewModel = DashboardViewModel(repository, api)
+        viewModel = DashboardViewModel(repositoryRappel, repositoryStats)
         testDispatcher.scheduler.advanceUntilIdle()
 
         // Préparation du mock d'ajout (correction : retourne un mock au lieu de Unit)
-        coEvery { repository.addRappel(any()) } returns mockk()
+        coEvery { repositoryRappel.addRappel(any()) } returns mockk()
 
         // Action
         viewModel.addRappel("Pneus", "Changer pneus neige", "2023-12-01")
         testDispatcher.scheduler.advanceUntilIdle()
 
         // Vérification
-        coVerify { repository.addRappel(match { it.titre == "Pneus" }) }
+        coVerify { repositoryRappel.addRappel(match { it.titre == "Pneus" }) }
         // Vérifie que fetchDashboardData a bien été relancé (getMonthlyIncome appelé 2 fois : init + refresh)
-        coVerify(exactly = 2) { api.getMonthlyIncome() }
+        coVerify(exactly = 2) { repositoryStats.getMonthlyIncome() }
     }
 
     @Test
     fun `fetchDashboardData formatte correctement les dates du planning`() = runTest {
         // Given : Mocks de base pour les autres cartes (pour éviter les crashs)
-        coEvery { api.getTotalUsers() } returns mockk { every { totalUsers } returns 0 }
-        coEvery { api.getMostRentedCar() } returns mockk { every { voiturePlusLouee } returns null }
-        coEvery { api.getMonthlyIncome() } returns mockk { every { monthlyIncome } returns 0.0f }
-        coEvery { api.getCTAlerts() } returns mockk { every { vehicules } returns emptyList() }
-        coEvery { repository.getRappels() } returns emptyList()
-
-        // Given : Mock spécifique des contrats pour forcer le passage dans formatDate()
-        coEvery { api.getContratsProchains() } returns mockk {
-            every { contratsProchains } returns listOf(
-                mockk {
-                    every { marque } returns "Toyota"
-                    every { modele } returns "Yaris"
-                    // Date valide (sera formatée grâce au try)
-                    every { dateDebut } returns "2099-12-25 14:00:00"
-                    // Date invalide (fera planter le parser, passera dans le catch et restera telle quelle)
-                    every { dateFin } returns "DateInvalide"
-                }
-            )
-        }
+        coEvery { repositoryStats.getTotalUsers() } returns mockk { every { totalUsers } returns 0 }
+        coEvery { repositoryStats.getMostRentedCar() } returns mockk { every { voiturePlusLouee } returns null }
+        coEvery { repositoryStats.getMonthlyIncome() } returns mockk { every { monthlyIncome } returns 0.0f }
+        coEvery { repositoryRappel.getRappels() } returns emptyList()
 
         // When
-        viewModel = DashboardViewModel(repository, api)
+        viewModel = DashboardViewModel(repositoryRappel, repositoryStats)
         testDispatcher.scheduler.advanceUntilIdle()
 
         // Then : On récupère la carte du planning

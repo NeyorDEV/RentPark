@@ -5,6 +5,7 @@ import com.example.rentparkkotlin.data.api.AuthApiService
 import com.example.rentparkkotlin.data.api.ClientApiService
 import com.example.rentparkkotlin.data.api.ContratApiService
 import com.example.rentparkkotlin.data.api.RappelApiService
+import com.example.rentparkkotlin.data.api.StatsApiService
 import com.example.rentparkkotlin.data.api.UserApiService
 import com.example.rentparkkotlin.data.api.VoitureApiService
 import okhttp3.OkHttpClient
@@ -47,13 +48,5 @@ object RetrofitInstance {
     val apiClient: ClientApiService = getRetrofit("rentpark-clients-pod/api/").create(ClientApiService::class.java)
     val apiRappel: RappelApiService = getRetrofit("rentpark-rappel-pod/api/").create(RappelApiService::class.java)
     val apiContrat: ContratApiService = getRetrofit("rentpark-contrat-pod/api/").create(ContratApiService::class.java)
-
-
-    private val retrofit = Retrofit.Builder()
-        .baseUrl("http://10.0.2.2:8880/") // adapte à ton serveur
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
-
-    val api: ApiService = retrofit.create(ApiService::class.java)
-
+    val apiStats: StatsApiService = getRetrofit("rentpark-statts-pod/api/").create(StatsApiService::class.java)
 }
