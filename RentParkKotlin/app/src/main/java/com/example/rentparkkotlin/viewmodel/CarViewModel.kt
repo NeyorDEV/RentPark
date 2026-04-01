@@ -59,7 +59,8 @@ class CarViewModel(private val repository: CarRepository = CarRepository()) : Vi
                 if (response.isSuccessful) {
                     fetchVoitures()
                 } else {
-                    error = "Erreur serveur : ${response.code()}"
+                    val serverError = response.errorBody()?.string() ?: "Erreur inconnue"
+                    error = "Erreur serveur (${response.code()}) : $serverError"
                 }
             } catch (e: Exception) {
                 error = "Impossible d'ajouter le véhicule : ${e.message}"
