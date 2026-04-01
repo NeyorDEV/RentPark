@@ -12,6 +12,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -22,7 +23,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.rentparkkotlin.model.Client
 import com.example.rentparkkotlin.model.Contrat
+import com.example.rentparkkotlin.model.Voiture
+import com.example.rentparkkotlin.viewmodel.CarViewModel
+import com.example.rentparkkotlin.viewmodel.ClientViewModel
 import com.example.rentparkkotlin.viewmodel.ContratViewModel
 
 class ContratsActivity : ComponentActivity() {
@@ -39,12 +44,15 @@ class ContratsActivity : ComponentActivity() {
 // --- ÉCRAN PRINCIPAL ---
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ContractsScreen(viewModel: ContratViewModel = viewModel()) { // Injection du ViewModel ici
+fun ContractsScreen(viewModel: ContratViewModel = viewModel(), clientViewModel: ClientViewModel = viewModel(), carViewModel: CarViewModel = viewModel()) {
 
     // Récupération des données depuis l'API
     val contrats = viewModel.contrats
     val isLoading = viewModel.isLoading
     val error = viewModel.error
+    val clients = clientViewModel.clients
+    val voitures = carViewModel.voitures
+
 
     // États pour la suppression et l'édition
     var showDeleteDialog by remember { mutableStateOf(false) }
@@ -53,6 +61,7 @@ fun ContractsScreen(viewModel: ContratViewModel = viewModel()) { // Injection du
     var showSheet by remember { mutableStateOf(false) }
     var contratToEdit by remember { mutableStateOf<Contrat?>(null) }
     var contratDetails by remember { mutableStateOf<Contrat?>(null) }
+
 
     val sheetState = rememberModalBottomSheetState()
 
@@ -146,6 +155,8 @@ fun ContractsScreen(viewModel: ContratViewModel = viewModel()) { // Injection du
         ) {
             ContratForm(
                 initialContrat = contratToEdit,
+                clients = clients,
+                voitures = voitures,
                 onDismiss = {
                     showSheet = false
                     contratToEdit = null
@@ -206,7 +217,9 @@ fun FilterHeader(onAddClick: () -> Unit) {
 fun ContratForm(
     initialContrat: Contrat?,
     onDismiss: () -> Unit,
-    onSave: (Contrat) -> Unit
+    onSave: (Contrat) -> Unit,
+    clients: List<Client>,
+    voitures: List<Voiture>
 ) {
     // Pré-remplir les champs si on est en mode édition
     var clientId by remember { mutableStateOf(initialContrat?.idClient?.toString() ?: "") }
@@ -228,8 +241,23 @@ fun ContratForm(
             fontWeight = FontWeight.Bold
         )
 
-        CustomTextField(value = clientId, onValueChange = { clientId = it }, label = "ID Client")
-        CustomTextField(value = vehiculeId, onValueChange = { vehiculeId = it }, label = "Véhicule (Num Série)")
+        DropdownSelector(
+            label = "Client",
+            items = clients,
+            selectedId = clientId,
+            onItemSelected = { clientId = it },
+            itemLabel = { "${it.nom.uppercase()} ${it.prenom}" },
+            itemId = { it.idClient.toString() }
+        )
+
+        DropdownSelector(
+            label = "Véhicule",
+            items = voitures,
+            selectedId = vehiculeId,
+            onItemSelected = { vehiculeId = it },
+            itemLabel = { "${it.Marque} ${it.Nom} (${it.NumSerie})" },
+            itemId = { it.NumSerie }
+        )
         CustomTextField(value = statut, onValueChange = { statut = it }, label = "Statut (ex: En cours, Terminé)")
 
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -402,5 +430,56 @@ fun ContratDetailRow(label: String, value: String) {
             fontWeight = FontWeight.Medium,
             modifier = Modifier.padding(start = 16.dp)
         )
+    }
+}
+
+@Composable
+fun <T> DropdownSelector(
+    label: String,
+    items: List<T>,
+    selectedId: String,
+    onItemSelected: (String) -> Unit,
+    itemLabel: (T) -> String,
+    itemId: (T) -> String
+) {
+    var expanded by remember { mutableStateOf(false) }
+    val selectedText = items.find { itemId(it) == selectedId }?.let { itemLabel(it) } ?: "Sélectionner..."
+
+    Box(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
+        OutlinedTextField(
+            value = selectedText,
+            onValueChange = {},
+            readOnly = true,
+            label = { Text(label, color = Color.Gray) },
+            modifier = Modifier.fillMaxWidth(),
+            textStyle = androidx.compose.ui.text.TextStyle(color = Color.White),
+            shape = RoundedCornerShape(12.dp),
+            trailingIcon = {
+                Icon(Icons.Default.ArrowDropDown, contentDescription = null, tint = Color.Gray)
+            }
+        )
+        Box(modifier = Modifier.matchParentSize().clickable { expanded = true })
+
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+            modifier = Modifier.background(Color(0xFF222222))
+        ) {
+            if (items.isEmpty()) {
+                DropdownMenuItem(
+                    text = { Text("Aucune donnée disponible", color = Color.Gray) },
+                    onClick = { expanded = false }
+                )
+            }
+            items.forEach { item ->
+                DropdownMenuItem(
+                    text = { Text(itemLabel(item), color = Color.White) },
+                    onClick = {
+                        onItemSelected(itemId(item))
+                        expanded = false
+                    }
+                )
+            }
+        }
     }
 }
