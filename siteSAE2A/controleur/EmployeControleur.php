@@ -21,6 +21,8 @@ class EmployeControleur
     private Client $apiClient;
     private Client $clientApiClient;
 
+    private Client $contratApiClient; 
+
     public function __construct()
     {
         global $rep, $vues, $user, $pass, $dsn, $action;
@@ -34,6 +36,7 @@ class EmployeControleur
             $this->reservationGateway = new ReservationGateway($this->connection);
             $this->apiClient          = getApiClient();
             $this->clientApiClient    = getClientApiClient();
+            $this->contratApiClient   = getContratApiClient();
 
             switch ($action) {
                 case "affichePlanning":    $this->affichePlanning($dVueErreur); break;
@@ -365,8 +368,8 @@ class EmployeControleur
         $today  = date('Y-m-d');
         $results = [];
 
-        try {
-            $response    = $this->apiClient->get('contrat', $this->authHeaders());
+        try { 
+            $response    = $this->contratApiClient->get('api/contrat', $this->authHeaders());
             $allContrats = json_decode($response->getBody()->getContents(), true) ?? [];
 
             $filtered = array_filter($allContrats, function ($c) use ($champ, $q, $filtre, $today) {
@@ -409,7 +412,7 @@ class EmployeControleur
     private function ajouterReservation(array $post, array &$dVueErreur): void
     {
         try {
-            $this->apiClient->post('modif/contrat', $this->withAuth([
+            $this->contratApiClient->post('api/contrat', $this->withAuth([
                 'json' => [
                     'DateDebut'  => trim($post['DateDebut']  ?? ''),
                     'DateFin'    => trim($post['DateFin']    ?? ''),
@@ -428,7 +431,7 @@ class EmployeControleur
     {
         $id = (int)($post['id'] ?? 0);
         try {
-            $this->apiClient->put("contrat/$id", $this->withAuth([
+            $this->apiClient->put("api/contrat/$id", $this->withAuth([
                 'json' => [
                     'DateDebut' => trim($post['DateDebut'] ?? ''),
                     'DateFin'   => trim($post['DateFin']   ?? ''),
@@ -449,7 +452,7 @@ class EmployeControleur
         $id = (int)($_POST['id'] ?? -1);
         if ($id > 0) {
             try {
-                $this->apiClient->delete("contrat/$id", $this->authHeaders());
+                $this->contratApiClient->delete("api/contrat/$id", $this->authHeaders());
             } catch (RequestException $e) {
                 $dVueErreur[] = "Erreur suppression réservation : " . $e->getMessage();
             }
@@ -466,7 +469,7 @@ class EmployeControleur
 
         if ($id > 0 && in_array($nouveauStatut, ['Validé', 'Annulé'])) {
             try {
-                $this->apiClient->patch("contrat/$id/statut", $this->withAuth([
+                $this->contratApiClient->patch("api/contrat/$id/statut", $this->withAuth([
                     'json' => ['Statut' => $nouveauStatut]
                 ]));
             } catch (RequestException $e) {
