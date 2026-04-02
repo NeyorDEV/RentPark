@@ -1,5 +1,6 @@
 <?php
 namespace controleur;
+
 use modele\Connection;
 use modele\UserGateway;
 use modele\VehicleGateway;
@@ -14,6 +15,7 @@ require_once __DIR__ . '/ApiHelper.php';
 class AdminControleur
 {
     use RoleAwareTrait;
+    
     private Connection $connection;
     private VehicleGateway $gateway;
     private UserGateway $userGateway;
@@ -29,8 +31,7 @@ class AdminControleur
     public function __construct()
     {
         $this->checkAdmin();
-        global $rep, $vues, $user, $pass, $dsn, $action;
-        $dVueErreur = [];
+        global $user, $pass, $dsn;
 
         try {
             $this->connection         = new Connection($dsn, $user, $pass);
@@ -44,21 +45,13 @@ class AdminControleur
             $this->planningApiClient   = getPlanningApiClient();
             $this->rappelApiClient     = getRappelApiClient();
             $this->userApiClient       = getUserApiClient();
-
-            switch ($action) {
-                case "afficheDashboard":  $this->afficheDashboard($dVueErreur);  break;
-                case "listeUtilisateurs": $this->listeUtilisateurs($dVueErreur); break;
-                case "listeClients":      $this->listeClients($dVueErreur);      break;
-                default:
-                    $dVueErreur[] = "Action inconnue";
-                    $this->afficherVue('homeCustomers', $dVueErreur, null);
-                    break;
-            }
+            
+            // Le switch($action) et le exit(0) ont été supprimés pour laisser AltoRouter travailler.
         } catch (\PDOException $e) {
-            $dVueErreur[] = "Erreur BDD : " . $e->getMessage();
+            $dVueErreur = ["Erreur BDD : " . $e->getMessage()];
             $this->afficherVue('erreur', $dVueErreur, null);
+            exit(0);
         }
-        exit(0);
     }
 
     private function authHeaders(): array
@@ -76,8 +69,10 @@ class AdminControleur
         return array_merge_recursive($this->authHeaders(), $options);
     }
 
-    public function afficheDashboard(array $dVueErreur)
+    public function afficheDashboard()
     {
+        $dVueErreur = [];
+        
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $sousAction = $_POST['action'] ?? '';
             if ($sousAction === 'ajouterRappel') {
@@ -148,7 +143,7 @@ class AdminControleur
         $this->afficherVue('dashboard', $dVueErreur, $results);
     }
 
-    private function rechercherUtilisateur(array $dVueErreur = []): void
+    private function rechercherUtilisateur(array &$dVueErreur = []): void
     {
         $motCle = trim($_GET['q'] ?? '');
         if ($motCle === '') {
@@ -160,7 +155,7 @@ class AdminControleur
         $this->afficherVue('user', $dVueErreur, $results);
     }
 
-    private function rechercherClient(array $dVueErreur = []): void
+    private function rechercherClient(array &$dVueErreur = []): void
     {
         $motCle  = trim($_GET['q'] ?? '');
         $results = [];
@@ -182,7 +177,7 @@ class AdminControleur
         $this->afficherVue('client', $dVueErreur, $results);
     }
 
-    private function ajouterClient(array $dVueErreur)
+    private function ajouterClient(array &$dVueErreur)
     {
         $data = [
             'Nom'         => $_POST['nom']         ?? '',
@@ -213,7 +208,7 @@ class AdminControleur
         $this->afficherVue('client', $dVueErreur, $results);
     }
 
-    private function modifierClient(array $dVueErreur)
+    private function modifierClient(array &$dVueErreur)
     {
         $IdClient = (int)($_POST['idClient'] ?? -1);
         $data = [
@@ -245,7 +240,7 @@ class AdminControleur
         $this->afficherVue('client', $dVueErreur, $results);
     }
 
-    private function supprimerUtilisateur(array $dVueErreur)
+    private function supprimerUtilisateur(array &$dVueErreur)
     {
         $id = (int)($_POST['id'] ?? -1);
         if ($id <= 0) {
@@ -255,19 +250,19 @@ class AdminControleur
         try {
             $this->apiClient->delete("api/users/$id", $this->authHeaders());
         } catch (RequestException $e) {
-            // log si besoin
+            $dVueErreur[] = "Erreur suppression utilisateur : " . $e->getMessage();
         }
         header("Location: /siteSAE2A/utilisateurs");
         exit;
     }
 
-    private function ajouterUtilisateur(array $dVueErreur)
+    private function ajouterUtilisateur(array &$dVueErreur)
     {
         $username = $_POST['username'] ?? '';
         $password = $_POST['password'] ?? '';
         $role     = $_POST['role']     ?? '';
 
-        Validation::val_user($username, $password, $role, $dVueErreur);
+        Validation::val_user($username, $password, '', $dVueErreur);
 
         if (empty($dVueErreur)) {
             try {
@@ -289,12 +284,14 @@ class AdminControleur
         $this->afficherVue('user', $dVueErreur, $results);
     }
 
-    public function listeUtilisateurs(array $dVueErreur)
+    public function listeUtilisateurs()
     {
+        $dVueErreur = [];
+        
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $sousAction = $_POST['action'] ?? '';
             switch ($sousAction) {
-                case 'ajouterUtilisateur':  $this->ajouterUtilisateur($dVueErreur);  break;
+                case 'ajouterUtilisateur':   $this->ajouterUtilisateur($dVueErreur);  break;
                 case 'supprimerUtilisateur': $this->supprimerUtilisateur($dVueErreur); break;
                 case 'modifierUtilisateur':  $this->modifierUtilisateur($dVueErreur);  break;
             }
@@ -312,8 +309,10 @@ class AdminControleur
         $this->afficherVue('user', $dVueErreur, $results);
     }
 
-    public function listeClients(array $dVueErreur)
+    public function listeClients()
     {
+        $dVueErreur = [];
+        
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $sousAction = $_POST['action'] ?? '';
             switch ($sousAction) {
@@ -340,7 +339,7 @@ class AdminControleur
         $this->afficherVue('client', $dVueErreur, $results);
     }
 
-    private function modifierUtilisateur(array $dVueErreur)
+    private function modifierUtilisateur(array &$dVueErreur)
     {
         $username = $_POST['username'] ?? '';
         $id       = (int)($_POST['id'] ?? -1);

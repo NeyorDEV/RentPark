@@ -1,5 +1,6 @@
 <?php
 namespace controleur;
+
 use modele\Connection;
 use modele\VehicleGateway;
 use modele\UserGateway;
@@ -18,45 +19,23 @@ class UserController
     private VehicleGateway $gateway;
     private UserGateway $userGateway;
     private Client $apiClient;
-    private Client $authApiClient;
 
     public function __construct()
     {
-        global $rep, $vues, $user, $pass, $dsn, $action;
-        $dVueErreur = [];
+        global $user, $pass, $dsn;
 
         try {
             $this->connection = new Connection($dsn, $user, $pass);
             $this->gateway = new VehicleGateway($this->connection);
             $this->userGateway = new UserGateway($this->connection);
             $this->apiClient = getApiClient();
-            $this->authApiClient = getAuthApiClient();
-
-            switch ($action) {
-                case "afficheInscription":      $this->afficheInscription($dVueErreur); break;
-                case "afficheConnection":       $this->afficheConnection($dVueErreur); break;
-                case 'deconnecter':             $this->deconnecter(); break;
-                case "listeVoitures":           $this->listeVoitures($dVueErreur); break;
-                case 'cars':                    $this->cars($dVueErreur); break;
-                case 'homeCustomers':           $this->homeCustomers($dVueErreur); break;
-                case 'reservationForm':         $this->reservationForm($dVueErreur); break;
-                case 'afficheRecapitulatif':    $this->afficheRecapitulatif($dVueErreur); break;
-                case 'finaliserReservation':    $this->finaliserReservation($dVueErreur); break;
-                case 'listeReservation':        $this->listeReservation($dVueErreur); break;
-                case 'afficheParametres':       $this->afficheParametres($dVueErreur); break;
-                default:
-                    $dVueErreur[] = "Action inconnue";
-                    $this->afficherVue('homeCustomers', $dVueErreur, null);
-                    break;
-            }
         } catch (\PDOException $e) {
             $dVueErreur[] = "Erreur BDD : " . $e->getMessage();
             $this->afficherVue('erreur', $dVueErreur);
+            exit(0);
         }
-        exit(0);
     }
 
-    // Token injecté dynamiquement à chaque requête
     private function authHeaders(): array
     {
         return [
@@ -67,31 +46,107 @@ class UserController
         ];
     }
 
-    // Fusionne authHeaders avec d'autres options Guzzle (json, query...)
     private function withAuth(array $options = []): array
     {
         return array_merge_recursive($this->authHeaders(), $options);
     }
 
-    public function homeCustomers(array $dVueErreur)
+    public function homeCustomers()
     {
+        $dVueErreur = [];
         $this->afficherVue('homeCustomers', $dVueErreur, null);
     }
 
-    public function afficheInscription(array $dVueErreur)
+    public function afficheInscription()
     {
+        $dVueErreur = [];
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $sousAction = $_POST['action'] ?? '';
-            if ($sousAction === 'inscription') {
-                $this->inscription($dVueErreur);
-            }
-            header("Location: /siteSAE2A/connection");
-            exit;
+            $this->inscription($dVueErreur);
+            return;
         }
         $this->afficherVue('inscription', $dVueErreur, null);
     }
 
-    public function deconnecter(): void
+    private function inscription(array &$dVueErreur)
+    {
+        $username = $_POST['username'] ?? '';
+        $password = $_POST['password'] ?? '';
+        $confirm  = $_POST['confirm'] ?? '';
+        $role     = $_POST['role'] ?? 'user';
+
+        Validation::val_user($username, $password, $confirm, $dVueErreur);
+
+        if (!empty($dVueErreur)) {
+            $this->afficherVue('erreur', $dVueErreur, null);
+            return;
+        }
+
+        $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+        $userObj = new User(null, $username, $hashedPassword, $role);
+        $this->userGateway->login($userObj);
+        
+        header("Location: /siteSAE2A/connection");
+        exit;
+    }
+
+    public function afficheConnection()
+    {
+        $dVueErreur = [];
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $this->traitementConnection($dVueErreur);
+            return;
+        }
+        $this->afficherVue('connection', $dVueErreur, null);
+    }
+
+    private function traitementConnection(array &$dVueErreur)
+    {
+        $username = $_POST['username'] ?? '';
+        $password = $_POST['password'] ?? '';
+        
+        // 1. Validation BDD locale
+        $savepass = $this->userGateway->getHashPass($username, $password);
+        Validation::val_connection($username, $password, $savepass, $dVueErreur);
+
+        if (!empty($dVueErreur)) {
+            $this->afficherVue('erreur', $dVueErreur, null);
+            return;
+        }
+
+        // 2. Appel de l'API avec Guzzle
+        try {
+            $client = new Client([
+                'base_uri' => 'https://codefirst.iut.uca.fr/kubernetes/iut-inf63-projets-etudiants-rentpark/rentpark-auth-pod/',
+                'timeout'  => 60.0,
+                'verify'   => false,
+                'http_errors' => true,
+            ]);
+            
+            $response = $client->post('login', [
+                'json' => ['username' => $username, 'password' => $password]
+            ]);
+            
+            $data = json_decode($response->getBody()->getContents(), true);
+            
+            // 3. Création de la session sécurisée
+            session_regenerate_id(true);
+            $_SESSION['username']  = $username;
+            $_SESSION['role']      = $data['user']['role'] ?? $this->userGateway->getRole($username);
+            $_SESSION['idClient']  = $this->userGateway->getClientId($username);
+            $_SESSION['api_token'] = $data['token']; // Le fameux token JWT
+            
+            // 4. Redirection vers l'accueil après le succès
+            header("Location: /siteSAE2A/home");
+            exit;
+            
+        } catch (\Exception $e) { 
+            $dVueErreur[] = "Erreur de connexion à l'API : " . $e->getMessage();
+            $this->afficherVue('erreur', $dVueErreur, null);
+            return;
+        }
+    }
+
+    public function deconnecter()
     {
         session_unset();
         session_destroy();
@@ -99,78 +154,12 @@ class UserController
         exit;
     }
 
-    public function inscription(array $dVueErreur)
+    public function cars()
     {
-        $username = $_POST['username'] ?? '';
-        $password = $_POST['password'] ?? '';
-        $confirm  = $_POST['confirm'] ?? '';
-        $role     = $_POST['role'] ?? '';
-
-        Validation::val_user($username, $password, $confirm, $dVueErreur);
-
-        if (!empty($dVueErreur)) {
-            $dVueErreur[] = "Erreur dans l'inscription";
-            $this->afficherVue('erreur', $dVueErreur, null);
-            return;
-        }
-
-        $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-        $user = new User(null, $username, $hashedPassword, $role);
-        $this->userGateway->login($user);
-    }
-
-    public function afficheConnection(array $dVueErreur)
-    {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $sousAction = $_POST['action'] ?? '';
-            if ($sousAction === 'connection') {
-                $this->connection($dVueErreur);
-            }
-            header("Location: /siteSAE2A/home");
-            exit;
-        }
-        $this->afficherVue('connection', $dVueErreur, null);
-    }
-
-    public function connection(array &$dVueErreur)
-    {
-        $username = $_POST['username'] ?? '';
-        $password = $_POST['password'] ?? '';
-        $savepass = $this->userGateway->getHashPass($username, $password);
-
-        Validation::val_connection($username, $password, $savepass, $dVueErreur);
-
-        if (!empty($dVueErreur)) {
-            $this->afficherVue('erreur', $dVueErreur, null);
-            exit;
-        }
-
-        // Régénérer la session AVANT d'écrire dedans
-        session_regenerate_id(true);
-
-        $_SESSION['username'] = $username;
-        $_SESSION['role']     = $this->userGateway->getRole($username);
-        $_SESSION['idClient'] = $this->userGateway->getClientId($username);
-
-        // Login API pour récupérer le token
-        try {
-            $response = $this->authApiClient->post('login', [
-                'json' => ['username' => $username, 'password' => $password]
-            ]);
-            $data = json_decode($response->getBody()->getContents(), true);
-            $_SESSION['api_token'] = $data['token'] ?? '';
-
-        } catch (RequestException $e) {
-            // API indisponible, on continue sans token
-            $_SESSION['api_token'] = '';
-        }
-    }
-
-    public function cars(array $dVueErreur)
-    {
-        $date_depart   = $_GET['date_depart'] ?? null;
-        $date_retour   = $_GET['date_retour'] ?? null;
-        $boite_filtre  = $_GET['boite'] ?? null;
+        $dVueErreur = [];
+        $date_depart  = $_GET['date_depart'] ?? null;
+        $date_retour  = $_GET['date_retour'] ?? null;
+        $boite_filtre = $_GET['boite'] ?? null;
         $energie_filtre = $_GET['energie'] ?? null;
         $prix_min = isset($_GET['prix_min']) && $_GET['prix_min'] !== '' ? (float)$_GET['prix_min'] : null;
         $prix_max = isset($_GET['prix_max']) && $_GET['prix_max'] !== '' ? (float)$_GET['prix_max'] : null;
@@ -202,18 +191,21 @@ class UserController
         $this->afficherVue('cars', $dVueErreur, $results);
     }
 
-    public function reservationForm(array $dVueErreur)
+    public function reservationForm()
     {
+        $dVueErreur = [];
         $this->afficherVue('reservationForm', $dVueErreur, null);
     }
 
-    public function afficheRecapitulatif(array $dVueErreur)
+    public function afficheRecapitulatif()
     {
+        $dVueErreur = [];
         $this->afficherVue('recapitulatif', $dVueErreur, null);
     }
 
-    public function finaliserReservation(array &$dVueErreur)
+    public function finaliserReservation()
     {
+        $dVueErreur = [];
         try {
             $nom        = $_POST['nom']        ?? null;
             $prenom     = $_POST['prenom']     ?? null;
@@ -308,20 +300,22 @@ class UserController
         }
     }
 
-    public function listeReservation(array $dVueErreur = [])
+    public function listeReservation()
     {
-        $results = [];
         $dVueErreur = ['PAGE non faite pour user'];
-        $this->afficherVue('erreur', $dVueErreur, $results);
+        $this->afficherVue('erreur', $dVueErreur, []);
     }
 
-    public function listeVoitures(array $dVueErreur)
+    public function listeVoitures()
     {
+        $dVueErreur = [];
         $sousAction = $_GET['action'] ?? '';
+        
         if ($sousAction === 'rechercherVoitures') {
             $this->rechercherVoitures($dVueErreur);
             return;
         }
+        
         try {
             $response = $this->apiClient->get('api/vehicules', $this->authHeaders());
             $results  = json_decode($response->getBody()->getContents(), true) ?? [];
@@ -332,7 +326,7 @@ class UserController
         $this->afficherVue('flotte', $dVueErreur, $results);
     }
 
-    private function rechercherVoitures(array $dVueErreur = []): void
+    private function rechercherVoitures(array &$dVueErreur): void
     {
         $motCle = trim($_GET['q'] ?? '');
         try {
@@ -347,8 +341,9 @@ class UserController
         $this->afficherVue('flotte', $dVueErreur, $results);
     }
 
-    public function afficheParametres(array $dVueErreur)
+    public function afficheParametres()
     {
+        $dVueErreur = [];
         $this->afficherVue('parametres', $dVueErreur, null);
     }
 }

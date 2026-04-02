@@ -1,5 +1,6 @@
 <?php
 namespace controleur;
+
 use modele\Connection;
 use modele\VehicleGateway;
 use modele\ReservationGateway;
@@ -23,9 +24,8 @@ class EmployeControleur
 
     public function __construct()
     {
-        global $rep, $vues, $user, $pass, $dsn, $action;
+        global $rep, $vues, $user, $pass, $dsn;
         $this->checkEmploye();
-        $dVueErreur = [];
 
         try {
             $this->connection         = new Connection($dsn, $user, $pass);
@@ -34,23 +34,14 @@ class EmployeControleur
             $this->reservationGateway = new ReservationGateway($this->connection);
             $this->apiClient          = getApiClient();
             $this->clientApiClient    = getClientApiClient();
-
-            switch ($action) {
-                case "affichePlanning":    $this->affichePlanning($dVueErreur); break;
-                case "listeClients":       $this->listeClients($dVueErreur); break;
-                case "listeUtilisateurs":  $this->listeUtilisateurs($dVueErreur); break;
-                case 'listeReservation':   $this->listeReservation($dVueErreur); break;
-                case 'listeVoitures':      $this->listeVoitures($dVueErreur); break;
-                default:
-                    $dVueErreur[] = "Action inconnue";
-                    $this->afficherVue('homeCustomers', $dVueErreur, null);
-                    break;
-            }
+            
+            // Le switch($action) et le exit(0) qui tuaient le script ont été supprimés ici.
+            // C'est le FrontControleur qui gère l'appel de la bonne méthode désormais.
         } catch (\PDOException $e) {
-            $dVueErreur[] = "Erreur BDD : " . $e->getMessage();
+            $dVueErreur = ["Erreur BDD : " . $e->getMessage()];
             $this->afficherVue('erreur', $dVueErreur);
+            exit(0);
         }
-        exit(0);
     }
 
     private function authHeaders(): array
@@ -68,7 +59,7 @@ class EmployeControleur
         return array_merge_recursive($this->authHeaders(), $options);
     }
 
-    private function ajouterVoiture(array $dVueErreur)
+    private function ajouterVoiture(array &$dVueErreur)
     {
         $imagePath = '';
 
@@ -114,7 +105,7 @@ class EmployeControleur
         exit;
     }
 
-    private function supprimerVoiture(array $dVueErreur)
+    private function supprimerVoiture(array &$dVueErreur)
     {
         $id = $_POST['NumSerie'] ?? -1;
         try {
@@ -126,7 +117,7 @@ class EmployeControleur
         exit;
     }
 
-    private function modifierVoiture(array $dVueErreur)
+    private function modifierVoiture(array &$dVueErreur)
     {
         $numSerie = $_POST['NumSerie'] ?? '';
         $data = [
@@ -160,7 +151,7 @@ class EmployeControleur
         exit;
     }
 
-    private function rechercherVoitures(array $dVueErreur = []): void
+    private function rechercherVoitures(array &$dVueErreur = []): void
     {
         $motCle = trim($_GET['q'] ?? '');
         try {
@@ -175,8 +166,9 @@ class EmployeControleur
         $this->afficherVue('flotte', $dVueErreur, $results);
     }
 
-    public function listeVoitures(array $dVueErreur)
+    public function listeVoitures()
     {
+        $dVueErreur = [];
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $sousAction = $_POST['action'] ?? '';
             switch ($sousAction) {
@@ -198,13 +190,13 @@ class EmployeControleur
             $response = $this->apiClient->get('api/vehicules', $this->authHeaders());
             $results  = json_decode($response->getBody()->getContents(), true) ?? [];
         } catch (RequestException $e) {
-            $dVueErreur[] = "Impossible de récupérer les véhicules.";
+            $dVueErreur[] = "Impossible de récupérer les véhicules. L'API a renvoyé une erreur.";
             $results = [];
         }
         $this->afficherVue('flotte', $dVueErreur, $results);
     }
 
-    private function rechercherUtilisateur(array $dVueErreur = []): void
+    private function rechercherUtilisateur(array &$dVueErreur = []): void
     {
         $motCle = trim($_GET['q'] ?? '');
         if ($motCle === '') {
@@ -216,7 +208,7 @@ class EmployeControleur
         $this->afficherVue('user', $dVueErreur, $results);
     }
 
-    private function rechercherClient(array $dVueErreur = []): void
+    private function rechercherClient(array &$dVueErreur = []): void
     {
         $motCle  = trim($_GET['q'] ?? '');
         $results = [];
@@ -236,7 +228,7 @@ class EmployeControleur
         $this->afficherVue('client', $dVueErreur, $results);
     }
 
-    private function ajouterUtilisateur(array $dVueErreur)
+    private function ajouterUtilisateur(array &$dVueErreur)
     {
         $username = $_POST['username'] ?? '';
         $password = $_POST['password'] ?? '';
@@ -255,7 +247,7 @@ class EmployeControleur
         $this->afficherVue('user', $dVueErreur, $results);
     }
 
-    private function ajouterClient(array $dVueErreur)
+    private function ajouterClient(array &$dVueErreur)
     {
         $data = [
             'Nom'         => $_POST['nom']         ?? '',
@@ -282,7 +274,7 @@ class EmployeControleur
         $this->afficherVue('client', $dVueErreur, $results);
     }
 
-    private function modifierClient(array $dVueErreur)
+    private function modifierClient(array &$dVueErreur)
     {
         $IdClient = (int)($_POST['idClient'] ?? -1);
         $data = [
@@ -310,11 +302,14 @@ class EmployeControleur
         $this->afficherVue('client', $dVueErreur, $results);
     }
 
-    public function listeUtilisateurs(array $dVueErreur)
+    public function listeUtilisateurs()
     {
+        $dVueErreur = [];
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $sousAction = $_POST['action'] ?? '';
-            if ($sousAction === 'ajouterUtilisateur') $this->ajouterUtilisateur($dVueErreur);
+            if ($sousAction === 'ajouterUtilisateur') {
+                $this->ajouterUtilisateur($dVueErreur);
+            }
             header("Location: /siteSAE2A/utilisateurs");
             exit;
         }
@@ -329,8 +324,9 @@ class EmployeControleur
         $this->afficherVue('user', $dVueErreur, $results);
     }
 
-    public function listeClients(array $dVueErreur)
+    public function listeClients()
     {
+        $dVueErreur = [];
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $sousAction = $_POST['action'] ?? '';
             switch ($sousAction) {
@@ -478,14 +474,15 @@ class EmployeControleur
         $this->rechercherReservation($dVueErreur);
     }
 
-    public function listeReservation(array &$dVueErreur)
+    public function listeReservation()
     {
+        $dVueErreur = [];
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $sousAction = $_POST['action'] ?? '';
             switch ($sousAction) {
                 case 'ajouterReservation':   $this->ajouterReservation($_POST, $dVueErreur);   break;
                 case 'modifierReservation':  $this->modifierReservation($_POST, $dVueErreur);  break;
-                case 'supprimerReservation': $this->supprimerReservation($dVueErreur);          break;
+                case 'supprimerReservation': $this->supprimerReservation($dVueErreur);         break;
                 case 'changerStatut':        $this->changerStatutReservation($_POST, $dVueErreur); break;
             }
             exit;
@@ -493,8 +490,9 @@ class EmployeControleur
         $this->rechercherReservation($dVueErreur);
     }
 
-    public function affichePlanning(array $dVueErreur)
+    public function affichePlanning()
     {
+        $dVueErreur = [];
         $month = max(1, min(12, (int)($_GET['month'] ?? date('m'))));
         $year  = (int)($_GET['year'] ?? date('Y'));
 
