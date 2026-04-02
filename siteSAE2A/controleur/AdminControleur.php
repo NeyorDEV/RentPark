@@ -197,7 +197,7 @@ class AdminControleur
 
         if (empty($dVueErreur)) {
             try {
-                $this->clientApiClient->post('api/client', $this->withAuth(['json' => $data]));
+                $this->clientApiClient->post('api/clients', $this->withAuth(['json' => $data]));
                 header("Location: /siteSAE2A/clients");
                 exit;
             } catch (RequestException $e) {
@@ -229,7 +229,7 @@ class AdminControleur
 
         if (empty($dVueErreur)) {
             try {
-                $this->clientApiClient->put("api/client/$IdClient", $this->withAuth(['json' => $data]));
+                $this->clientApiClient->put("api/clients/$IdClient", $this->withAuth(['json' => $data]));
                 header("Location: /siteSAE2A/clients");
                 exit;
             } catch (RequestException $e) {
