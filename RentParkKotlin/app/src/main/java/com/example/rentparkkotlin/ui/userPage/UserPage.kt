@@ -28,6 +28,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.rentparkkotlin.model.Client
 import com.example.rentparkkotlin.model.ClientRequest
 import com.example.rentparkkotlin.model.User
+import com.example.rentparkkotlin.ui.components.DatePickerField
 import com.example.rentparkkotlin.viewmodel.ClientViewModel
 import com.example.rentparkkotlin.viewmodel.UserViewModel
 
@@ -209,7 +210,7 @@ fun ClientsContent(viewModel: ClientViewModel) {
             ) {
                 Icon(Icons.Default.Person, contentDescription = null, modifier = Modifier.size(18.dp))
                 Spacer(Modifier.width(6.dp))
-                Text("Nouveau", fontSize = 13.sp)
+                Text("Ajouter", fontSize = 13.sp)
             }
         }
 
@@ -295,7 +296,11 @@ fun ClientFormDialog(initialClient: Client?, onDismiss: () -> Unit, onConfirm: (
                 OutlinedTextField(value = email, onValueChange = { email = it }, label = { Text("Email", color = Color.Gray) }, textStyle = TextStyle(color = Color.White), singleLine = true)
                 OutlinedTextField(value = tel, onValueChange = { tel = it }, label = { Text("Téléphone", color = Color.Gray) }, textStyle = TextStyle(color = Color.White), singleLine = true)
                 OutlinedTextField(value = permis, onValueChange = { permis = it }, label = { Text("Numéro Permis", color = Color.Gray) }, textStyle = TextStyle(color = Color.White), singleLine = true)
-                OutlinedTextField(value = dateNaiss, onValueChange = { dateNaiss = it }, label = { Text("Date Naissance (AAAA-MM-JJ)", color = Color.Gray) }, textStyle = TextStyle(color = Color.White), singleLine = true)
+                DatePickerField(
+                    value = dateNaiss,
+                    onDateSelected = { dateNaiss = it },
+                    label = "Date de Naissance"
+                )
                 OutlinedTextField(value = nationalite, onValueChange = { nationalite = it }, label = { Text("Nationalité", color = Color.Gray) }, textStyle = TextStyle(color = Color.White), singleLine = true)
             }
         },
