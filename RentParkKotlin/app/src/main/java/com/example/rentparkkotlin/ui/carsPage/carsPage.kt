@@ -20,6 +20,7 @@ import coil.compose.AsyncImage
 import com.example.rentparkkotlin.model.Voiture
 import com.example.rentparkkotlin.viewmodel.CarViewModel
 import com.example.rentparkkotlin.R
+import com.example.rentparkkotlin.model.Model
 import com.example.rentparkkotlin.ui.components.DatePickerField
 import com.example.rentparkkotlin.ui.header.Header
 
@@ -408,7 +409,6 @@ fun AddEditCarForm(
     onDismiss: () -> Unit,
     onConfirm: (Voiture) -> Unit
 ) {
-    // --- ÉTATS DES CHAMPS (Initialisés avec l'objet si modification) ---
     var numSerie by remember { mutableStateOf(voiture?.NumSerie ?: "") }
     var marque by remember { mutableStateOf(voiture?.Marque ?: "") }
     var nom by remember { mutableStateOf(voiture?.Nom ?: "") }
@@ -416,22 +416,24 @@ fun AddEditCarForm(
     var couleur by remember { mutableStateOf(voiture?.Couleur ?: "") }
     var nbPlaces by remember { mutableStateOf(voiture?.NbPlaces ?: "5") }
     var categorie by remember { mutableStateOf(voiture?.Categorie ?: "") }
-
     var puissance by remember { mutableStateOf(voiture?.Puissance ?: "") }
     var boite by remember { mutableStateOf(voiture?.Boite ?: "") }
     var transmission by remember { mutableStateOf(voiture?.Transmission ?: "") }
     var energie by remember { mutableStateOf(voiture?.Energie ?: "") }
-
     var prix by remember { mutableStateOf(voiture?.Prix ?: "") }
     var etat by remember { mutableStateOf(voiture?.Etat ?: "") }
-
     var dateAchat by remember { mutableStateOf(voiture?.DateAchat?.take(10) ?: "") }
     var dateCT by remember { mutableStateOf(voiture?.DateDernierControleTech?.take(10) ?: "") }
     var dateExpCT by remember { mutableStateOf(voiture?.DateExpirationControleTech?.take(10) ?: "") }
-
-    // IDs (Numériques)
     var idAssureur by remember { mutableStateOf(voiture?.IdAssureur?.toString() ?: "") }
     var idFournisseur by remember { mutableStateOf(voiture?.IdFournisseur?.toString() ?: "") }
+
+    val optionsModeles = listeModelesPredefinis.map { "${it.marque} ${it.nom} (${it.annee})" }
+    var selectedModeleString by remember {
+        mutableStateOf(
+            if (voiture != null) "${voiture.Marque} ${voiture.Nom} (${voiture.Annee})" else ""
+        )
+    }
 
     val optionsEnergie = listOf("Hybride", "Électrique", "Essence", "Diesel")
     val optionsTranmission = listOf("Propulsion", "Traction", "Intégrale")
@@ -456,18 +458,24 @@ fun AddEditCarForm(
                 FormSectionTitle("Identification & Style")
                 SimpleField(numSerie, { numSerie = it }, "N° Série (VIN)", readOnly = (voiture != null))
 
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    SimpleField(marque, { marque = it }, "Marque", Modifier.weight(1f))
-                    SimpleField(nom, { nom = it }, "Modèle", Modifier.weight(1f))
+                StableDropDown("Sélectionnez un modèle", optionsModeles, selectedModeleString) { selection ->
+                    selectedModeleString = selection
+                    val modeleTrouve = listeModelesPredefinis.find {
+                        "${it.marque} ${it.nom} (${it.annee})" == selection
+                    }
+                    if (modeleTrouve != null) {
+                        marque = modeleTrouve.marque
+                        nom = modeleTrouve.nom
+                        annee = modeleTrouve.annee
+                    }
                 }
 
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    SimpleField(annee, { annee = it }, "Année", Modifier.weight(1f))
                     SimpleField(couleur, { couleur = it }, "Couleur", Modifier.weight(1f))
+                    SimpleField(nbPlaces, { nbPlaces = it }, "Places", Modifier.weight(1f))
                 }
 
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    SimpleField(nbPlaces, { nbPlaces = it }, "Places", Modifier.weight(1f))
                     SimpleField(categorie, { categorie = it }, "Catégorie", Modifier.weight(1f))
                 }
 
@@ -490,7 +498,6 @@ fun AddEditCarForm(
                 }
 
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    // Filtre pour n'accepter que des chiffres
                     SimpleField(idAssureur, { if (it.all { c -> c.isDigit() }) idAssureur = it }, "ID Assureur", Modifier.weight(1f))
                     SimpleField(idFournisseur, { if (it.all { c -> c.isDigit() }) idFournisseur = it }, "ID Fournisseur", Modifier.weight(1f))
                 }
@@ -521,7 +528,7 @@ fun AddEditCarForm(
                     TextButton(onClick = onDismiss) { Text("Annuler") }
                     Button(
                         onClick = {
-                            if (numSerie.isNotBlank()) {
+                            if (numSerie.isNotBlank() && marque.isNotBlank()) {
                                 onConfirm(Voiture(
                                     NumSerie = numSerie,
                                     Marque = marque,
@@ -540,7 +547,6 @@ fun AddEditCarForm(
                                     DateDernierControleTech = dateCT,
                                     DateExpirationControleTech = dateExpCT,
                                     ImagePath = voiture?.ImagePath ?: "default_car.jpg",
-                                    // Conversion sécurisée vers Int
                                     IdAssureur = idAssureur.toIntOrNull() ?: 1,
                                     IdFournisseur = idFournisseur.toIntOrNull() ?: 1
                                 ))
@@ -611,3 +617,17 @@ fun InfoRow(label: String, value: String) {
         Text(value, fontWeight = FontWeight.Bold, fontSize = 14.sp)
     }
 }
+
+val listeModelesPredefinis = listOf(
+    Model("Audi", "A4", "2022", 47000.00),
+    Model("BMW", "Série 3", "2021", 45000.00),
+    Model("Ford", "Focus", "2019", 22000.00),
+    Model("Honda", "Accord", "2019", 25000.00),
+    Model("Hyundai", "Ioniq", "2022", 35000.00),
+    Model("Nissan", "Qashqai", "2020", 31000.00),
+    Model("Peugeot", "3008", "2021", 30000.00),
+    Model("Renault", "Clio", "2020", 35000.00),
+    Model("Renault", "Koleos", "2020", 32000.00),
+    Model("Toyota", "Corolla", "2020", 23000.00),
+    Model("Volkswagen", "Golf", "2021", 27000.00)
+)
