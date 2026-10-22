@@ -39,4 +39,10 @@ $action = "RAS";
 
 $role="unknow";
 
-$smtp_pass = 'crpw mjdp rawc nkwq';
+// Mot de passe d'application SMTP : ne jamais l'écrire dans le dépôt.
+// Il est lu depuis la variable d'environnement SMTP_PASS, ou depuis
+// config/config.local.php (non versionné, voir config.local.example.php).
+$smtp_pass = getenv('SMTP_PASS') ?: '';
+if (is_file(__DIR__ . '/config.local.php')) {
+    require __DIR__ . '/config.local.php';
+}

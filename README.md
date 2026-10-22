@@ -72,3 +72,10 @@ Le reste est configuré dans Android pour le moment.
 Pareil pour le serveur photo, vous devez le lancer en `0.0.0.0:9990`
 
 Code source : [RentParkKotlin](https://github.com/NeyorDEV/RentPark/tree/main/RentParkKotlin)
+
+## ✉️ Configuration du mail (SMTP)
+
+Le mot de passe d'application Gmail n'est plus dans le code. Fournis-le de l'une de ces deux façons :
+
+- variable d'environnement `SMTP_PASS` ;
+- ou fichier `siteSAE2A/config/config.local.php` (copie `config.local.example.php`, il est ignoré par git).
