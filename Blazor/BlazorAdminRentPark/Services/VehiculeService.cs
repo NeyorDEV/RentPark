@@ -10,7 +10,7 @@ namespace BlazorAdminRentPark.Services
     public class VehiculeService : IVehiculeService
     {
         private readonly HttpClient _httpClient;
-        private const string ImagesBaseUrl = "http://localhost:9990";
+        private static readonly string ImagesBaseUrl = BlazorAdminRentPark.ApiConfig.Images;
 
         public VehiculeService(HttpClient httpClient)
         {
@@ -19,7 +19,7 @@ namespace BlazorAdminRentPark.Services
 
         public async Task<GridItemsProviderResult<VehiculeModel>> GetItems(GridItemsProviderRequest<VehiculeModel> request)
         {
-            var items = await _httpClient.GetFromJsonAsync<List<VehiculeModel>>($"http://localhost:8880/voitures");
+            var items = await _httpClient.GetFromJsonAsync<List<VehiculeModel>>($"{BlazorAdminRentPark.ApiConfig.Api}/voitures");
 
             if (items != null)
             {
@@ -42,17 +42,17 @@ namespace BlazorAdminRentPark.Services
         public async Task Add(VehiculeUiModel vehiculeUiModel)
         {
             var vehicule = VehiculeFactory.Create(vehiculeUiModel);
-            await _httpClient.PostAsJsonAsync("http://localhost:8880/add/vehicule", vehicule);
+            await _httpClient.PostAsJsonAsync($"{BlazorAdminRentPark.ApiConfig.Api}/add/vehicule", vehicule);
         }
 
         public async Task Delete(string numSerie)
         {
-            await _httpClient.DeleteAsync($"http://localhost:8880/delete/voitures/{numSerie}");
+            await _httpClient.DeleteAsync($"{BlazorAdminRentPark.ApiConfig.Api}/delete/voitures/{numSerie}");
         }
 
         public async Task Update(string numSerie, VehiculeModel vehicule)
         {
-            await _httpClient.PutAsJsonAsync($"http://localhost:8880/voitures/{numSerie}", vehicule); // [cite: 7]
+            await _httpClient.PutAsJsonAsync($"{BlazorAdminRentPark.ApiConfig.Api}/voitures/{numSerie}", vehicule); //
         }
         
     }

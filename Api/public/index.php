@@ -16,6 +16,47 @@ $conn = $databaseFactory(); // $conn est maintenant une instance de Connection
 $app = AppFactory::create();
 
 $app->addBodyParsingMiddleware();
+// Erreurs en JSON (jamais de page HTML/stack trace pour les clients)
+$app->addRoutingMiddleware();
+
+// Compatibilité : le site appelle des routes "micro-services" (api/utilisateurs, api/vehicules, register...)
+// qui sont toutes servies par cette API unique. On les réécrit vers les routes réelles.
+$app->add(function (Request $request, \Psr\Http\Server\RequestHandlerInterface $handler) {
+    $method = $request->getMethod();
+    $path = '/' . trim($request->getUri()->getPath(), '/');
+    $rules = [
+        ['POST',   '#^/api/utilisateurs$#',           '/add/users'],
+        ['ANY',    '#^/api/utilisateurs(/.*)?$#',     '/users$1'],
+        ['GET',    '#^/api/clients$#',                '/clients'],
+        ['POST',   '#^/api/clients$#',                '/client'],
+        ['PUT',    '#^/api/clients/(.+)$#',           '/client/$1'],
+        ['POST',   '#^/api/contrat$#',                '/modif/contrat'],
+        ['ANY',    '#^/api/contrat(/.*)?$#',          '/contrat$1'],
+        ['GET',    '#^/api/rappels$#',                '/rappels'],
+        ['POST',   '#^/api/rappels$#',                '/rappel'],
+        ['GET',    '#^/api/vehicules$#',              '/voitures'],
+        ['POST',   '#^/api/vehicules$#',              '/vehicule'],
+        ['GET',    '#^/(api/)?vehicules/(.+)$#',      '/voitures/$2'],
+        ['PUT',    '#^/api/vehicules/(.+)$#',         '/voitures/$1'],
+        ['DELETE', '#^/api/vehicules/(.+)$#',         '/delete/voitures/$1'],
+        ['POST',   '#^/register$#',                   '/add/users'],
+    ];
+    foreach ($rules as [$m, $regex, $to]) {
+        if (($m === 'ANY' || $m === $method) && preg_match($regex, $path)) {
+            $new = preg_replace($regex, $to, $path);
+            $request = $request->withUri($request->getUri()->withPath($new));
+            break;
+        }
+    }
+    return $handler->handle($request);
+});
+$errorMiddleware = $app->addErrorMiddleware((bool) getenv('API_DEBUG'), true, true);
+$errorMiddleware->setDefaultErrorHandler(function ($request, Throwable $e) use ($app) {
+    $status = $e instanceof \Slim\Exception\HttpException ? $e->getCode() : 500;
+    $response = $app->getResponseFactory()->createResponse($status);
+    $response->getBody()->write(json_encode(['error' => $status === 500 ? 'Erreur serveur' : $e->getMessage()]));
+    return $response->withHeader('Content-Type', 'application/json');
+});
 
 
 
@@ -95,82 +136,6 @@ $app->get('/voitures/{numSerie}', function (Request $request, Response $response
     return $response->withHeader('Content-Type', 'application/json');
 });
 
-// POST : Ajouter un véhicule
-$app->post('/vehicule', function (Request $request, Response $response, $args) use ($conn) {
-
-    $data = $request->getParsedBody();
-
-    if (empty($data['NumSerie'])) {
-        $response->getBody()->write(json_encode([
-            'error' => 'Le champ NumSerie est obligatoire.'
-        ]));
-        return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
-    }
-
-    $sql = "INSERT INTO Vehicule (
-                NumSerie, Energie, NbPlaces, Categorie, Transmission, Boite, Etat, 
-                Puissance, DateAchat, DateExpirationControleTech, DateDernierControleTech, 
-                Marque, Nom, Annee, IdAssureur, IdFournisseur, ImagePath, Couleur, Prix
-            ) VALUES (
-                :numSerie, :energie, :nbPlaces, :categorie, :transmission, :boite, :etat, 
-                :puissance, :dateAchat, :dateExpiration, :dateDernierControle, 
-                :marque, :nom, :annee, :idAssureur, :idFournisseur, :imagePath, :couleur, :prix
-            )";
-
-    $params = [
-        ':numSerie' => [$data['NumSerie'], \PDO::PARAM_STR],
-        ':energie' => [$data['Energie'], \PDO::PARAM_STR],
-        ':nbPlaces' => [$data['NbPlaces'], \PDO::PARAM_STR],
-        ':categorie' => [$data['Categorie'], \PDO::PARAM_STR],
-
-        ':transmission' => [$data['Transmission'] ?? 'Traction', \PDO::PARAM_STR],
-        ':boite' => [$data['Boite'] ?? 'Manuelle', \PDO::PARAM_STR],
-        ':etat' => [$data['Etat'] ?? 'Libre', \PDO::PARAM_STR],
-
-        ':puissance' => [$data['Puissance'], \PDO::PARAM_STR],
-        ':dateAchat' => [$data['DateAchat'], \PDO::PARAM_STR],
-        ':dateExpiration' => [$data['DateExpirationControleTech'], \PDO::PARAM_STR],
-        ':dateDernierControle' => [$data['DateDernierControleTech'], \PDO::PARAM_STR],
-
-        ':marque' => [$data['Marque'], \PDO::PARAM_STR],
-        ':nom' => [$data['Nom'], \PDO::PARAM_STR],
-        ':annee' => [$data['Annee'], \PDO::PARAM_STR],
-        ':idAssureur' => [$data['IdAssureur'], \PDO::PARAM_INT],
-        ':idFournisseur' => [$data['IdFournisseur'], \PDO::PARAM_INT],
-
-        ':imagePath' => [$data['ImagePath'] ?? '', \PDO::PARAM_STR],
-
-        ':couleur' => [$data['Couleur'] ?? null, \PDO::PARAM_STR],
-        ':prix' => [$data['Prix'] ?? null, \PDO::PARAM_STR]
-    ];
-
-    try {
-        $conn->executeQuery($sql, $params);
-
-        $response->getBody()->write(json_encode([
-            'message' => 'Véhicule ajouté avec succès',
-            'NumSerie' => $data['NumSerie']
-        ]));
-
-        return $response->withHeader('Content-Type', 'application/json')->withStatus(201);
-
-    } catch (\Exception $e) {
-        $errorCode = $e->getCode();
-        $status = 500;
-        $message = 'Erreur lors de l\'ajout du véhicule : ' . $e->getMessage();
-
-        if (strpos($e->getMessage(), 'Duplicate entry') !== false) {
-            $status = 409; // Conflict
-            $message = 'Un véhicule avec ce Numéro de Série existe déjà.';
-        }
-
-        $response->getBody()->write(json_encode([
-            'error' => $message
-        ]));
-        return $response->withHeader('Content-Type', 'application/json')->withStatus($status);
-    }
-});
-
 // PUT : Modification d'un véhicule
 $app->put('/voitures/{numSerie}', function (Request $request, Response $response, $args) use ($conn) {
     $numSerie = (string) $args['numSerie'];
@@ -183,44 +148,44 @@ $app->put('/voitures/{numSerie}', function (Request $request, Response $response
     }
 
     $sql = "UPDATE Vehicule SET 
-            Nom = :nom, 
-            Marque = :marque, 
-            Annee = :annee,
-            Energie = :energie, 
-            NbPlaces = :nbPlaces, 
-            Categorie = :categorie, 
-            Transmission = :transmission, 
-            Boite = :boite, 
-            Puissance = :puissance, 
-            Etat = :etat, 
-            Prix = :prix,
-            DateAchat = :dateAchat,
-            DateDernierControleTech = :dateDernierControle,
-            DateExpirationControleTech = :dateExpirationControle,
-            Couleur = :couleur,
-            ImagePath = :imagePath,
-            IdAssureur = :idAssureur,
-            IdFournisseur = :idFournisseur
+            Nom = COALESCE(:nom, Nom), 
+            Marque = COALESCE(:marque, Marque), 
+            Annee = COALESCE(:annee, Annee),
+            Energie = COALESCE(:energie, Energie), 
+            NbPlaces = COALESCE(:nbPlaces, NbPlaces), 
+            Categorie = COALESCE(:categorie, Categorie), 
+            Transmission = COALESCE(:transmission, Transmission), 
+            Boite = COALESCE(:boite, Boite), 
+            Puissance = COALESCE(:puissance, Puissance), 
+            Etat = COALESCE(:etat, Etat), 
+            Prix = COALESCE(:prix, Prix),
+            DateAchat = COALESCE(:dateAchat, DateAchat),
+            DateDernierControleTech = COALESCE(:dateDernierControle, DateDernierControleTech),
+            DateExpirationControleTech = COALESCE(:dateExpirationControle, DateExpirationControleTech),
+            Couleur = COALESCE(:couleur, Couleur),
+            ImagePath = COALESCE(:imagePath, ImagePath),
+            IdAssureur = COALESCE(:idAssureur, IdAssureur),
+            IdFournisseur = COALESCE(:idFournisseur, IdFournisseur)
         WHERE NumSerie = :numSerie";
     $params = [
         ':nom' => [$data['Nom'] ?? null, \PDO::PARAM_STR],
         ':marque' => [$data['Marque'] ?? null, \PDO::PARAM_STR],
         ':annee' => [$data['Annee'] ?? null, \PDO::PARAM_INT],
         ':energie' => [$data['Energie'] ?? null, \PDO::PARAM_STR],
-        ':nbPlaces' => [$data['NbPlaces'] ?? 0, \PDO::PARAM_INT],
+        ':nbPlaces' => [$data['NbPlaces'] ?? null, \PDO::PARAM_INT],
         ':categorie' => [$data['Categorie'] ?? null, \PDO::PARAM_STR],
         ':transmission' => [$data['Transmission'] ?? null, \PDO::PARAM_STR],
         ':boite' => [$data['Boite'] ?? null, \PDO::PARAM_STR],
         ':puissance' => [$data['Puissance'] ?? null, \PDO::PARAM_STR],
         ':etat' => [$data['Etat'] ?? null, \PDO::PARAM_STR],
-        ':prix' => [$data['Prix'] ?? 0, \PDO::PARAM_STR],
+        ':prix' => [$data['Prix'] ?? null, \PDO::PARAM_STR],
         ':dateAchat' => [$data['DateAchat'] ?? null, \PDO::PARAM_STR],
         ':dateDernierControle' => [$data['DateDernierControleTech'] ?? null, \PDO::PARAM_STR],
         ':dateExpirationControle' => [$data['DateExpirationControleTech'] ?? null, \PDO::PARAM_STR],
         ':couleur' => [$data['Couleur'] ?? null, \PDO::PARAM_STR],
         ':imagePath' => [$data['ImagePath'] ?? null, \PDO::PARAM_STR],
-        ':idAssureur' => [$data['IdAssureur'] ?? 0, \PDO::PARAM_INT],
-        ':idFournisseur' => [$data['IdFournisseur'] ?? 0, \PDO::PARAM_INT],
+        ':idAssureur' => [$data['IdAssureur'] ?? null, \PDO::PARAM_INT],
+        ':idFournisseur' => [$data['IdFournisseur'] ?? null, \PDO::PARAM_INT],
         ':numSerie' => [$numSerie, \PDO::PARAM_STR]
     ];
 
@@ -283,7 +248,7 @@ $app->delete('/delete/voitures/{numSerie}', function ($request, $response, $args
 });
 
 // POST : Ajouter un véhicule
-$app->post('/add/vehicule', function (Request $request, Response $response, $args) use ($conn) {
+$addVehicule = function (Request $request, Response $response, $args) use ($conn) {
 
     $data = $request->getParsedBody();
 
@@ -356,7 +321,9 @@ $app->post('/add/vehicule', function (Request $request, Response $response, $arg
         ]));
         return $response->withHeader('Content-Type', 'application/json')->withStatus($status);
     }
-});
+};
+$app->post('/vehicule', $addVehicule);
+$app->post('/add/vehicule', $addVehicule);
 
 // -----------------------------------------------------------------------
 // SECTION : CLIENTS
@@ -716,7 +683,7 @@ $app->patch('/contrat/{id}', function (Request $request, Response $response, $ar
 // GET : Liste des utilisateurs par role (optionnel)
 $app->get('/users', function (Request $request, Response $response, $args) use ($conn) {
 
-    $conn->executeQuery("SELECT * FROM users");
+    $conn->executeQuery("SELECT id, username, role FROM Users");
 
     $users = $conn->getResults();
 
@@ -740,7 +707,7 @@ $app->delete('/users/{id}', function (Request $request, Response $response, arra
 
     // 2️⃣ Vérifier si l'utilisateur existe
     $conn->executeQuery(
-        "SELECT id FROM users WHERE id = :id",
+        "SELECT id FROM Users WHERE id = :id",
         [':id' => [$id, \PDO::PARAM_INT]]
     );
 
@@ -756,7 +723,7 @@ $app->delete('/users/{id}', function (Request $request, Response $response, arra
 
     // 3️⃣ Suppression
     $conn->executeQuery(
-        "DELETE FROM users WHERE id = :id",
+        "DELETE FROM Users WHERE id = :id",
         [':id' => [$id, \PDO::PARAM_INT]]
     );
 
@@ -777,6 +744,13 @@ $app->post('/add/users', function (Request $request, Response $response) use ($c
     $username = $data['username'] ?? null;
     $password = $data['password'] ?? null;
     $role = $data['role'] ?? 'client';
+    if ($role === 'user') {
+        $role = 'client'; // l'ENUM de la table Users ne connaît que admin/employe/client
+    }
+    if (!in_array($role, ['admin', 'employe', 'client'], true)) {
+        $response->getBody()->write(json_encode(['error' => 'Rôle invalide']));
+        return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
+    }
 
     if (!$username || !$password) {
         $response->getBody()->write(json_encode([
@@ -789,7 +763,7 @@ $app->post('/add/users', function (Request $request, Response $response) use ($c
 
     try {
         $conn->executeQuery(
-            "INSERT INTO users (username, password, role)
+            "INSERT INTO Users (username, password, role)
              VALUES (:username, :password, :role)",
             [
                 ':username' => [$username, \PDO::PARAM_STR],
@@ -862,7 +836,7 @@ $app->put('/users/{id}', function (Request $request, Response $response, $args) 
         return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
     }
 
-    $sql = "UPDATE users SET " . implode(', ', $fields) . " WHERE id = :id";
+    $sql = "UPDATE Users SET " . implode(', ', $fields) . " WHERE id = :id";
 
     try {
         $conn->executeQuery($sql, $params);
@@ -932,7 +906,7 @@ $app->get('/stats/contrats-prochains', function (Request $request, Response $res
 // GET : Nombre total d'utilisateurs
 $app->get('/stats/total-users', function (Request $request, Response $response, $args) use ($conn) {
 
-    $query = "SELECT COUNT(*) AS totalUsers FROM users";
+    $query = "SELECT COUNT(*) AS totalUsers FROM Users";
 
     try {
         $conn->executeQuery($query);
@@ -962,7 +936,7 @@ $app->get('/stats/voiture-plus-louee', function (Request $request, Response $res
         SELECT 
             v.Marque,
             v.Nom AS Modele,
-            v.ImagePath,
+            ANY_VALUE(v.ImagePath) AS ImagePath,
             COUNT(*) AS nb_locations
         FROM Contrat c
         JOIN Vehicule v ON c.IdVehicule = v.NumSerie
@@ -1133,7 +1107,7 @@ $app->post('/login', function (Request $request, Response $response, $args) use 
     }
 
     $conn->executeQuery(
-        "SELECT * FROM users WHERE username = :username",
+        "SELECT * FROM Users WHERE username = :username",
         [':username' => [$username, \PDO::PARAM_STR]]
     );
 
@@ -1278,9 +1252,6 @@ $app->patch('/contrat/{id}/statut', function (Request $request, Response $respon
 // LANCEMENT DE L'APPLICATION
 // -----------------------------------------------------------------------
 
-$app->addRoutingMiddleware();
-
-$errorMiddleware = $app->addErrorMiddleware(true, true, true);
 $errorMiddleware->setErrorHandler(
     Slim\Exception\HttpNotFoundException::class,
     function ($request, $exception, $displayErrorDetails) use ($app) {

@@ -64,7 +64,7 @@ class VehicleGateway {
             SELECT 
                 v.Marque,
                 v.Nom AS Modele,
-                v.ImagePath,
+                ANY_VALUE(v.ImagePath) AS ImagePath,
                 COUNT(*) AS nb_locations
             FROM Contrat c
             JOIN Vehicule v ON c.IdVehicule = v.NumSerie
@@ -119,5 +119,3 @@ public function getVehiculesControleTechniqueBientotExpire(): array
 }
 
 }
-?>
-

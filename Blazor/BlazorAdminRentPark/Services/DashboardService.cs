@@ -5,8 +5,8 @@ using System.Text.Json.Serialization;
 public class DashboardService : IDashboardService
 {
     private readonly HttpClient _http;
-    private const string BaseUrl = "http://localhost:8880/stats";
-    private const string ImagesBaseUrl = "http://localhost:9990";
+    private static readonly string BaseUrl = BlazorAdminRentPark.ApiConfig.Api + "/stats";
+    private static readonly string ImagesBaseUrl = BlazorAdminRentPark.ApiConfig.Images;
 
     public DashboardService(HttpClient http) => _http = http;
 
@@ -19,7 +19,7 @@ public class DashboardService : IDashboardService
     public async Task<int> GetMonthlyRevenuesAsync()
     {
         var response = await _http.GetFromJsonAsync<RevenueResponse>($"{BaseUrl}/revenus-mensuel");
-        return response?.monthlyIncome ?? 0;
+        return (int)Math.Round(response?.monthlyIncome ?? 0);
     }
 
     public async Task<CarDetails> GetMostRentedCarDetailsAsync()
@@ -59,7 +59,7 @@ public class CountResponse
 }
 public class RevenueResponse 
 { 
-    public int monthlyIncome { get; set; } 
+    public double monthlyIncome { get; set; } 
 }
 
 public class MostRentedCarResponse

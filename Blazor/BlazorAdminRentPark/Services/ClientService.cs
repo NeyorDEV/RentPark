@@ -16,7 +16,7 @@ namespace BlazorAdminRentPark.Services
 
         public async Task<GridItemsProviderResult<ClientModel>> GetItems(GridItemsProviderRequest<ClientModel> request)
         {
-            var items = await _http.GetFromJsonAsync<List<ClientModel>>($"http://localhost:8880/client");
+            var items = await _http.GetFromJsonAsync<List<ClientModel>>($"{BlazorAdminRentPark.ApiConfig.Api}/clients");
 
             return new GridItemsProviderResult<ClientModel>
             {

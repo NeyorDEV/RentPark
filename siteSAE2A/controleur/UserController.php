@@ -111,7 +111,8 @@ class UserController
         $username = $_POST['username'] ?? '';
         $password = $_POST['password'] ?? '';
         $confirm  = $_POST['confirm'] ?? ''; // Utilisé pour une vérification manuelle si besoin
-        $role     = $_POST['role'] ?? 'user';
+        // Inscription publique = toujours client (sinon n'importe qui pouvait se créer un compte admin)
+        $role     = 'user';
 
         // CORRECTION : L'ordre doit être (username, password, role, dVueErreur)
         Validation::val_user($username, $password, $role, $dVueErreur);
@@ -126,7 +127,7 @@ class UserController
                 'json' => [
                     'username' => $username,
                     'password' => $password,
-                    'role'     => $role
+                    'role'     => 'client'
                 ]
             ]);
 
@@ -234,6 +235,10 @@ class UserController
 
     public function afficheRecapitulatif(array $dVueErreur)
     {
+        if (empty($_POST['num_serie'])) { // le devis n'existe qu'après le formulaire de réservation
+            header('Location: /siteSAE2A/cars');
+            exit;
+        }
         $this->afficherVue('recapitulatif', $dVueErreur, null);
     }
 

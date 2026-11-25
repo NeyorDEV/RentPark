@@ -452,3 +452,4 @@ FodyWeavers.xsd
 
 # --- Configuration locale (mots de passe) ---
 siteSAE2A/config/config.local.php
+logs/

@@ -14,7 +14,7 @@ namespace BlazorAdminRentPark.Services
         }
         public async Task<GridItemsProviderResult<UserModel>> GetItems(GridItemsProviderRequest<UserModel> request)
         {
-            var items = await _http.GetFromJsonAsync<List<UserModel>>($"http://localhost:8880/users");
+            var items = await _http.GetFromJsonAsync<List<UserModel>>($"{BlazorAdminRentPark.ApiConfig.Api}/users");
 
             return new GridItemsProviderResult<UserModel>
             {
@@ -25,21 +25,21 @@ namespace BlazorAdminRentPark.Services
 
         public async Task Delete(int id)
         {
-            await _http.DeleteAsync($"http://localhost:8880/users/{id}");
+            await _http.DeleteAsync($"{BlazorAdminRentPark.ApiConfig.Api}/users/{id}");
         }
 
         public async Task Add(UserUiModel model)
         {
             var item = UserFactory.Create(model);   
 
-            await _http.PostAsJsonAsync("http://localhost:8880/add/users", item);       
+            await _http.PostAsJsonAsync($"{BlazorAdminRentPark.ApiConfig.Api}/add/users", item);       
         }
         
         public async Task<LoginResponse?> LoginAsync(string username, string password)
         {
             try
             {
-                var response = await _http.PostAsJsonAsync("http://localhost:8880/login", new { username, password });
+                var response = await _http.PostAsJsonAsync($"{BlazorAdminRentPark.ApiConfig.Api}/login", new { username, password });
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -65,7 +65,7 @@ namespace BlazorAdminRentPark.Services
                 password = model.Password // Si null ou vide, l'API PHP l'ignorera
             };
 
-            await _http.PutAsJsonAsync($"http://localhost:8880/users/{id}", data); //
+            await _http.PutAsJsonAsync($"{BlazorAdminRentPark.ApiConfig.Api}/users/{id}", data); //
         }
     }
 }

@@ -38,7 +38,7 @@ function sendAlertEmail($to, $subject, $body) {
         $mail->Port       = 587;
 
         // Paramètres de l’email
-        $mail->setFrom('ton_email@gmail.com', 'Alerte Système');
+        $mail->setFrom('rentpark88@gmail.com', 'Alerte Système');
         $mail->addAddress($to);
         $mail->isHTML(true);
         $mail->Subject = $subject;
@@ -51,18 +51,3 @@ function sendAlertEmail($to, $subject, $body) {
         echo "❌ Erreur lors de l'envoi : {$mail->ErrorInfo}";
     }
 }
-
-// ----------------------
-// Exemple d'utilisation
-// ----------------------
-
-
-if ($valeurActuelle > $limite) {
-    sendAlertEmail(
-        'alban.tixier@hotmail.com',             // à qui envoyer
-        'Limite dépassée',                   // sujet
-        "<p>Bonjour,</p><p>La valeur actuelle (<b>$valeurActuelle</b>) depasse la limite (<b>$limite</b>).</p>"
-    );
-}
-
-?> 

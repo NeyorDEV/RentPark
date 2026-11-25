@@ -122,6 +122,11 @@ class FrontControleur
                     break;
                 }
             }
+            if (!$find) {
+                header('HTTP/1.1 403 FORBIDDEN');
+                header('Location: /siteSAE2A/connection');
+                exit;
+            }
             $controleur->$action();
         }
 
@@ -130,7 +135,15 @@ class FrontControleur
     }  
     private function hasRole(string $roleUser, string $roleRequis, array $hierarchie): bool {
         // Un rôle plus à gauche dans la hiérarchie a plus de droits
-        return array_search($roleUser, $hierarchie) <= array_search($roleRequis, $hierarchie);
+        // Rôle inconnu / non connecté / 'client' => niveau le plus bas (sinon array_search renvoie false et donne tous les droits)
+        if ($roleUser === 'client') {
+            $roleUser = 'user'; // le rôle BDD "client" correspond au niveau "user"
+        }
+        $niveauUser = array_search($roleUser, $hierarchie);
+        if ($niveauUser === false) {
+            $niveauUser = count($hierarchie) - 1;
+        }
+        return $niveauUser <= array_search($roleRequis, $hierarchie);
     }
 
     private function checkRole(string $role): void {
@@ -142,5 +155,3 @@ class FrontControleur
         };
     }
 }
-?> 
-    

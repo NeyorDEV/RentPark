@@ -38,4 +38,3 @@ class Voiture {
         return "Voiture: {$this->voiture}, Modèle: {$this->modele}, Couleur: {$this->couleur}, Puissance:{$this->puissance} ";
     }
 }
-?>

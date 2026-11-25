@@ -511,7 +511,7 @@ class EmployeControleur
         $currentMonthLabel = $moisFr[$month] . " " . $year;
 
         $contracts     = $this->reservationGateway->getMonthlyPlanning();
-        $daysInMonth   = cal_days_in_month(CAL_GREGORIAN, $month, $year);
+        $daysInMonth   = (int) date('t', mktime(0, 0, 0, $month, 1, $year));
         $today         = date('Y-m-d');
         $calendar      = [];
 

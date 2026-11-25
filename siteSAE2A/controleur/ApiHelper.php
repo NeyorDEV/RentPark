@@ -2,54 +2,23 @@
 namespace controleur;
 use GuzzleHttp\Client;
 
-function getApiClient(): Client
+/**
+ * Tous les "pods" pointent vers la même API.
+ * Local : http://localhost:8880/ (défaut). Déployé : définir API_BASE_URL.
+ */
+function makeApiClient(): Client
 {
+    $base = getenv('API_BASE_URL') ?: 'http://localhost:8880/';
     return new Client([
-        'base_uri' => 'https://codefirst.iut.uca.fr/kubernetes/iut-inf63-projets-etudiants-rentpark/rentpark-api-pod/',
-        'timeout' => 30.0,
+        'base_uri' => rtrim($base, '/') . '/',
+        'timeout'  => 30.0,
     ]);
 }
 
-function getClientApiClient(): Client
-{
-    return new Client([
-        'base_uri' => 'https://codefirst.iut.uca.fr/kubernetes/iut-inf63-projets-etudiants-rentpark/rentpark-clients-pod/',
-        'timeout'  => 30.0,
-    ]);
-}
-function getAuthApiClient(): Client
-{
-    return new Client([
-        'base_uri' => 'https://codefirst.iut.uca.fr/kubernetes/iut-inf63-projets-etudiants-rentpark/rentpark-auth-pod/',
-        'timeout'  => 30.0,
-        'verify'   => false,
-    ]);
-}
-function getContratApiClient(): Client
-{
-    return new Client([
-        'base_uri' => 'https://codefirst.iut.uca.fr/kubernetes/iut-inf63-projets-etudiants-rentpark/rentpark-contrat-pod/',
-        'timeout'  => 30.0,
-    ]);
-}
-function getPlanningApiClient(): Client
-{
-    return new Client([
-        'base_uri' => 'https://codefirst.iut.uca.fr/kubernetes/iut-inf63-projets-etudiants-rentpark/rentpark-planning-pod/',
-        'timeout'  => 30.0,
-    ]);
-}
-function getRappelApiClient(): Client
-{
-    return new Client([
-        'base_uri' => 'https://codefirst.iut.uca.fr/kubernetes/iut-inf63-projets-etudiants-rentpark/rentpark-rappel-pod/',
-        'timeout'  => 30.0,
-    ]);
-}
-function getUserApiClient(): Client
-{
-    return new Client([
-        'base_uri' => 'https://codefirst.iut.uca.fr/kubernetes/iut-inf63-projets-etudiants-rentpark/rentpark-utilisateurs-pod/',
-        'timeout'  => 30.0,
-    ]);
-}
+function getApiClient(): Client { return makeApiClient(); }
+function getClientApiClient(): Client { return makeApiClient(); }
+function getAuthApiClient(): Client { return makeApiClient(); }
+function getContratApiClient(): Client { return makeApiClient(); }
+function getPlanningApiClient(): Client { return makeApiClient(); }
+function getRappelApiClient(): Client { return makeApiClient(); }
+function getUserApiClient(): Client { return makeApiClient(); }

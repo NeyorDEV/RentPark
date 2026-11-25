@@ -119,5 +119,3 @@ class UserGateway {
         $this->connection->executeQuery($query, $params);
     }
 }
-?>
-

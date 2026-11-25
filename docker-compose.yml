@@ -1,0 +1,53 @@
+# Tout lancer :  docker compose up --build
+# Seulement la base (pour start.ps1 / start.sh) :  docker compose up -d db
+services:
+  db:
+    image: mysql:8.0
+    # lower_case_table_names=1 : l'API/le site mélangent Users/users, Vehicule/vehicule...
+    command: --lower-case-table-names=1 --character-set-server=utf8mb4 --collation-server=utf8mb4_general_ci
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: dbaltixier1
+      MYSQL_USER: altixier1
+      MYSQL_PASSWORD: achanger
+    ports: ["3307:3306"]
+    volumes:
+      - dbdata:/var/lib/mysql
+      - ./BaseDeDonnees/rentpark.sql:/docker-entrypoint-initdb.d/01-rentpark.sql:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-proot"]
+      interval: 3s
+      retries: 40
+
+  api:
+    build: { context: ., dockerfile: docker/php.Dockerfile }
+    command: php -S 0.0.0.0:8880 -t Api/public
+    environment: &php-env
+      DB_HOST: db
+      DB_PORT: "3306"
+      PHP_CLI_SERVER_WORKERS: "4"
+      API_BASE_URL: http://api:8880/
+      SMTP_PASS: ${SMTP_PASS:-}
+    volumes: ["./:/app"]
+    ports: ["8880:8880"]
+    depends_on: { db: { condition: service_healthy } }
+
+  site:
+    build: { context: ., dockerfile: docker/php.Dockerfile }
+    command: php -S 0.0.0.0:9990 router.php
+    environment: *php-env
+    volumes: ["./:/app"]
+    ports: ["9990:9990"]
+    depends_on: [api]
+
+  blazor:
+    build: ./Blazor/BlazorAdminRentPark
+    environment:
+      ASPNETCORE_URLS: http://+:8080
+      API_URL: http://api:8880
+      IMAGES_URL: http://localhost:9990
+    ports: ["5019:8080"]
+    depends_on: [api]
+
+volumes:
+  dbdata:

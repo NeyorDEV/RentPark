@@ -11,9 +11,10 @@ $rep = __DIR__ . '/../';
 
 //BD
 
-$user = 'altixier1';
-$pass = 'achanger';
-$dsn = 'mysql:host=127.0.0.1;port=3307;dbname=dbaltixier1;charset=utf8';
+$user = getenv('DB_USER') ?: 'altixier1';
+$pass = getenv('DB_PASS') !== false ? getenv('DB_PASS') : 'achanger';
+$dsn = 'mysql:host=' . (getenv('DB_HOST') ?: '127.0.0.1') . ';port=' . (getenv('DB_PORT') ?: '3307')
+     . ';dbname=' . (getenv('DB_NAME') ?: 'dbaltixier1') . ';charset=utf8mb4';
 
 //Vues
 

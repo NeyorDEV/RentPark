@@ -30,6 +30,7 @@ trait RoleAwareTrait
             header('HTTP/1.1 403 FORBIDDEN');
             $dVueErreur[] = "Accès refusé : Vous avez besoin d'être connecté en tant qu'admin";
             $this->afficherVue('erreur', $dVueErreur);
+            exit; // sinon l'action protégée s'exécuterait quand même
         }
     }
 
@@ -43,6 +44,7 @@ trait RoleAwareTrait
             header('HTTP/1.1 403 FORBIDDEN');
             $dVueErreur[] = "Accès refusé : Vous avez besoin d'être connecté en tant qu'employé ou admin";
             $this->afficherVue('erreur', $dVueErreur);
+            exit; // sinon l'action protégée s'exécuterait quand même
         }
     }
 
@@ -53,10 +55,11 @@ trait RoleAwareTrait
     protected function checkUser(): void
     {
         
-        if (!in_array($this->getRole(), ['admin','employe','user'])) {
+        if (!in_array($this->getRole(), ['admin','employe','user','client'])) {
             header('HTTP/1.1 403 FORBIDDEN');
             $dVueErreur[] = "Accès refusé : Vous avez besoin d'être connecté";
             $this->afficherVue('erreur', $dVueErreur);
+            exit; // sinon l'action protégée s'exécuterait quand même
         }
     }
 

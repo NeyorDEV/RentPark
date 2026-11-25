@@ -3,12 +3,8 @@
 -- Base: RentPark
 -- ====================================
 
--- Création de la base
-CREATE DATABASE IF NOT EXISTS RentPark
-CHARACTER SET utf8mb4
-COLLATE utf8mb4_general_ci;
-
-USE RentPark;
+-- La base est créée par docker-compose (MYSQL_DATABASE) ; importer ce fichier dans la base voulue.
+SET NAMES utf8mb4;
 
 -- =======================
 -- Table Assureur
@@ -29,7 +25,7 @@ INSERT INTO Assureur VALUES
 -- Table Client
 -- =======================
 CREATE TABLE Client (
-    IdClient INT(11) NOT NULL PRIMARY KEY,
+    IdClient INT(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
     Nom VARCHAR(500) NOT NULL,
     Prenom VARCHAR(500) NOT NULL,
     DateNaiss DATE NOT NULL,
@@ -109,7 +105,7 @@ CREATE TABLE Vehicule (
     IdFournisseur INT(11) NOT NULL,
     ImagePath VARCHAR(255) NOT NULL,
     Couleur VARCHAR(30) DEFAULT NULL,
-    Prix DECIMAL(5,2) DEFAULT NULL,
+    Prix DECIMAL(8,2) DEFAULT NULL,
     KEY IdAssureur (IdAssureur),
     KEY IdFournisseur (IdFournisseur),
     KEY Marque (Marque),
@@ -125,7 +121,7 @@ INSERT INTO Vehicule VALUES
 -- Table Contrat
 -- =======================
 CREATE TABLE Contrat (
-    IdContrat INT(11) NOT NULL PRIMARY KEY,
+    IdContrat INT(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
     DateDebut DATE NOT NULL,
     DateFin DATE NOT NULL,
     Statut ENUM('EnCours','Terminé','EnCoursValidation','Annulé','Validé') NOT NULL DEFAULT 'EnCoursValidation',
@@ -152,7 +148,7 @@ INSERT INTO Contrat VALUES
 -- Table EtatDesLieux
 -- =======================
 CREATE TABLE EtatDesLieux (
-    IdEtatLieu INT(11) NOT NULL PRIMARY KEY,
+    IdEtatLieu INT(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
     Collaborateur VARCHAR(100) NOT NULL,
     PhotosEtat VARCHAR(100) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -164,7 +160,7 @@ INSERT INTO EtatDesLieux VALUES
 -- Table PieceJustificatives
 -- =======================
 CREATE TABLE PieceJustificatives (
-    IdPiece INT(11) NOT NULL PRIMARY KEY,
+    IdPiece INT(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
     PhotoIdentite VARCHAR(100) NOT NULL,
     PhotoPermis VARCHAR(100) NOT NULL,
     IdContrat INT(11) DEFAULT NULL,
@@ -179,7 +175,7 @@ INSERT INTO PieceJustificatives VALUES
 -- Table Rappel
 -- =======================
 CREATE TABLE Rappel (
-    Id INT(11) NOT NULL PRIMARY KEY,
+    Id INT(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
     Titre VARCHAR(100) NOT NULL,
     Description VARCHAR(500) NOT NULL,
     Date DATE NOT NULL
@@ -192,13 +188,16 @@ INSERT INTO Rappel VALUES
 -- Table Users
 -- =======================
 CREATE TABLE Users (
-    id INT(11) NOT NULL PRIMARY KEY,
+    id INT(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
     username VARCHAR(100) NOT NULL,
     password VARCHAR(255) NOT NULL,
     role ENUM('admin','employe','client') NOT NULL,
+    client_id INT(11) DEFAULT NULL,
     UNIQUE KEY username (username)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO Users VALUES
-(1,'admin','adminpass','admin');
+INSERT INTO Users (id, username, password, role, client_id) VALUES
+(1,'admin','$2y$12$QJJD/docL9purqUXjDhmbug98nsUneDlQ8Ub1F.fkbNHHpbDUCekW','admin',NULL),
+(2,'employe','$2y$12$QHgEeZPiyGUyLt3Hr5W2reYEVEG9L7sFsGH6i0iR2k.Ue.qmqQ7Z6','employe',NULL),
+(3,'client','$2y$12$6yjlBbnkUZSRVhtCaw5im.trilqD1Ct.b.nBzOhxQajbfDBPj2nqK','client',1);
 

@@ -45,21 +45,6 @@
       </div>
 
       
-      <div class="input-group">
-        <label>Rôle</label>
-        <div class="role-options">
-          <label> 
-            <input type="radio" name="role" value="admin" required> Admin
-          </label>
-          <label>
-            <input type="radio" name="role" value="employe"> Employé
-          </label>
-          <label>
-            <input type="radio" name="role" value="user" required> Client
-          </label>
-        </div>
-      </div>
-
       <button type="submit" name="inscription">S'inscrire</button>
 
       <?php if (!empty($dVueErreur)): ?>
